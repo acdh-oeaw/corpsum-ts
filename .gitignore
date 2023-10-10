@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# logs
+*.log
+
+# non-public environment variables
+.env.local
+.env.*.local
+
+# caches
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
+.idea/
+
+# nuxt.js
+dist
+.nuxt/
+.nitro/
+.output/
+
+# playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# references
+references/

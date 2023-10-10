@@ -1,0 +1,65 @@
+{
+	"AppFooter": {
+		"links": {
+			"imprint": "Imprint"
+		},
+		"navigation-secondary": "Secondary"
+	},
+	"AppHeader": {
+		"links": {
+			"home": "Home",
+			"corpsum": "Corpsum"
+		},
+		"navigation-main": "Main"
+	},
+	"Corpsum": {
+		"meta": {
+			"title": "Corpsum",
+			"description": ""
+		},
+		"title": "Corpsum"
+	},
+	"DefaultLayout": {
+		"meta": {
+			"title": "ACDH-CH App",
+			"description": ""
+		},
+		"skip-to-main-content": "Skip to main content"
+	},
+	"ErrorPage": {
+		"meta": {
+			"title": "Error"
+		},
+		"title": "Something went wrong!",
+		"try-again": "Try again"
+	},
+	"ImprintPage": {
+		"meta": {
+			"title": "Imprint"
+		},
+		"title": "Imprint"
+	},
+	"IndexPage": {
+		"meta": {
+			"title": "Home"
+		},
+		"title": "Home"
+	},
+	"LocaleSwitcher": {
+		"locales": {
+			"en": "English",
+			"de": "German"
+		},
+		"current-locale": "Current language: {locale}",
+		"switch-locale": "Switch to {locale}"
+	},
+	"NotFoundPage": {
+		"meta": {
+			"title": "Page not found"
+		},
+		"title": "Page not found"
+	},
+	"corpusSelection": {
+		"title": "Corpus Auswählen"
+	}
+}
