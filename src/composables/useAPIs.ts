@@ -1,8 +1,10 @@
 // https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_3.2;subcorpora=1;format=json
 
 export function useAPIs() {
-	// ToDo: add to envs
-	const BASE_URL = "https://corpsum-proxy.acdh-dev.oeaw.ac.at";
+
+	const config = useRuntimeConfig();
+
+	const BASE_URL = config.public.apiBaseUrl;
 	//const BASE_CORPUS =
 
 	// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_3.2;subcorpora=1;format=json
