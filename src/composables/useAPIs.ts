@@ -1,7 +1,6 @@
 // https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_3.2;subcorpora=1;format=json
 
 export function useAPIs() {
-
 	const config = useRuntimeConfig();
 
 	const BASE_URL = config.public.apiBaseUrl;
