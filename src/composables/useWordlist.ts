@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia";
 import { type Ref, ref } from "vue";
 
 export function useWordlist() {
-	const { SOURCES_WORDLIST_URL } = useAPIs();
+	const { WORDLIST_URL } = useAPIs();
 
 	const corporaStore = useCorporaStore();
 	const { selectedCorpus } = storeToRefs(corporaStore);
@@ -20,7 +20,8 @@ export function useWordlist() {
 		if (!selectedCorpus.value) return console.error("no corpus selected");
 		if (loading.value) return console.error("no corpus selected");
 		loading.value = true;
-		const { data: response } = await authenticatedFetch(SOURCES_WORDLIST_URL, {
+		// todo adapt to weird format everything under corpname?
+		const { data: response } = await authenticatedFetch(WORDLIST_URL, {
 			params: {
 				corpname: selectedCorpus.value.id,
 				wlmaxitems: 1000,
