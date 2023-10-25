@@ -39,6 +39,11 @@
 		},
 		"title": "Impressum"
 	},
+	"LoginPage": {
+		"meta": {
+			"title": "Login"
+		}
+	},
 	"IndexPage": {
 		"meta": {
 			"title": "Startseite"

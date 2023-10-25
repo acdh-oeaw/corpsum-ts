@@ -1,4 +1,6 @@
 // this file incoperates the actual search for the yearly frequency data
+import { type Ref } from "vue"
+
 import { useCorporaStore } from "../stores/corpora";
 
 export function useYearlyFrequenciesSearch() {
@@ -12,7 +14,7 @@ export function useYearlyFrequenciesSearch() {
 		const corpora = useCorporaStore();
 		// console.log("corpora.corporaForSearch", corpora.corporaForSearch, corpora.selectedCorpus);
 
-		const { data: freqttYear } = await authenticatedFetch(FREQUENCIES_URL, {
+		const { data: _freqttYear } = await authenticatedFetch(FREQUENCIES_URL, {
 			params: {
 				// Why The Fuck is all of this in the query?
 				// aword,[word="asdf"];corpname=amc_3.2;fttattr=doc.year;fcrit=doc.id;flimit=0;format=json
@@ -20,17 +22,18 @@ export function useYearlyFrequenciesSearch() {
 			},
 		});
 		// console.log({ freqttYear: freqttYear.value });
-
-		const yearlyData = freqttYear.value.Blocks[0].Items || [];
+		const freqttYear = _freqttYear.value as YearlyFrequencyData;
+		const yearlyData = freqttYear.Blocks[0]?.Items || [];
 		// console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items });
 		// console.log('data', query.data);
 
 		yearlyData.forEach(({ freq, Word }) => {
-			const year = Word[0].n;
+			const year = Word[0]?.n;
 			query.data.yearlyFrequencies.push({
 				year: Number(year),
 				absolute: freq,
-				relative: freq / corpusStatistics.avgYearlyFrequencies[year],
+				// @ts-ignore
+				relative: freq / corpusStatistics.avgYearlyFrequencies[Number(year)],
 			});
 		});
 		query.loading.yearlyFrequencies = false;

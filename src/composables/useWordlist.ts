@@ -1,6 +1,6 @@
 // this file incoperates the actual search for the yearly frequency data
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { type Ref, ref } from "vue";
 
 export function useWordlist() {
 	const { SOURCES_WORDLIST_URL } = useAPIs();
@@ -32,7 +32,7 @@ export function useWordlist() {
 				format: "json",
 			},
 		});
-		wordlist.value = response;
+		wordlist.value = response as unknown as Array<string>;
 		loading.value = false;
 	}
 

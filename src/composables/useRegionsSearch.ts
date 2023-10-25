@@ -34,7 +34,8 @@ export function useRegionsSearch() {
 			// },
 		});
 
-	const escapeZeroSafe = (input) => (typeof input === "number" ? input : input || null);
+	const escapeZeroSafe = (input: any) => (typeof input === "number" ? input : input || null);
+
 
 	const getRegionsFrequencies = async (query: CorpusQuery) => {
 		query.loading.regionalFrequencies = true;
@@ -43,20 +44,21 @@ export function useRegionsSearch() {
 		//const queryTermEncoded = encodeURIComponent(`aword,${queryTerm} within <doc ${metaAttr}="${metaVal}"/>`);
 		//const viewattrsxURI = `${engineAPI}viewattrsx?q=${queryTermEncoded};corpname=${selectedCorpus};${useSubCorp};attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.region;pagesize=10;newctxsize=5;async=0;format=json`;
 
-		const regions = ["aost", "awest", "amitte", "asuedost"];
+		const regions: Array<Region> = ["aost", "awest", "amitte", "asuedost"];
 
 		const regionalResponses = await Promise.all(
 			regions.map((region) => getRegionalRequestPerRegion(query, region)),
-		);
+		)
 
 		regionalResponses.forEach((response, i) => {
-			const { data: regionalData } = response;
+			const { data: _regionalData } = response;
+			const regionalData = _regionalData.value as unknown as RegionalResponseData;
 			// console.log('one step ahead', { regionalData, a: regionalData.value.fullsize });
 			const region = regions[i];
 			// console.log('region', { region, regionalData });
-			query.data.regionalFrequencies[region] = {
-				absolute: escapeZeroSafe(regionalData.value?.fullsize),
-				relative: escapeZeroSafe(regionalData.value?.relsize),
+			query.data.regionalFrequencies[region || "awest"] = {
+				absolute: escapeZeroSafe(regionalData.fullsize),
+				relative: escapeZeroSafe(regionalData.relsize),
 			};
 		});
 

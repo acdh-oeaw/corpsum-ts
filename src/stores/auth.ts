@@ -6,24 +6,27 @@ export const useAuth = defineStore(
 		const username = ref("");
 		const basicAuthToken = ref("");
 
-		function login(username: string, password: string) {
+		function login(_username: string, password: string) {
 			// todo actual login implementation
-			if (username) {
-				this.username = username;
-				this.basicAuthToken = btoa(`${username}:${password}`);
+			if (_username) {
+				username.value = _username;
+
+
+				basicAuthToken.value = btoa(`${username.value}:${password}`);
 				return true;
 			}
 			return false;
 		}
 
 		function logout() {
-			this.username = "";
-			this.basicAuthToken = "";
+			username.value = "";
+			basicAuthToken.value = "";
 		}
 
 		return { username, basicAuthToken, login, logout };
 	},
 	{ persist: true },
+	//{ persist: { storage: persistedState.localStorage }, },
 );
 
 if (import.meta.hot) {

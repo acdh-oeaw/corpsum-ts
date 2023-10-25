@@ -1,5 +1,8 @@
 type CorpusQueryType = "custom" | "lc" | "lc*" | "lemma" | "word";
 
+
+type Region = "amitte" | "aost" | "asuedost" | "awest";
+
 interface QueryData {
 	yearlyFrequencies: Array<{
 		year: number;
@@ -13,12 +16,7 @@ interface QueryData {
 		relative: number;
 	}>;
 
-	regionalFrequencies: {
-		aost: { absolute: number | null; relative: number | null };
-		awest: { absolute: number | null; relative: number | null };
-		amitte: { absolute: number | null; relative: number | null };
-		asuedost: { absolute: number | null; relative: number | null };
-	};
+	regionalFrequencies: Record<Region, { absolute: number | null; relative: number | null }>;
 
 	keywordInContext: Array<{
 		date: string;
@@ -29,7 +27,7 @@ interface QueryData {
 		right: string;
 		docid: string;
 		topic: string;
-		toknum: string;
+		toknum: number;
 	}>;
 }
 interface CorpusQuery {
@@ -46,6 +44,7 @@ interface CorpusQuery {
 		formFrequencies: boolean;
 		regionalFrequencies: boolean;
 		keywordInContext: boolean;
+		mediaSources: boolean;
 	};
 
 	data: QueryData;

@@ -38,10 +38,10 @@ export const useQuery = defineStore("query", {
 				default: // default is word search
 					finalQuery = `[word="${userInput}"]`;
 			}
-			const colorId = this.nextQueryId % colors.length; // so not to overshoot array
+			const colorId = (this.nextQueryId % colors.length) as number; // so not to overshoot array
 			const query: CorpusQuery = {
 				id: this.nextQueryId++,
-				color: colors[colorId],
+				color: colors[colorId] as string,
 				type,
 				userInput,
 				finalQuery,
@@ -58,10 +58,13 @@ export const useQuery = defineStore("query", {
 					formFrequencies: false,
 					regionalFrequencies: false,
 					keywordInContext: false,
+					mediaSources: false,
 				},
 			};
 			this.queries.push(query);
-			return this.queries.find((q) => q.id === query.id);
+			const foundQuery = this.queries.find((q) => q.id === query.id);
+			if (!foundQuery) throw new Error("could not find query")
+			return foundQuery;
 		},
 	},
 });

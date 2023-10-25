@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 definePageMeta({
-	title: "Login",
+	title: "LoginPage.meta.title",
 });
 
 const auth = useAuth();

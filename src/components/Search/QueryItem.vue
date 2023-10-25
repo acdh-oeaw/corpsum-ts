@@ -5,6 +5,7 @@ const props = defineProps<{ query: CorpusQuery }>();
 const queries = useQuery();
 
 const i = queries.queries.findIndex((q) => q.id === props.query.id);
+const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unknown as CorpusQuery;
 </script>
 
 <template>
@@ -25,7 +26,7 @@ const i = queries.queries.findIndex((q) => q.id === props.query.id);
 					<v-btn
 						density="compact"
 						icon="mdi-palette"
-						@click="queries.queries[i].showPicker = !queries.queries[i].showPicker"
+						@click="storeQuery.showPicker = !storeQuery.showPicker"
 					></v-btn>
 					<v-btn
 						density="compact"
@@ -35,12 +36,9 @@ const i = queries.queries.findIndex((q) => q.id === props.query.id);
 				</div>
 			</div>
 		</v-card-title>
-		<v-card-text v-if="queries.queries[i].showPicker">
+		<v-card-text v-if="storeQuery.showPicker">
 			<!-- <p>userInput: {{ props.query.userInput }}</p> -->
-			<v-color-picker
-				v-if="queries.queries[i].showPicker"
-				v-model="queries.queries[i].color"
-			></v-color-picker>
+			<v-color-picker v-if="storeQuery.showPicker" v-model="storeQuery.color"></v-color-picker>
 		</v-card-text>
 	</v-card>
 </template>

@@ -16,9 +16,9 @@ const CORPUS_QUERY_TYPES = [
 ];
 
 // const { getYearlyFrequencies } = useYearlyFrequenciesSearch();
-// const { getWordFormFrequencies } = useWordFormsSearch();
-// // const { getMediaSourceFrequencies } = useMediaSourceSearch();
-// const { getRegionsFrequencies } = useRegionsSearch();
+const { getWordFormFrequencies } = useWordFormsSearch();
+const { getMediaSourceFrequencies } = useMediaSourceSearch();
+const { getRegionsFrequencies } = useRegionsSearch();
 const { getKeywordInContext } = useKeywordInContextSearch();
 // getRegionsFrequencies
 async function addQuery() {
@@ -27,9 +27,9 @@ async function addQuery() {
 	newUserInput.value = "";
 
 	// await getYearlyFrequencies(addedQuery);
-	// await getWordFormFrequencies(addedQuery);
-	// // await getMediaSourceFrequencies(addedQuery);
-	// await getRegionsFrequencies(addedQuery);
+	await getWordFormFrequencies(addedQuery);
+	await getMediaSourceFrequencies(addedQuery);
+	await getRegionsFrequencies(addedQuery);
 	await getKeywordInContext(addedQuery);
 }
 

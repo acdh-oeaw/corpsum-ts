@@ -45,6 +45,11 @@
 		},
 		"title": "Home"
 	},
+	"LoginPage": {
+		"meta": {
+			"title": "Login"
+		}
+	},
 	"LocaleSwitcher": {
 		"locales": {
 			"en": "English",

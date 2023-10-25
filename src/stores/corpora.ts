@@ -1,6 +1,8 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, type Ref, ref, watch } from "vue";
 
+import { useAuthenticatedFetch } from "../composables/useAuthenticatedFetch";
+
 export const useCorporaStore = defineStore(
 	"corpora",
 	() => {
@@ -57,9 +59,7 @@ export const useCorporaStore = defineStore(
 		});
 
 		const { SUB_CORPUS_URL } = useAPIs();
-
-		const auth = useAuth();
-
+		const { authenticatedFetch } = useAuthenticatedFetch();
 		// auto-fetch subcorpora when selectedCorpus changes
 		watch(selectedCorpus, async (before, after) => {
 			if (!after || before === after) return; //console.log("no change")
@@ -68,27 +68,26 @@ export const useCorporaStore = defineStore(
 			selectedSubCorpus.value = null;
 			subCorpora.value = [];
 			if (!selectedCorpus.value) return console.error("no corpus selected");
-			const { data: _subCorpora, error } = await useFetch(SUB_CORPUS_URL, {
+			const { data: _subCorpora, error } = await authenticatedFetch(SUB_CORPUS_URL, {
 				params: {
 					corpname: selectedCorpus.value.id,
 					subcorpora: 1,
 					format: "json",
 				},
-				headers: {
-					Authorization: `Basic ${auth.basicAuthToken}`,
-				},
 			});
-			if (error.value) console.error("upsie whoopsie");
+			if (error.value) return console.error("upsie whoopsie");
 			else {
-				subCorpora.value = _subCorpora.value.subcorpora;
+				if (!_subCorpora.value) return console.error("could not feth subcorpora");
+				const subCorporaResponseData = _subCorpora.value as unknown as CorpInfoResponse;
+
+				subCorpora.value = subCorporaResponseData.subcorpora;
 				// corporaStore.selectedSubCorpus = subCorpora.value[0];
 			}
 		});
 
 		const corporaForSearch = computed(
 			() =>
-				`corpname=${selectedCorpus.value.id}${
-					selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
+				`corpname=${selectedCorpus.value?.id}${selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
 				}`,
 		);
 

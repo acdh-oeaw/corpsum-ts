@@ -8,14 +8,18 @@ export function useMediaSourceSearch() {
 	const { corpusStatistics } = useCorporaStore();
 	// const { getWordlist } = useWordlist();
 	const getMediaSourceFrequencies = async (query: CorpusQuery) => {
-		query.loading.regionalFrequencies = true;
+		// todo implement proper mapping and returning of ifos
 
-		const corpora = useCorporaStore();
-		const { data: freqtt } = await authenticatedFetch(FREQUENCIES_URL, {
-			params: {
-				q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
-			},
-		});
+		// query.loading.mediaSources = true;
+
+		// const corpora = useCorporaStore();
+		// const { data: _freqtt } = await authenticatedFetch(FREQUENCIES_URL, {
+		// 	params: {
+		// 		q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
+		// 	},
+		// });
+		// const freqtt = _freqtt.value as SourcesResponseData
+
 		// const wordlistDocsrcURI = `${engineAPI}wordlist?corpname=${selectedCorpus};wlmaxitems=1000;wlattr=doc.docsrc;wlminfreq=1;include_nonwords=1;wlsort=f;wlnums=docf;format=json`;
 
 		// console.log('getMediaSourceFrequencies', { freqtt: freqtt.value, wordlist: wordlist.value });
@@ -25,16 +29,16 @@ export function useMediaSourceSearch() {
 
 		// console.log('in regional', { wordlist: wordlist.value });
 
-		const WordformData = freqtt.value.Blocks[0].Items || [];
-		WordformData.forEach(({ freq, Word }) => {
-			query.data.wordFormFrequencies.push({
-				word: Word[0].n,
-				absolute: freq,
-				relative: freq / corpusStatistics.totalAverageFrequency,
-			});
-		});
+		// const WordformData = freqtt.Lines[0];
+		// WordformData.forEach(({ freq, Word }) => {
+		// 	query.data.wordFormFrequencies.push({
+		// 		word: Word[0].n,
+		// 		absolute: freq,
+		// 		relative: freq / corpusStatistics.totalAverageFrequency,
+		// 	});
+		// });
 
-		query.loading.regionalFrequencies = false;
+		query.loading.mediaSources = false;
 	};
 
 	return { getMediaSourceFrequencies };
