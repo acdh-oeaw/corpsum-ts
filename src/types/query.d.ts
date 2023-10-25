@@ -1,6 +1,5 @@
 type CorpusQueryType = "custom" | "lc" | "lc*" | "lemma" | "word";
 
-
 type Region = "amitte" | "aost" | "asuedost" | "awest";
 
 interface QueryData {

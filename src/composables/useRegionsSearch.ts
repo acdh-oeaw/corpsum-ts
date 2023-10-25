@@ -36,7 +36,6 @@ export function useRegionsSearch() {
 
 	const escapeZeroSafe = (input: any) => (typeof input === "number" ? input : input || null);
 
-
 	const getRegionsFrequencies = async (query: CorpusQuery) => {
 		query.loading.regionalFrequencies = true;
 
@@ -48,7 +47,7 @@ export function useRegionsSearch() {
 
 		const regionalResponses = await Promise.all(
 			regions.map((region) => getRegionalRequestPerRegion(query, region)),
-		)
+		);
 
 		regionalResponses.forEach((response, i) => {
 			const { data: _regionalData } = response;

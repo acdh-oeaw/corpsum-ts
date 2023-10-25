@@ -63,7 +63,7 @@ export const useQuery = defineStore("query", {
 			};
 			this.queries.push(query);
 			const foundQuery = this.queries.find((q) => q.id === query.id);
-			if (!foundQuery) throw new Error("could not find query")
+			if (!foundQuery) throw new Error("could not find query");
 			return foundQuery;
 		},
 	},

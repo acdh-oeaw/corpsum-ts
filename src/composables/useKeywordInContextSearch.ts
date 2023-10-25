@@ -22,7 +22,7 @@ export function useKeywordInContextSearch() {
 				q: `${query.preparedQuery};${corporaForSearch.value};viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.datum;setrefs==doc.region;setrefs==doc.ressort2;setrefs==doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`,
 			},
 		});
-		const keywordInContext = _keywordInContext.value as KeywordInContextData
+		const keywordInContext = _keywordInContext.value as KeywordInContextData;
 		// console.log('keywordInContext', { keywordInContext: keywordInContext.value });
 
 		query.data.keywordInContext = keywordInContext.Lines.map(

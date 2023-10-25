@@ -23,7 +23,6 @@ export function useAPIs() {
 	// yearly Frequencies:
 	// q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.year;fcrit=doc.id;flimit=0;format=json`,
 
-
 	// todo this is something else, prob docs, but not entirely sure yet
 	// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/collx?q=aword%2C%5Bword%3D%22arbeit%22%5D%20within%20%3Cdoc%20year%3D%222017%22%2F%3E;corpname=amc_3.2;cfromw=-5;ctow=5;cminfreq=5;cminbgr=3;cmaxitems=10;cbgrfns=d;csortfn=d;format=json
 	//const FREQUENCIES_URL = `${BASE_URL}/run.cgi/collx`
@@ -31,7 +30,6 @@ export function useAPIs() {
 	// for word forms
 	const WORD_FORMS_URL = `${BASE_URL}/run.cgi/freqs`;
 	// q: `${query.preparedQuery};${corpora.corporaForSearch};fcrit=word/e 0~0>0;flimit=0;format=json`,
-
 
 	// used for region and keywrdInContext
 	const VIEWSATTRSX_URL = `${BASE_URL}/run.cgi/viewattrsx`;
@@ -41,12 +39,10 @@ export function useAPIs() {
 	// keyword in context params:
 	// q: `${query.preparedQuery};${corporaForSearch.value};viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.datum;setrefs==doc.region;setrefs==doc.ressort2;setrefs==doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`,
 
-
 	// for keywrdInContext details for a document
 	// (not implemented yet)
 	const SOURCES_URL = `${BASE_URL}/run.cgi/structctx`;
 	// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/structctx?corpname=amc_3.2;pos=489439339;struct=doc;format=json
-
 
 	const WORDLIST_URL = `${BASE_URL}/run.cgi/wordlist`;
 	// wordlist params:
@@ -61,7 +57,6 @@ export function useAPIs() {
 	// 	wlnums: "docf",
 	// 	format: "json",
 	// },
-
 
 	return {
 		BASE_URL,

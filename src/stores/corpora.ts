@@ -3,23 +3,24 @@ import { computed, type Ref, ref, watch } from "vue";
 
 import { useAuthenticatedFetch } from "../composables/useAuthenticatedFetch";
 
-export type usedYear = 2005 |
-	2006 |
-	2007 |
-	2008 |
-	2009 |
-	2010 |
-	2012 |
-	2013 |
-	2014 |
-	2015 |
-	2016 |
-	2017 |
-	2018 |
-	2019 |
-	2020 |
-	2021 |
-	2022;
+export type usedYear =
+	| 2005
+	| 2006
+	| 2007
+	| 2008
+	| 2009
+	| 2010
+	| 2012
+	| 2013
+	| 2014
+	| 2015
+	| 2016
+	| 2017
+	| 2018
+	| 2019
+	| 2020
+	| 2021
+	| 2022;
 
 export const useCorporaStore = defineStore(
 	"corpora",
@@ -50,8 +51,6 @@ export const useCorporaStore = defineStore(
 		const selectedCorpus: Ref<Corpus | null> = ref(null);
 		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
-
-
 
 		const corpusStatistics = ref({
 			// todo fetch this data from server
@@ -107,7 +106,8 @@ export const useCorporaStore = defineStore(
 
 		const corporaForSearch = computed(
 			() =>
-				`corpname=${selectedCorpus.value?.id}${selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
+				`corpname=${selectedCorpus.value?.id}${
+					selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
 				}`,
 		);
 

@@ -11,7 +11,6 @@ export const useAuth = defineStore(
 			if (_username) {
 				username.value = _username;
 
-
 				basicAuthToken.value = btoa(`${username.value}:${password}`);
 				return true;
 			}
