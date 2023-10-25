@@ -1,7 +1,5 @@
 // this file incoperates the actual search for the yearly frequency data
-import { type Ref } from "vue"
-
-import { useCorporaStore } from "../stores/corpora";
+import { useCorporaStore, type usedYear } from "../stores/corpora";
 
 export function useYearlyFrequenciesSearch() {
 	const { FREQUENCIES_URL } = useAPIs();
@@ -32,8 +30,7 @@ export function useYearlyFrequenciesSearch() {
 			query.data.yearlyFrequencies.push({
 				year: Number(year),
 				absolute: freq,
-				// @ts-ignore
-				relative: freq / corpusStatistics.avgYearlyFrequencies[Number(year)],
+				relative: freq / corpusStatistics.avgYearlyFrequencies[Number(year) as unknown as usedYear],
 			});
 		});
 		query.loading.yearlyFrequencies = false;

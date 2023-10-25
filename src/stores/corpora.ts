@@ -3,6 +3,24 @@ import { computed, type Ref, ref, watch } from "vue";
 
 import { useAuthenticatedFetch } from "../composables/useAuthenticatedFetch";
 
+export type usedYear = 2005 |
+	2006 |
+	2007 |
+	2008 |
+	2009 |
+	2010 |
+	2012 |
+	2013 |
+	2014 |
+	2015 |
+	2016 |
+	2017 |
+	2018 |
+	2019 |
+	2020 |
+	2021 |
+	2022;
+
 export const useCorporaStore = defineStore(
 	"corpora",
 	() => {
@@ -33,6 +51,8 @@ export const useCorporaStore = defineStore(
 		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
 
+
+
 		const corpusStatistics = ref({
 			// todo fetch this data from server
 			totalAverageFrequency: 30,
@@ -55,7 +75,7 @@ export const useCorporaStore = defineStore(
 				2020: 5,
 				2021: 5,
 				2022: 5,
-			},
+			} as Record<usedYear, number>,
 		});
 
 		const { SUB_CORPUS_URL } = useAPIs();

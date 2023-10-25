@@ -1,11 +1,11 @@
 // this file incoperates the actual search for the yearly frequency data
 
 export function useMediaSourceSearch() {
-	const { FREQUENCIES_URL } = useAPIs();
+	// const { FREQUENCIES_URL } = useAPIs();
 
-	const { authenticatedFetch } = useAuthenticatedFetch();
-	// todo storeToRefs as soon this data is actually fetched
-	const { corpusStatistics } = useCorporaStore();
+	// const { authenticatedFetch } = useAuthenticatedFetch();
+	// // todo storeToRefs as soon this data is actually fetched
+	// const { corpusStatistics } = useCorporaStore();
 	// const { getWordlist } = useWordlist();
 	const getMediaSourceFrequencies = async (query: CorpusQuery) => {
 		// todo implement proper mapping and returning of ifos
