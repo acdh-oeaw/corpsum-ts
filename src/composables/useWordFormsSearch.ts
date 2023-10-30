@@ -29,6 +29,7 @@ export function useWordFormsSearch() {
 				relative: freq / corpusStatistics.totalAverageFrequency,
 			});
 		});
+		// eslint-disable-next-line require-atomic-updates
 		query.loading.formFrequencies = false;
 	};
 

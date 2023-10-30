@@ -14,7 +14,7 @@ export function useKeywordInContextSearch() {
 	const getKeywordInContext = async (query: CorpusQuery) => {
 		query.loading.keywordInContext = true;
 
-		const { data: _keywordInContext } = await authenticatedFetch(VIEWSATTRSX_URL, {
+		const { data } = await authenticatedFetch(VIEWSATTRSX_URL, {
 			params: {
 				// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/viewattrsx?q=aword%2C%5Blc%3D%22.*arbeit.*%22%5D%20within%20%3Cdoc%20region%3D%22asuedost%22%2F%3E;corpname=amc_3.2;usesubcorp=zdl2021_04;viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.region;pagesize=10;newctxsize=5;async=0;format=json
 				//const viewattrs`${engineAPI}viewattrsx?q=${queryTermEncoded};corpname=${selectedCorpus};${subCorp}viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.datum;setrefs==doc.region;setrefs==doc.ressort2;setrefs==doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`;
@@ -22,10 +22,10 @@ export function useKeywordInContextSearch() {
 				q: `${query.preparedQuery};${corporaForSearch.value};viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.datum;setrefs==doc.region;setrefs==doc.ressort2;setrefs==doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`,
 			},
 		});
-		const keywordInContext = _keywordInContext.value as KeywordInContextData;
+		const keywordInContext = data.value as KeywordInContextData;
 		// console.log('keywordInContext', { keywordInContext: keywordInContext.value });
 
-		query.data.keywordInContext = keywordInContext.Lines.map(
+		query.data.keywordInContext = keywordInContext.Lines.map( // eslint-disable-line require-atomic-updates
 			({ Tbl_refs, Left, Kwic, toknum, Right }) => ({
 				// this mapping is directly taken from the ancient code
 				date: Tbl_refs[1] ?? "",
@@ -40,7 +40,7 @@ export function useKeywordInContextSearch() {
 			}),
 		);
 
-		query.loading.keywordInContext = false;
+		query.loading.keywordInContext = false; // eslint-disable-line require-atomic-updates
 	};
 
 	return { getKeywordInContext };

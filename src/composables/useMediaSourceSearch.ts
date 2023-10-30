@@ -8,7 +8,7 @@ export function useMediaSourceSearch() {
 	// const { corpusStatistics } = useCorporaStore();
 	// const { getWordlist } = useWordlist();
 	// todo implement proper mapping and returning of ifos
-	/* tslint:disable */
+	/* eslint-disable */
 	const getMediaSourceFrequencies = async (query: CorpusQuery) => {
 
 

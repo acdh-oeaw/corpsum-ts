@@ -22,8 +22,8 @@ useSeoMeta({
 	},
 });
 
-function onReset() {
-	clearError({ redirect: localePath("/") });
+async function onReset() {
+	await clearError({ redirect: localePath("/") });
 }
 </script>
 

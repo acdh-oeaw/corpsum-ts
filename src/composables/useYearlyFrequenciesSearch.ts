@@ -33,6 +33,7 @@ export function useYearlyFrequenciesSearch() {
 				relative: freq / corpusStatistics.avgYearlyFrequencies[Number(year) as unknown as usedYear],
 			});
 		});
+		// eslint-disable-next-line require-atomic-updates
 		query.loading.yearlyFrequencies = false;
 	};
 

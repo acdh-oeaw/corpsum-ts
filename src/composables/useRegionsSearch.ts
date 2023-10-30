@@ -34,7 +34,8 @@ export function useRegionsSearch() {
 			// },
 		});
 
-	const escapeZeroSafe = (input: any) => (typeof input === "number" ? input : input || null);
+
+	const escapeZeroSafe = (input: unknown) => (typeof input === "number" ? input : null);
 
 	const getRegionsFrequencies = async (query: CorpusQuery) => {
 		query.loading.regionalFrequencies = true;
