@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const authStore = useAuth();
-authStore.$subscribe(async (_mutation, _state) => {
+authStore.$subscribe(async (_mutation, _state): void => {
 	if (authStore.username) return await navigateTo("/corpsum");
 	await navigateTo("/login");
 });
