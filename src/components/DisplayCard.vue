@@ -7,30 +7,30 @@ const expand = ref(false);
 </script>
 
 <template>
-	<v-card>
-		<v-card-item :title="props.title">
+	<VCard>
+		<VCardItem :title="props.title">
 			<template #subtitle>
 				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
 				Display Component
 			</template>
-		</v-card-item>
+		</VCardItem>
 
-		<v-card-text class="py-0">
+		<VCardText class="py-0">
 			<span>CONTENT</span>
-		</v-card-text>
+		</VCardText>
 
-		<v-expand-transition>
+		<VExpandTransition>
 			<div v-if="expand">
-				<v-data-table dense />
+				<VDataTable dense />
 			</div>
-		</v-expand-transition>
+		</VExpandTransition>
 
-		<v-divider></v-divider>
+		<VDivider></VDivider>
 
-		<v-card-actions>
-			<v-btn variant="outlined" size="small" @click="expand = !expand">
+		<VCardActions>
+			<VBtn variant="outlined" size="small" @click="expand = !expand">
 				{{ !expand ? "Show Data" : "Hide Data" }}
-			</v-btn>
-		</v-card-actions>
-	</v-card>
+			</VBtn>
+		</VCardActions>
+	</VCard>
 </template>

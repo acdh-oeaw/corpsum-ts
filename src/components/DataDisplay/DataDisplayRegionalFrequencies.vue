@@ -9,19 +9,19 @@ const expand = ref(false);
 </script>
 
 <template>
-	<v-card>
-		<v-card-item title="Regional Frequencies">
+	<VCard>
+		<VCardItem title="Regional Frequencies">
 			<template #subtitle>
 				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
 				shows absolute and relative Values.
 			</template>
-		</v-card-item>
+		</VCardItem>
 
-		<v-card-text class="py-0">
+		<VCardText class="py-0">
 			<span>Graph goes here</span>
-		</v-card-text>
+		</VCardText>
 
-		<v-expand-transition v-if="expand">
+		<VExpandTransition v-if="expand">
 			<div>
 				{{ queries.length }}
 				<div v-for="query of queries" :key="query.id">
@@ -30,17 +30,17 @@ const expand = ref(false);
 						<!-- <v-data-table :data="query.data.regionalFrequencies" dense /> -->
 						{{ query.data.regionalFrequencies }}
 					</div>
-					<v-progress-circular v-else indeterminate></v-progress-circular>
+					<VProgressCircular v-else indeterminate></VProgressCircular>
 				</div>
 			</div>
-		</v-expand-transition>
+		</VExpandTransition>
 
-		<v-divider></v-divider>
+		<VDivider></VDivider>
 
-		<v-card-actions>
-			<v-btn variant="outlined" size="small" @click="expand = !expand">
+		<VCardActions>
+			<VBtn variant="outlined" size="small" @click="expand = !expand">
 				{{ !expand ? "Show Data" : "Hide Data" }}
-			</v-btn>
-		</v-card-actions>
-	</v-card>
+			</VBtn>
+		</VCardActions>
+	</VCard>
 </template>

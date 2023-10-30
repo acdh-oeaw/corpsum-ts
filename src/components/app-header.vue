@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type NavLinkProps } from "@/components/nav-link.vue";
+import type { NavLinkProps } from "@/components/nav-link.vue";
 
 const t = useTranslations("AppHeader");
 
@@ -26,8 +26,8 @@ const links = {
 
 			<LocaleSwitcher />
 
-			<v-btn v-if="auth.username" @click="auth.logout()">Logout {{ auth.username }}</v-btn>
-			<v-btn v-else @click="navigateTo('/login')">Login</v-btn>
+			<VBtn v-if="auth.username" @click="auth.logout()">Logout {{ auth.username }}</VBtn>
+			<VBtn v-else @click="navigateTo('/login')">Login</VBtn>
 		</div>
 	</header>
 </template>

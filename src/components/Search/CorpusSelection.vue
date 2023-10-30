@@ -5,7 +5,7 @@ const corporaStore = useCorporaStore();
 
 <template>
 	<div class="flex items-center gap-1">
-		<v-select
+		<VSelect
 			v-model="corporaStore.selectedCorpus"
 			:items="corporaStore.corpora"
 			item-title="name"
@@ -13,9 +13,9 @@ const corporaStore = useCorporaStore();
 			label="Corpus"
 			placeholder="select the Corpus"
 			style="flex-grow: 0; min-width: 15rem"
-		></v-select>
+		></VSelect>
 
-		<v-autocomplete
+		<VAutocomplete
 			v-model="corporaStore.selectedSubCorpus"
 			:items="corporaStore.subCorpora"
 			item-title="n"
@@ -26,7 +26,7 @@ const corporaStore = useCorporaStore();
 			label="Sub-Corpus"
 			placeholder="select the Subcorpus or leave empty to query the whole corpus"
 			style="flex-grow: 0; min-width: 10rem"
-		></v-autocomplete>
+		></VAutocomplete>
 
 		<!-- <v-btn variant="outlined">Add Query</v-btn> -->
 	</div>

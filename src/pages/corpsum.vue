@@ -28,14 +28,14 @@ const { queries } = storeToRefs(queryStore);
 
 <template>
 	<MainContent class="container py-8">
-		<v-container>
+		<VContainer>
 			<h1>{{ t("title") }}</h1>
 			<p>This is the amazing page for the whole Corpsum application</p>
-		</v-container>
+		</VContainer>
 
 		<Search></Search>
 		<!-- <v-data-table /> -->
-		<v-container>
+		<VContainer>
 			<div class="flex flex-wrap gap-3">
 				<!-- <DisplayCard v-for="i in 2" :key="i" :title="titles[i]"></DisplayCard> -->
 
@@ -44,6 +44,6 @@ const { queries } = storeToRefs(queryStore);
 				<DataDisplayRegionalFrequencies :queries="queries"></DataDisplayRegionalFrequencies>
 				<DataDisplayKeywordInContext :queries="queries"></DataDisplayKeywordInContext>
 			</div>
-		</v-container>
+		</VContainer>
 	</MainContent>
 </template>

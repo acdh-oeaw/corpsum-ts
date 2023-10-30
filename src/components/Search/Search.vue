@@ -39,13 +39,13 @@ const _alert = (msg: string) => {
 </script>
 
 <template>
-	<v-container>
+	<VContainer>
 		<div>
-			<v-form @submit.prevent="addQuery">
+			<VForm @submit.prevent="addQuery">
 				<div class="flex items-center gap-1">
 					<CorpusSelection />
 
-					<v-select
+					<VSelect
 						v-model="newSelectedType"
 						:items="CORPUS_QUERY_TYPES"
 						item-title="description"
@@ -54,8 +54,8 @@ const _alert = (msg: string) => {
 						placeholder="select the Query type"
 						style="flex-grow: 0"
 						class="ml-4"
-					></v-select>
-					<v-text-field
+					></VSelect>
+					<VTextField
 						v-model="newUserInput"
 						placeholder="your search term"
 						vafriant="outlined"
@@ -63,13 +63,13 @@ const _alert = (msg: string) => {
 						append-inner-icon="mdi-send-circle"
 						@keydown.enter="addQuery"
 						@click:append-inner="addQuery"
-					></v-text-field>
+					></VTextField>
 					<!-- <v-btn variant="outlined">Add Query</v-btn> -->
 				</div>
-			</v-form>
+			</VForm>
 		</div>
 		<div class="mt-4 flex flex-wrap gap-4">
 			<QueryItem v-for="(q, i) of query.queries" :key="i" :query="q"></QueryItem>
 		</div>
-	</v-container>
+	</VContainer>
 </template>

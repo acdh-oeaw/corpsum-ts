@@ -14,15 +14,15 @@ function login() {
 
 <template>
 	<MainContent class="container py-8">
-		<v-form @submit.prevent="login">
-			<v-container class="flex justify-center">
+		<VForm @submit.prevent="login">
+			<VContainer class="flex justify-center">
 				<div class="flex w-full flex-col sm:w-1/2">
 					<h1>Please Login</h1>
-					<v-text-field v-model="username" placeholder="username"></v-text-field>
-					<v-text-field v-model="password" type="password" placeholder="password"></v-text-field>
-					<v-btn type="submit" block>Login</v-btn>
+					<VTextField v-model="username" placeholder="username"></VTextField>
+					<VTextField v-model="password" type="password" placeholder="password"></VTextField>
+					<VBtn type="submit" block>Login</VBtn>
 				</div>
-			</v-container>
-		</v-form>
+			</VContainer>
+		</VForm>
 	</MainContent>
 </template>

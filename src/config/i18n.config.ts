@@ -1,4 +1,4 @@
-import { type LocaleObject } from "vue-i18n-routing";
+import type { LocaleObject } from "vue-i18n-routing";
 
 import type messages from "@/messages/en.json";
 
@@ -13,4 +13,4 @@ export const defaultLocale: Locale = "en";
 
 export type Messages = typeof messages;
 
-export type Schema = { message: Messages };
+export interface Schema { message: Messages }
