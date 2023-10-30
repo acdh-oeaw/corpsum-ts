@@ -55,7 +55,7 @@ export function useRegionsSearch() {
 			// console.log('one step ahead', { regionalData, a: regionalData.value.fullsize });
 			const region = regions[i];
 			// console.log('region', { region, regionalData });
-			query.data.regionalFrequencies[region || "awest"] = {
+			query.data.regionalFrequencies[region ?? "awest"] = {
 				absolute: escapeZeroSafe(regionalData.fullsize),
 				relative: escapeZeroSafe(regionalData.relsize),
 			};

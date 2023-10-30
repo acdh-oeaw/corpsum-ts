@@ -28,14 +28,14 @@ export function useKeywordInContextSearch() {
 		query.data.keywordInContext = keywordInContext.Lines.map(
 			({ Tbl_refs, Left, Kwic, toknum, Right }) => ({
 				// this mapping is directly taken from the ancient code
-				date: Tbl_refs[1] || "",
-				source: Tbl_refs[4] || "",
-				region: Tbl_refs[2] || "",
+				date: Tbl_refs[1] ?? "",
+				source: Tbl_refs[4] ?? "",
+				region: Tbl_refs[2] ?? "",
 				left: typeof Left[0] !== "undefined" ? Left[0].str : "",
 				word: typeof Kwic[0] !== "undefined" ? Kwic[0].str : "",
 				right: typeof Right[0] !== "undefined" ? Right[0].str : "",
-				docid: Tbl_refs[0] || "",
-				topic: Tbl_refs[3] || "",
+				docid: Tbl_refs[0] ?? "",
+				topic: Tbl_refs[3] ?? "",
 				toknum,
 			}),
 		);

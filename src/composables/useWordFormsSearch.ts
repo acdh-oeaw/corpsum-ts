@@ -20,11 +20,11 @@ export function useWordFormsSearch() {
 		// console.log({ freqtWords: freqtWords.value });
 		// // console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items }););
 		const freqtWordsData = freqtWords.value as FreqsResponseData;
-		const WordformData = freqtWordsData.Blocks[0]?.Items || [];
+		const WordformData = freqtWordsData.Blocks[0]?.Items ?? [];
 
 		WordformData.forEach(({ freq, Word }) => {
 			query.data.wordFormFrequencies.push({
-				word: Word[0]?.n || "0",
+				word: Word[0]?.n ?? "0",
 				absolute: freq,
 				relative: freq / corpusStatistics.totalAverageFrequency,
 			});

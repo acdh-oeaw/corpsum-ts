@@ -21,7 +21,7 @@ export function useYearlyFrequenciesSearch() {
 		});
 		// console.log({ freqttYear: freqttYear.value });
 		const freqttYear = _freqttYear.value as YearlyFrequencyData;
-		const yearlyData = freqttYear.Blocks[0]?.Items || [];
+		const yearlyData = freqttYear.Blocks[0]?.Items ?? [];
 		// console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items });
 		// console.log('data', query.data);
 
