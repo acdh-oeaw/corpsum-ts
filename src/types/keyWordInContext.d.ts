@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface KeywordInContextData {
 	request: Request;
 	Sort_idx: Array<any>;

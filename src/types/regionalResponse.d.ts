@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface RegionalResponseData {
 	request: Request;
 	Sort_idx: Array<any>;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface CorpInfoResponse {
 	gramrels: Array<any>;
 	diachronic?: any;
