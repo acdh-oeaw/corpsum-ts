@@ -24,9 +24,8 @@ export function useKeywordInContextSearch() {
 		});
 		const keywordInContext = data.value as KeywordInContextData;
 		// console.log('keywordInContext', { keywordInContext: keywordInContext.value });
-
+		// eslint-disable-next-line require-atomic-updates
 		query.data.keywordInContext = keywordInContext.Lines.map(
-			// eslint-disable-line require-atomic-updates
 			({ Tbl_refs, Left, Kwic, toknum, Right }) => ({
 				// this mapping is directly taken from the ancient code
 				date: Tbl_refs[1] ?? "",
