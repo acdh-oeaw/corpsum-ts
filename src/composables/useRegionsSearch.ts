@@ -34,7 +34,6 @@ export function useRegionsSearch() {
 			// },
 		});
 
-
 	const escapeZeroSafe = (input: unknown) => (typeof input === "number" ? input : null);
 
 	const getRegionsFrequencies = async (query: CorpusQuery) => {
@@ -52,7 +51,7 @@ export function useRegionsSearch() {
 
 		regionalResponses.forEach((response, i) => {
 			const { data: _regionalData } = response;
-			const regionalData = _regionalData.value  as RegionalResponseData;
+			const regionalData = _regionalData.value as RegionalResponseData;
 			// console.log('one step ahead', { regionalData, a: regionalData.value.fullsize });
 			const region = regions[i];
 			// console.log('region', { region, regionalData });

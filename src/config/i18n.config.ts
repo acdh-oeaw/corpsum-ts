@@ -13,4 +13,6 @@ export const defaultLocale: Locale = "en";
 
 export type Messages = typeof messages;
 
-export interface Schema { message: Messages }
+export interface Schema {
+	message: Messages;
+}

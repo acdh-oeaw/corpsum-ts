@@ -38,7 +38,7 @@ export const useQuery = defineStore("query", {
 				default: // default is word search
 					finalQuery = `[word="${userInput}"]`;
 			}
-			const colorId = (this.nextQueryId % colors.length); // so not to overshoot array
+			const colorId = this.nextQueryId % colors.length; // so not to overshoot array
 			const query: CorpusQuery = {
 				id: this.nextQueryId++,
 				color: colors[colorId]!,

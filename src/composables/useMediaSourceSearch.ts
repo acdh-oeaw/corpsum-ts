@@ -10,8 +10,6 @@ export function useMediaSourceSearch() {
 	// todo implement proper mapping and returning of ifos
 	/* eslint-disable */
 	const getMediaSourceFrequencies = async (query: CorpusQuery) => {
-
-
 		// query.loading.mediaSources = true;
 
 		// const corpora = useCorporaStore();

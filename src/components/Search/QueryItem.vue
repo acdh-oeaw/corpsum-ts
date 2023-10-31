@@ -28,11 +28,7 @@ const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unkno
 						icon="mdi-palette"
 						@click="storeQuery.showPicker = !storeQuery.showPicker"
 					></VBtn>
-					<VBtn
-						density="compact"
-						icon="mdi-trash-can"
-						@click="queries.queries.splice(i, 1)"
-					></VBtn>
+					<VBtn density="compact" icon="mdi-trash-can" @click="queries.queries.splice(i, 1)"></VBtn>
 				</div>
 			</div>
 		</VCardTitle>
