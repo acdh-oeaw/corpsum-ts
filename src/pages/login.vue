@@ -7,8 +7,9 @@ const auth = useAuth();
 const username = ref("");
 const password = ref("");
 
-function login() {
-	if (!auth.login(username.value, password.value)) return alert("Username or Password wrong");
+async function login() {
+	if (!(await auth.login(username.value, password.value)))
+		return alert("Username or Password wrong");
 }
 </script>
 

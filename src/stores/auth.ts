@@ -1,17 +1,24 @@
 import { defineStore } from "pinia";
 
+import { useCorporaStore } from "./corpora";
+
 export const useAuth = defineStore(
 	"auth",
 	() => {
 		const username = ref("");
 		const basicAuthToken = ref("");
 
-		function login(_username: string, password: string) {
+		async function login(_username: string, password: string) {
 			// todo actual login implementation
 			if (_username) {
+				basicAuthToken.value = btoa(`${_username}:${password}`);
+				const copora = useCorporaStore();
+				const corpora = await copora.fetchCorpora();
+				if (!corpora) {
+					basicAuthToken.value = "";
+					return false;
+				}
 				username.value = _username;
-
-				basicAuthToken.value = btoa(`${username.value}:${password}`);
 				return true;
 			}
 			return false;

@@ -15,7 +15,7 @@ const CORPUS_QUERY_TYPES = [
 	{ value: "word", description: "Word Search" },
 ];
 
-// const { getYearlyFrequencies } = useYearlyFrequenciesSearch();
+const { getYearlyFrequencies } = useYearlyFrequenciesSearch();
 const { getWordFormFrequencies } = useWordFormsSearch();
 const { getMediaSourceFrequencies } = useMediaSourceSearch();
 const { getRegionsFrequencies } = useRegionsSearch();
@@ -26,7 +26,7 @@ async function addQuery() {
 	// newSelectedType.value = "word";
 	newUserInput.value = "";
 
-	// await getYearlyFrequencies(addedQuery);
+	await getYearlyFrequencies(addedQuery);
 	await getWordFormFrequencies(addedQuery);
 	await getMediaSourceFrequencies(addedQuery);
 	await getRegionsFrequencies(addedQuery);

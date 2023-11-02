@@ -23,7 +23,7 @@ export function useWordlist() {
 		// todo adapt to weird format everything under corpname?
 		const { data: response } = await authenticatedFetch(WORDLIST_URL, {
 			params: {
-				corpname: selectedCorpus.value.id,
+				corpname: selectedCorpus.value.corpname,
 				wlmaxitems: 1000,
 				wlattr: "doc.docsrc",
 				wlminfreq: 1,

@@ -5,6 +5,9 @@ export function useAPIs() {
 
 	const BASE_URL = config.public.apiBaseUrl;
 
+	// run.cgi/corpora
+	const CORPORA_LIST_URL = `${BASE_URL}/run.cgi/corpora`;
+
 	// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_3.2;subcorpora=1;format=json
 	const SUB_CORPUS_URL = `${BASE_URL}/run.cgi/corp_info`;
 	// params: {
@@ -66,5 +69,6 @@ export function useAPIs() {
 		WORDLIST_URL,
 		VIEWSATTRSX_URL,
 		SOURCES_URL,
+		CORPORA_LIST_URL,
 	};
 }

@@ -57,10 +57,3 @@ interface SubCorpus {
 	words: number;
 	n: string;
 }
-
-// structure taken from old project (hardcoded)
-interface Corpus {
-	id: string;
-	name: string;
-	description: string;
-}

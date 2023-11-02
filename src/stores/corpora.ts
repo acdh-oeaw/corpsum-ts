@@ -25,28 +25,42 @@ export type usedYear =
 export const useCorporaStore = defineStore(
 	"corpora",
 	() => {
-		const corpora: Ref<Array<Corpus>> = ref([
-			{
-				name: "Corpus: AMC 3.2",
-				id: "amc_3.2",
-				description: "The latest and full Austrian Media Corpus",
-			},
-			{
-				name: "Corpus: AMC 60M",
-				id: "amc_60M",
-				description: "A 60M token sample of Austrian Media Corpus",
-			},
-			{
-				name: "Corpus: AMC Demo",
-				id: "amc3_demo",
-				description: "A limited-size demo of Austrian Media Corpus",
-			},
-			{
-				name: "Corpus: wrdiarium02.1",
-				id: "wrdiarium02.1",
-				description: "Wienerisches Diarium 02.1",
-			},
-		]);
+		const { SUB_CORPUS_URL, CORPORA_LIST_URL } = useAPIs();
+		const { authenticatedFetch } = useAuthenticatedFetch();
+
+		const corpora: Ref<Array<Corpus>> = ref([]);
+
+		async function fetchCorpora() {
+			// console.log("in fetchCorpora", CORPORA_LIST_URL);
+			const { data } = await authenticatedFetch(CORPORA_LIST_URL, {});
+			// console.log("corpfetch ", { data: data.value, error: error.value });
+			if (!data.value) return false;
+			const corporaInfo = data.value as CorporaInfo;
+			corpora.value = corporaInfo.data;
+			return true;
+		}
+		// const corpora: Ref<Array<Corpus>> = ref([
+		// 	{
+		// 		name: "Corpus: AMC 3.2",
+		// 		id: "amc_3.2",
+		// 		description: "The latest and full Austrian Media Corpus",
+		// 	},
+		// 	{
+		// 		name: "Corpus: AMC 60M",
+		// 		id: "amc_60M",
+		// 		description: "A 60M token sample of Austrian Media Corpus",
+		// 	},
+		// 	{
+		// 		name: "Corpus: AMC Demo",
+		// 		id: "amc3_demo",
+		// 		description: "A limited-size demo of Austrian Media Corpus",
+		// 	},
+		// 	{
+		// 		name: "Corpus: wrdiarium02.1",
+		// 		id: "wrdiarium02.1",
+		// 		description: "Wienerisches Diarium 02.1",
+		// 	},
+		// ]);
 
 		const selectedCorpus: Ref<Corpus | null> = ref(null);
 		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
@@ -76,9 +90,6 @@ export const useCorporaStore = defineStore(
 				2022: 5,
 			} as Record<usedYear, number>,
 		});
-
-		const { SUB_CORPUS_URL } = useAPIs();
-		const { authenticatedFetch } = useAuthenticatedFetch();
 		// auto-fetch subcorpora when selectedCorpus changes
 		watch(selectedCorpus, async (before, after) => {
 			if (!after || before === after) return; //console.log("no change")
@@ -89,7 +100,7 @@ export const useCorporaStore = defineStore(
 			if (!selectedCorpus.value) return console.error("no corpus selected");
 			const { data: _subCorpora, error } = await authenticatedFetch(SUB_CORPUS_URL, {
 				params: {
-					corpname: selectedCorpus.value.id,
+					corpname: selectedCorpus.value.corpname,
 					subcorpora: 1,
 					format: "json",
 				},
@@ -113,6 +124,7 @@ export const useCorporaStore = defineStore(
 
 		return {
 			corpora,
+			fetchCorpora,
 			subCorpora,
 			selectedCorpus,
 			selectedSubCorpus,
