@@ -30,7 +30,8 @@
 		"test:e2e:debug": "playwright test --debug",
 		"test:e2e:ui": "playwright test --ui",
 		"types:check": "vue-tsc --noEmit",
-		"validate": "run-p format:check lint:check types:check test test:e2e",
+		"validate": "run-p format:check lint:check types:check",
+		"full-validate": "run-p format:check lint:check types:check test test:e2e",
 		"validate-without-tests": "run-p format:check lint:check types:check"
 	},
 	"dependencies": {
@@ -62,7 +63,7 @@
 		"jsdom": "^22.1.0",
 		"lint-staged": "^14.0.1",
 		"npm-run-all2": "^6.0.6",
-		"nuxt": "3.7.4",
+		"nuxt": "^3.6.5",
 		"nuxt-vitest": "^0.8.5",
 		"postcss": "^8.4.26",
 		"postcss-nesting": "^12.0.0",
