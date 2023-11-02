@@ -7,10 +7,12 @@ concurrency:
 on:
   pull_request:
     branches:
-      - main, dev
+      - main
+      - dev
   push:
     branches:
-      - main, dev
+      - main
+      - dev
 
 jobs:
   validate:
