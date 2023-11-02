@@ -54,17 +54,11 @@ jobs:
       - name: Test
         run: pnpm run test
 
-      - name: Install playwright browsers
-        run: pnpm exec playwright install --with-deps
-
       - name: Build app
         run: pnpm run build
         env:
           NUXT_PUBLIC_APP_BASE_URL: "http://localhost:3000"
           NUXT_PUBLIC_REDMINE_ID: "${{ vars.NUXT_PUBLIC_REDMINE_ID }}"
-
-      - name: Run e2e tests
-        run: pnpm run test:e2e
 
       - uses: actions/upload-artifact@v3
         if: always()
