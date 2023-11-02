@@ -15,7 +15,6 @@ COPY --chown=node:node .npmrc package.json pnpm-lock.yaml ./
 RUN pnpm fetch
 
 COPY --chown=node:node nuxt.config.ts tailwind.config.js tsconfig.json ./
-COPY --chown=node:node config ./config
 COPY --chown=node:node public ./public
 COPY --chown=node:node src ./src
 
