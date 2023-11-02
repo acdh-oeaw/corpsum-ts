@@ -86,7 +86,7 @@ devDependencies:
     specifier: ^6.0.6
     version: 6.1.1
   nuxt:
-    specifier: 3.7.4
+    specifier: ^3.6.5
     version: 3.7.4(@types/node@20.8.8)(eslint@8.52.0)(sass@1.69.4)(stylelint@15.11.0)(typescript@5.2.2)(vue-tsc@1.8.21)
   nuxt-vitest:
     specifier: ^0.8.5
