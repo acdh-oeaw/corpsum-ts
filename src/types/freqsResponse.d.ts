@@ -35,7 +35,7 @@ interface Item {
 	Word: Array<Word>;
 	fbar: number;
 	pfilter_list: Array<string>;
-	freq: number;
+	frq: number;
 	nfilter: string;
 	norel: number;
 }

@@ -25,12 +25,12 @@ export function useYearlyFrequenciesSearch() {
 		// console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items });
 		// console.log('data', query.data);
 
-		yearlyData.forEach(({ freq, Word }) => {
+		yearlyData.forEach(({ frq, rel, Word }) => {
 			const year = Word[0]?.n;
 			query.data.yearlyFrequencies.push({
 				year: Number(year),
-				absolute: freq,
-				relative: freq / corpusStatistics.avgYearlyFrequencies[Number(year) as unknown as usedYear],
+				absolute: frq,
+				relative: rel,
 			});
 		});
 		// eslint-disable-next-line require-atomic-updates

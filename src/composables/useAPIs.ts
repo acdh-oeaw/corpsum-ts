@@ -11,7 +11,7 @@ export function useAPIs() {
 	// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_3.2;subcorpora=1;format=json
 	const SUB_CORPUS_URL = `${BASE_URL}/run.cgi/corp_info`;
 	// params: {
-	// 	corpname: selectedCorpus.value.id,
+	// 	corpname: selectedCorpus.value.corpname,
 	// 	subcorpora: 1,
 	// 	format: "json",
 	// },
@@ -51,7 +51,7 @@ export function useAPIs() {
 	// wordlist params:
 	// (maybe adapt to same format as old corpsum where everything is under corpname param)
 	// params: {
-	// 	corpname: selectedCorpus.value.id,
+	// 	corpname: selectedCorpus.value.corpname,
 	// 	wlmaxitems: 1000,
 	// 	wlattr: "doc.docsrc",
 	// 	wlminfreq: 1,

@@ -19,7 +19,7 @@ export function useRegionsSearch() {
 			},
 			// params: {
 			// 	q: encodeURIComponent(`aword,${query.finalQuery} within <doc region="${region}"/>`),
-			// 	corpname: selectedCorpus.value.id,
+			// 	corpname: selectedCorpus.value.corpname,
 			// 	viewmode: "kwic",
 			// 	attrs: "word",
 			// 	ctxattrs: "word",
