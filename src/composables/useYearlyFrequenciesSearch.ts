@@ -1,10 +1,8 @@
 // this file incoperates the actual search for the yearly frequency data
-import { useCorporaStore, type usedYear } from "../stores/corpora";
+import { useCorporaStore } from "../stores/corpora";
 
 export function useYearlyFrequenciesSearch() {
 	const { FREQUENCIES_URL } = useAPIs();
-	const { corpusStatistics } = useCorporaStore();
-
 	const { authenticatedFetch } = useAuthenticatedFetch();
 	const getYearlyFrequencies = async (query: CorpusQuery) => {
 		//const q = queryStore.queries.find(q => q.id === query.id);
