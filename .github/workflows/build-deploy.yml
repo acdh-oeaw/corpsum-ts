@@ -78,7 +78,7 @@ jobs:
     secrets: inherit
     with:
       DOCKER_TAG: ${{ needs.env.outputs.registry }}/${{ needs.env.outputs.image }}
-      APP_NAME: "corpsum-${{ needs.setup_workflow_env.outputs.environment_short }}"
+      APP_NAME: "corpsum-${{ github.ref_name }}"
       APP_ROOT: "/"
       SERVICE_ID: "${{ vars.NUXT_PUBLIC_REDMINE_ID }}"
       PUBLIC_URL: "${{ vars.NUXT_PUBLIC_APP_BASE_URL }}"
