@@ -78,10 +78,10 @@ jobs:
     secrets: inherit
     with:
       DOCKER_TAG: ${{ needs.env.outputs.registry }}/${{ needs.env.outputs.image }}
-      APP_NAME: "corpsum-ts"
+      APP_NAME: "corpsum-ts-${{ github.ref_name }}"
       APP_ROOT: "/"
       SERVICE_ID: "${{ vars.NUXT_PUBLIC_REDMINE_ID }}"
-      PUBLIC_URL: "${{ vars.NUXT_PUBLIC_APP_BASE_URL }}"
+      PUBLIC_URL: "https://corpsum-ts-${{ github.ref_name }}.acdh-ch-dev.oeaw.ac.at"
       POSTGRES_ENABLED: false
       environment: ${{ needs.env.outputs.environment }}
       default_port: "3000"
