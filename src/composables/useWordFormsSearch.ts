@@ -22,11 +22,11 @@ export function useWordFormsSearch() {
 		const freqtWordsData = freqtWords.value as FreqsResponseData;
 		const WordformData = freqtWordsData.Blocks[0]?.Items ?? [];
 
-		WordformData.forEach(({ freq, Word }) => {
+		WordformData.forEach(({ frq, Word }) => {
 			query.data.wordFormFrequencies.push({
 				word: Word[0]?.n ?? "0",
-				absolute: freq,
-				relative: freq / corpusStatistics.totalAverageFrequency,
+				absolute: frq,
+				relative: frq / corpusStatistics.totalAverageFrequency,
 			});
 		});
 		// eslint-disable-next-line require-atomic-updates
