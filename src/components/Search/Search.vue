@@ -26,11 +26,13 @@ async function addQuery() {
 	// newSelectedType.value = "word";
 	newUserInput.value = "";
 
-	await getYearlyFrequencies(addedQuery);
-	await getWordFormFrequencies(addedQuery);
-	await getMediaSourceFrequencies(addedQuery);
-	await getRegionsFrequencies(addedQuery);
-	await getKeywordInContext(addedQuery);
+	await Promise.all([
+		getYearlyFrequencies(addedQuery),
+		getWordFormFrequencies(addedQuery),
+		getMediaSourceFrequencies(addedQuery),
+		getRegionsFrequencies(addedQuery),
+		getKeywordInContext(addedQuery),
+	]);
 }
 
 const _alert = (msg: string) => {
