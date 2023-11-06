@@ -14,12 +14,11 @@ const corporaStore = useCorporaStore();
 			placeholder="select the Corpus"
 			style="flex-grow: 0; min-width: 15rem"
 		></VSelect>
-
 		<VAutocomplete
 			v-model="corporaStore.selectedSubCorpus"
 			:items="corporaStore.subCorpora"
-			item-title="n"
-			item-value="n"
+			item-title="name"
+			item-value="name"
 			dese
 			return-object
 			:clearable="true"
