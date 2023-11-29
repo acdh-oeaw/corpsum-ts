@@ -1,4 +1,4 @@
-interface FreqsResponseData {
+export interface FreqsResponseData {
 	Blocks: Array<Block>;
 	wllimit: number;
 	request: Request;

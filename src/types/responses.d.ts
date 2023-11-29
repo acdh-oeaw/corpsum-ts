@@ -1,5 +1,5 @@
 interface YearlyFrequencyData {
-	Blocks: Array<Block>;
+	Blocks: Array<YearlyBlock>;
 	wllimit: number;
 	request: Request;
 	fullsize: number;
@@ -34,7 +34,7 @@ interface Request {
 	kwicleftctx: string;
 }
 
-interface Block {
+interface YearlyBlock {
 	totalfrq: number;
 	Head: Array<Head>;
 	total: number;
