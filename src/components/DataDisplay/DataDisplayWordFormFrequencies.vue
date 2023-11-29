@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { VDataTable } from "vuetify/labs/VDataTable";
 
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
