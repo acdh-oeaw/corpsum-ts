@@ -5,9 +5,10 @@ import DataDisplayKeywordInContext from "../components/DataDisplay/DataDisplayKe
 import DataDisplayRegionalFrequencies from "../components/DataDisplay/DataDisplayRegionalFrequencies.vue";
 import DataDisplayWordFormFrequencies from "../components/DataDisplay/DataDisplayWordFormFrequencies.vue";
 import { useQuery } from "../stores/query";
+import { useSearchSettingsStore } from "../stores/searchSettings";
 
-// import { VDataTable } from "vuetify/labs/VDataTable";
-
+const searchSettings = useSearchSettingsStore();
+const { selectedSearches } = storeToRefs(searchSettings);
 definePageMeta({
 	title: "Corpsum.meta.title",
 });
@@ -28,22 +29,37 @@ const { queries } = storeToRefs(queryStore);
 
 <template>
 	<MainContent class="container py-8">
-		<VContainer>
-			<h1>{{ t("title") }}</h1>
-			<p>This is the amazing page for the whole Corpsum application</p>
-		</VContainer>
+		<ClientOnly>
+			<VContainer>
+				<h1>{{ t("title") }}</h1>
+				<p>This is the amazing page for the whole Corpsum application</p>
+			</VContainer>
 
-		<Search></Search>
-		<!-- <v-data-table /> -->
-		<VContainer>
-			<div class="flex flex-wrap gap-3">
-				<!-- <DisplayCard v-for="i in 2" :key="i" :title="titles[i]"></DisplayCard> -->
+			<Search></Search>
+			<!-- <v-data-table /> -->
+			<VContainer>
+				<div class="grid grid-cols-1 gap-3">
+					<!-- <DisplayCard v-for="i in 2" :key="i" :title="titles[i]"></DisplayCard> -->
 
-				<DataDisplayYearlyFrequencies :queries="queries"></DataDisplayYearlyFrequencies>
-				<DataDisplayWordFormFrequencies :queries="queries"></DataDisplayWordFormFrequencies>
-				<DataDisplayRegionalFrequencies :queries="queries"></DataDisplayRegionalFrequencies>
-				<DataDisplayKeywordInContext :queries="queries"></DataDisplayKeywordInContext>
-			</div>
-		</VContainer>
+					<DataDisplayYearlyFrequencies
+						v-if="selectedSearches.includes('yearlyFrequencies')"
+						:queries="queries"
+					></DataDisplayYearlyFrequencies>
+					<DataDisplayWordFormFrequencies
+						v-if="selectedSearches.includes('wordFormFrequencies')"
+						:queries="queries"
+					></DataDisplayWordFormFrequencies>
+					<DataDisplayRegionalFrequencies
+						v-if="selectedSearches.includes('regionalFrequencies')"
+						:queries="queries"
+					></DataDisplayRegionalFrequencies>
+					<DataDisplayKeywordInContext
+						v-if="selectedSearches.includes('keywordInContext')"
+						:queries="queries"
+					></DataDisplayKeywordInContext>
+				</div>
+			</VContainer>
+			<Dev />
+		</ClientOnly>
 	</MainContent>
 </template>
