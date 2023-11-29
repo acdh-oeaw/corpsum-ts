@@ -3,9 +3,6 @@ import { storeToRefs } from "pinia";
 
 // const query = useQuery();
 const corporaStore = useCorporaStore();
-async function fetchCorpora() {
-	await corporaStore.fetchCorpora();
-}
 
 const { subCorporaLoading, corporaLoading } = storeToRefs(corporaStore);
 </script>

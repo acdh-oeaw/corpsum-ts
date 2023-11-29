@@ -6,9 +6,6 @@ import { useSearchSettingsStore } from "../stores/searchSettings";
 const corporaStore = useCorporaStore();
 const { corpora, selectedCorpus, tracker } = storeToRefs(corporaStore);
 
-const testStore = useTestStoreStore();
-const { niceArray } = storeToRefs(testStore);
-
 const query = useQuery();
 const { queries, nextQueryId } = storeToRefs(query);
 const disabled = ref(false);

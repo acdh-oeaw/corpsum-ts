@@ -6,7 +6,7 @@ import { useCorporaStore } from "../stores/corpora";
 export function useRegionsSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
 	const corporaStore = useCorporaStore();
-	const { corporaForSearch, selectedCorpus } = storeToRefs(corporaStore);
+	const { selectedCorpus } = storeToRefs(corporaStore);
 	// const queryStore = useQuery();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();

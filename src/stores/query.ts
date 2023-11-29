@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { computed, type Ref, ref, watch } from "vue";
+import { type Ref, ref } from "vue";
 
 export const useQuery = defineStore(
 	"query",
@@ -28,7 +28,7 @@ export const useQuery = defineStore(
 				default: // default is word search
 					finalQuery = `[word="${userInput}"]`;
 			}
-			const colorId = this.nextQueryId % colors.length; // so not to overshoot array
+			const colorId = nextQueryId.value % colors.length; // so not to overshoot array
 			const query: CorpusQuery = {
 				id: nextQueryId.value++,
 				color: colors[colorId]!,

@@ -34,9 +34,9 @@ export const useCorporaStore = defineStore(
 		const tracker = ref(0);
 		async function fetchCorpora() {
 			corporaLoading.value = true;
-			console.log("in fetchCorpora", CORPORA_LIST_URL);
-			const { data, error } = await authenticatedFetch(CORPORA_LIST_URL, {});
-			console.log("corpfetch ", { data: data.value, error: error.value });
+			// console.log("in fetchCorpora", CORPORA_LIST_URL);
+			const { data } = await authenticatedFetch(CORPORA_LIST_URL, {});
+			// console.log("corpfetch ", { data: data.value, error: error.value });
 			corporaLoading.value = false;
 
 			if (!data.value) return false;
@@ -46,7 +46,7 @@ export const useCorporaStore = defineStore(
 			// corpora.value.push(corporaInfo.data[0]);
 			// corpora.value = [...corporaInfo.data];
 
-			console.log({ corpval: corpora.value });
+			// console.log({ corpval: corpora.value });
 			tracker.value++;
 			return true;
 		}
@@ -58,7 +58,7 @@ export const useCorporaStore = defineStore(
 		// auto-fetch subcorpora when selectedCorpus changes
 		watch(selectedCorpus, async (before, after) => {
 			if (!after || before?.name === after.name) return; //console.log("no change")
-			console.log({ selectedCorpus, before, after, isSame: before?.name === after.name });
+			// console.log({ selectedCorpus, before, after, isSame: before?.name === after.name });
 			subCorporaLoading.value = true;
 			// console.log({ before: before, after });
 			// console.log("corporaStore.selectedCorpus changed");
@@ -86,8 +86,7 @@ export const useCorporaStore = defineStore(
 
 		const corporaForSearch = computed(
 			() =>
-				`corpname=${selectedCorpus.value?.corpname}${
-					selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
+				`corpname=${selectedCorpus.value?.corpname}${selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
 				}`,
 		);
 

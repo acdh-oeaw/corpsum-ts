@@ -1,1 +1,2 @@
-export default defineNuxtPlugin((nuxtApp) => {});
+// eslint-disable-next-line
+export default defineNuxtPlugin((nuxtApp) => { });

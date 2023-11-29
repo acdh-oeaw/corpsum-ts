@@ -17,9 +17,6 @@ const CORPUS_QUERY_TYPES = [
 	{ value: "word", description: "Word Search" },
 ];
 
-const corporaStore = useCorporaStore();
-
-const { selectedCorpus } = storeToRefs(corporaStore);
 const searchSettings = useSearchSettingsStore();
 // getRegionsFrequencies
 async function addQuery() {

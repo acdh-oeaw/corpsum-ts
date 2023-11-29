@@ -21,10 +21,15 @@ export const useSearchSettingsStore = defineStore(
 		]);
 
 		const searchFunctions: Record<SearchFunctionKey, (query: CorpusQuery) => void> = {
+			// eslint-disable-next-line
 			yearlyFrequencies: getYearlyFrequencies,
+			// eslint-disable-next-line
 			wordFormFrequencies: getWordFormFrequencies,
+			// eslint-disable-next-line
 			regionalFrequencies: getRegionsFrequencies,
+			// eslint-disable-next-line
 			keywordInContext: getKeywordInContext,
+			// eslint-disable-next-line
 			mediaSources: getMediaSourceFrequencies,
 		};
 
@@ -37,8 +42,9 @@ export const useSearchSettingsStore = defineStore(
 		]);
 
 		async function doSearches(query: CorpusQuery) {
-			console.log({ selsearchVal: selectedSearches.value });
+			// console.log({ selsearchVal: selectedSearches.value });
 
+			// eslint-disable-next-line
 			return await Promise.all(selectedSearches.value.map((a) => searchFunctions[a](query)));
 		}
 
@@ -47,11 +53,13 @@ export const useSearchSettingsStore = defineStore(
 
 		// run undone queries on change of dimensions
 		watch(selectedSearches, async (before, after) => {
-			console.log({ selectedSearches, before, after, isSame: before === after });
+			// console.log({ selectedSearches, before, after, isSame: before === after });
+			// eslint-disable-next-line
 			if (!after || before === after) return; //console.log("no change")
 			// find querys with undone searches // or just do all and set queries do Only do if no data
 
 			const functionsToRun = [];
+			// eslint-disable-next-line
 			if (!queriesStore.queries) return;
 			queries.value.forEach((query: CorpusQuery) => {
 				selectedSearches.value.forEach((searchKey: SearchFunctionKey) => {
