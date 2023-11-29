@@ -9,7 +9,6 @@ export const useAuth = defineStore(
 		const basicAuthToken = ref("");
 
 		async function login(_username: string, password: string) {
-			// todo actual login implementation
 			if (_username) {
 				basicAuthToken.value = btoa(`${_username}:${password}`);
 				const copora = useCorporaStore();
