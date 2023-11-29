@@ -42,6 +42,7 @@ export const useQuery = defineStore(
 					wordFormFrequencies: [],
 					regionalFrequencies: [],
 					keywordInContext: [],
+					mediaSources: [],
 				},
 				loading: {
 					yearlyFrequencies: false,

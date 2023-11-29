@@ -20,6 +20,12 @@ interface QueryData {
 		relative: number;
 	}>;
 
+	mediaSources: Array<{
+		media: string;
+		absolute: number;
+		relative: number;
+	}>;
+
 	wordFormFrequencies: Array<{
 		word: string;
 		absolute: number;

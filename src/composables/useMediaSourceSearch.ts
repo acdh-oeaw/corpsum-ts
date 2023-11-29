@@ -1,42 +1,60 @@
 // this file incoperates the actual search for the yearly frequency data
 
-export function useMediaSourceSearch() {
-	// const { FREQUENCIES_URL } = useAPIs();
+import { storeToRefs } from "pinia";
 
-	// const { authenticatedFetch } = useAuthenticatedFetch();
+export function useMediaSourceSearch() {
+	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
+
+	const { authenticatedFetch } = useAuthenticatedFetch();
+
 	// // todo storeToRefs as soon this data is actually fetched
 	// const { corpusStatistics } = useCorporaStore();
 	// const { getWordlist } = useWordlist();
 	// todo implement proper mapping and returning of ifos
 	/* eslint-disable */
 	const getMediaSourceFrequencies = async (query: CorpusQuery) => {
+		// doc.docsrc
 		// query.loading.mediaSources = true;
+		query.loading.mediaSources = true;
 
-		// const corpora = useCorporaStore();
-		// const { data: _freqtt } = await authenticatedFetch(FREQUENCIES_URL, {
-		// 	params: {
-		// 		q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
-		// 	},
-		// });
-		// const freqtt = _freqtt.value as SourcesResponseData
+		const corpora = useCorporaStore();
+		const { selectedCorpus } = storeToRefs(corpora);
+		const { data: mediaSources } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
+			params: {
+				// todo Subcorpus
+				corpname: selectedCorpus.value?.corpname,
+				format: "json",
+				fmaxitems: 5000,
+				fpage: 1,
+				freq_sort: "freq",
+				group: 0,
+				showpoc: 1,
+				showreltt: 1,
+				showrel: 1,
+				freqlevel: 1,
+				ml1attr: "doc.docsrc",
+				ml1ctx: "0~0 > 0",
+				json: { "concordance_query": [{ "queryselector": "iqueryrow", iquery: query.userInput }] }
+				//q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
+			},
+		});
+		if (!mediaSources?.value) {
+			query.loading.mediaSources = false;
+			return console.error('error on MediaSources');
+		}
+		const mediaSourceData = mediaSources.value as FreqMLDocsRC
 
-		// const wordlistDocsrcURI = `${engineAPI}wordlist?corpname=${selectedCorpus};wlmaxitems=1000;wlattr=doc.docsrc;wlminfreq=1;include_nonwords=1;wlsort=f;wlnums=docf;format=json`;
+		console.log({ mediaSourceData, blocks: mediaSourceData.Blocks, items: mediaSourceData.Blocks[0].Items });
 
-		// console.log('getMediaSourceFrequencies', { freqtt: freqtt.value, wordlist: wordlist.value });
-		// console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items }););
-
-		// const wordlist = await getWordlist();
-
-		// console.log('in regional', { wordlist: wordlist.value });
-
-		// const WordformData = freqtt.Lines[0];
-		// WordformData.forEach(({ freq, Word }) => {
-		// 	query.data.wordFormFrequencies.push({
-		// 		word: Word[0].n,
-		// 		absolute: freq,
-		// 		relative: freq / corpusStatistics.totalAverageFrequency,
-		// 	});
-		// });
+		const WordformData = mediaSourceData.Blocks[0].Items;
+		WordformData.forEach(({ frq, Word, fpm }) => {
+			query.data.mediaSources.push({
+				media: Word[0].n,
+				// todo absolute is here actually also a frequency
+				absolute: frq,
+				relative: fpm,
+			});
+		});
 
 		query.loading.mediaSources = false;
 	};

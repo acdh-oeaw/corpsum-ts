@@ -2,6 +2,7 @@
 import { storeToRefs } from "pinia";
 
 import DataDisplayKeywordInContext from "../components/DataDisplay/DataDisplayKeywordInContext.vue";
+import DataDisplayMediaSource from "../components/DataDisplay/DataDisplayMediaSource.vue";
 import DataDisplayRegionalFrequencies from "../components/DataDisplay/DataDisplayRegionalFrequencies.vue";
 import DataDisplayWordFormFrequencies from "../components/DataDisplay/DataDisplayWordFormFrequencies.vue";
 import { useQuery } from "../stores/query";
@@ -57,6 +58,11 @@ const { queries } = storeToRefs(queryStore);
 						v-if="selectedSearches.includes('keywordInContext')"
 						:queries="queries"
 					></DataDisplayKeywordInContext>
+
+					<DataDisplayMediaSource
+						v-if="selectedSearches.includes('mediaSources')"
+						:queries="queries"
+					/>
 				</div>
 			</VContainer>
 			<Dev />

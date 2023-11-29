@@ -2,10 +2,7 @@ import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
 import { type Ref, ref, watch } from "vue";
 
 type SearchFunctionKey =
-	| "keywordInContext"
-	| "regionalFrequencies"
-	| "wordFormFrequencies"
-	| "yearlyFrequencies";
+	"keywordInContext" | "mediaSources" | "regionalFrequencies" | "wordFormFrequencies" | "yearlyFrequencies";
 
 export const useSearchSettingsStore = defineStore(
 	"searchSettings",
@@ -20,20 +17,23 @@ export const useSearchSettingsStore = defineStore(
 			{ value: "wordFormFrequencies", title: "Word Form Frequencies" },
 			{ value: "regionalFrequencies", title: "Regional Frequencies" },
 			{ value: "keywordInContext", title: "Keyword in Context View" },
+			{ value: "mediaSources", title: "Media Sources" },
 		]);
 
-		const searchFunctions: Record<SearchFunctionKey, Function> = {
+		const searchFunctions: Record<SearchFunctionKey, (query: CorpusQuery) => void> = {
 			yearlyFrequencies: getYearlyFrequencies,
 			wordFormFrequencies: getWordFormFrequencies,
 			regionalFrequencies: getRegionsFrequencies,
 			keywordInContext: getKeywordInContext,
+			mediaSources: getMediaSourceFrequencies,
 		};
 
 		const selectedSearches = ref([
-			"keywordInContext",
-			"regionalFrequencies",
-			"wordFormFrequencies",
-			"yearlyFrequencies",
+			// "keywordInContext",
+			// "regionalFrequencies",
+			// "wordFormFrequencies",
+			// "yearlyFrequencies",
+			// "mediaSources"
 		]);
 
 		async function doSearches(query: CorpusQuery) {
