@@ -26,7 +26,7 @@ interface QueryData {
 		relative: number;
 	}>;
 
-	regionalFrequencies: Array<{ absolute: number | null; relative: number | null, region: Region }>;
+	regionalFrequencies: Array<{ absolute: number | null; relative: number | null; region: Region }>;
 
 	keywordInContext: Array<KeywordInContext>;
 }

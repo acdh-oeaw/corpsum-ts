@@ -3,7 +3,7 @@
 export function useAPIs() {
 	const config = useRuntimeConfig();
 
-	const BASE_URL = config.public.apiBaseUrl as string;
+	const BASE_URL = config.public.apiBaseUrl;
 
 	// run.cgi/corpora
 	const CORPORA_LIST_URL = `${BASE_URL}/run.cgi/corpora`;
@@ -69,8 +69,6 @@ export function useAPIs() {
 	wlpage: 1
 	 *
 	 */
-
-
 
 	// wordlist params:
 	// (maybe adapt to same format as old corpsum where everything is under corpname param)

@@ -1,4 +1,3 @@
-
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, type Ref, ref, watch } from "vue";
 
@@ -23,7 +22,8 @@ export type usedYear =
 	| 2021
 	| 2022;
 
-export const useCorporaStore = defineStore("corpora",
+export const useCorporaStore = defineStore(
+	"corpora",
 	() => {
 		const { SUB_CORPUS_URL, CORPORA_LIST_URL } = useAPIs();
 		const { authenticatedFetch } = useAuthenticatedFetch();
@@ -31,7 +31,7 @@ export const useCorporaStore = defineStore("corpora",
 		const corpora = ref([]) as Ref<Array<Corpus>>;
 		const corporaLoading = ref(false);
 		const subCorporaLoading = ref(false);
-		const tracker = ref(0)
+		const tracker = ref(0);
 		async function fetchCorpora() {
 			corporaLoading.value = true;
 			console.log("in fetchCorpora", CORPORA_LIST_URL);
@@ -55,11 +55,10 @@ export const useCorporaStore = defineStore("corpora",
 		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
 
-
 		// auto-fetch subcorpora when selectedCorpus changes
 		watch(selectedCorpus, async (before, after) => {
 			if (!after || before?.name === after.name) return; //console.log("no change")
-			console.log({ selectedCorpus, before, after, isSame: before?.name === after.name })
+			console.log({ selectedCorpus, before, after, isSame: before?.name === after.name });
 			subCorporaLoading.value = true;
 			// console.log({ before: before, after });
 			// console.log("corporaStore.selectedCorpus changed");
@@ -87,7 +86,8 @@ export const useCorporaStore = defineStore("corpora",
 
 		const corporaForSearch = computed(
 			() =>
-				`corpname=${selectedCorpus.value?.corpname}${selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
+				`corpname=${selectedCorpus.value?.corpname}${
+					selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
 				}`,
 		);
 
@@ -103,7 +103,7 @@ export const useCorporaStore = defineStore("corpora",
 			subCorporaLoading,
 		};
 	},
-	{ persist: { storage: persistedState.localStorage } }
+	{ persist: { storage: persistedState.localStorage } },
 );
 
 if (import.meta.hot) {

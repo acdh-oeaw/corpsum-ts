@@ -1,13 +1,11 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, type Ref, ref, watch } from "vue";
 
-
-export const useQuery = defineStore("query",
+export const useQuery = defineStore(
+	"query",
 	() => {
-
 		const nextQueryId = ref(0);
 		const queries = ref([]) as Ref<Array<CorpusQuery>>;
-
 
 		function addQuery(userInput: string, type: CorpusQueryType) {
 			let finalQuery = "";
@@ -61,7 +59,7 @@ export const useQuery = defineStore("query",
 
 		return { nextQueryId, queries, addQuery };
 	},
-	{ persist: { storage: persistedState.localStorage } }
+	{ persist: { storage: persistedState.localStorage } },
 	// { persist: true }
 );
 
