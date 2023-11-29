@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { useKeywordInContextSearch } from "../../composables/useKeywordInContextSearch";
+import { storeToRefs } from "pinia";
+
 import QueryItem from "./QueryItem.vue";
+import SearchDimensions from "./SearchDimensions.vue";
 
 const query = useQuery();
 
@@ -15,24 +17,16 @@ const CORPUS_QUERY_TYPES = [
 	{ value: "word", description: "Word Search" },
 ];
 
-const { getYearlyFrequencies } = useYearlyFrequenciesSearch();
-const { getWordFormFrequencies } = useWordFormsSearch();
-const { getMediaSourceFrequencies } = useMediaSourceSearch();
-const { getRegionsFrequencies } = useRegionsSearch();
-const { getKeywordInContext } = useKeywordInContextSearch();
+const corporaStore = useCorporaStore();
+
+const { selectedCorpus } = storeToRefs(corporaStore);
+const searchSettings = useSearchSettingsStore();
 // getRegionsFrequencies
 async function addQuery() {
 	const addedQuery = query.addQuery(newUserInput.value, newSelectedType.value);
 	// newSelectedType.value = "word";
 	newUserInput.value = "";
-
-	await Promise.all([
-		getYearlyFrequencies(addedQuery),
-		getWordFormFrequencies(addedQuery),
-		getMediaSourceFrequencies(addedQuery),
-		getRegionsFrequencies(addedQuery),
-		getKeywordInContext(addedQuery),
-	]);
+	await searchSettings.doSearches(addedQuery);
 }
 
 const _alert = (msg: string) => {
@@ -70,6 +64,7 @@ const _alert = (msg: string) => {
 				</div>
 			</VForm>
 		</div>
+		<SearchDimensions />
 		<div class="mt-4 flex flex-wrap gap-4">
 			<QueryItem v-for="(q, i) of query.queries" :key="i" :query="q"></QueryItem>
 		</div>
