@@ -1,23 +1,33 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { VDataTable } from "vuetify/labs/VDataTable";
+import type { Ref } from "vue";
+
+import KWICDetailDialog from "./KWICDetailDialog.vue";
 
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
 
 const headers = ref([
-	{ title: "date", key: "date", type: "string" },
-	{ title: "source", key: "source", type: "string" },
-	{ title: "region", key: "region", type: "string" },
+	// { title: "date", key: "date", type: "string" },
+	// { title: "source", key: "source", type: "string" },
+	// { title: "region", key: "region", type: "string" },
 	{ title: "left", key: "left", type: "string" },
 	{ title: "word", key: "word", type: "string" },
 	{ title: "right", key: "right", type: "string" },
 	{ title: "docid", key: "docid", type: "string" },
-	{ title: "topic", key: "topic", type: "string" },
+	// { title: "topic", key: "topic", type: "string" },
 	{ title: "toknum", key: "toknum", type: "string" },
+	{ title: "open", key: "open", type: "string" },
 ]);
 
 const expand = ref(false);
+
+function open(item) {
+	console.log("open", { item });
+	selectedKWIC.value = item;
+}
+
+const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 </script>
 
 <template>
@@ -29,18 +39,19 @@ const expand = ref(false);
 			</template>
 		</VCardItem>
 
-		<VCardText class="py-0">
-			<span>Graph goes here</span>
-		</VCardText>
-
 		<VExpandTransition v-if="expand">
 			<div>
-				{{ queries.length }}
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.keywordInContext">
-						<span>{{ query.finalQuery }}</span>
-						<VDataTable :headers="headers" :items="query.data.keywordInContext" dense />
-						{{ query.data.keywordInContext }}
+						<span :style="`color: ${query.color}`">
+							{{ query.finalQuery }}
+						</span>
+						<VDataTable :headers="headers" :items="query.data.keywordInContext" dense>
+							<template #item.open="{ item }">
+								<VIcon size="small" class="me-2" @click="open(item)">mdi-pencil</VIcon>
+							</template>
+						</VDataTable>
+						<KWICDetailDialog :kwic="selectedKWIC" @close="selectedKWIC = null" />
 					</div>
 					<VProgressCircular v-else indeterminate></VProgressCircular>
 				</div>

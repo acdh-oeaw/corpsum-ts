@@ -3,7 +3,7 @@
 export function useAPIs() {
 	const config = useRuntimeConfig();
 
-	const BASE_URL = config.public.apiBaseUrl;
+	const BASE_URL = config.public.apiBaseUrl as string;
 
 	// run.cgi/corpora
 	const CORPORA_LIST_URL = `${BASE_URL}/run.cgi/corpora`;
@@ -20,6 +20,7 @@ export function useAPIs() {
 	// used for yearly and for media sources
 	// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/freqtt?q=aword%2C%5Bword%3D%22arbeit%22%5D;corpname=amc_3.2;fttattr=doc.year;fcrit=doc.id;flimit=0;format=json
 	const FREQUENCIES_URL = `${BASE_URL}/run.cgi/freqtt`;
+	const FREQUENCIES_MULTI_LEVEL_URL = `${BASE_URL}/run.cgi/freqml`;
 	// media sources:
 	// q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
 
@@ -93,5 +94,6 @@ export function useAPIs() {
 		VIEWSATTRSX_URL,
 		SOURCES_URL,
 		CORPORA_LIST_URL,
+		FREQUENCIES_MULTI_LEVEL_URL,
 	};
 }
