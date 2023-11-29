@@ -39,7 +39,7 @@ const expand = ref(false);
 						<span :style="`color: ${query.color}`">
 							{{ query.finalQuery }}
 						</span>
-						<VDataTable :items="query.data.regionalFrequencies" density="compact" />
+						<VDataTable :items="query.data.mediaSources" density="compact" />
 					</div>
 					<VProgressCircular v-else indeterminate></VProgressCircular>
 				</div>
