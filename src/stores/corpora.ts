@@ -1,3 +1,4 @@
+
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, type Ref, ref, watch } from "vue";
 
@@ -22,78 +23,44 @@ export type usedYear =
 	| 2021
 	| 2022;
 
-export const useCorporaStore = defineStore(
-	"corpora",
+export const useCorporaStore = defineStore("corpora",
 	() => {
 		const { SUB_CORPUS_URL, CORPORA_LIST_URL } = useAPIs();
 		const { authenticatedFetch } = useAuthenticatedFetch();
 
-		const corpora: Ref<Array<Corpus>> = ref([]);
-
+		const corpora = ref([]) as Ref<Array<Corpus>>;
+		const corporaLoading = ref(false);
+		const subCorporaLoading = ref(false);
+		const tracker = ref(0)
 		async function fetchCorpora() {
-			// console.log("in fetchCorpora", CORPORA_LIST_URL);
-			const { data } = await authenticatedFetch(CORPORA_LIST_URL, {});
-			// console.log("corpfetch ", { data: data.value, error: error.value });
+			corporaLoading.value = true;
+			console.log("in fetchCorpora", CORPORA_LIST_URL);
+			const { data, error } = await authenticatedFetch(CORPORA_LIST_URL, {});
+			console.log("corpfetch ", { data: data.value, error: error.value });
+			corporaLoading.value = false;
+
 			if (!data.value) return false;
 			const corporaInfo = data.value as CorporaInfo;
-			corpora.value = corporaInfo.data;
+			corpora.value = [...corporaInfo.data];
+			//			corporaInfo.data.forEach(c => corpora.value.push(c));
+			// corpora.value.push(corporaInfo.data[0]);
+			// corpora.value = [...corporaInfo.data];
+
+			console.log({ corpval: corpora.value });
+			tracker.value++;
 			return true;
 		}
-		// const corpora: Ref<Array<Corpus>> = ref([
-		// 	{
-		// 		name: "Corpus: AMC 3.2",
-		// 		id: "amc_3.2",
-		// 		description: "The latest and full Austrian Media Corpus",
-		// 	},
-		// 	{
-		// 		name: "Corpus: AMC 60M",
-		// 		id: "amc_60M",
-		// 		description: "A 60M token sample of Austrian Media Corpus",
-		// 	},
-		// 	{
-		// 		name: "Corpus: AMC Demo",
-		// 		id: "amc3_demo",
-		// 		description: "A limited-size demo of Austrian Media Corpus",
-		// 	},
-		// 	{
-		// 		name: "Corpus: wrdiarium02.1",
-		// 		id: "wrdiarium02.1",
-		// 		description: "Wienerisches Diarium 02.1",
-		// 	},
-		// ]);
 
 		const selectedCorpus: Ref<Corpus | null> = ref(null);
 		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
 
-		const corpusStatistics = ref({
-			// todo fetch this data from server
-			totalAverageFrequency: 30,
-			// todo Fetch this data from the server
-			avgYearlyFrequencies: {
-				2005: 5,
-				2006: 5,
-				2007: 5,
-				2008: 5,
-				2009: 5,
-				2010: 5,
-				2012: 5,
-				2013: 5,
-				2014: 5,
-				2015: 5,
-				2016: 5,
-				2017: 5,
-				2018: 5,
-				2019: 5,
-				2020: 5,
-				2021: 5,
-				2022: 5,
-			} as Record<usedYear, number>,
-		});
+
 		// auto-fetch subcorpora when selectedCorpus changes
 		watch(selectedCorpus, async (before, after) => {
-			console.log({ selectedCorpus, before, after, isSame: before?.name === after?.name })
-			if (!after || before?.name === after?.name) return; //console.log("no change")
+			if (!after || before?.name === after.name) return; //console.log("no change")
+			console.log({ selectedCorpus, before, after, isSame: before?.name === after.name })
+			subCorporaLoading.value = true;
 			// console.log({ before: before, after });
 			// console.log("corporaStore.selectedCorpus changed");
 			selectedSubCorpus.value = null;
@@ -106,6 +73,8 @@ export const useCorporaStore = defineStore(
 					format: "json",
 				},
 			});
+			subCorporaLoading.value = false;
+
 			if (error.value) return console.error("upsie whoopsie");
 			else {
 				if (!_subCorpora.value) return console.error("could not fetch subcorpora");
@@ -128,11 +97,13 @@ export const useCorporaStore = defineStore(
 			subCorpora,
 			selectedCorpus,
 			selectedSubCorpus,
+			tracker,
 			corporaForSearch,
-			corpusStatistics,
+			corporaLoading,
+			subCorporaLoading,
 		};
 	},
-	{ persist: true },
+	{ persist: { storage: persistedState.localStorage } }
 );
 
 if (import.meta.hot) {
