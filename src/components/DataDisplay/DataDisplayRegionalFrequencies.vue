@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-// import { VDataTable } from "vuetify/labs/VDataTable";
 
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
@@ -18,17 +17,29 @@ const expand = ref(false);
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<span>Graph goes here</span>
+			<div v-for="query of queries" :key="query.id">
+				<div v-if="!query.loading.regionalFrequencies">
+					<span :style="`color: ${query.color}`">
+						{{ query.finalQuery }}
+					</span>
+					<ClientOnly>
+						<MapChart :query="query" />
+					</ClientOnly>
+				</div>
+				<VProgressCircular v-else indeterminate></VProgressCircular>
+			</div>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<div>
-				{{ queries.length }}
+			<div class="grid grid-cols-3 gap-2">
+				<!-- {{ queries.length }} -->
+				<!-- <div v-for="query of queries" :key="query.id" :style="`border: 2px solid ${query.color}`"> -->
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.regionalFrequencies">
-						<span>{{ query.finalQuery }}</span>
-						<!-- <v-data-table :data="query.data.regionalFrequencies" dense /> -->
-						{{ query.data.regionalFrequencies }}
+						<span :style="`color: ${query.color}`">
+							{{ query.finalQuery }}
+						</span>
+						<VDataTable :items="query.data.regionalFrequencies" density="compact" />
 					</div>
 					<VProgressCircular v-else indeterminate></VProgressCircular>
 				</div>

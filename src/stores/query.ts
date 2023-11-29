@@ -1,23 +1,15 @@
-import { defineStore } from "pinia";
+import { acceptHMRUpdate, defineStore } from "pinia";
+import { computed, type Ref, ref, watch } from "vue";
 
-const getEmptyRegionalFrequencyData = () => ({
-	aost: { absolute: null, relative: null },
-	awest: { absolute: null, relative: null },
-	amitte: { absolute: null, relative: null },
-	asuedost: { absolute: null, relative: null },
-});
 
-export const useQuery = defineStore("query", {
-	persist: true,
-	state: () => ({
-		nextQueryId: 0,
-		queries: [] as Array<CorpusQuery>,
-	}),
+export const useQuery = defineStore("query",
+	() => {
 
-	getters: {},
+		const nextQueryId = ref(0);
+		const queries = ref([]) as Ref<Array<CorpusQuery>>;
 
-	actions: {
-		addQuery(userInput: string, type: CorpusQueryType) {
+
+		function addQuery(userInput: string, type: CorpusQueryType) {
 			let finalQuery = "";
 			switch (type) {
 				case "word":
@@ -40,7 +32,7 @@ export const useQuery = defineStore("query", {
 			}
 			const colorId = this.nextQueryId % colors.length; // so not to overshoot array
 			const query: CorpusQuery = {
-				id: this.nextQueryId++,
+				id: nextQueryId.value++,
 				color: colors[colorId]!,
 				type,
 				userInput,
@@ -50,7 +42,7 @@ export const useQuery = defineStore("query", {
 				data: {
 					yearlyFrequencies: [],
 					wordFormFrequencies: [],
-					regionalFrequencies: getEmptyRegionalFrequencyData(),
+					regionalFrequencies: [],
 					keywordInContext: [],
 				},
 				loading: {
@@ -61,13 +53,17 @@ export const useQuery = defineStore("query", {
 					mediaSources: false,
 				},
 			};
-			this.queries.push(query);
-			const foundQuery = this.queries.find((q) => q.id === query.id);
+			queries.value.push(query);
+			const foundQuery = queries.value.find((q) => q.id === query.id);
 			if (!foundQuery) throw new Error("could not find query");
 			return foundQuery;
-		},
+		}
+
+		return { nextQueryId, queries, addQuery };
 	},
-});
+	{ persist: { storage: persistedState.localStorage } }
+	// { persist: true }
+);
 
 if (import.meta.hot) {
 	import.meta.hot.accept(acceptHMRUpdate(useQuery, import.meta.hot));
