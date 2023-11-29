@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { VDataTable } from "vuetify/labs/VDataTable";
-
 const props = defineProps<{ title: string }>();
 
 const expand = ref(false);
