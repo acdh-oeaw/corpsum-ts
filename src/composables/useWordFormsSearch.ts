@@ -22,11 +22,13 @@ export function useWordFormsSearch() {
 		const freqtWordsData = freqtWords.value as FreqsResponseData;
 		const WordformData = freqtWordsData.Blocks[0]?.Items ?? [];
 
-		WordformData.forEach(({ frq, Word }) => {
+		WordformData.forEach(({ frq, fpm, Word }) => {
 			query.data.wordFormFrequencies.push({
 				word: Word[0]?.n ?? "0",
 				absolute: frq,
-				relative: frq / corpusStatistics.totalAverageFrequency,
+				// todo use actual relative Value as provided by Api.
+				relative: fpm,
+				// relative: frq / corpusStatistics.totalAverageFrequency,
 			});
 		});
 		// eslint-disable-next-line require-atomic-updates
