@@ -27,7 +27,7 @@ export default defineNuxtConfig({
 		public: "../public",
 	},
 	imports: {
-		dirs: ["./stores"],
+		dirs: ["../stores", "./stores", "types"],
 	},
 	experimental: {
 		componentIslands: true,
@@ -39,7 +39,7 @@ export default defineNuxtConfig({
 		cookieOptions: {
 			sameSite: "strict",
 		},
-		//	storage: 'localStorage'
+		// storage: 'localStorage'
 	},
 	i18n: {
 		baseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL,
