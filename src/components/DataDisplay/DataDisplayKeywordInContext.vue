@@ -38,32 +38,28 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 				shows absolute and relative Values.
 			</template>
 		</VCardItem>
-
-		<VExpandTransition v-if="expand">
-			<div>
-				<div v-for="query of queries" :key="query.id">
-					<div v-if="!query.loading.keywordInContext">
-						<span :style="`color: ${query.color}`">
-							{{ query.finalQuery }}
-						</span>
-						<VDataTable :headers="headers" :items="query.data.keywordInContext" dense>
-							<template #item.open="{ item }">
-								<VIcon size="small" class="me-2" @click="open(item)">mdi-pencil</VIcon>
-							</template>
-						</VDataTable>
-						<KWICDetailDialog :kwic="selectedKWIC" @close="selectedKWIC = null" />
-					</div>
-					<VProgressCircular v-else indeterminate></VProgressCircular>
+		<VCardText class="py-0">
+			<div v-for="query of queries" :key="query.id">
+				<div v-if="!query.loading.keywordInContext">
+					<span :style="`color: ${query.color}`">
+						{{ query.finalQuery }}
+					</span>
+					<VDataTable
+						density="compact"
+						:headers="headers"
+						:items="query.data.keywordInContext"
+						dense
+					>
+						<template #item.open="{ item }">
+							<VIcon size="small" class="me-2" @click="open(item)">mdi-open-in-new</VIcon>
+						</template>
+					</VDataTable>
+					<KWICDetailDialog :kwic="selectedKWIC" @close="selectedKWIC = null" />
 				</div>
+				<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 			</div>
-		</VExpandTransition>
+		</VCardText>
 
 		<VDivider></VDivider>
-
-		<VCardActions>
-			<VBtn variant="outlined" size="small" @click="expand = !expand">
-				{{ !expand ? "Show Data" : "Hide Data" }}
-			</VBtn>
-		</VCardActions>
 	</VCard>
 </template>
