@@ -74,7 +74,7 @@ const parsedText = computed(() => {
 						<br /> -->
 						<!-- {{ details }} -->
 					</div>
-					<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
+					<VProgressCircular v-else indeterminate></VProgressCircular>
 
 					<!-- <VCol cols="12" sm="6" md="4">
 							<VTextField v-model="editedItem.name" label="Dessert name"></VTextField>
