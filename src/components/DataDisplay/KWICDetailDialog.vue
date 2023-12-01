@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { convert } from "html-to-text";
-import { computed, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
 import { useAPIs } from "../../composables/useAPIs";
 import { useAuthenticatedFetch } from "../../composables/useAuthenticatedFetch";
@@ -15,7 +15,8 @@ const { authenticatedFetch } = useAuthenticatedFetch();
 
 const loading = ref(false);
 
-const details = ref(null);
+// todo: better type this
+const details: Ref<StructCtxDocumentResponse | null> = ref(null);
 
 async function getDetails() {
 	loading.value = true;
@@ -49,7 +50,7 @@ const parsedText = computed(() => {
 	<VDialog v-model="active">
 		<VCard v-if="kwic">
 			<VCardTitle>
-				<span class="text-h5">{{ kwic.word }} {{ kwic.docid }}</span>
+				<span class="text-3xl">{{ kwic.docid }}</span>
 			</VCardTitle>
 
 			<VCardText>

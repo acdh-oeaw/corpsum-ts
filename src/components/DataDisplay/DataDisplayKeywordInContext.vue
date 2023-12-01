@@ -20,8 +20,6 @@ const headers = ref([
 	{ title: "open", key: "open", type: "string" },
 ]);
 
-const expand = ref(false);
-
 function open(item) {
 	console.log("open", { item });
 	selectedKWIC.value = item;
@@ -50,8 +48,8 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 						:items="query.data.keywordInContext"
 						dense
 					>
-						<template #item.open="{ item }">
-							<VIcon size="small" class="me-2" @click="open(item)">mdi-open-in-new</VIcon>
+						<template #[`item.open`]="{ item }">
+							<VIcon size="small" class="me-2" icon="mdi-open-in-new" @click="open(item)" />
 						</template>
 					</VDataTable>
 					<KWICDetailDialog :kwic="selectedKWIC" @close="selectedKWIC = null" />

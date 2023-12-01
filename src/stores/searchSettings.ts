@@ -24,16 +24,15 @@ export const useSearchSettingsStore = defineStore(
 			{ value: "keywordInContext", title: "Keyword in Context View" },
 		]);
 
-		const searchFunctions: Record<SearchFunctionKey, (query: CorpusQuery) => void> = {
-			// eslint-disable-next-line
+		const searchFunctions: Record<SearchFunctionKey, (query: CorpusQuery) => Promise<void>> = {
 			yearlyFrequencies: getYearlyFrequencies,
-			// eslint-disable-next-line
+
 			wordFormFrequencies: getWordFormFrequencies,
-			// eslint-disable-next-line
+
 			regionalFrequencies: getRegionsFrequencies,
-			// eslint-disable-next-line
+
 			keywordInContext: getKeywordInContext,
-			// eslint-disable-next-line
+
 			mediaSources: getMediaSourceFrequencies,
 		};
 
@@ -62,7 +61,7 @@ export const useSearchSettingsStore = defineStore(
 			if (!after || before === after) return; //console.log("no change")
 			// find querys with undone searches // or just do all and set queries do Only do if no data
 
-			const functionsToRun = [];
+			const functionsToRun: Array<Promise<void>> = [];
 			// eslint-disable-next-line
 			if (!queriesStore.queries) return;
 			queries.value.forEach((query: CorpusQuery) => {

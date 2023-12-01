@@ -92,7 +92,7 @@ export const useCorporaStore = defineStore(
 		);
 
 		const corporaForSearchKeys = computed(() => {
-			let val: Record<string, string> = {
+			let val: Record<string, string | undefined> = {
 				usecorp: selectedCorpus.value?.corpname,
 			};
 			if (selectedSubCorpus.value)

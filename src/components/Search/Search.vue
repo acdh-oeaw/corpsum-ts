@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-
 import QueryItem from "./QueryItem.vue";
 import SearchDimensions from "./SearchDimensions.vue";
 

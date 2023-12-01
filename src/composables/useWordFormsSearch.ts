@@ -11,6 +11,7 @@ export function useWordFormsSearch() {
 		query.loading.formFrequencies = true;
 
 		const corpora = useCorporaStore();
+		/* eslint-disable */
 		const { data: freqtWords } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
 				...corpora.corporaForSearchKeys.value,
@@ -43,7 +44,7 @@ export function useWordFormsSearch() {
 				// relative: frq / corpusStatistics.totalAverageFrequency,
 			});
 		});
-		// eslint-disable-next-line require-atomic-updates
+
 		query.loading.formFrequencies = false;
 	};
 

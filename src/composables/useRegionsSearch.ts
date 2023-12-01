@@ -1,6 +1,3 @@
-// this file incoperates the actual search for the yearly frequency data
-import { storeToRefs } from "pinia";
-
 import { useCorporaStore } from "../stores/corpora";
 
 export function useRegionsSearch() {
