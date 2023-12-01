@@ -1,8 +1,8 @@
-<script setup>
-import { mapAustria } from "./utils/mapAustria.ts";
+<script setup lang="ts">
+import { mapAustria } from "./utils/mapAustria";
 // import { CorpusQuery } from "~/types/query";
 
-const props = defineProps({ query: { type: CorpusQuery } });
+const props = defineProps<{ query: CorpusQuery }>();
 // const props = defineProps(["query"]);
 
 const usedRegion = ["amitte", "aost", "asuedost", "awest"];
@@ -15,10 +15,10 @@ const chartOptions = computed(() => {
 	const max = data
 		.filter(([region]) => {
 			// console.log({ region });
-			return usedRegion.includes(region);
+			return usedRegion.includes(region as unknown as string);
 		})
 		.map(([, a]) => a)
-		.reduce((a, b) => (a > b ? a : b), 0);
+		.reduce((a, b) => Number(Number(a) > Number(b) ? a : b), 0);
 	// console.log({ max });
 	return {
 		chart: {
@@ -30,7 +30,7 @@ const chartOptions = computed(() => {
 		// },
 		colorAxis: {
 			// min: 0.1,
-			max: max > 10 ? max : 10,
+			max: Number(max) > 10 ? max : 10,
 			type: "logarithmic",
 			minColor: "#eee",
 			maxColor: props.query.color,

@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { watch } from "vue";
 
 import { useCorporaStore } from "./corpora";
 
@@ -8,6 +9,11 @@ export const useAuth = defineStore(
 		const username = ref("");
 		const basicAuthToken = ref("");
 
+		watch(username, async () => {
+			if (username.value) {
+				await navigateTo("/corpsum");
+			} else await navigateTo("/login");
+		});
 		async function login(_username: string, password: string) {
 			if (_username) {
 				basicAuthToken.value = btoa(`${_username}:${password}`);
