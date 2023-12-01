@@ -4,6 +4,27 @@ import { storeToRefs } from "pinia";
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
 
+const categories = computed(() => {
+	const allCats: Array<string> = [];
+	queries.value.forEach((query: CorpusQuery) => {
+		query.data.mediaSources.forEach((qm) => allCats.push(qm.media));
+	});
+	return [...new Set(allCats)];
+});
+const mode = ref("relative");
+const series = computed(() => {
+	const allSeries = queries.value.map((query: CorpusQuery) => {
+		return {
+			color: query.color,
+			name: query.finalQuery,
+			data: categories.value
+				.map((category) => query.data.mediaSources.find(({ media }) => category === media))
+				.map((a) => (a ? a[mode.value] : 0)),
+		};
+	});
+	return allSeries;
+});
+
 const expand = ref(false);
 </script>
 
@@ -17,16 +38,31 @@ const expand = ref(false);
 		</VCardItem>
 
 		<VCardText class="py-0">
+			<HighCharts
+				:options="{
+					chart: {
+						type: 'bar',
+					},
+					title: {
+						text: 'Highcharts Bar Chart',
+					},
+					xAxis: {
+						categories: categories,
+					},
+
+					yAxis: {
+						title: {
+							text: 'sources',
+						},
+					},
+					series,
+				}"
+			></HighCharts>
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="!query.loading.mediaSources">
-					<span :style="`color: ${query.color}`">
-						{{ query.finalQuery }}
-					</span>
-					<ClientOnly>
-						{{ query.data.mediaSources }}
-					</ClientOnly>
+					<ClientOnly></ClientOnly>
 				</div>
-				<VProgressCircular v-else indeterminate></VProgressCircular>
+				<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 			</div>
 		</VCardText>
 
@@ -41,7 +77,7 @@ const expand = ref(false);
 						</span>
 						<VDataTable :items="query.data.mediaSources" density="compact" />
 					</div>
-					<VProgressCircular v-else indeterminate></VProgressCircular>
+					<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 				</div>
 			</div>
 		</VExpandTransition>

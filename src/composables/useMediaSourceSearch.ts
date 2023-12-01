@@ -21,8 +21,7 @@ export function useMediaSourceSearch() {
 		const { selectedCorpus } = storeToRefs(corpora);
 		const { data: mediaSources } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
-				// todo Subcorpus
-				corpname: selectedCorpus.value?.corpname,
+				...corpora.corporaForSearchKeys.value,
 				format: "json",
 				fmaxitems: 5000,
 				fpage: 1,
