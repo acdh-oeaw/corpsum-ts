@@ -17,19 +17,47 @@ const expand = ref(false);
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<span>Graph goes here</span>
+			<div v-for="query of queries" :key="query.id">
+				<span :style="`color: ${query.color}`">
+					{{ query.finalQuery }}
+				</span>
+				<HighCharts
+					:options="{
+						chart: {
+							type: 'bar',
+						},
+						title: {
+							text: query.userInput,
+						},
+						xAxis: {
+							categories: query.data.wordFormFrequencies.map(({ word }) => word),
+						},
+
+						yAxis: {
+							title: {
+								text: 'sources',
+							},
+						},
+						series: [
+							{
+								color: query.color,
+								name: 'relative value',
+								data: query.data.wordFormFrequencies.map(({ relative }) => relative),
+							},
+						],
+					}"
+				></HighCharts>
+			</div>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<div>
-				{{ queries.length }}
+			<div class="grid grid-cols-2 gap-2">
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.formFrequencies">
 						<span>{{ query.finalQuery }}</span>
-						<VDataTable :data="query.data.wordFormFrequencies" dense />
-						{{ query.data.wordFormFrequencies }}
+						<VDataTable :items="query.data.wordFormFrequencies" density="compact" />
 					</div>
-					<VProgressCircular v-else indeterminate></VProgressCircular>
+					<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 				</div>
 			</div>
 		</VExpandTransition>

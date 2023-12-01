@@ -2,8 +2,7 @@
 import { useCorporaStore } from "../stores/corpora";
 
 export function useWordFormsSearch() {
-	const { WORD_FORMS_URL } = useAPIs();
-	const { corpusStatistics } = useCorporaStore();
+	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
 	// const queryStore = useQuery();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
@@ -12,12 +11,27 @@ export function useWordFormsSearch() {
 		query.loading.formFrequencies = true;
 
 		const corpora = useCorporaStore();
-		const { data: freqtWords } = await authenticatedFetch(WORD_FORMS_URL, {
+		const { data: freqtWords } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
-				q: `${query.preparedQuery};${corpora.corporaForSearch};fcrit=word/e 0~0>0;flimit=0;format=json`,
+
+				...corpora.corporaForSearchKeys.value,
+
+				default_attr: "lemma",
+				attrs: "word",
+				refs: "=doc.id",
+				attr_allpos: "all",
+				viewmode: "kwic",
+				cup_hl: "q",
+				structs: "s, g",
+				fromp: 1,
+				pagesize: 20,
+				kwicleftctx: "100#",
+				kwicrightctx: "100#",
+				json: { "concordance_query": [{ "queryselector": "iqueryrow", "iquery": query.userInput }] }
+
 			},
 		});
-		// console.log({ freqtWords: freqtWords.value });
+		console.log({ freqtWords: freqtWords.value });
 		// // console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items }););
 		const freqtWordsData = freqtWords.value as FreqsResponseData;
 		const WordformData = freqtWordsData.Blocks[0]?.Items ?? [];
