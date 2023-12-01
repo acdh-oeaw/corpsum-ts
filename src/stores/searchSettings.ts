@@ -2,7 +2,11 @@ import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
 import { type Ref, ref, watch } from "vue";
 
 type SearchFunctionKey =
-	"keywordInContext" | "mediaSources" | "regionalFrequencies" | "wordFormFrequencies" | "yearlyFrequencies";
+	| "keywordInContext"
+	| "mediaSources"
+	| "regionalFrequencies"
+	| "wordFormFrequencies"
+	| "yearlyFrequencies";
 
 export const useSearchSettingsStore = defineStore(
 	"searchSettings",

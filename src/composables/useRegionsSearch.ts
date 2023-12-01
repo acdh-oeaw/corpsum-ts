@@ -33,7 +33,6 @@ export function useRegionsSearch() {
 			},
 		});
 
-
 		if (!regionsData.value) {
 			query.loading.regionalFrequencies = false;
 			return console.error("error on fetching freqml regions");

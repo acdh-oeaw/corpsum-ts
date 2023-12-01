@@ -86,24 +86,22 @@ export const useCorporaStore = defineStore(
 
 		const corporaForSearch = computed(
 			() =>
-				`corpname=${selectedCorpus.value?.corpname}${selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
+				`corpname=${selectedCorpus.value?.corpname}${
+					selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
 				}`,
 		);
 
-		const corporaForSearchKeys = computed(
-			() => {
-				let val: Record<string, string> = {
-					usecorp: selectedCorpus.value?.corpname,
-
-				}
-				if (selectedSubCorpus.value) val = {
+		const corporaForSearchKeys = computed(() => {
+			let val: Record<string, string> = {
+				usecorp: selectedCorpus.value?.corpname,
+			};
+			if (selectedSubCorpus.value)
+				val = {
 					...val,
-					usesubcorp: selectedSubCorpus.value.n
+					usesubcorp: selectedSubCorpus.value.n,
 				};
-				return val
-
-			}
-		);
+			return val;
+		});
 
 		return {
 			corpora,

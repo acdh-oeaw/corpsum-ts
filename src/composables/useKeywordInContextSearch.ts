@@ -38,7 +38,6 @@ export function useKeywordInContextSearch() {
 				docid: Tbl_refs[0] ?? "",
 				topic: Tbl_refs[3] ?? "",
 				toknum,
-
 			}),
 		);
 

@@ -13,7 +13,6 @@ export function useWordFormsSearch() {
 		const corpora = useCorporaStore();
 		const { data: freqtWords } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
-
 				...corpora.corporaForSearchKeys.value,
 
 				default_attr: "lemma",
@@ -27,8 +26,7 @@ export function useWordFormsSearch() {
 				pagesize: 20,
 				kwicleftctx: "100#",
 				kwicrightctx: "100#",
-				json: { "concordance_query": [{ "queryselector": "iqueryrow", "iquery": query.userInput }] }
-
+				json: { concordance_query: [{ queryselector: "iqueryrow", iquery: query.userInput }] },
 			},
 		});
 		console.log({ freqtWords: freqtWords.value });

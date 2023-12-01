@@ -1,7 +1,5 @@
-import Highlighter from 'vue-highlight-words'
-
+import Highlighter from "vue-highlight-words";
 
 export default defineNuxtPlugin((nuxtApp) => {
-
-	nuxtApp.vueApp.component('TextHighlight', Highlighter)
+	nuxtApp.vueApp.component("TextHighlight", Highlighter);
 });
