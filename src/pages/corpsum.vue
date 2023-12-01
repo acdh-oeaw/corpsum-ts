@@ -26,6 +26,10 @@ const t = useTranslations("Corpsum");
 
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
+
+const elementsPerRow = computed(() => {
+	return 1;
+});
 </script>
 
 <template>
@@ -39,7 +43,7 @@ const { queries } = storeToRefs(queryStore);
 			<Search></Search>
 			<!-- <v-data-table /> -->
 			<VContainer>
-				<div class="grid grid-cols-1 gap-3">
+				<div class="" :class="['grid', 'gap-3', `grid-cols-${elementsPerRow}`]">
 					<!-- <DisplayCard v-for="i in 2" :key="i" :title="titles[i]"></DisplayCard> -->
 
 					<DataDisplayYearlyFrequencies
@@ -54,15 +58,14 @@ const { queries } = storeToRefs(queryStore);
 						v-if="selectedSearches.includes('regionalFrequencies')"
 						:queries="queries"
 					></DataDisplayRegionalFrequencies>
-					<DataDisplayKeywordInContext
-						v-if="selectedSearches.includes('keywordInContext')"
-						:queries="queries"
-					></DataDisplayKeywordInContext>
-
 					<DataDisplayMediaSource
 						v-if="selectedSearches.includes('mediaSources')"
 						:queries="queries"
 					/>
+					<DataDisplayKeywordInContext
+						v-if="selectedSearches.includes('keywordInContext')"
+						:queries="queries"
+					></DataDisplayKeywordInContext>
 				</div>
 			</VContainer>
 			<Dev />

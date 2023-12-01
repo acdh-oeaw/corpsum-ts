@@ -16,8 +16,8 @@ export const useSearchSettingsStore = defineStore(
 			{ value: "yearlyFrequencies", title: "Yearly Frequencies" },
 			{ value: "wordFormFrequencies", title: "Word Form Frequencies" },
 			{ value: "regionalFrequencies", title: "Regional Frequencies" },
-			{ value: "keywordInContext", title: "Keyword in Context View" },
 			{ value: "mediaSources", title: "Media Sources" },
+			{ value: "keywordInContext", title: "Keyword in Context View" },
 		]);
 
 		const searchFunctions: Record<SearchFunctionKey, (query: CorpusQuery) => void> = {
