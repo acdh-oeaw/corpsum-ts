@@ -30,7 +30,7 @@ const chartOptions = computed(() => {
 		// },
 		colorAxis: {
 			// min: 0.1,
-			max,
+			max: max > 10 ? max : 10,
 			type: "logarithmic",
 			minColor: "#eee",
 			maxColor: props.query.color,
