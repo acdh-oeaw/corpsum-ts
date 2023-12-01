@@ -2,7 +2,7 @@
 import { useCorporaStore } from "../stores/corpora";
 
 export function useYearlyFrequenciesSearch() {
-	const { FREQUENCIES_URL } = useAPIs();
+	const { FREQUENCIES_TIME_URL } = useAPIs();
 	const { authenticatedFetch } = useAuthenticatedFetch();
 	const getYearlyFrequencies = async (query: CorpusQuery) => {
 		//const q = queryStore.queries.find(q => q.id === query.id);
@@ -10,7 +10,7 @@ export function useYearlyFrequenciesSearch() {
 		const corpora = useCorporaStore();
 		// console.log("corpora.corporaForSearch", corpora.corporaForSearch, corpora.selectedCorpus);
 
-		const { data: _freqttYear } = await authenticatedFetch(FREQUENCIES_URL, {
+		const { data: _freqttYear } = await authenticatedFetch(FREQUENCIES_TIME_URL, {
 			params: {
 				// Why The Fuck is all of this in the query?
 				// aword,[word="asdf"];corpname=amc_3.2;fttattr=doc.year;fcrit=doc.id;flimit=0;format=json

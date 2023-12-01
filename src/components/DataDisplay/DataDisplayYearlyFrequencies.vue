@@ -57,7 +57,7 @@ const series = computed(() =>
 						</span>
 						<VDataTable :items="query.data.yearlyFrequencies" density="compact" />
 					</div>
-					<VProgressCircular v-else indeterminate></VProgressCircular>
+					<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 				</div>
 			</div>
 		</VExpandTransition>
