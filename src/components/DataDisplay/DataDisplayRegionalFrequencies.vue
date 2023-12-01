@@ -26,7 +26,7 @@ const expand = ref(false);
 						<MapChart :query="query" />
 					</ClientOnly>
 				</div>
-				<VProgressCircular v-else indeterminate></VProgressCircular>
+				<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 			</div>
 		</VCardText>
 
@@ -41,7 +41,7 @@ const expand = ref(false);
 						</span>
 						<VDataTable :items="query.data.regionalFrequencies" density="compact" />
 					</div>
-					<VProgressCircular v-else indeterminate></VProgressCircular>
+					<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 				</div>
 			</div>
 		</VExpandTransition>
