@@ -1,5 +1,5 @@
 <script setup>
-import { mapAustria } from "~/assets/mapAustria.ts";
+import { mapAustria } from "./utils/mapAustria.ts";
 // import { CorpusQuery } from "~/types/query";
 
 const props = defineProps({ query: { type: CorpusQuery } });
