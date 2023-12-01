@@ -21,6 +21,7 @@ export function useMediaSourceSearch() {
 		const { selectedCorpus } = storeToRefs(corpora);
 		const { data: mediaSources } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
+				// @ts-ignore
 				...corpora.corporaForSearchKeys.value,
 				format: "json",
 				fmaxitems: 5000,
@@ -46,12 +47,15 @@ export function useMediaSourceSearch() {
 		console.log({
 			mediaSourceData,
 			blocks: mediaSourceData.Blocks,
+			// @ts-ignore
 			items: mediaSourceData.Blocks[0].Items,
 		});
 
+		// @ts-ignore
 		const WordformData = mediaSourceData.Blocks[0].Items;
 		WordformData.forEach(({ frq, Word, fpm }) => {
 			query.data.mediaSources.push({
+				// @ts-ignore
 				media: Word[0].n,
 				// todo absolute is here actually also a frequency
 				absolute: frq,

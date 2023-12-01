@@ -1,13 +1,6 @@
 import { acceptHMRUpdate, defineStore, storeToRefs } from "pinia";
 import { type Ref, ref, watch } from "vue";
 
-type SearchFunctionKey =
-	| "keywordInContext"
-	| "mediaSources"
-	| "regionalFrequencies"
-	| "wordFormFrequencies"
-	| "yearlyFrequencies";
-
 export const useSearchSettingsStore = defineStore(
 	"searchSettings",
 	() => {
@@ -16,6 +9,7 @@ export const useSearchSettingsStore = defineStore(
 		const { getMediaSourceFrequencies } = useMediaSourceSearch();
 		const { getRegionsFrequencies } = useRegionsSearch();
 		const { getKeywordInContext } = useKeywordInContextSearch();
+
 		const possibleSearchKeys: Ref<Array<{ value: SearchFunctionKey; title: string }>> = ref([
 			{ value: "yearlyFrequencies", title: "Yearly Frequencies" },
 			{ value: "wordFormFrequencies", title: "Word Form Frequencies" },
@@ -36,7 +30,7 @@ export const useSearchSettingsStore = defineStore(
 			mediaSources: getMediaSourceFrequencies,
 		};
 
-		const selectedSearches = ref([
+		const selectedSearches: Ref<Array<SearchFunctionKey>> = ref([
 			// "keywordInContext",
 			// "regionalFrequencies",
 			// "wordFormFrequencies",
@@ -47,8 +41,14 @@ export const useSearchSettingsStore = defineStore(
 		async function doSearches(query: CorpusQuery) {
 			// console.log({ selsearchVal: selectedSearches.value });
 
-			// eslint-disable-next-line
-			return await Promise.all(selectedSearches.value.map((a) => searchFunctions[a](query)));
+			return await Promise.all(
+				selectedSearches.value.map(
+					(a: SearchFunctionKey) =>
+						(searchFunctions[a] as unknown as (query: CorpusQuery) => Promise<void>)(
+							query,
+						) as unknown as Promise<void>,
+				),
+			);
 		}
 
 		const queriesStore = useQuery();
@@ -74,7 +74,12 @@ export const useSearchSettingsStore = defineStore(
 			await Promise.all(functionsToRun);
 		});
 
-		return { possibleSearchKeys, searchFunctions, selectedSearches, doSearches };
+		return {
+			possibleSearchKeys,
+			searchFunctions,
+			selectedSearches,
+			doSearches,
+		};
 	},
 	{ persist: true },
 );

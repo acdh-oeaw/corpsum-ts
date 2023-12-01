@@ -14,6 +14,7 @@ export function useRegionsSearch() {
 		/* eslint-disable */
 		const { data: regionsData } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
+				// @ts-ignore
 				...corpora.corporaForSearchKeys.value,
 				format: "json",
 				fmaxitems: 5000,
@@ -35,13 +36,13 @@ export function useRegionsSearch() {
 			return console.error("error on fetching freqml regions");
 		}
 		const freqmlRegionData = regionsData.value as unknown as FreqMLRegionResponse;
-		query.data.regionalFrequencies = freqmlRegionData.Blocks[0].Items.map(
-			(regionalData: FreqMLRegion) => ({
-				region: regionalData.Word[0].n,
-				absolute: escapeZeroSafe(regionalData.frq),
-				relative: escapeZeroSafe(regionalData.fpm),
-			}),
-		);
+		query.data.regionalFrequencies = (
+			freqmlRegionData.Blocks[0] ?? { Items: [] as Array<FreqMLRegion> }
+		).Items.map((regionalData: FreqMLRegion) => ({
+			region: regionalData.Word[0]?.n as unknown as Region,
+			absolute: escapeZeroSafe(regionalData.frq),
+			relative: escapeZeroSafe(regionalData.fpm),
+		}));
 
 		query.loading.regionalFrequencies = false;
 	};

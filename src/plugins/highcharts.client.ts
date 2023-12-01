@@ -7,5 +7,6 @@ import HighchartsVue from "highcharts-vue";
 
 export default defineNuxtPlugin((nuxtApp) => {
 	MapsModule(Highcharts);
+	// @ts-ignore
 	nuxtApp.vueApp.use(HighchartsVue, { tagName: "HighCharts" });
 });

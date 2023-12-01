@@ -19,6 +19,7 @@ const loading = ref(false);
 const details: Ref<StructCtxDocumentResponse | null> = ref(null);
 
 async function getDetails() {
+	if (!props.kwic) return;
 	loading.value = true;
 	details.value = null;
 	const { data: _details } = await authenticatedFetch(STRUCTCTX_URL, {
@@ -28,7 +29,7 @@ async function getDetails() {
 	});
 	loading.value = false;
 
-	details.value = _details.value;
+	details.value = _details.value as StructCtxDocumentResponse;
 }
 
 watch(active, async () => {

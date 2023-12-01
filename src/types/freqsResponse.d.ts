@@ -1,4 +1,4 @@
-export interface FreqsResponseData {
+interface FreqsResponseData {
 	Blocks: Array<Block>;
 	wllimit: number;
 	request: Request;
@@ -36,6 +36,7 @@ interface Item {
 	fbar: number;
 	pfilter_list: Array<string>;
 	frq: number;
+	fpm: number;
 	nfilter: string;
 	norel: number;
 }

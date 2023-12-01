@@ -20,7 +20,7 @@ const headers = ref([
 	{ title: "open", key: "open", type: "string" },
 ]);
 
-function open(item) {
+function open(item: KeywordInContext) {
 	console.log("open", { item });
 	selectedKWIC.value = item;
 }

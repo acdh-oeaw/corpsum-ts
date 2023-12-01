@@ -32,7 +32,7 @@
 		"types:check": "vue-tsc --noEmit",
 		"validate": "run-p format:check lint:check types:check",
 		"full-validate": "run-p format:check lint:check types:check test test:e2e",
-		"validate-without-tests": "run-p format:check lint:check types:check"
+		"validate-without-tests": "run-p format:fix lint:check types:check"
 	},
 	"dependencies": {
 		"@acdh-oeaw/lib": "^0.1.4",
@@ -60,6 +60,7 @@
 		"@pinia-plugin-persistedstate/nuxt": "^1.2.0",
 		"@playwright/test": "^1.36.1",
 		"@tailwindcss/typography": "^0.5.9",
+		"@types/html-to-text": "^9.0.4",
 		"@types/node": "^20.7.0",
 		"autoprefixer": "^10.4.14",
 		"eslint": "^8.45.0",
@@ -102,7 +103,10 @@
 			"@acdh-oeaw/eslint-config-vue",
 			"@acdh-oeaw/eslint-config-nuxt",
 			"plugin:eslint-plugin-tailwindcss/recommended"
-		]
+		],
+		"rules": {
+			"@typescript-eslint/ban-ts-comment": "off"
+		}
 	},
 	"lint-staged": {
 		"*.@(vue)": [

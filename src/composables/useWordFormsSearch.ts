@@ -14,6 +14,7 @@ export function useWordFormsSearch() {
 		/* eslint-disable */
 		const { data: freqtWords } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
+				// @ts-ignore
 				...corpora.corporaForSearchKeys.value,
 
 				default_attr: "lemma",

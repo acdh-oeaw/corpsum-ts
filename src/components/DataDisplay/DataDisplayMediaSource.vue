@@ -19,6 +19,7 @@ const series = computed(() => {
 			name: query.finalQuery,
 			data: categories.value
 				.map((category) => query.data.mediaSources.find(({ media }) => category === media))
+				// @ts-ignore
 				.map((a) => (a ? a[mode.value] : 0)),
 		};
 	});

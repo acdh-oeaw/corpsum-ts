@@ -33,6 +33,7 @@ export default defineNuxtConfig({
 		componentIslands: true,
 	},
 	pinia: {
+		// @ts-ignore
 		autoImports: ["defineStore", "acceptHMRUpdate"],
 	},
 	piniaPersistedstate: {

@@ -8,11 +8,12 @@ import DataDisplayWordFormFrequencies from "../components/DataDisplay/DataDispla
 import { useQuery } from "../stores/query";
 import { useSearchSettingsStore } from "../stores/searchSettings";
 
-const searchSettings = useSearchSettingsStore();
-const { selectedSearches } = storeToRefs(searchSettings);
 definePageMeta({
 	title: "Corpsum.meta.title",
 });
+
+const searchSettings = useSearchSettingsStore();
+const { selectedSearches } = storeToRefs(searchSettings);
 
 const t = useTranslations("Corpsum");
 
@@ -47,23 +48,23 @@ const elementsPerRow = computed(() => {
 					<!-- <DisplayCard v-for="i in 2" :key="i" :title="titles[i]"></DisplayCard> -->
 
 					<DataDisplayYearlyFrequencies
-						v-if="selectedSearches.includes('yearlyFrequencies')"
+						v-if="selectedSearches.includes('yearlyFrequencies' as unknown as SearchFunctionKey)"
 						:queries="queries"
 					></DataDisplayYearlyFrequencies>
 					<DataDisplayWordFormFrequencies
-						v-if="selectedSearches.includes('wordFormFrequencies')"
+						v-if="selectedSearches.includes('wordFormFrequencies' as unknown as SearchFunctionKey)"
 						:queries="queries"
 					></DataDisplayWordFormFrequencies>
 					<DataDisplayRegionalFrequencies
-						v-if="selectedSearches.includes('regionalFrequencies')"
+						v-if="selectedSearches.includes('regionalFrequencies' as unknown as SearchFunctionKey)"
 						:queries="queries"
 					></DataDisplayRegionalFrequencies>
 					<DataDisplayMediaSource
-						v-if="selectedSearches.includes('mediaSources')"
+						v-if="selectedSearches.includes('mediaSources' as unknown as SearchFunctionKey)"
 						:queries="queries"
 					/>
 					<DataDisplayKeywordInContext
-						v-if="selectedSearches.includes('keywordInContext')"
+						v-if="selectedSearches.includes('keywordInContext' as unknown as SearchFunctionKey)"
 						:queries="queries"
 					></DataDisplayKeywordInContext>
 				</div>

@@ -2,6 +2,13 @@ type CorpusQueryType = "custom" | "lc" | "lc*" | "lemma" | "word";
 
 type Region = "agesamt" | "amitte" | "aost" | "asuedost" | "awest" | "spezifisch";
 
+type SearchFunctionKey =
+	| "keywordInContext"
+	| "mediaSources"
+	| "regionalFrequencies"
+	| "wordFormFrequencies"
+	| "yearlyFrequencies";
+
 interface KeywordInContext {
 	date: string;
 	source: string;
