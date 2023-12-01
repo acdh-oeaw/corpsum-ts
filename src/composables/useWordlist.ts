@@ -1,3 +1,4 @@
+// todo probably delete this file
 // this file incoperates the actual search for the yearly frequency data
 import { storeToRefs } from "pinia";
 import { type Ref, ref } from "vue";
