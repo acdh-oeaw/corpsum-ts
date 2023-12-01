@@ -2,8 +2,8 @@
 import { mapAustria } from "~/assets/mapAustria.ts";
 // import { CorpusQuery } from "~/types/query";
 
-// const props = defineProps({ query: { type: CorpusQuery } });
-const props = defineProps(["query"]);
+const props = defineProps({ query: { type: CorpusQuery } });
+// const props = defineProps(["query"]);
 
 const usedRegion = ["amitte", "aost", "asuedost", "awest"];
 
@@ -14,12 +14,12 @@ const chartOptions = computed(() => {
 	]);
 	const max = data
 		.filter(([region]) => {
-			console.log({ region });
+			// console.log({ region });
 			return usedRegion.includes(region);
 		})
 		.map(([, a]) => a)
 		.reduce((a, b) => (a > b ? a : b), 0);
-	console.log({ max });
+	// console.log({ max });
 	return {
 		chart: {
 			map: mapAustria,

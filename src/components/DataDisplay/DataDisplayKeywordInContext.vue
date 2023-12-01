@@ -21,7 +21,7 @@ const headers = ref([
 ]);
 
 function open(item: KeywordInContext) {
-	console.log("open", { item });
+	// console.log("open", { item });
 	selectedKWIC.value = item;
 }
 

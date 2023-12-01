@@ -31,7 +31,6 @@ export function useYearlyFrequenciesSearch() {
 				relative: rel,
 			});
 		});
-		// eslint-disable-next-line require-atomic-updates
 		query.loading.yearlyFrequencies = false;
 	};
 

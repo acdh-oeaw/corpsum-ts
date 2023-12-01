@@ -35,7 +35,6 @@ export function useWordlist() {
 			},
 		});
 		wordlist.value = response as unknown as Array<string>;
-		// eslint-disable-next-line require-atomic-updates
 		loading.value = false;
 	}
 

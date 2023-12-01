@@ -28,9 +28,9 @@ const t = useTranslations("Corpsum");
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
 
-const elementsPerRow = computed(() => {
-	return 1;
-});
+// const elementsPerRow = computed(() => {
+// 	return 1;
+// });
 </script>
 
 <template>
@@ -44,7 +44,7 @@ const elementsPerRow = computed(() => {
 			<Search></Search>
 			<!-- <v-data-table /> -->
 			<VContainer>
-				<div class="" :class="['grid', 'gap-3', `grid-cols-${elementsPerRow}`]">
+				<div class="" :class="['grid', 'gap-3', `grid-cols-1`]">
 					<!-- <DisplayCard v-for="i in 2" :key="i" :title="titles[i]"></DisplayCard> -->
 
 					<DataDisplayYearlyFrequencies

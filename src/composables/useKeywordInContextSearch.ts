@@ -24,7 +24,7 @@ export function useKeywordInContextSearch() {
 		});
 		const keywordInContext = data.value as KeywordInContextData;
 		// console.log('keywordInContext', { keywordInContext: keywordInContext.value });
-		// eslint-disable
+		// eslint-disable require-atomic-updates
 		// @ts-ignore
 		query.data.keywordInContext = keywordInContext.Lines.map(
 			({ Tbl_refs, Left, Kwic, toknum, Right }) => ({
@@ -42,7 +42,7 @@ export function useKeywordInContextSearch() {
 			}),
 		);
 		// eslint-enable
-		query.loading.keywordInContext = false; // eslint-disable-line require-atomic-updates
+		query.loading.keywordInContext = false;
 	};
 
 	return { getKeywordInContext };

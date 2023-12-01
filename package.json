@@ -105,7 +105,8 @@
 			"plugin:eslint-plugin-tailwindcss/recommended"
 		],
 		"rules": {
-			"@typescript-eslint/ban-ts-comment": "off"
+			"@typescript-eslint/ban-ts-comment": "off",
+			"require-atomic-updates": "off"
 		}
 	},
 	"lint-staged": {
