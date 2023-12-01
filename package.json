@@ -41,7 +41,9 @@
 		"@nuxt/image": "rc",
 		"@nuxtjs/i18n": "^8.0.0-beta.13",
 		"@pinia/nuxt": "^0.5.1",
+		"html-to-text": "^9.0.5",
 		"pinia": "^2.1.7",
+		"vue-highlight-words": "^3.0.1",
 		"vue-json-viewer": "3"
 	},
 	"devDependencies": {
