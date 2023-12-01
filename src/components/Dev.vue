@@ -28,19 +28,6 @@ function refresh() {
 				<!-- <ChartTest></ChartTest> -->
 
 				<div>
-					<h2>test</h2>
-
-					<JsonViewer
-						v-if="!disabled"
-						preview-mode
-						show-double-quotes
-						:value="niceArray"
-						:expand-depth="5"
-						boxed
-						@click.alt="refresh()"
-					></JsonViewer>
-				</div>
-				<div>
 					<h2>Corpora</h2>
 					<p>Corpora:</p>
 					<JsonViewer
