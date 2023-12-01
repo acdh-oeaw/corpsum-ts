@@ -90,6 +90,21 @@ export const useCorporaStore = defineStore(
 				}`,
 		);
 
+		const corporaForSearchKeys = computed(
+			() => {
+				let val: Record<string, string> = {
+					usecorp: selectedCorpus.value?.corpname,
+
+				}
+				if (selectedSubCorpus.value) val = {
+					...val,
+					usesubcorp: selectedSubCorpus.value.n
+				};
+				return val
+
+			}
+		);
+
 		return {
 			corpora,
 			fetchCorpora,
@@ -98,6 +113,7 @@ export const useCorporaStore = defineStore(
 			selectedSubCorpus,
 			tracker,
 			corporaForSearch,
+			corporaForSearchKeys,
 			corporaLoading,
 			subCorporaLoading,
 		};
