@@ -28,7 +28,7 @@ export function useKeywordInContextSearch() {
 		query.data.keywordInContext = keywordInContext.Lines.map(
 			({ Tbl_refs, Left, Kwic, toknum, Right }) => ({
 				// this mapping is directly taken from the ancient code
-				refs: Tbl_refs.join(),
+				refs: Tbl_refs,
 				// date: Tbl_refs[1] ?? "",
 				// source: Tbl_refs[4] ?? "",
 				// region: Tbl_refs[2] ?? "",
@@ -38,6 +38,7 @@ export function useKeywordInContextSearch() {
 				docid: Tbl_refs[0] ?? "",
 				topic: Tbl_refs[3] ?? "",
 				toknum,
+
 			}),
 		);
 
