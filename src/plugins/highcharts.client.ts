@@ -1,4 +1,6 @@
 import Highcharts from "highcharts";
+import ExportingDataModule from "highcharts/modules/export-data";
+import ExportingModule from "highcharts/modules/exporting";
 import MapsModule from "highcharts/modules/map";
 import HighchartsVue from "highcharts-vue";
 
@@ -7,6 +9,8 @@ import HighchartsVue from "highcharts-vue";
 
 export default defineNuxtPlugin((nuxtApp) => {
 	MapsModule(Highcharts);
+	ExportingModule(Highcharts);
+	ExportingDataModule(Highcharts);
 	// @ts-ignore
 	nuxtApp.vueApp.use(HighchartsVue, { tagName: "HighCharts" });
 });
