@@ -39,8 +39,7 @@ watch(active, async () => {
 });
 
 const parsedText = computed(() => {
-	if (!details.value) return "not loaded yet, lol";
-
+	if (!details.value?.content) return "not loaded yet.";
 	const html = details.value.content.map((a) => a.str).join(" ");
 	const text = convert(html.replaceAll("</p>", "</p>\n\n"), { preserveNewlines: true });
 	return text;

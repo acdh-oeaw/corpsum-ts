@@ -44,7 +44,8 @@
 		"html-to-text": "^9.0.5",
 		"pinia": "^2.1.7",
 		"vue-highlight-words": "^3.0.1",
-		"vue-json-viewer": "3"
+		"vue-json-viewer": "3",
+		"zipcelx": "^1.6.2"
 	},
 	"devDependencies": {
 		"@acdh-oeaw/eslint-config": "^1.0.0",
