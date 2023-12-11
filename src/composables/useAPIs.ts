@@ -3,7 +3,7 @@
 export function useAPIs() {
 	const config = useRuntimeConfig();
 
-	const BASE_URL: string = config.public.NUXT_PUBLIC_API_BASE_URL;
+	const BASE_URL: string = config.public.apiBaseUrl;
 
 	// run.cgi/corpora
 	const CORPORA_LIST_URL = `${BASE_URL}/run.cgi/corpora`;
