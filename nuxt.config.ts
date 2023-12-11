@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 
-import { defaultLocale, locales } from "./src/config/i18n.config";
+import { defaultLocale, locales } from "@/config/i18n.config";
 
 export default defineNuxtConfig({
 	alias: {
@@ -81,7 +81,7 @@ export default defineNuxtConfig({
 		ENV_VALIDATION: process.env.ENV_VALIDATION,
 		NODE_ENV: process.env.NODE_ENV,
 		public: {
-			apiBaseUrl: '',
+			apiBaseUrl: "",
 			NUXT_PUBLIC_APP_BASE_URL: process.env.NUXT_PUBLIC_APP_BASE_URL,
 			NUXT_PUBLIC_MATOMO_BASE_URL: process.env.NUXT_PUBLIC_MATOMO_BASE_URL,
 			NUXT_PUBLIC_MATOMO_ID: process.env.NUXT_PUBLIC_MATOMO_ID,
