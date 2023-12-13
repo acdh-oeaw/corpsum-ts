@@ -3,6 +3,7 @@ import { storeToRefs } from "pinia";
 
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
+const mode = ref("relative");
 
 const expand = ref(false);
 </script>
@@ -17,10 +18,18 @@ const expand = ref(false);
 		</VCardItem>
 
 		<VCardText class="py-0">
+			<VBtnToggle v-model="mode" density="compact">
+				<VBtn variant="outlined" value="absolute">Absolute</VBtn>
+
+				<VBtn variant="outlined" value="relative">Relative</VBtn>
+			</VBtnToggle>
 			<div v-for="query of queries" :key="query.id">
-				<span :style="`color: ${query.color}`">
-					{{ query.finalQuery }}
-				</span>
+				<div v-if="query.loading.wordFormFrequencies">
+					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
+					<span :style="`color: ${query.color}`">
+						{{ query.finalQuery }}
+					</span>
+				</div>
 				<HighCharts
 					:options="{
 						chart: {
@@ -42,7 +51,9 @@ const expand = ref(false);
 							{
 								color: query.color,
 								name: 'relative value',
-								data: query.data.wordFormFrequencies.map(({ relative }) => relative),
+								data: query.data.wordFormFrequencies.map(({ relative, absolute }) =>
+									mode === 'relative' ? relative : absolute,
+								),
 							},
 						],
 					}"
@@ -53,7 +64,7 @@ const expand = ref(false);
 		<VExpandTransition v-if="expand">
 			<div class="grid grid-cols-2 gap-2">
 				<div v-for="query of queries" :key="query.id">
-					<div v-if="!query.loading.formFrequencies">
+					<div v-if="!query.loading.wordFormFrequencies">
 						<span>{{ query.finalQuery }}</span>
 						<VDataTable :items="query.data.wordFormFrequencies" density="compact" />
 					</div>

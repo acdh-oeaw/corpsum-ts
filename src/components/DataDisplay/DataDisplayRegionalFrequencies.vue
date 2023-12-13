@@ -3,6 +3,7 @@ import { storeToRefs } from "pinia";
 
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
+const mode = ref("relative");
 
 const expand = ref(false);
 </script>
@@ -17,16 +18,28 @@ const expand = ref(false);
 		</VCardItem>
 
 		<VCardText class="py-0">
+			<VBtnToggle v-model="mode" density="compact">
+				<VBtn variant="outlined" value="absolute">Absolute</VBtn>
+
+				<VBtn variant="outlined" value="relative">Relative</VBtn>
+			</VBtnToggle>
+			<div v-for="query of queries" :key="query.id">
+				<div v-if="query.loading.regionalFrequencies">
+					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
+					<span :style="`color: ${query.color}`">
+						{{ query.finalQuery }}
+					</span>
+				</div>
+			</div>
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="!query.loading.regionalFrequencies">
 					<span :style="`color: ${query.color}`">
 						{{ query.finalQuery }}
 					</span>
 					<ClientOnly>
-						<MapChart :query="query" />
+						<MapChart :query="query" :mode="mode" />
 					</ClientOnly>
 				</div>
-				<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 			</div>
 		</VCardText>
 

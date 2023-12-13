@@ -8,7 +8,7 @@ export function useWordFormsSearch() {
 	const { authenticatedFetch } = useAuthenticatedFetch();
 
 	const getWordFormFrequencies = async (query: CorpusQuery) => {
-		query.loading.formFrequencies = true;
+		query.loading.wordFormFrequencies = true;
 
 		const corpora = useCorporaStore();
 		/* eslint-disable */
@@ -46,7 +46,7 @@ export function useWordFormsSearch() {
 			});
 		});
 
-		query.loading.formFrequencies = false;
+		query.loading.wordFormFrequencies = false;
 	};
 
 	return { getWordFormFrequencies };

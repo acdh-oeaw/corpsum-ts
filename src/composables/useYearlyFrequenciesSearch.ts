@@ -23,12 +23,12 @@ export function useYearlyFrequenciesSearch() {
 		// console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items });
 		// console.log('data', query.data);
 
-		yearlyData.forEach(({ frq, rel, Word }) => {
+		yearlyData.forEach(({ frq, fpm, Word }) => {
 			const year = Word[0]?.n;
 			query.data.yearlyFrequencies.push({
 				year: Number(year),
 				absolute: frq,
-				relative: rel,
+				relative: fpm,
 			});
 		});
 		query.loading.yearlyFrequencies = false;

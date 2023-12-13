@@ -5,6 +5,8 @@ import { computed } from "vue";
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
 
+const mode = ref("relative");
+
 const expand = ref(false);
 const series = computed(() =>
 	queries.value
@@ -13,7 +15,7 @@ const series = computed(() =>
 			name: query.userInput,
 			data: query.data.yearlyFrequencies
 				.sort((a, b) => b.year - a.year)
-				.map((point) => [point.year, point.relative]),
+				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
 			color: query.color,
 		})),
 );
@@ -29,6 +31,19 @@ const series = computed(() =>
 		</VCardItem>
 
 		<VCardText class="py-0">
+			<VBtnToggle v-model="mode" density="compact">
+				<VBtn variant="outlined" value="absolute">Absolute</VBtn>
+
+				<VBtn variant="outlined" value="relative">Relative</VBtn>
+			</VBtnToggle>
+			<div v-for="query of queries" :key="query.id">
+				<div v-if="query.loading.yearlyFrequencies">
+					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
+					<span :style="`color: ${query.color}`">
+						{{ query.finalQuery }}
+					</span>
+				</div>
+			</div>
 			<HighCharts
 				:options="{
 					series,
@@ -48,8 +63,6 @@ const series = computed(() =>
 
 		<VExpandTransition v-if="expand">
 			<div class="grid grid-cols-4 gap-2">
-				<!-- {{ queries.length }} -->
-				<!-- <div v-for="query of queries" :key="query.id" :style="`border: 2px solid ${query.color}`"> -->
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.yearlyFrequencies">
 						<span :style="`color: ${query.color}`">

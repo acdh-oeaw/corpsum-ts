@@ -54,7 +54,7 @@ interface CorpusQuery {
 
 	loading: {
 		yearlyFrequencies: boolean;
-		formFrequencies: boolean;
+		wordFormFrequencies: boolean;
 		regionalFrequencies: boolean;
 		keywordInContext: boolean;
 		mediaSources: boolean;

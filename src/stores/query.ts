@@ -46,7 +46,7 @@ export const useQuery = defineStore(
 				},
 				loading: {
 					yearlyFrequencies: false,
-					formFrequencies: false,
+					wordFormFrequencies: false,
 					regionalFrequencies: false,
 					keywordInContext: false,
 					mediaSources: false,

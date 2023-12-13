@@ -2,15 +2,15 @@
 import { mapAustria } from "./utils/mapAustria";
 // import { CorpusQuery } from "~/types/query";
 
-const props = defineProps<{ query: CorpusQuery }>();
+const props = defineProps<{ query: CorpusQuery; mode: string }>();
 // const props = defineProps(["query"]);
 
 const usedRegion = ["amitte", "aost", "asuedost", "awest"];
 
 const chartOptions = computed(() => {
-	const data = props.query.data.regionalFrequencies.map(({ region, relative }) => [
+	const data = props.query.data.regionalFrequencies.map(({ region, relative, absolute }) => [
 		region,
-		relative,
+		props.mode === "relative" ? relative : absolute,
 	]);
 	const max = data
 		.filter(([region]) => {
@@ -34,6 +34,9 @@ const chartOptions = computed(() => {
 			type: "logarithmic",
 			minColor: "#eee",
 			maxColor: props.query.color,
+		},
+		title: {
+			text: props.query.userInput,
 		},
 		series: [
 			{
