@@ -3,7 +3,7 @@
 export function useAPIs() {
 	const config = useRuntimeConfig();
 
-	const BASE_URL = 'https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at';
+	const BASE_URL: string = config.public.apiBaseUrl;
 
 	// run.cgi/corpora
 	const CORPORA_LIST_URL = `${BASE_URL}/run.cgi/corpora`;
@@ -48,8 +48,6 @@ export function useAPIs() {
 	const WORDLIST_URL = `${BASE_URL}/run.cgi/wordlist`;
 	// https://noske-amc.acdh.oeaw.ac.at/bonito/run.cgi/wordlist?corpname=amc4_demo&results_url=https%3A%2F%2Fnoske-amc.acdh.oeaw.ac.at%2Fcrystal%2F%23wordlist%3Fcorpname%3Damc4_demo%26tab%3Dbasic%26find%3Dlemma%26keyword%3Dauto%26filter%3Dcontaining%26wlminfreq%3D0%26include_nonwords%3D1%26itemsPerPage%3D50%26cols%3D%255B%2522frq%2522%255D%26showresults%3D1&wlmaxitems=20000&wlsort=frq&wlattr=lemma&wlpat=(.*auto.*)&wlminfreq=0&wlicase=1&wlmaxfreq=0&wltype=simple&include_nonwords=1&random=0&relfreq=1&reldocf=1&wlpage=1
 
-	// todo!
-	const CREATES_SUBCORP_URL = `${BASE_URL}/run.cgi/subcorp`;
 	/**
 	 * corpname: amc4_demo
 	results_url: https://noske-amc.acdh.oeaw.ac.at/crystal/#wordlist?corpname=amc4_demo&tab=basic&find=lemma&keyword=auto&filter=containing&wlminfreq=0&include_nonwords=1&itemsPerPage=50&cols=%5B%22frq%22%5D&showresults=1
@@ -91,6 +89,5 @@ export function useAPIs() {
 		CORPORA_LIST_URL,
 		FREQUENCIES_MULTI_LEVEL_URL,
 		STRUCTCTX_URL,
-		CREATES_SUBCORP_URL,
 	};
 }
