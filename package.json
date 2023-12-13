@@ -43,6 +43,7 @@
 		"@pinia/nuxt": "^0.5.1",
 		"html-to-text": "^9.0.5",
 		"pinia": "^2.1.7",
+		"sweetalert2": "^11.10.1",
 		"vue-highlight-words": "^3.0.1",
 		"vue-json-viewer": "3",
 		"zipcelx": "^1.6.2"

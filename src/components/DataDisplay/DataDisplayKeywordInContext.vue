@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+import Swal from "sweetalert2";
 import type { Ref } from "vue";
 
 import KWICDetailDialog from "./KWICDetailDialog.vue";
@@ -20,9 +21,33 @@ const headers = ref([
 	{ title: "open", key: "open", type: "string" },
 ]);
 
+const selected = ref([]);
+const createSubcorpusMode = ref(false);
+
 function open(item: KeywordInContext) {
 	// console.log("open", { item });
 	selectedKWIC.value = item;
+}
+
+const subCorpusName = ref("");
+
+async function createSubcorpus() {
+	const { isConfirmed } = await Swal.fire({
+		title: "Create Subcorpus",
+		text: `Do you really want to create a subcorpus named '${subCorpusName.value}'' containing ${
+			selected.value.length || 0
+		} documents?`,
+		showDenyButton: true,
+	});
+
+	if (isConfirmed) {
+		return Swal.fire(
+			"Confirmed*",
+			"Currently this does not yet send a request, so actually no subcorpus is created",
+		);
+		// todo send results
+		// await  useFetch()
+	}
 }
 
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
@@ -30,21 +55,31 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 
 <template>
 	<VCard>
-		<VCardItem title="Keyword in Context View">
-			<template #subtitle>
-				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
-				shows absolute and relative Values.
-			</template>
-		</VCardItem>
+		<VCardItem title="Keyword in Context View"></VCardItem>
 		<VCardText class="py-0">
+			<VCheckbox v-model="createSubcorpusMode" label="Show Subcorpus Creation"></VCheckbox>
+			<div v-if="createSubcorpusMode">
+				<p>Create Sub-Corpus from Selection ({{ selected.length }})</p>
+				<VTextField
+					v-model="subCorpusName"
+					label="Name"
+					append-inner-icon="mdi-send-circle"
+					@keydown.enter="createSubcorpus"
+					@click:append-inner="createSubcorpus"
+				/>
+			</div>
+
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="!query.loading.keywordInContext">
 					<span :style="`color: ${query.color}`">
 						{{ query.finalQuery }}
 					</span>
 					<VDataTable
+						v-model="selected"
 						density="compact"
 						:headers="headers"
+						item-value="docid"
+						:show-select="createSubcorpusMode"
 						:items="query.data.keywordInContext"
 						dense
 					>

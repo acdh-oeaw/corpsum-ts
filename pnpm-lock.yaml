@@ -29,12 +29,18 @@ dependencies:
   pinia:
     specifier: ^2.1.7
     version: 2.1.7(typescript@5.2.2)(vue@3.3.7)
+  sweetalert2:
+    specifier: ^11.10.1
+    version: 11.10.1
   vue-highlight-words:
     specifier: ^3.0.1
     version: 3.0.1(vue@3.3.7)
   vue-json-viewer:
     specifier: '3'
     version: 3.0.4(vue@3.3.7)
+  vue-sweetalert2:
+    specifier: ^5.0.5
+    version: 5.0.5(vue@3.3.7)
   zipcelx:
     specifier: ^1.6.2
     version: 1.6.2
@@ -9879,6 +9885,10 @@ packages:
       csso: 5.0.5
       picocolors: 1.0.0
 
+  /sweetalert2@11.10.1:
+    resolution: {integrity: sha512-qu145oBuFfjYr5yZW9OSdG6YmRxDf8CnkgT/sXMfrXGe+asFy2imC2vlaLQ/L/naZ/JZna1MPAY56G4qYM0VUQ==}
+    dev: false
+
   /symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
     dev: true
@@ -11080,6 +11090,15 @@ packages:
     dependencies:
       '@vue/devtools-api': 6.5.1
       vue: 3.3.7(typescript@5.2.2)
+
+  /vue-sweetalert2@5.0.5(vue@3.3.7):
+    resolution: {integrity: sha512-Q7+TjQxNwGruT2jfPaSKMz18HHWs81r4umEwlrrtOf/QL5Iwl1T+tUaNkcvKB7Rf9rYftubt7NnOMjfDMnDH3A==}
+    peerDependencies:
+      vue: '*'
+    dependencies:
+      sweetalert2: 11.10.1
+      vue: 3.3.7(typescript@5.2.2)
+    dev: false
 
   /vue-template-compiler@2.7.15:
     resolution: {integrity: sha512-yQxjxMptBL7UAog00O8sANud99C6wJF+7kgbcwqkvA38vCGF7HWE66w0ZFnS/kX5gSoJr/PQ4/oS3Ne2pW37Og==}
