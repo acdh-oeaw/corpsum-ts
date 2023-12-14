@@ -17,7 +17,6 @@ const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unkno
 					{{ props.query.finalQuery }}
 				</span>
 				<div class="flex gap-2">
-					<VChip>{{ props.query.type }}</VChip>
 					<VBtn
 						density="compact"
 						icon="mdi-palette"
@@ -27,9 +26,20 @@ const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unkno
 				</div>
 			</div>
 		</VCardTitle>
-		<VCardText v-if="storeQuery.showPicker">
+
+		<VCardText class="flex justify-between">
+			<VChip>
+				{{ props.query.corpus }}
+				{{ props.query.subCorpus ? ` / ${props.query.subCorpus}` : "" }}
+			</VChip>
+			<VChip>{{ props.query.type }}</VChip>
 			<!-- <p>userInput: {{ props.query.userInput }}</p> -->
-			<VColorPicker v-if="storeQuery.showPicker" v-model="storeQuery.color"></VColorPicker>
 		</VCardText>
+
+		<VCardActions v-if="storeQuery.showPicker">
+			<VExpandTransition v-if="storeQuery.showPicker">
+				<VColorPicker v-model="storeQuery.color"></VColorPicker>
+			</VExpandTransition>
+		</VCardActions>
 	</VCard>
 </template>

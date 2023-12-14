@@ -1,12 +1,14 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { type Ref, ref } from "vue";
 
+import { useCorporaStore } from "./corpora";
+
 export const useQuery = defineStore(
 	"query",
 	() => {
 		const nextQueryId = ref(0);
 		const queries = ref([]) as Ref<Array<CorpusQuery>>;
-
+		const corporaStore = useCorporaStore();
 		function addQuery(userInput: string, type: CorpusQueryType) {
 			let finalQuery = "";
 			switch (type) {
@@ -35,6 +37,8 @@ export const useQuery = defineStore(
 				type,
 				userInput,
 				finalQuery,
+				corpus: corporaStore.selectedCorpus?.corpname ?? "",
+				subCorpus: corporaStore.selectedSubCorpus?.n ?? "",
 				preparedQuery: `aword,${finalQuery}`, // note: this is done in the old project, so we do it here too
 				showPicker: false,
 				data: {

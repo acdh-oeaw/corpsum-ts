@@ -51,6 +51,8 @@ interface CorpusQuery {
 	preparedQuery: string;
 	color: string;
 	showPicker: boolean;
+	corpus: string;
+	subCorpus: string;
 
 	loading: {
 		yearlyFrequencies: boolean;
