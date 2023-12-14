@@ -38,9 +38,6 @@ dependencies:
   vue-json-viewer:
     specifier: '3'
     version: 3.0.4(vue@3.3.7)
-  vue-sweetalert2:
-    specifier: ^5.0.5
-    version: 5.0.5(vue@3.3.7)
   zipcelx:
     specifier: ^1.6.2
     version: 1.6.2
@@ -11090,15 +11087,6 @@ packages:
     dependencies:
       '@vue/devtools-api': 6.5.1
       vue: 3.3.7(typescript@5.2.2)
-
-  /vue-sweetalert2@5.0.5(vue@3.3.7):
-    resolution: {integrity: sha512-Q7+TjQxNwGruT2jfPaSKMz18HHWs81r4umEwlrrtOf/QL5Iwl1T+tUaNkcvKB7Rf9rYftubt7NnOMjfDMnDH3A==}
-    peerDependencies:
-      vue: '*'
-    dependencies:
-      sweetalert2: 11.10.1
-      vue: 3.3.7(typescript@5.2.2)
-    dev: false
 
   /vue-template-compiler@2.7.15:
     resolution: {integrity: sha512-yQxjxMptBL7UAog00O8sANud99C6wJF+7kgbcwqkvA38vCGF7HWE66w0ZFnS/kX5gSoJr/PQ4/oS3Ne2pW37Og==}
