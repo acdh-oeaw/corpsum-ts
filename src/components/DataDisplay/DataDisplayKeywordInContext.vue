@@ -41,7 +41,7 @@ async function createSubcorpus() {
 	});
 
 	if (isConfirmed) {
-		return Swal.fire(
+		await Swal.fire(
 			"Confirmed*",
 			"Currently this does not yet send a request, so actually no subcorpus is created",
 		);

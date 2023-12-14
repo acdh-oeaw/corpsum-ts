@@ -25,17 +25,17 @@ export const useSearchSettingsStore = defineStore(
 
 			regionalFrequencies: getRegionsFrequencies,
 
-			keywordInContext: getKeywordInContext,
-
 			mediaSources: getMediaSourceFrequencies,
+
+			keywordInContext: getKeywordInContext,
 		};
 
 		const selectedSearches: Ref<Array<SearchFunctionKey>> = ref([
-			// "keywordInContext",
-			// "regionalFrequencies",
-			// "wordFormFrequencies",
-			// "yearlyFrequencies",
-			// "mediaSources"
+			"yearlyFrequencies",
+			"wordFormFrequencies",
+			"regionalFrequencies",
+			"mediaSources",
+			"keywordInContext",
 		]);
 
 		async function doSearches(query: CorpusQuery) {
