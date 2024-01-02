@@ -30,10 +30,7 @@ const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unkno
 		</VCardTitle>
 
 		<VCardText class="flex justify-between">
-			<VChip>
-				{{ props.query.corpus }}
-				{{ props.query.subCorpus ? ` / ${props.query.subCorpus}` : "" }}
-			</VChip>
+			<CorpusChip :query="query"></CorpusChip>
 			<VChip>{{ props.query.type }}</VChip>
 			<!-- <p>userInput: {{ props.query.userInput }}</p> -->
 		</VCardText>

@@ -16,7 +16,7 @@ const series = computed(() => {
 	const allSeries = queries.value.map((query: CorpusQuery) => {
 		return {
 			color: query.color,
-			name: query.finalQuery,
+			name: `${query.finalQuery} ${query.corpus}${query.subCorpus ? ` / ${query.subCorpus}` : ""}`,
 			data: categories.value
 				.map((category) => query.data.mediaSources.find(({ media }) => category === media))
 				// @ts-ignore

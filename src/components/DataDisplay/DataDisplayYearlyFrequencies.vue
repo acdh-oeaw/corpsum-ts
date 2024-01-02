@@ -12,7 +12,8 @@ const series = computed(() =>
 	queries.value
 		.filter((q: CorpusQuery) => !q.loading.yearlyFrequencies)
 		.map((query: CorpusQuery) => ({
-			name: query.userInput,
+			name: `${query.finalQuery} ${query.corpus}${query.subCorpus ? ` / ${query.subCorpus}` : ""}`,
+
 			data: query.data.yearlyFrequencies
 				.sort((a, b) => b.year - a.year)
 				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),

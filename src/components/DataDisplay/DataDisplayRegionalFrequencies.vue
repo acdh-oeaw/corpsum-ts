@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 
+import CorpusChip from "../Search/CorpusChip.vue";
+
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
 const mode = ref("relative");
@@ -29,13 +31,15 @@ const expand = ref(false);
 					<span :style="`color: ${query.color}`">
 						{{ query.finalQuery }}
 					</span>
+					<CorpusChip :query="query" />
 				</div>
 			</div>
 			<div v-for="query of queries" :key="query.id">
-				<div v-if="!query.loading.regionalFrequencies">
+				<div v-if="!query.loading.regionalFrequencies" class="mt-1">
 					<span :style="`color: ${query.color}`">
 						{{ query.finalQuery }}
 					</span>
+					<CorpusChip :query="query" />
 					<ClientOnly>
 						<MapChart :query="query" :mode="mode" />
 					</ClientOnly>

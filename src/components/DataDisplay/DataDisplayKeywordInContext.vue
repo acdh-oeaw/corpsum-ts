@@ -3,6 +3,7 @@ import { storeToRefs } from "pinia";
 import Swal from "sweetalert2";
 import type { Ref } from "vue";
 
+import CorpusChip from "../Search/CorpusChip.vue";
 import KWICDetailDialog from "./KWICDetailDialog.vue";
 
 const queryStore = useQuery();
@@ -74,6 +75,7 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 					<span :style="`color: ${query.color}`">
 						{{ query.finalQuery }}
 					</span>
+					<CorpusChip :query="query" />
 					<VDataTable
 						v-model="selected"
 						density="compact"

@@ -19,11 +19,15 @@ export function useYearlyFrequenciesSearch() {
 		});
 		// console.log({ freqttYear: freqttYear.value });
 		const freqttYear = _freqttYear.value as YearlyFrequencyData;
+		// console.log({ freqttYear });
 
 		/* eslint-disable-next-line */
 		const _yearlyData = freqttYear.Blocks ?? [];
-		// @ts-ignore
+		// console.log({ _yearlyData });
+
 		const yearlyData = _yearlyData[0]?.Items ?? [];
+		// console.log({ yearlyData });
+
 		// console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items });
 		// console.log('data', query.data);
 

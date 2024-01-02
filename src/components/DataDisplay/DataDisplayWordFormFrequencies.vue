@@ -50,7 +50,9 @@ const expand = ref(false);
 						series: [
 							{
 								color: query.color,
-								name: 'relative value',
+								name: `${query.finalQuery} ${query.corpus}${
+									query.subCorpus ? ` / ${query.subCorpus}` : ''
+								}`,
 								data: query.data.wordFormFrequencies.map(({ relative, absolute }) =>
 									mode === 'relative' ? relative : absolute,
 								),
@@ -65,7 +67,10 @@ const expand = ref(false);
 			<div class="grid grid-cols-2 gap-2">
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.wordFormFrequencies">
-						<span>{{ query.finalQuery }}</span>
+						<span :style="`color: ${query.color}`">
+							{{ query.finalQuery }}
+						</span>
+						<CorpusChip :query="query" />
 						<VDataTable :items="query.data.wordFormFrequencies" density="compact" />
 					</div>
 					<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
