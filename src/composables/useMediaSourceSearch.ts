@@ -34,7 +34,7 @@ export function useMediaSourceSearch() {
 				freqlevel: 1,
 				ml1attr: "doc.docsrc",
 				ml1ctx: "0~0 > 0",
-				json: { concordance_query: [{ queryselector: "iqueryrow", iquery: query.userInput }] },
+				json: { concordance_query: query.concordance_query },
 				//q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
 			},
 		});
@@ -44,13 +44,6 @@ export function useMediaSourceSearch() {
 		// 	return console.error("error on MediaSources");
 		// }
 		const mediaSourceData = mediaSources.value as FreqMLDocsRC;
-
-		console.log({
-			mediaSourceData,
-			blocks: mediaSourceData.Blocks,
-			// @ts-ignore
-			items: mediaSourceData.Blocks[0]?.Items,
-		});
 
 		// @ts-ignore
 		const WordformData = (mediaSourceData.Blocks || [])[0]?.Items ?? [];

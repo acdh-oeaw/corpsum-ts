@@ -26,9 +26,7 @@ const expand = ref(false);
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="query.loading.wordFormFrequencies">
 					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
-					<span :style="`color: ${query.color}`">
-						{{ query.finalQuery }}
-					</span>
+					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
 				</div>
 				<HighCharts
 					:options="{
@@ -50,7 +48,7 @@ const expand = ref(false);
 						series: [
 							{
 								color: query.color,
-								name: `${query.finalQuery} ${query.corpus}${
+								name: `${query.type}: ${query.userInput} ${query.corpus}${
 									query.subCorpus ? ` / ${query.subCorpus}` : ''
 								}`,
 								data: query.data.wordFormFrequencies.map(({ relative, absolute }) =>
@@ -64,13 +62,14 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<div class="grid grid-cols-2 gap-2">
+			<div class="m-2 grid grid-cols-2 gap-2">
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.wordFormFrequencies">
 						<span :style="`color: ${query.color}`">
-							{{ query.finalQuery }}
+							{{ query.type }}: {{ query.userInput }}
+							<CorpusChip :query="query" />
 						</span>
-						<CorpusChip :query="query" />
+
 						<VDataTable :items="query.data.wordFormFrequencies" density="compact" />
 					</div>
 					<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>

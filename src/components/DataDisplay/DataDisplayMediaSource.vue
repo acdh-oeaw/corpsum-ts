@@ -16,7 +16,9 @@ const series = computed(() => {
 	const allSeries = queries.value.map((query: CorpusQuery) => {
 		return {
 			color: query.color,
-			name: `${query.finalQuery} ${query.corpus}${query.subCorpus ? ` / ${query.subCorpus}` : ""}`,
+			name: `${query.type}: ${query.userInput} ${query.corpus}${
+				query.subCorpus ? ` / ${query.subCorpus}` : ""
+			}`,
 			data: categories.value
 				.map((category) => query.data.mediaSources.find(({ media }) => category === media))
 				// @ts-ignore
@@ -47,13 +49,11 @@ const expand = ref(false);
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="query.loading.mediaSources">
 					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
-					<span :style="`color: ${query.color}`">
-						{{ query.finalQuery }}
-					</span>
+					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
 				</div>
 			</div>
 			<HighCharts
-				style="height: 800px"
+				style="height: 1200px"
 				:options="{
 					chart: {
 						type: 'bar',
@@ -76,13 +76,14 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<div class="grid grid-cols-3 gap-2">
+			<div class="m-2 grid grid-cols-2 gap-2">
 				<!-- {{ queries.length }} -->
 				<!-- <div v-for="query of queries" :key="query.id" :style="`border: 2px solid ${query.color}`"> -->
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.mediaSources">
 						<span :style="`color: ${query.color}`">
-							{{ query.finalQuery }}
+							{{ query.type }}: {{ query.userInput }}
+							<CorpusChip :query="query" />
 						</span>
 						<VDataTable :items="query.data.mediaSources" density="compact" />
 					</div>

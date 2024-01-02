@@ -29,16 +29,14 @@ const expand = ref(false);
 				<div v-if="query.loading.regionalFrequencies">
 					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
 					<span :style="`color: ${query.color}`">
-						{{ query.finalQuery }}
+						{{ query.type }}: {{ query.userInput }}
+						<CorpusChip :query="query" />
 					</span>
-					<CorpusChip :query="query" />
 				</div>
 			</div>
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="!query.loading.regionalFrequencies" class="mt-1">
-					<span :style="`color: ${query.color}`">
-						{{ query.finalQuery }}
-					</span>
+					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
 					<CorpusChip :query="query" />
 					<ClientOnly>
 						<MapChart :query="query" :mode="mode" />
@@ -48,13 +46,14 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<div class="grid grid-cols-3 gap-2">
+			<div class="m-2 grid grid-cols-2 gap-2">
 				<!-- {{ queries.length }} -->
 				<!-- <div v-for="query of queries" :key="query.id" :style="`border: 2px solid ${query.color}`"> -->
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.regionalFrequencies">
 						<span :style="`color: ${query.color}`">
-							{{ query.finalQuery }}
+							{{ query.type }}: {{ query.userInput }}
+							<CorpusChip :query="query" />
 						</span>
 						<VDataTable :items="query.data.regionalFrequencies" density="compact" />
 					</div>

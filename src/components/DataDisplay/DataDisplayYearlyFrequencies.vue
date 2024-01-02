@@ -12,8 +12,9 @@ const series = computed(() =>
 	queries.value
 		.filter((q: CorpusQuery) => !q.loading.yearlyFrequencies)
 		.map((query: CorpusQuery) => ({
-			name: `${query.finalQuery} ${query.corpus}${query.subCorpus ? ` / ${query.subCorpus}` : ""}`,
-
+			name: `${query.type}: ${query.userInput} ${query.corpus}${
+				query.subCorpus ? ` / ${query.subCorpus}` : ""
+			}`,
 			data: query.data.yearlyFrequencies
 				.sort((a, b) => b.year - a.year)
 				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
@@ -40,9 +41,7 @@ const series = computed(() =>
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="query.loading.yearlyFrequencies">
 					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
-					<span :style="`color: ${query.color}`">
-						{{ query.finalQuery }}
-					</span>
+					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
 				</div>
 			</div>
 			<HighCharts
@@ -63,11 +62,12 @@ const series = computed(() =>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<div class="grid grid-cols-4 gap-2">
+			<div class="m-2 grid grid-cols-4 gap-2">
 				<div v-for="query of queries" :key="query.id">
 					<div v-if="!query.loading.yearlyFrequencies">
 						<span :style="`color: ${query.color}`">
-							{{ query.finalQuery }}
+							{{ query.type }}: {{ query.userInput }}
+							<CorpusChip :query="query" />
 						</span>
 						<VDataTable :items="query.data.yearlyFrequencies" density="compact" />
 					</div>

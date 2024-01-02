@@ -4,15 +4,16 @@ import SearchDimensions from "./SearchDimensions.vue";
 
 const query = useQuery();
 
-const newSelectedType: Ref<CorpusQueryType> = ref("word");
+const newSelectedType: Ref<CorpusQueryType> = ref("iqueryrow");
 const newUserInput = ref("");
 
 const CORPUS_QUERY_TYPES = [
-	{ value: "custom", description: "Custom search" },
-	{ value: "lc", description: "Lemma C Search (ToDo)" },
-	{ value: "lc*", description: "LemmaC with wildcard" },
-	{ value: "lemma", description: "Lemma search" },
-	{ value: "word", description: "Word Search" },
+	{ value: "charrow", description: "Character Search" },
+	{ value: "cqlrow", description: "Custom Query Lang Search" },
+	{ value: "iqueryrow", description: "Simplie Search (iquery)" },
+	{ value: "lemmarow", description: "Lemma Search" },
+	{ value: "phraserow", description: "Phrase search" },
+	{ value: "wordrow", description: "Word search" },
 ];
 
 const searchSettings = useSearchSettingsStore();

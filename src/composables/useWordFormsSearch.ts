@@ -28,7 +28,7 @@ export function useWordFormsSearch() {
 				pagesize: 20,
 				kwicleftctx: "100#",
 				kwicrightctx: "100#",
-				json: { concordance_query: [{ queryselector: "iqueryrow", iquery: query.userInput }] },
+				json: { concordance_query: query.concordance_query },
 			},
 		});
 		console.log({ freqtWords: freqtWords.value });

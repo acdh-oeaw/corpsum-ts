@@ -27,7 +27,7 @@ export function useRegionsSearch() {
 				freqlevel: 1,
 				ml1attr: "doc.region",
 				ml1ctx: "0~0 > 0",
-				json: { concordance_query: [{ queryselector: "iqueryrow", iquery: query.userInput }] },
+				json: { concordance_query: query.concordance_query },
 			},
 		});
 

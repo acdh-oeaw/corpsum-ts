@@ -3,33 +3,50 @@ import { type Ref, ref } from "vue";
 
 import { useCorporaStore } from "./corpora";
 
+const keyToKey = {
+	charrow: 'char',
+	cqlrow: 'cql',
+	iqueryrow: 'iquery',
+	lemmarow: 'lemma',
+	phraserow: 'phrase',
+	wordrow: 'word',
+}
+
 export const useQuery = defineStore(
-	"query",
+	"queryNew",
 	() => {
 		const nextQueryId = ref(0);
 		const queries = ref([]) as Ref<Array<CorpusQuery>>;
 		const corporaStore = useCorporaStore();
+
 		function addQuery(userInput: string, type: CorpusQueryType) {
 			let finalQuery = "";
+
+
+			const concordance_query: Partial<ConcordanceQuery> = {
+
+			}
+
+			concordance_query[keyToKey[type]] = userInput;
+			concordance_query.queryselector = type;
+
+			// for old (regional Frequencies)
 			switch (type) {
-				case "word":
+				case "wordrow":
 					finalQuery = `[word="${userInput}"]`;
 					break;
-				case "lemma":
+				case "lemmarow":
 					finalQuery = `[lemma="${userInput}"]`;
 					break;
-				case "lc":
-					finalQuery = `[lc="${userInput.toLowerCase()}"]`;
-					break;
-				case "lc*":
-					finalQuery = `[lc=".*${userInput.toLowerCase()}.*"]`;
-					break;
-				case "custom":
+				case "cqlrow":
 					finalQuery = userInput;
 					break;
 				default: // default is word search
 					finalQuery = `[word="${userInput}"]`;
 			}
+
+
+
 			const colorId = nextQueryId.value % colors.length; // so not to overshoot array
 			const query: CorpusQuery = {
 				id: nextQueryId.value++,
@@ -39,6 +56,7 @@ export const useQuery = defineStore(
 				finalQuery,
 				corpus: corporaStore.selectedCorpus?.corpname ?? "",
 				subCorpus: corporaStore.selectedSubCorpus?.n ?? "",
+				concordance_query: concordance_query as ConcordanceQuery,
 				preparedQuery: `aword,${finalQuery}`, // note: this is done in the old project, so we do it here too
 				showPicker: false,
 				data: {

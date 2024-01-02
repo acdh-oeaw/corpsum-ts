@@ -73,9 +73,9 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="!query.loading.keywordInContext">
 					<span :style="`color: ${query.color}`">
-						{{ query.finalQuery }}
+						{{ query.type }}: {{ query.userInput }}
+						<CorpusChip :query="query" />
 					</span>
-					<CorpusChip :query="query" />
 					<VDataTable
 						v-model="selected"
 						density="compact"
