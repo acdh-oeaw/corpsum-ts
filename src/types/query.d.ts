@@ -1,11 +1,6 @@
 type CorpusQueryType = "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
 
-type CorpusQueryTypeValue = 'char' |
-	'cql' |
-	'iquery' |
-	'lemma' |
-	'phrase' |
-	'word';
+type CorpusQueryTypeValue = "char" | "cql" | "iquery" | "lemma" | "phrase" | "word";
 
 type Region = "agesamt" | "amitte" | "aost" | "asuedost" | "awest" | "spezifisch";
 
@@ -51,7 +46,8 @@ interface QueryData {
 	keywordInContext: Array<KeywordInContext>;
 }
 
-type ConcordanceQuery = Record<'queryselector', CorpusQueryType> & Record<CorpusQueryTypeValue, string>
+type ConcordanceQuery = Record<"queryselector", CorpusQueryType> &
+	Record<CorpusQueryTypeValue, string>;
 interface CorpusQuery {
 	id: number;
 	type: CorpusQueryType;

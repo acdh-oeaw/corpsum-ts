@@ -4,13 +4,13 @@ import { type Ref, ref } from "vue";
 import { useCorporaStore } from "./corpora";
 
 const keyToKey = {
-	charrow: 'char',
-	cqlrow: 'cql',
-	iqueryrow: 'iquery',
-	lemmarow: 'lemma',
-	phraserow: 'phrase',
-	wordrow: 'word',
-}
+	charrow: "char",
+	cqlrow: "cql",
+	iqueryrow: "iquery",
+	lemmarow: "lemma",
+	phraserow: "phrase",
+	wordrow: "word",
+};
 
 export const useQuery = defineStore(
 	"queryNew",
@@ -22,11 +22,9 @@ export const useQuery = defineStore(
 		function addQuery(userInput: string, type: CorpusQueryType) {
 			let finalQuery = "";
 
+			const concordance_query: Partial<ConcordanceQuery> = {};
 
-			const concordance_query: Partial<ConcordanceQuery> = {
-
-			}
-
+			// @ts-ignore
 			concordance_query[keyToKey[type]] = userInput;
 			concordance_query.queryselector = type;
 
@@ -44,8 +42,6 @@ export const useQuery = defineStore(
 				default: // default is word search
 					finalQuery = `[word="${userInput}"]`;
 			}
-
-
 
 			const colorId = nextQueryId.value % colors.length; // so not to overshoot array
 			const query: CorpusQuery = {
