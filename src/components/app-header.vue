@@ -7,7 +7,7 @@ const auth = useAuth();
 
 const links = {
 	home: { href: { path: "/" }, label: t("links.home") },
-	corpsum: { href: { path: "/corpsum" }, label: t("links.corpsum") },
+	// corpsum: { href: { path: "/corpsum" }, label: t("links.corpsum") },
 } satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
 </script>
 
