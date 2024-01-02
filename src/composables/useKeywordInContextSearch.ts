@@ -26,7 +26,7 @@ export function useKeywordInContextSearch() {
 		// console.log('keywordInContext', { keywordInContext: keywordInContext.value });
 		// eslint-disable require-atomic-updates
 		// @ts-ignore
-		query.data.keywordInContext = keywordInContext.Lines.map(
+		query.data.keywordInContext = (keywordInContext.Lines || []).map(
 			({ Tbl_refs, Left, Kwic, toknum, Right }) => ({
 				// this mapping is directly taken from the ancient code
 				refs: Tbl_refs,

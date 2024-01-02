@@ -38,7 +38,7 @@ export function useMediaSourceSearch() {
 				//q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
 			},
 		});
-		if (!mediaSources?.value) {
+		if (!mediaSources?.value || mediaSources?.value.Blocks) {
 			query.loading.mediaSources = false;
 			return console.error("error on MediaSources");
 		}
