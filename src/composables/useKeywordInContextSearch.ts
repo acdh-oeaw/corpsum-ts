@@ -25,14 +25,14 @@ export function useKeywordInContextSearch() {
 		const keywordInContext = data.value as KeywordInContextData;
 		// console.log('keywordInContext', { keywordInContext: keywordInContext.value });
 		// eslint-disable require-atomic-updates
-		// @ts-ignore
+		/* eslint-disable-next-line */
 		query.data.keywordInContext = (keywordInContext.Lines || []).map(
 			({ Tbl_refs, Left, Kwic, toknum, Right }) => ({
 				// this mapping is directly taken from the ancient code
 				refs: Tbl_refs,
-				// date: Tbl_refs[1] ?? "",
-				// source: Tbl_refs[4] ?? "",
-				// region: Tbl_refs[2] ?? "",
+				date: Tbl_refs[1] ?? "",
+				source: Tbl_refs[4] ?? "",
+				region: Tbl_refs[2] ?? "",
 				left: Left.map(({ str }: { str: string }) => str).join(" "),
 				word: typeof Kwic[0] !== "undefined" ? Kwic[0].str : "",
 				right: Right.map(({ str }: { str: string }) => str).join(" "),
