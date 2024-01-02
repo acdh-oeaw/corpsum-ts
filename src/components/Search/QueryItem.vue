@@ -9,13 +9,15 @@ const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unkno
 </script>
 
 <template>
-	<VCard :key="props.query.id" :style="`border: 2px solid ${props.query.color}`">
+	<VCard :key="props.query.id" :style="`border: 2px solid ${props.query.color};`">
 		<!-- <p>id: {{ props.query.id }}</p> -->
 		<VCardTitle>
+			<span class="text-xl" :style="`color: ${props.query.color}`">
+				{{ props.query.finalQuery }}
+				<VTooltip activator="parent">{{ props.query.finalQuery }}</VTooltip>
+			</span>
+
 			<div class="flex items-center justify-between">
-				<span class="text-xl" :style="`color: ${props.query.color}`">
-					{{ props.query.finalQuery }}
-				</span>
 				<div class="flex gap-2">
 					<VBtn
 						density="compact"
