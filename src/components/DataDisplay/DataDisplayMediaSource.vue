@@ -53,6 +53,7 @@ const expand = ref(false);
 				</div>
 			</div>
 			<HighCharts
+				style="height: 800px"
 				:options="{
 					chart: {
 						type: 'bar',
