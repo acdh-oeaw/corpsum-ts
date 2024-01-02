@@ -38,21 +38,22 @@ export function useMediaSourceSearch() {
 				//q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
 			},
 		});
-		if (!mediaSources?.value || mediaSources?.value.Blocks) {
-			query.loading.mediaSources = false;
-			return console.error("error on MediaSources");
-		}
+		// // @ts-ignore
+		// if (!mediaSources?.value || !mediaSources?.value.Blocks) {
+		// 	query.loading.mediaSources = false;
+		// 	return console.error("error on MediaSources");
+		// }
 		const mediaSourceData = mediaSources.value as FreqMLDocsRC;
 
 		console.log({
 			mediaSourceData,
 			blocks: mediaSourceData.Blocks,
 			// @ts-ignore
-			items: mediaSourceData.Blocks[0].Items,
+			items: mediaSourceData.Blocks[0]?.Items,
 		});
 
 		// @ts-ignore
-		const WordformData = mediaSourceData.Blocks[0].Items;
+		const WordformData = (mediaSourceData.Blocks || [])[0]?.Items ?? [];
 		WordformData.forEach(({ frq, Word, fpm }) => {
 			query.data.mediaSources.push({
 				// @ts-ignore
