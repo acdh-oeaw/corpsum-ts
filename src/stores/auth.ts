@@ -11,7 +11,7 @@ export const useAuth = defineStore(
 
 		watch(username, async () => {
 			if (username.value) {
-				await navigateTo("/corpsum");
+				await navigateTo("/");
 			} else await navigateTo("/login");
 		});
 		async function login(_username: string, password: string) {
