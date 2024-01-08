@@ -8,7 +8,7 @@ const newSelectedType: Ref<CorpusQueryType> = ref("iqueryrow");
 const newUserInput = ref("");
 
 const CORPUS_QUERY_TYPES = [
-	{ value: "charrow", description: "Character Search" },
+	// { value: "charrow", description: "Character Search" },
 	{ value: "cqlrow", description: "Custom Query Lang Search" },
 	{ value: "iqueryrow", description: "Simplie Search (iquery)" },
 	{ value: "lemmarow", description: "Lemma Search" },
