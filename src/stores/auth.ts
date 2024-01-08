@@ -4,7 +4,7 @@ import { watch } from "vue";
 import { useCorporaStore } from "./corpora";
 
 export const useAuth = defineStore(
-	"auth",
+	"newAuth",
 	() => {
 		const username = ref("");
 		const basicAuthToken = ref("");
