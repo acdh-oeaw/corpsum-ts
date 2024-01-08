@@ -47,13 +47,13 @@ export function useMediaSourceSearch() {
 
 		// @ts-ignore
 		const WordformData = (mediaSourceData.Blocks || [])[0]?.Items ?? [];
-		WordformData.forEach(({ frq, Word, fpm }) => {
+		WordformData.forEach(({ frq, Word, rel }) => {
 			query.data.mediaSources.push({
 				// @ts-ignore
 				media: Word[0].n,
 				// todo absolute is here actually also a frequency
 				absolute: frq,
-				relative: fpm,
+				relative: rel,
 			});
 		});
 
