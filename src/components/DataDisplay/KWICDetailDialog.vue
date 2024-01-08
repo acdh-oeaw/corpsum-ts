@@ -10,7 +10,7 @@ defineEmits(["close"]);
 const { STRUCTCTX_URL } = useAPIs();
 const active = computed(() => Boolean(props.kwic));
 const corporaStore = useCorporaStore();
-const { corporaForSearch } = storeToRefs(corporaStore);
+const { corporaForSearchWithoutSubCorpus } = storeToRefs(corporaStore);
 const { authenticatedFetch } = useAuthenticatedFetch();
 
 const loading = ref(false);
@@ -24,7 +24,7 @@ async function getDetails() {
 	details.value = null;
 	const { data: _details } = await authenticatedFetch(STRUCTCTX_URL, {
 		params: {
-			q: `${corporaForSearch.value};pos=${props.kwic.toknum};struct=doc;format=json`,
+			q: `${corporaForSearchWithoutSubCorpus.value};pos=${props.kwic.toknum};struct=doc;format=json`,
 		},
 	});
 	loading.value = false;
