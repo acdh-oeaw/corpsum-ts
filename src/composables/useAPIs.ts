@@ -15,7 +15,7 @@ export function useAPIs() {
 	// 	subcorpora: 1,
 	// 	format: "json",
 	// },
-
+	const CREATE_SUBCORPUS_URL = `${BASE_URL}/run.cgi/subcorp`;
 	// frequencies
 	// used for yearly and for media sources
 	// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/freqtt?q=aword%2C%5Bword%3D%22arbeit%22%5D;corpname=amc_3.2;fttattr=doc.year;fcrit=doc.id;flimit=0;format=json
@@ -89,5 +89,6 @@ export function useAPIs() {
 		CORPORA_LIST_URL,
 		FREQUENCIES_MULTI_LEVEL_URL,
 		STRUCTCTX_URL,
+		CREATE_SUBCORPUS_URL,
 	};
 }

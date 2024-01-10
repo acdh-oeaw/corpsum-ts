@@ -3,6 +3,9 @@ import { storeToRefs } from "pinia";
 import Swal from "sweetalert2";
 import type { Ref } from "vue";
 
+import { useAPIs } from "../../composables/useAPIs";
+import { useAuthenticatedFetch } from "../../composables/useAuthenticatedFetch";
+import { useCorporaStore } from "../../stores/corpora";
 import CorpusChip from "../Search/CorpusChip.vue";
 import KWICDetailDialog from "./KWICDetailDialog.vue";
 
@@ -22,6 +25,8 @@ const headers = ref([
 	{ title: "open", key: "open", type: "string" },
 ]);
 
+const { CREATE_SUBCORPUS_URL } = useAPIs();
+
 const selected = ref([]);
 const createSubcorpusMode = ref(false);
 
@@ -31,7 +36,8 @@ function open(item: KeywordInContext) {
 }
 
 const subCorpusName = ref("");
-
+const { authenticatedFetch } = useAuthenticatedFetch();
+const { corporaForSearchWithoutSubCorpus, fetchSubCorpora } = useCorporaStore();
 async function createSubcorpus() {
 	const { isConfirmed } = await Swal.fire({
 		title: "Create Subcorpus",
@@ -42,11 +48,17 @@ async function createSubcorpus() {
 	});
 
 	if (isConfirmed) {
-		await Swal.fire(
-			"Confirmed*",
-			"Currently this does not yet send a request, so actually no subcorpus is created",
-		);
 		// todo send results
+		await authenticatedFetch(
+			`${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus};subcname=${
+				subCorpusName.value
+			};create=True;${selected.value.map((docid: string) => `sca_doc.id=${docid}`).join(";")}`,
+			// 			"${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus};reload=;subcname=testcorbussi;create=Trueundefined;sca_doc.id=APA_19860220_APA0002;sca_doc.id=APA_19860220_APA0003",
+		);
+		Swal.fire("Confirmed", "Subcorpus created successfully!")
+			.then(console.log)
+			.catch(console.error);
+		await fetchSubCorpora();
 	}
 }
 
@@ -60,6 +72,7 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 			<VCheckbox v-model="createSubcorpusMode" label="Show Subcorpus Creation"></VCheckbox>
 			<div v-if="createSubcorpusMode">
 				<p>Create Sub-Corpus from Selection ({{ selected.length }})</p>
+				{{ selected }}
 				<VTextField
 					v-model="subCorpusName"
 					label="Name"

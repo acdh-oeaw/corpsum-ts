@@ -55,10 +55,7 @@ export const useCorporaStore = defineStore(
 		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
 
-		// auto-fetch subcorpora when selectedCorpus changes
-		watch(selectedCorpus, async (before, after) => {
-			if (!after || before?.name === after.name) return; //console.log("no change")
-			// console.log({ selectedCorpus, before, after, isSame: before?.name === after.name });
+		async function fetchSubCorpora() {
 			subCorporaLoading.value = true;
 			// console.log({ before: before, after });
 			// console.log("corporaStore.selectedCorpus changed");
@@ -82,6 +79,13 @@ export const useCorporaStore = defineStore(
 				subCorpora.value = subCorporaResponseData.subcorpora;
 				// corporaStore.selectedSubCorpus = subCorpora.value[0];
 			}
+		}
+
+		// auto-fetch subcorpora when selectedCorpus changes
+		watch(selectedCorpus, async (before, after) => {
+			if (!after || before?.name === after.name) return; //console.log("no change")
+			// console.log({ selectedCorpus, before, after, isSame: before?.name === after.name });
+			await fetchSubCorpora();
 		});
 
 		const corporaForSearch = computed(
@@ -111,6 +115,7 @@ export const useCorporaStore = defineStore(
 			corpora,
 			fetchCorpora,
 			subCorpora,
+			fetchSubCorpora,
 			selectedCorpus,
 			selectedSubCorpus,
 			tracker,
