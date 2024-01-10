@@ -72,7 +72,6 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 			<VCheckbox v-model="createSubcorpusMode" label="Show Subcorpus Creation"></VCheckbox>
 			<div v-if="createSubcorpusMode">
 				<p>Create Sub-Corpus from Selection ({{ selected.length }})</p>
-				{{ selected }}
 				<VTextField
 					v-model="subCorpusName"
 					label="Name"
