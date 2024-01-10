@@ -16,10 +16,7 @@ export function useKeywordInContextSearch() {
 
 		const { data } = await authenticatedFetch(VIEWSATTRSX_URL, {
 			params: {
-				// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/viewattrsx?q=aword%2C%5Blc%3D%22.*arbeit.*%22%5D%20within%20%3Cdoc%20region%3D%22asuedost%22%2F%3E;corpname=amc_3.2;usesubcorp=zdl2021_04;viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.region;pagesize=10;newctxsize=5;async=0;format=json
-				//const viewattrs`${engineAPI}viewattrsx?q=${queryTermEncoded};corpname=${selectedCorpus};${subCorp}viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.datum;setrefs==doc.region;setrefs==doc.ressort2;setrefs==doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`;
-				// ;corpname=${selectedCorpus};${subCorp}viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.datum;setrefs==doc.region;setrefs==doc.ressort2;setrefs==doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`;
-				q: `${query.preparedQuery};${corporaForSearch.value};viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.datum;setrefs==doc.region;setrefs==doc.ressort2;setrefs==doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`,
+				q: `${query.preparedQuery};${corporaForSearch.value};viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;refs==doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`,
 			},
 		});
 		const keywordInContext = data.value as KeywordInContextData;

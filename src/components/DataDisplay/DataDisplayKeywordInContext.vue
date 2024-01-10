@@ -10,14 +10,14 @@ const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
 
 const headers = ref([
-	// { title: "date", key: "date", type: "string" },
-	// { title: "source", key: "source", type: "string" },
-	// { title: "region", key: "region", type: "string" },
+	{ title: "date", key: "date", type: "string" },
+	{ title: "source", key: "source", type: "string" },
+	{ title: "region", key: "region", type: "string" },
 	{ title: "left", key: "left", type: "string" },
 	{ title: "word", key: "word", type: "string" },
 	{ title: "right", key: "right", type: "string" },
 	{ title: "docid", key: "docid", type: "string" },
-	// { title: "topic", key: "topic", type: "string" },
+	{ title: "topic", key: "topic", type: "string" },
 	{ title: "toknum", key: "toknum", type: "string" },
 	{ title: "open", key: "open", type: "string" },
 ]);
@@ -47,7 +47,6 @@ async function createSubcorpus() {
 			"Currently this does not yet send a request, so actually no subcorpus is created",
 		);
 		// todo send results
-		// await  useFetch()
 	}
 }
 
