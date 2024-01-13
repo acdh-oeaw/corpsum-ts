@@ -36,14 +36,14 @@ export function useRegionsSearch() {
 			return console.error("error on fetching freqml regions");
 		}
 		const freqmlRegionData = regionsData.value as unknown as FreqMLRegionResponse;
-		if (freqmlRegionData.Blocks)
-			query.data.regionalFrequencies = (
-				freqmlRegionData.Blocks[0] ?? { Items: [] as Array<FreqMLRegion> }
-			).Items.map((regionalData: FreqMLRegion) => ({
-				region: regionalData.Word[0]?.n as unknown as Region,
-				absolute: escapeZeroSafe(regionalData.frq),
-				relative: escapeZeroSafe(regionalData.rel),
-			}));
+
+		query.data.regionalFrequencies = (
+			freqmlRegionData.Blocks[0] ?? { Items: [] as Array<FreqMLRegion> }
+		).Items.map((regionalData: FreqMLRegion) => ({
+			region: regionalData.Word[0]?.n as unknown as Region,
+			absolute: escapeZeroSafe(regionalData.frq),
+			relative: escapeZeroSafe(regionalData.rel),
+		}));
 
 		query.loading.regionalFrequencies = false;
 	};

@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { watch } from "vue";
 
 import { useCorporaStore } from "./corpora";
 
@@ -27,7 +26,6 @@ export const useAuth = defineStore(
 		function logout() {
 			username.value = "";
 			basicAuthToken.value = "";
-			navigateTo("/login");
 		}
 
 		return { username, basicAuthToken, login, logout };

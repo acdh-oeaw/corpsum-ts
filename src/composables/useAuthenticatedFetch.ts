@@ -1,3 +1,5 @@
+// for better typing
+// https://nuxt.com/docs/examples/advanced/use-custom-fetch-composable
 export function useAuthenticatedFetch() {
 	const authenticatedFetch = (URL: string, options = {}, headers = {}) => {
 		const auth = useAuth();

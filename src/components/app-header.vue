@@ -10,9 +10,9 @@ const links = {
 	// corpsum: { href: { path: "/corpsum" }, label: t("links.corpsum") },
 } satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
 
-function logout() {
+async function logout() {
 	auth.logout();
-	navigateTo("/login");
+	await navigateTo("/login");
 }
 </script>
 
