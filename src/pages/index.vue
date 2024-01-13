@@ -17,20 +17,8 @@ const { selectedSearches } = storeToRefs(searchSettings);
 
 const t = useTranslations("Corpsum");
 
-// const titles = [
-// 	"Frequencies and Forms",
-// 	"Yearly Frequencies",
-// 	"Distribution of Media Sources",
-// 	"Regional Frequencies",
-// 	"Keyword in Context",
-// ];
-
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
-
-// const elementsPerRow = computed(() => {
-// 	return 1;
-// });
 </script>
 
 <template>
