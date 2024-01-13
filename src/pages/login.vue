@@ -10,7 +10,13 @@ const password = ref("");
 async function login() {
 	if (!(await auth.login(username.value, password.value)))
 		return alert("Username or Password wrong");
+	navigateTo("/");
 }
+
+onMounted(() => {
+	console.log("checking auth");
+	if (auth.basicAuthToken) navigateTo("/");
+});
 </script>
 
 <template>

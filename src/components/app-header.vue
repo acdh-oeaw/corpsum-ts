@@ -9,6 +9,11 @@ const links = {
 	home: { href: { path: "/" }, label: t("links.home") },
 	// corpsum: { href: { path: "/corpsum" }, label: t("links.corpsum") },
 } satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
+
+function logout() {
+	auth.logout();
+	navigateTo("/login");
+}
 </script>
 
 <template>
@@ -26,7 +31,7 @@ const links = {
 
 			<LocaleSwitcher />
 
-			<VBtn v-if="auth.username" @click="auth.logout()">Logout {{ auth.username }}</VBtn>
+			<VBtn v-if="auth.username" @click="logout">Logout {{ auth.username }}</VBtn>
 			<VBtn v-else @click="navigateTo('/login')">Login</VBtn>
 		</div>
 	</header>
