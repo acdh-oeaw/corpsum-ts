@@ -31,11 +31,14 @@ export function useRegionsSearch() {
 			},
 		});
 
-		if (!regionsData.value) {
+		const freqmlRegionData = regionsData.value as FreqMLRegionResponse | { Blocks: undefined };
+		// @ts-ignore
+		if (!freqmlRegionData.Blocks) {
 			query.loading.regionalFrequencies = false;
+			// alert('error on fetching freqml regions')
+			query.data.regionalFrequencies = [];
 			return console.error("error on fetching freqml regions");
 		}
-		const freqmlRegionData = regionsData.value as unknown as FreqMLRegionResponse;
 
 		query.data.regionalFrequencies = (
 			freqmlRegionData.Blocks[0] ?? { Items: [] as Array<FreqMLRegion> }
