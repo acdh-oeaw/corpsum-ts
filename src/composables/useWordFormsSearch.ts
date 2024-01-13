@@ -15,8 +15,7 @@ export function useWordFormsSearch() {
 		const { data: freqtWords } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
 				// @ts-ignore
-				...corpora.corporaForSearchKeys.value,
-
+				...corpora.corporaForSearchKeys,
 				default_attr: "lemma",
 				attrs: "word",
 				refs: "=doc.id",
@@ -34,7 +33,7 @@ export function useWordFormsSearch() {
 		console.log({ freqtWords: freqtWords.value });
 		// // console.log({ yearlyData, blocks: freqttYear.value.Blocks, items: freqttYear.value.Blocks[0].Items }););
 		const freqtWordsData = freqtWords.value as FreqsResponseData;
-		const WordformData = freqtWordsData.Blocks[0]?.Items ?? [];
+		const WordformData = (freqtWordsData.Blocks && freqtWordsData.Blocks[0]?.Items) ?? [];
 
 		WordformData.forEach(({ frq, fpm, Word }) => {
 			query.data.wordFormFrequencies.push({

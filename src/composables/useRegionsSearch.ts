@@ -11,11 +11,11 @@ export function useRegionsSearch() {
 	const getRegionsFrequencies = async (query: CorpusQuery) => {
 		query.loading.regionalFrequencies = true;
 		const corpora = useCorporaStore();
-		/* eslint-disable */
+
 		const { data: regionsData } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
 				// @ts-ignore
-				...corpora.corporaForSearchKeys.value,
+				...corpora.corporaForSearchKeys,
 				format: "json",
 				fmaxitems: 5000,
 				fpage: 1,
@@ -36,13 +36,14 @@ export function useRegionsSearch() {
 			return console.error("error on fetching freqml regions");
 		}
 		const freqmlRegionData = regionsData.value as unknown as FreqMLRegionResponse;
-		query.data.regionalFrequencies = (
-			freqmlRegionData.Blocks[0] ?? { Items: [] as Array<FreqMLRegion> }
-		).Items.map((regionalData: FreqMLRegion) => ({
-			region: regionalData.Word[0]?.n as unknown as Region,
-			absolute: escapeZeroSafe(regionalData.frq),
-			relative: escapeZeroSafe(regionalData.rel),
-		}));
+		if (freqmlRegionData.Blocks)
+			query.data.regionalFrequencies = (
+				freqmlRegionData.Blocks[0] ?? { Items: [] as Array<FreqMLRegion> }
+			).Items.map((regionalData: FreqMLRegion) => ({
+				region: regionalData.Word[0]?.n as unknown as Region,
+				absolute: escapeZeroSafe(regionalData.frq),
+				relative: escapeZeroSafe(regionalData.rel),
+			}));
 
 		query.loading.regionalFrequencies = false;
 	};

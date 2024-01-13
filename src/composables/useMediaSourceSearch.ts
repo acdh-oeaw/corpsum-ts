@@ -22,7 +22,7 @@ export function useMediaSourceSearch() {
 		const { data: mediaSources } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
 				// @ts-ignore
-				...corpora.corporaForSearchKeys.value,
+				...corpora.corporaForSearchKeys,
 				format: "json",
 				fmaxitems: 5000,
 				fpage: 1,
