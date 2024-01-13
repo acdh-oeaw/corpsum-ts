@@ -34,7 +34,7 @@ const _alert = (msg: string) => {
 	<VContainer>
 		<div>
 			<VForm @submit.prevent="addQuery">
-				<div class="flex items-center gap-1">
+				<div class="flex items-start gap-1">
 					<CorpusSelection />
 
 					<VSelect
