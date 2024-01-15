@@ -44,7 +44,7 @@ async function createSubcorpus() {
 		title: "Create Subcorpus",
 		text: `Do you really want to create a subcorpus named '${subCorpusName.value}' containing ${
 			selected.value.length || 0
-		} documents in subcorpus ${selectedCorpus.value.name}?`,
+		} documents in subcorpus ${selectedCorpus.value?.name}?`,
 		showDenyButton: true,
 	});
 
@@ -74,7 +74,7 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 			<div v-if="createSubcorpusMode">
 				<p>
 					Create Sub-Corpus from Selection ({{ selected.length }}) in Corpus
-					{{ selectedCorpus.name }}
+					{{ selectedCorpus?.name }}
 				</p>
 				<VTextField
 					v-model="subCorpusName"
