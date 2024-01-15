@@ -34,13 +34,14 @@ export function useMediaSourceSearch() {
 		// }
 		const mediaSourceData = mediaSources.value as FreqMLDocsRC;
 
-		if (!mediaSourceData.Blocks) {
+		// @ts-ignore
+		if (!mediaSources.value?.Blocks) {
 			query.loading.mediaSources = false;
 			query.data.mediaSources = [];
 			// alert('error on fetching freqml regions');
 			return console.error("error on fetching freqml mediaSources");
 		}
-		const WordformData = (mediaSourceData.Blocks || [])[0]?.Items ?? [];
+		const WordformData = mediaSourceData.Blocks[0]?.Items ?? [];
 		WordformData.forEach(({ frq, Word, rel }) => {
 			query.data.mediaSources.push({
 				// @ts-ignore

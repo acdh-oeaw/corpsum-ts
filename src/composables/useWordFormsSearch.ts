@@ -1,6 +1,4 @@
 // this file incoperates the actual search for the yearly frequency data
-import { useCorporaStore } from "../stores/corpora";
-
 export function useWordFormsSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
 	const queryStore = useQuery();

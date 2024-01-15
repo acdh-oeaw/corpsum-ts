@@ -1,5 +1,3 @@
-import { useCorporaStore } from "../stores/corpora";
-
 export function useRegionsSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
 	const queryStore = useQuery();

@@ -1,5 +1,4 @@
 // this file incoperates the actual search for the yearly frequency data
-import { useCorporaStore } from "../stores/corpora";
 
 export function useYearlyFrequenciesSearch() {
 	const queryStore = useQuery();

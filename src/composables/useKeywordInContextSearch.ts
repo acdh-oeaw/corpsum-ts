@@ -1,6 +1,3 @@
-// this file incoperates the actual search for the yearly frequency data
-import { storeToRefs } from "pinia";
-
 import { useQuery } from "../stores/query";
 
 export function useKeywordInContextSearch() {
