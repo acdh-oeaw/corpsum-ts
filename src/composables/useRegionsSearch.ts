@@ -42,7 +42,7 @@ export function useRegionsSearch() {
 		).Items.map((regionalData: FreqMLRegion) => ({
 			region: regionalData.Word[0]?.n as unknown as Region,
 			absolute: escapeZeroSafe(regionalData.frq),
-			relative: escapeZeroSafe(regionalData.rel),
+			relative: escapeZeroSafe(regionalData.reltt),
 		}));
 
 		query.loading.regionalFrequencies = false;

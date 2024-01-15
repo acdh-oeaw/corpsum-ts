@@ -42,13 +42,13 @@ export function useMediaSourceSearch() {
 			return console.error("error on fetching freqml mediaSources");
 		}
 		const WordformData = mediaSourceData.Blocks[0]?.Items ?? [];
-		WordformData.forEach(({ frq, Word, rel }) => {
+		WordformData.forEach(({ frq, Word, reltt }) => {
 			query.data.mediaSources.push({
 				// @ts-ignore
 				media: Word[0].n,
 				// todo absolute is here actually also a frequency
 				absolute: frq,
-				relative: rel,
+				relative: reltt,
 			});
 		});
 
