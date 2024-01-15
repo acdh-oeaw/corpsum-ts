@@ -13,7 +13,7 @@ const CORPUS_QUERY_TYPES = [
 	{ value: "wordrow", description: "Word search" },
 	{ value: "lemmarow", description: "Lemma search" },
 	{ value: "phraserow", description: "Phrase search" },
-	{ value: "cqlrow", description: "Custom Query search (CQL)" }
+	{ value: "cqlrow", description: "Custom Query search (CQL)" },
 ];
 
 const searchSettings = useSearchSettingsStore();
