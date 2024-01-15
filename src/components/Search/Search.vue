@@ -9,11 +9,11 @@ const newUserInput = ref("");
 
 const CORPUS_QUERY_TYPES = [
 	// { value: "charrow", description: "Character Search" },
-	{ value: "cqlrow", description: "Custom Query Lang Search" },
-	{ value: "iqueryrow", description: "Simplie Search (iquery)" },
-	{ value: "lemmarow", description: "Lemma Search" },
-	{ value: "phraserow", description: "Phrase search" },
+	{ value: "iqueryrow", description: "Simple search (iquery)" },
 	{ value: "wordrow", description: "Word search" },
+	{ value: "lemmarow", description: "Lemma search" },
+	{ value: "phraserow", description: "Phrase search" },
+	{ value: "cqlrow", description: "Custom Query search (CQL)" }
 ];
 
 const searchSettings = useSearchSettingsStore();
