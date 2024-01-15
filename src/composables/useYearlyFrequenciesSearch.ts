@@ -3,18 +3,27 @@ import { useCorporaStore } from "../stores/corpora";
 
 export function useYearlyFrequenciesSearch() {
 	const queryStore = useQuery();
-	const { FREQUENCIES_TIME_URL } = useAPIs();
+	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
 	const { authenticatedFetch } = useAuthenticatedFetch();
 	const getYearlyFrequencies = async (query: CorpusQuery) => {
 		//const q = queryStore.queries.find(q => q.id === query.id);
 		query.loading.yearlyFrequencies = true;
-		const { data: _freqttYear } = await authenticatedFetch(FREQUENCIES_TIME_URL, {
+		const { data: _freqttYear } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
-				// Why The Fuck is all of this in the query?
-				// aword,[word="asdf"];corpname=amc_3.2;fttattr=doc.year;fcrit=doc.id;flimit=0;format=json
-				q: `${query.preparedQuery};${queryStore.corporaForSearch(
-					query,
-				)};fttattr=doc.year;fcrit=doc.id;flimit=0;format=json`,
+				// @ts-ignore
+				...queryStore.corporaForSearchKeys(query),
+				format: "json",
+				// fmaxitems: 5000,
+				fpage: 1,
+				freq_sort: "freq",
+				group: 0,
+				showpoc: 1,
+				showreltt: 1,
+				showrel: 1,
+				freqlevel: 1,
+				ml1attr: "doc.year",
+				ml1ctx: "0~0 > 0",
+				json: { concordance_query: query.concordance_query },
 			},
 		});
 		// console.log({ freqttYear: freqttYear.value });
