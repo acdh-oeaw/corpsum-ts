@@ -1,59 +1,73 @@
 interface YearlyFrequencyData {
-	Blocks: Array<YearlyBlock>;
-	wllimit: number;
-	request: Request;
-	fullsize: number;
+	fcrit: string;
 	FCrit: Array<FCrit>;
-	lastpage: number;
+	Blocks: Array<Block>;
 	paging: number;
-	fcrit: string;
 	concsize: number;
+	fullsize: number;
+	Desc: Array<Desc>;
+	numofcolls: number;
+	hitlen: number;
+	wllimit: number;
+	lastpage: number;
+	ml: boolean;
 	api_version: string;
-}
-
-interface FCrit {
-	fcrit: string;
+	manatee_version: string;
+	request: Request;
 }
 
 interface Request {
-	ctxattrs: string;
-	pagesize: string;
+	concordance_query: Concordancequery;
+	fpage: string;
+	freqlevel: string;
+	json: string;
 	format: string;
-	gdexcnt: string;
-	fttattr: string;
-	gdexconf: string;
-	flimit: string;
-	kwicrightctx: string;
-	q: string;
-	viewmode: string;
-	attrs: string;
-	attr_tooltip: string;
+	freq_sort: string;
 	corpname: string;
-	fcrit: string;
-	structs: string;
-	kwicleftctx: string;
+	showpoc: string;
+	showrel: string;
+	ml1attr: string;
+	ml1ctx: string;
+	showreltt: string;
+	usecorp: string;
+	group: string;
 }
 
-interface YearlyBlock {
-	totalfrq: number;
+interface Concordancequery {
+	iquery: string;
+	queryselector: string;
+}
+
+interface Desc {
+	op: string;
+	arg: string;
+	nicearg: string;
+	rel: number;
+	size: number;
+	tourl: string;
+}
+
+interface Block {
 	Head: Array<Head>;
 	total: number;
+	totalfrq: number;
 	Items: Array<Item>;
 }
 
 interface Item {
-	relbar: number;
 	Word: Array<Word>;
-	fbar: number;
-	pfilter_list: Array<string>;
 	frq: number;
-	nfilter: string;
-	pfilter: string;
-	freqbar: number;
-	rel: number;
-	nbar: number;
 	norm: number;
-	norel: number;
+	rel: number;
+	reltt: number;
+	fbar: number;
+	relbar: number;
+	freqbar: number;
+	pfilter: string;
+	nfilter: string;
+	pfilter_list: Array<string>;
+	poc: number;
+	fpm: number;
 }
 
 interface Word {
@@ -61,7 +75,11 @@ interface Word {
 }
 
 interface Head {
+	n: string;
 	s: number | string;
 	id?: string;
-	n: string;
+}
+
+interface FCrit {
+	fcrit: string;
 }
