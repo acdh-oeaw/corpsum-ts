@@ -3,19 +3,17 @@ import { useCorporaStore } from "../stores/corpora";
 
 export function useWordFormsSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
-	// const queryStore = useQuery();
+	const queryStore = useQuery();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
 
 	const getWordFormFrequencies = async (query: CorpusQuery) => {
 		query.loading.wordFormFrequencies = true;
-
-		const corpora = useCorporaStore();
 		/* eslint-disable */
 		const { data: freqtWords } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
 				// @ts-ignore
-				...corpora.corporaForSearchKeys,
+				...queryStore.corporaForSearchKeys(query),
 				default_attr: "lemma",
 				attrs: "word",
 				refs: "=doc.id",

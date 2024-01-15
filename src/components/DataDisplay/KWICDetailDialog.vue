@@ -5,12 +5,12 @@ import { computed, type Ref, ref, watch } from "vue";
 import { useAPIs } from "../../composables/useAPIs";
 import { useAuthenticatedFetch } from "../../composables/useAuthenticatedFetch";
 
-const props = defineProps<{ kwic: KeywordInContext | null }>();
+const props = defineProps<{ kwic: KeywordInContext | null; query: CorpusQuery }>();
 defineEmits(["close"]);
 const { STRUCTCTX_URL } = useAPIs();
 const active = computed(() => Boolean(props.kwic));
-const corporaStore = useCorporaStore();
-const { corporaForSearchWithoutSubCorpus } = storeToRefs(corporaStore);
+const queryStore = useQuery();
+
 const { authenticatedFetch } = useAuthenticatedFetch();
 
 const loading = ref(false);
@@ -24,8 +24,16 @@ async function getDetails() {
 	details.value = null;
 	const { data: _details } = await authenticatedFetch(STRUCTCTX_URL, {
 		params: {
-			q: `${corporaForSearchWithoutSubCorpus.value};pos=${props.kwic.toknum};struct=doc;format=json`,
+			q: `ignored=niceapi;${queryStore.corporaForSearchWithoutSubCorpus(props.query)};pos=${
+				props.kwic.toknum
+			};struct=doc;format=json`,
 		},
+		// params: {
+		// 	...corporaForSearchKeys,
+		// 	pos: props.kwic.toknum,
+		// 	struct:'doc',
+		// 	format:'json',
+		// },
 	});
 	loading.value = false;
 

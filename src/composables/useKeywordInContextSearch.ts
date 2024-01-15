@@ -1,12 +1,12 @@
 // this file incoperates the actual search for the yearly frequency data
 import { storeToRefs } from "pinia";
 
-import { useCorporaStore } from "../stores/corpora";
+import { useQuery } from "../stores/query";
 
 export function useKeywordInContextSearch() {
 	const { VIEWSATTRSX_URL } = useAPIs();
-	const corporaStore = useCorporaStore();
-	const { corporaForSearch } = storeToRefs(corporaStore);
+	const queryStore = useQuery();
+
 	// const queryStore = useQuery();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
@@ -16,7 +16,9 @@ export function useKeywordInContextSearch() {
 
 		const { data } = await authenticatedFetch(VIEWSATTRSX_URL, {
 			params: {
-				q: `${query.preparedQuery};${corporaForSearch.value};viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;refs==doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`,
+				q: `${query.preparedQuery};${queryStore.corporaForSearch(
+					query,
+				)};viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;refs==doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`,
 			},
 		});
 		const keywordInContext = data.value as KeywordInContextData;

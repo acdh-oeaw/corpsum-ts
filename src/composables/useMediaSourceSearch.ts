@@ -1,28 +1,18 @@
-// this file incoperates the actual search for the yearly frequency data
-
-import { storeToRefs } from "pinia";
-
 export function useMediaSourceSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
+	const queryStore = useQuery();
 
-	// // todo storeToRefs as soon this data is actually fetched
-	// const { corpusStatistics } = useCorporaStore();
-	// const { getWordlist } = useWordlist();
-	// todo implement proper mapping and returning of ifos
-	/* eslint-disable */
 	const getMediaSourceFrequencies = async (query: CorpusQuery) => {
 		// doc.docsrc
 		// query.loading.mediaSources = true;
 		query.loading.mediaSources = true;
 
-		const corpora = useCorporaStore();
-		const { selectedCorpus } = storeToRefs(corpora);
 		const { data: mediaSources } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
 				// @ts-ignore
-				...corpora.corporaForSearchKeys,
+				...queryStore.corporaForSearchKeys(query),
 				format: "json",
 				fmaxitems: 5000,
 				fpage: 1,
@@ -35,7 +25,6 @@ export function useMediaSourceSearch() {
 				ml1attr: "doc.docsrc",
 				ml1ctx: "0~0 > 0",
 				json: { concordance_query: query.concordance_query },
-				//q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.docsrc;fcrit=doc.id;flimit=0;format=json`,
 			},
 		});
 		// // @ts-ignore
@@ -45,7 +34,7 @@ export function useMediaSourceSearch() {
 		// }
 		const mediaSourceData = mediaSources.value as FreqMLDocsRC;
 
-		if (!mediaSourceData?.Blocks) {
+		if (!mediaSourceData.Blocks) {
 			query.loading.mediaSources = false;
 			query.data.mediaSources = [];
 			// alert('error on fetching freqml regions');

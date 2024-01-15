@@ -2,6 +2,7 @@ import { useCorporaStore } from "../stores/corpora";
 
 export function useRegionsSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
+	const queryStore = useQuery();
 	// const queryStore = useQuery();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
@@ -10,12 +11,10 @@ export function useRegionsSearch() {
 
 	const getRegionsFrequencies = async (query: CorpusQuery) => {
 		query.loading.regionalFrequencies = true;
-		const corpora = useCorporaStore();
-
 		const { data: regionsData } = await authenticatedFetch(FREQUENCIES_MULTI_LEVEL_URL, {
 			params: {
 				// @ts-ignore
-				...corpora.corporaForSearchKeys,
+				...queryStore.corporaForSearchKeys(query),
 				format: "json",
 				fmaxitems: 5000,
 				fpage: 1,

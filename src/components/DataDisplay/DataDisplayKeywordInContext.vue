@@ -37,20 +37,21 @@ function open(item: KeywordInContext) {
 
 const subCorpusName = ref("");
 const { authenticatedFetch } = useAuthenticatedFetch();
-const { corporaForSearchWithoutSubCorpus, fetchSubCorpora } = useCorporaStore();
+const corporaStore = useCorporaStore();
+const { corporaForSearchWithoutSubCorpus, selectedCorpus } = storeToRefs(corporaStore);
 async function createSubcorpus() {
 	const { isConfirmed } = await Swal.fire({
 		title: "Create Subcorpus",
-		text: `Do you really want to create a subcorpus named '${subCorpusName.value}'' containing ${
+		text: `Do you really want to create a subcorpus named '${subCorpusName.value}' containing ${
 			selected.value.length || 0
-		} documents?`,
+		} documents in subcorpus ${selectedCorpus.value.name}?`,
 		showDenyButton: true,
 	});
 
 	if (isConfirmed) {
 		// todo send results
 		await authenticatedFetch(
-			`${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus};subcname=${
+			`${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus.value};subcname=${
 				subCorpusName.value
 			};create=True;${selected.value.map((docid: string) => `sca_doc.id=${docid}`).join(";")}`,
 			// 			"${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus};reload=;subcname=testcorbussi;create=Trueundefined;sca_doc.id=APA_19860220_APA0002;sca_doc.id=APA_19860220_APA0003",
@@ -58,7 +59,7 @@ async function createSubcorpus() {
 		Swal.fire("Confirmed", "Subcorpus created successfully!")
 			.then(console.log)
 			.catch(console.error);
-		await fetchSubCorpora();
+		await corporaStore.fetchSubCorpora();
 	}
 }
 
@@ -71,7 +72,10 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 		<VCardText class="py-0">
 			<VCheckbox v-model="createSubcorpusMode" label="Show Subcorpus Creation"></VCheckbox>
 			<div v-if="createSubcorpusMode">
-				<p>Create Sub-Corpus from Selection ({{ selected.length }})</p>
+				<p>
+					Create Sub-Corpus from Selection ({{ selected.length }}) in Corpus
+					{{ selectedCorpus.name }}
+				</p>
 				<VTextField
 					v-model="subCorpusName"
 					label="Name"
@@ -100,7 +104,7 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 							<VIcon size="small" class="me-2" icon="mdi-open-in-new" @click="open(item)" />
 						</template>
 					</VDataTable>
-					<KWICDetailDialog :kwic="selectedKWIC" @close="selectedKWIC = null" />
+					<KWICDetailDialog :query="query" :kwic="selectedKWIC" @close="selectedKWIC = null" />
 				</div>
 				<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 			</div>
