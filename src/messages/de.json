@@ -17,7 +17,10 @@
 			"title": "Corpsum",
 			"description": ""
 		},
-		"title": "Corpsum"
+		"title": "Corpsum",
+		"absolute": "Absolut",
+		"relative": "Relativ",
+		"YearlyFrequencies": "Frequenz nach Jahren"
 	},
 	"DefaultLayout": {
 		"meta": {

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+const t = useTranslations("Corpsum");
 
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
@@ -34,9 +35,9 @@ const series = computed(() =>
 
 		<VCardText class="py-0">
 			<VBtnToggle v-model="mode" density="compact">
-				<VBtn variant="outlined" value="absolute">Absolute</VBtn>
+				<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
 
-				<VBtn variant="outlined" value="relative">Relative</VBtn>
+				<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
 			</VBtnToggle>
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="query.loading.yearlyFrequencies">
@@ -48,7 +49,7 @@ const series = computed(() =>
 				:options="{
 					series,
 					title: {
-						text: 'Yearly Frequencies', // Specify your chart title here
+						text: t('YearlyFrequencies'), // Specify your chart title here
 						align: 'center', // Alignment of the title (default is 'center')
 						// style: {
 						// 	color: 'blue', // Text color
