@@ -21,8 +21,17 @@
 		"queries": "Abfrage(n)",
 		"absolute": "Absolut",
 		"relative": "Relativ",
+		"sources": "sources",
+		"ShowData": "Quelldaten anzeigen",
+		"HideData": "Quelldaten verstecken",
 		"YearlyFrequencies": "Frequenz nach Jahren",
-		"YearlyFrequenciesDesc": "Zeigt absolute und relative Werte."
+		"YearlyFrequenciesDesc": "Zeigt absolute und relative Werte.",
+		"WordFormFrequencies": "WordFormFrequencies",
+		"WordFormFrequenciesDesc": "WordFormFrequenciesDesc",
+		"RegionalFrequencies": "RegionalFrequencies",
+		"RegionalFrequenciesDesc": "RegionalFrequenciesDesc",
+		"MediaSources": "MediaSources",
+		"MediaSourcesDesc": "MediaSourcesDesc"
 	},
 	"DefaultLayout": {
 		"meta": {
