@@ -3,9 +3,9 @@ import { storeToRefs } from "pinia";
 import Swal from "sweetalert2";
 import type { Ref } from "vue";
 
-import { useAPIs } from "../../composables/useAPIs";
-import { useAuthenticatedFetch } from "../../composables/useAuthenticatedFetch";
-import { useCorporaStore } from "../../stores/corpora";
+import { useAPIs } from "@/composables/useAPIs";
+import { useAuthenticatedFetch } from "@/composables/useAuthenticatedFetch";
+import { useCorporaStore } from "@/stores/corpora";
 import CorpusChip from "../Search/CorpusChip.vue";
 import KWICDetailDialog from "./KWICDetailDialog.vue";
 
