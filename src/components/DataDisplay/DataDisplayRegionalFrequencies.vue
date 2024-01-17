@@ -14,7 +14,7 @@ const expand = ref(false);
 		<VCardItem :title="t('RegionalFrequencies')">
 			<template #subtitle>
 				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
-				{{ t('RegionalFrequenciesDesc') }}
+				{{ t("RegionalFrequenciesDesc") }}
 			</template>
 		</VCardItem>
 
@@ -44,7 +44,10 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<DataDisplaySourceTable :queries="queries" datatype="regionalFrequencies"></DataDisplaySourceTable>
+			<DataDisplaySourceTable
+				:queries="queries"
+				datatype="regionalFrequencies"
+			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>

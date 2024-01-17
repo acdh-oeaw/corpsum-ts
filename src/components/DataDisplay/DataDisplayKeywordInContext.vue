@@ -31,7 +31,6 @@ const selected = ref([]);
 const createSubcorpusMode = ref(false);
 
 function open(item: KeywordInContext) {
-	// console.log("open", { item });
 	selectedKWIC.value = item;
 }
 
@@ -57,7 +56,7 @@ async function createSubcorpus() {
 			// 			"${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus};reload=;subcname=testcorbussi;create=Trueundefined;sca_doc.id=APA_19860220_APA0002;sca_doc.id=APA_19860220_APA0003",
 		);
 		Swal.fire("Confirmed", "Subcorpus created successfully!")
-			.then(console.log)
+			.then()
 			.catch(console.error);
 		await corporaStore.fetchSubCorpora();
 	}

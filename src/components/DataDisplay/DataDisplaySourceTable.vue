@@ -1,21 +1,22 @@
 <script lang="ts" setup>
-const props = defineProps<{ queries: CorpusQuery[]; datatype: SearchFunctionKey }>();
-const t = useTranslations("Corpsum");
+const props = defineProps<{ queries: Array<CorpusQuery>; datatype: SearchFunctionKey }>();
 const tab = ref(null);
 </script>
 
 <template>
-	<v-card>
-		<v-tabs v-model="tab">
+	<VCard>
+		<VTabs v-model="tab">
 			<div v-for="query of props.queries" :key="query.id">
-				<v-tab :value="query.id"><span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span></v-tab>
+				<VTab :value="query.id">
+					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
+				</VTab>
 			</div>
-		</v-tabs>
+		</VTabs>
 
-		<v-card-text>
-			<v-window v-model="tab">
+		<VCardText>
+			<VWindow v-model="tab">
 				<div v-for="query of props.queries" :key="query.id">
-					<v-window-item :value="query.id">
+					<VWindowItem :value="query.id">
 						<div v-if="!query.loading[props.datatype]">
 							<span :style="`color: ${query.color}`">
 								<CorpusChip :query="query" />
@@ -23,9 +24,9 @@ const tab = ref(null);
 							<VDataTable :items="query.data[props.datatype]" density="compact" />
 						</div>
 						<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
-					</v-window-item>
+					</VWindowItem>
 				</div>
-			</v-window>
-		</v-card-text>
-	</v-card>
+			</VWindow>
+		</VCardText>
+	</VCard>
 </template>

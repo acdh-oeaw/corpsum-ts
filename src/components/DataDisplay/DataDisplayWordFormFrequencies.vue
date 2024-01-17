@@ -14,7 +14,7 @@ const expand = ref(false);
 		<VCardItem :title="t('WordFormFrequencies')">
 			<template #subtitle>
 				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
-				{{t('WordFormFrequenciesDesc')}}
+				{{ t("WordFormFrequenciesDesc") }}
 			</template>
 		</VCardItem>
 
@@ -62,7 +62,10 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<DataDisplaySourceTable :queries="queries" datatype="wordFormFrequencies"></DataDisplaySourceTable>
+			<DataDisplaySourceTable
+				:queries="queries"
+				datatype="wordFormFrequencies"
+			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>

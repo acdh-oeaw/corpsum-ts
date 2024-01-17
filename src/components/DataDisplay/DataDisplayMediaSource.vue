@@ -21,7 +21,7 @@ const series = computed(() => {
 		return {
 			color: query.color,
 			name: `${query.type}: ${query.userInput} (${query.corpus}${
-				query.subCorpus ? ` / ${query.subCorpus})` : ')'
+				query.subCorpus ? ` / ${query.subCorpus})` : ")"
 			}`,
 			data: categories.value
 				.map((category) => query.data.mediaSources.find(({ media }) => category === media))
@@ -31,10 +31,6 @@ const series = computed(() => {
 	});
 	return allSeries;
 });
-
-
-
-
 </script>
 
 <template>
@@ -42,7 +38,7 @@ const series = computed(() => {
 		<VCardItem :title="t('MediaSources')">
 			<template #subtitle>
 				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
-				{{ t('MediaSourcesDesc') }}
+				{{ t("MediaSourcesDesc") }}
 			</template>
 		</VCardItem>
 

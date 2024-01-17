@@ -13,7 +13,7 @@ const series = computed(() =>
 		.filter((q: CorpusQuery) => !q.loading.yearlyFrequencies)
 		.map((query: CorpusQuery) => ({
 			name: `${query.type}: ${query.userInput} (${query.corpus}${
-				query.subCorpus ? ` / ${query.subCorpus})` : ')'
+				query.subCorpus ? ` / ${query.subCorpus})` : ")"
 			}`,
 			data: query.data.yearlyFrequencies
 				.sort((a, b) => b.year - a.year)
@@ -21,15 +21,13 @@ const series = computed(() =>
 			color: query.color,
 		})),
 );
-
-
 </script>
 
 <template>
 	<VCard>
 		<VCardItem :title="t('YearlyFrequencies')">
 			<template #subtitle>
-				{{t('YearlyFrequenciesDesc')}}
+				{{ t("YearlyFrequenciesDesc") }}
 			</template>
 		</VCardItem>
 
@@ -49,19 +47,22 @@ const series = computed(() =>
 					series,
 					title: {
 						text: `${series.length} ${t('queries')}`,
-						align: 'center'
+						align: 'center',
 					},
-						yAxis: {
-							title: {
-								text: t('sources'),
-							},
+					yAxis: {
+						title: {
+							text: t('sources'),
 						},
+					},
 				}"
 			></HighCharts>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<DataDisplaySourceTable :queries="queries" datatype="yearlyFrequencies"></DataDisplaySourceTable>
+			<DataDisplaySourceTable
+				:queries="queries"
+				datatype="yearlyFrequencies"
+			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>
