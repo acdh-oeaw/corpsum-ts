@@ -6,6 +6,7 @@ import type { Ref } from "vue";
 import { useAPIs } from "@/composables/useAPIs";
 import { useAuthenticatedFetch } from "@/composables/useAuthenticatedFetch";
 import { useCorporaStore } from "@/stores/corpora";
+
 import CorpusChip from "../Search/CorpusChip.vue";
 import KWICDetailDialog from "./KWICDetailDialog.vue";
 
@@ -55,9 +56,7 @@ async function createSubcorpus() {
 			};create=True;${selected.value.map((docid: string) => `sca_doc.id=${docid}`).join(";")}`,
 			// 			"${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus};reload=;subcname=testcorbussi;create=Trueundefined;sca_doc.id=APA_19860220_APA0002;sca_doc.id=APA_19860220_APA0003",
 		);
-		Swal.fire("Confirmed", "Subcorpus created successfully!")
-			.then()
-			.catch(console.error);
+		Swal.fire("Confirmed", "Subcorpus created successfully!").then().catch(console.error);
 		await corporaStore.fetchSubCorpora();
 	}
 }
