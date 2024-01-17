@@ -18,9 +18,11 @@
 			"description": ""
 		},
 		"title": "Corpsum",
+		"queries": "querie(s)",
 		"absolute": "Absolute",
 		"relative": "Relative",
-		"YearlyFrequencies": "Yearly Frequencies"
+		"YearlyFrequencies": "Yearly Frequencies",
+		"YearlyFrequenciesDesc": "Shows absolute and relative Values."
 	},
 	"DefaultLayout": {
 		"meta": {

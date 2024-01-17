@@ -1,27 +1,27 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 
+const t = useTranslations("Corpsum");
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
-const mode = ref("relative");
 
+const mode = ref("relative");
 const expand = ref(false);
 </script>
 
 <template>
 	<VCard>
-		<VCardItem title="Word Form Frequencies">
+		<VCardItem :title="t('WordFormFrequencies')">
 			<template #subtitle>
 				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
-				shows absolute and relative Values.
+				{{t('WordFormFrequenciesDesc')}}
 			</template>
 		</VCardItem>
 
 		<VCardText class="py-0">
 			<VBtnToggle v-model="mode" density="compact">
-				<VBtn variant="outlined" value="absolute">Absolute</VBtn>
-
-				<VBtn variant="outlined" value="relative">Relative</VBtn>
+				<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
+				<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
 			</VBtnToggle>
 			<div v-for="query of queries" :key="query.id">
 				<div v-if="query.loading.wordFormFrequencies">
@@ -42,14 +42,14 @@ const expand = ref(false);
 
 						yAxis: {
 							title: {
-								text: 'sources',
+								text: t('sources'),
 							},
 						},
 						series: [
 							{
 								color: query.color,
-								name: `${query.type}: ${query.userInput} ${query.corpus}${
-									query.subCorpus ? ` / ${query.subCorpus}` : ''
+								name: `${query.type}: ${query.userInput} (${query.corpus}${
+									query.subCorpus ? ` / ${query.subCorpus})` : ')'
 								}`,
 								data: query.data.wordFormFrequencies.map(({ relative, absolute }) =>
 									mode === 'relative' ? relative : absolute,
@@ -62,26 +62,14 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<div class="m-2 grid grid-cols-2 gap-2">
-				<div v-for="query of queries" :key="query.id">
-					<div v-if="!query.loading.wordFormFrequencies">
-						<span :style="`color: ${query.color}`">
-							{{ query.type }}: {{ query.userInput }}
-							<CorpusChip :query="query" />
-						</span>
-
-						<VDataTable :items="query.data.wordFormFrequencies" density="compact" />
-					</div>
-					<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
-				</div>
-			</div>
+			<DataDisplaySourceTable :queries="queries" datatype="wordFormFrequencies"></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>
 
 		<VCardActions>
 			<VBtn variant="outlined" size="small" @click="expand = !expand">
-				{{ !expand ? "Show Data" : "Hide Data" }}
+				{{ !expand ? t("ShowData") : t("HideData") }}
 			</VBtn>
 		</VCardActions>
 	</VCard>
