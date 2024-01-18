@@ -11,10 +11,10 @@ const expand = ref(false);
 
 <template>
 	<VCard>
-		<VCardItem :title="t('WordFormFrequencies')">
+		<VCardItem :title="t('wordFormFrequencies')">
 			<template #subtitle>
 				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
-				{{ t("WordFormFrequenciesDesc") }}
+				{{ t("wordFormFrequenciesDesc") }}
 			</template>
 		</VCardItem>
 

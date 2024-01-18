@@ -5,11 +5,11 @@ import { storeToRefs } from "pinia";
 const corporaStore = useCorporaStore();
 
 const { subCorporaLoading, corporaLoading } = storeToRefs(corporaStore);
+const t = useTranslations("Corpsum");
 </script>
 
 <template>
 	<div class="flex items-start gap-1">
-		<!-- <VBtn @click="fetchCorpora()">refetch Corpora</VBtn> -->
 		<div class="flex flex-col justify-start">
 			<VSelect
 				v-model="corporaStore.selectedCorpus"
@@ -17,16 +17,18 @@ const { subCorporaLoading, corporaLoading } = storeToRefs(corporaStore);
 				:items="corporaStore.corpora"
 				item-title="name"
 				return-object
-				label="Corpus"
-				placeholder="select the Corpus"
+				:label="t('Corpus')"
+				:no-data-text="t('NoData')"
 				style="flex-grow: 0; min-width: 15rem"
 			></VSelect>
 			<p v-if="corporaStore.selectedCorpus">
-				tokencount: {{ corporaStore.selectedCorpus.sizes.tokencount }}
+				{{ t("compiledDate") }}: {{ corporaStore.selectedCorpus.compiled }}
 				<br />
-				wordcount: {{ corporaStore.selectedCorpus.sizes.wordcount }}
+				{{ t("tokencount") }}: {{ corporaStore.selectedCorpus.sizes.tokencount }}
 				<br />
-				doccount: {{ corporaStore.selectedCorpus.sizes.doccount }}
+				{{ t("wordcount") }}: {{ corporaStore.selectedCorpus.sizes.wordcount }}
+				<br />
+				{{ t('doccount') }}: {{ corporaStore.selectedCorpus.sizes.doccount }}
 			</p>
 		</div>
 		<div class="flex h-full flex-col items-start justify-start">
@@ -39,8 +41,9 @@ const { subCorporaLoading, corporaLoading } = storeToRefs(corporaStore);
 				dese
 				return-object
 				:clearable="true"
-				label="Sub-Corpus"
-				placeholder="select the Subcorpus or leave empty to query the whole corpus"
+				:label="t('SubCorpus')"
+				:placeholder="t('SelectSubCorpus')"
+				:no-data-text="t('NoData')"
 				style="flex-grow: 0; min-width: 10rem"
 			></VAutocomplete>
 			<p v-if="corporaStore.selectedSubCorpus">
@@ -50,15 +53,5 @@ const { subCorporaLoading, corporaLoading } = storeToRefs(corporaStore);
 				<br />
 			</p>
 		</div>
-
-		<!-- {{ !selectedCorpus }} {{ subCorporaLoading }} -->
-
-		<!-- <v-btn variant="outlined">Add Query</v-btn> -->
 	</div>
-	<!-- <p>
-		{{ corporaStore.selectedCorpus }}
-	</p> -->
-	<!-- <p>
-		{{ corporaStore.selectedSubCorpus }}
-	</p> -->
 </template>

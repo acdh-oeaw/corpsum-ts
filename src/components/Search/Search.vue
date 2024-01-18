@@ -3,17 +3,17 @@ import QueryItem from "./QueryItem.vue";
 import SearchDimensions from "./SearchDimensions.vue";
 
 const query = useQuery();
+const t = useTranslations("Corpsum");
 
 const newSelectedType: Ref<CorpusQueryType> = ref("iqueryrow");
 const newUserInput = ref("");
 
 const CORPUS_QUERY_TYPES = [
-	// { value: "charrow", description: "Character Search" },
-	{ value: "iqueryrow", description: "Simple search (iquery)" },
-	{ value: "wordrow", description: "Word search" },
-	{ value: "lemmarow", description: "Lemma search" },
-	{ value: "phraserow", description: "Phrase search" },
-	{ value: "cqlrow", description: "Custom Query search (CQL)" },
+	{ value: "iqueryrow", description: t("iqueryrow") },
+	{ value: "wordrow", description: t("wordrow") },
+	{ value: "lemmarow", description: t("lemmarow") },
+	{ value: "phraserow", description: t("phraserow") },
+	{ value: "cqlrow", description: t("cqlrow") },
 ];
 
 const searchSettings = useSearchSettingsStore();
@@ -42,21 +42,19 @@ const _alert = (msg: string) => {
 						:items="CORPUS_QUERY_TYPES"
 						item-title="description"
 						item-value="value"
-						label="Query type"
-						placeholder="select the Query type"
+						:label="t('querytype')"
 						style="flex-grow: 0"
 						class="ml-4"
 					></VSelect>
 					<VTextField
 						v-model="newUserInput"
-						placeholder="your search term"
+						:placeholder="t('SearchTerm')"
 						vafriant="outlined"
 						class="flex-1"
 						append-inner-icon="mdi-send-circle"
 						@keydown.enter="addQuery"
 						@click:append-inner="addQuery"
 					></VTextField>
-					<!-- <v-btn variant="outlined">Add Query</v-btn> -->
 				</div>
 			</VForm>
 		</div>

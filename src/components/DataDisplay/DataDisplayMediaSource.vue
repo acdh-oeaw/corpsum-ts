@@ -35,10 +35,10 @@ const series = computed(() => {
 
 <template>
 	<VCard>
-		<VCardItem :title="t('MediaSources')">
+		<VCardItem :title="t('mediaSources')">
 			<template #subtitle>
 				<!-- <v-icon icon="mdi-alert" size="18" color="error" class="me-1 pb-1"></v-icon> -->
-				{{ t("MediaSourcesDesc") }}
+				{{ t("mediaSourcesDesc") }}
 			</template>
 		</VCardItem>
 

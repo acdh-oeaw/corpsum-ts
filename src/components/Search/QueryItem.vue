@@ -10,7 +10,6 @@ const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unkno
 
 <template>
 	<VCard :key="props.query.id" :style="`border: 2px solid ${props.query.color};`">
-		<!-- <p>id: {{ props.query.id }}</p> -->
 		<VCardTitle>
 			<div class="flex justify-between gap-2">
 				<div class="flex gap-1">

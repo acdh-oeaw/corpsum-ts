@@ -25,9 +25,9 @@ const series = computed(() =>
 
 <template>
 	<VCard>
-		<VCardItem :title="t('YearlyFrequencies')">
+		<VCardItem :title="t('yearlyFrequencies')">
 			<template #subtitle>
-				{{ t("YearlyFrequenciesDesc") }}
+				{{ t("yearlyFrequenciesDesc") }}
 			</template>
 		</VCardItem>
 

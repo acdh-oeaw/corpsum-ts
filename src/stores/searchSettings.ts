@@ -10,12 +10,13 @@ export const useSearchSettingsStore = defineStore(
 		const { getRegionsFrequencies } = useRegionsSearch();
 		const { getKeywordInContext } = useKeywordInContextSearch();
 
+		const t = useTranslations("Corpsum");
 		const possibleSearchKeys: Ref<Array<{ value: SearchFunctionKey; title: string }>> = ref([
-			{ value: "yearlyFrequencies", title: "Yearly Frequencies" },
-			{ value: "wordFormFrequencies", title: "Word Form Frequencies" },
-			{ value: "regionalFrequencies", title: "Regional Frequencies" },
-			{ value: "mediaSources", title: "Media Sources" },
-			{ value: "keywordInContext", title: "Keyword in Context View" },
+			{ value: "yearlyFrequencies", title: t("yearlyFrequencies") },
+			{ value: "wordFormFrequencies", title: t("wordFormFrequencies") },
+			{ value: "regionalFrequencies", title: t("regionalFrequencies") },
+			{ value: "mediaSources", title: t("mediaSources") },
+			{ value: "keywordInContext", title: t("keywordInContext") },
 		]);
 
 		const searchFunctions: Record<SearchFunctionKey, (query: CorpusQuery) => Promise<void>> = {

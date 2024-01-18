@@ -1,7 +1,7 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, type Ref, ref, watch } from "vue";
 
-import { useAuthenticatedFetch } from "../composables/useAuthenticatedFetch";
+import { useAuthenticatedFetch } from "@/composables/useAuthenticatedFetch";
 
 export type usedYear =
 	| 2005
@@ -34,19 +34,12 @@ export const useCorporaStore = defineStore(
 		const tracker = ref(0);
 		async function fetchCorpora() {
 			corporaLoading.value = true;
-			// console.log("in fetchCorpora", CORPORA_LIST_URL);
 			const { data } = await authenticatedFetch(CORPORA_LIST_URL, {});
-			// console.log("corpfetch ", { data: data.value, error: error.value });
 			corporaLoading.value = false;
 
 			if (!data.value) return false;
 			const corporaInfo = data.value as CorporaInfo;
 			corpora.value = [...corporaInfo.data];
-			//			corporaInfo.data.forEach(c => corpora.value.push(c));
-			// corpora.value.push(corporaInfo.data[0]);
-			// corpora.value = [...corporaInfo.data];
-
-			// console.log({ corpval: corpora.value });
 			tracker.value++;
 			return true;
 		}

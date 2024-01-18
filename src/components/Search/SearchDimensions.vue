@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+const t = useTranslations("Corpsum");
 
 const searchSettings = useSearchSettingsStore();
 const { selectedSearches, possibleSearchKeys } = storeToRefs(searchSettings);
@@ -8,7 +9,7 @@ const { selectedSearches, possibleSearchKeys } = storeToRefs(searchSettings);
 <template>
 	<VAutocomplete
 		v-model="selectedSearches"
-		label="Search Dimensions"
+		:label="t('SearchDimensions')"
 		multiple
 		closable-chips
 		clearable
