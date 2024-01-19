@@ -16,7 +16,7 @@ const t = useTranslations("Corpsum");
 				:loading="corporaLoading"
 				:items="corporaStore.corpora"
 				item-title="name"
-				return-object
+				:return-object="true"
 				:label="t('Corpus')"
 				:no-data-text="t('NoData')"
 				style="flex-grow: 0; min-width: 15rem"
@@ -39,7 +39,7 @@ const t = useTranslations("Corpsum");
 				item-title="name"
 				item-value="name"
 				dese
-				return-object
+				:return-object="true"
 				:clearable="true"
 				:label="t('SubCorpus')"
 				:placeholder="t('SelectSubCorpus')"
@@ -47,9 +47,9 @@ const t = useTranslations("Corpsum");
 				style="flex-grow: 0; min-width: 10rem"
 			></VAutocomplete>
 			<p v-if="corporaStore.selectedSubCorpus">
-				tokens: {{ corporaStore.selectedSubCorpus.tokens }}
+				tokens: {{ corporaStore.selectedSubCorpus?.tokens }}
 				<br />
-				words: {{ corporaStore.selectedSubCorpus.words }}
+				words: {{ corporaStore.selectedSubCorpus?.words }}
 				<br />
 			</p>
 		</div>
