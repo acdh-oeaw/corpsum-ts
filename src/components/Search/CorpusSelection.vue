@@ -22,6 +22,8 @@ const t = useTranslations("Corpsum");
 				style="flex-grow: 0; min-width: 15rem"
 			></VSelect>
 			<p v-if="corporaStore.selectedCorpus">
+				{{ corporaStore.selectedCorpus?.info }}
+				<br />
 				{{ t("tokencount") }}: {{ corporaStore.selectedCorpus?.sizes.tokencount }}
 				<br />
 				{{ t("wordcount") }}: {{ corporaStore.selectedCorpus?.sizes.wordcount }}
