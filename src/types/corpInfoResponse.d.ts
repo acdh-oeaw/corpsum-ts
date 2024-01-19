@@ -1,82 +1,81 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * @interface
+ * Response Schema for SketchEngines corp_info endpoint
+ * Custom written as the actual response does  not fully match the response
+ * described here https://www.sketchengine.eu/apidoc/#/Corpus%20Search/get_search_corp_info
+ */
 interface CorpInfoResponse {
-	gramrels: Array<any>;
-	diachronic?: any;
-	encoding: string;
-	unicameral: boolean;
+	aligned: Array<any>;
 	aligned_details: Array<any>;
 	alsizes: Array<any>;
-	termdef: string;
-	newversion: string;
-	wsattr: string;
-	wsdef: string;
-	is_error_corpus: boolean;
-	subcorpora: Array<Subcorpora>;
-	infohref: string;
-	lposlist: Array<Array<string>>;
-	compiled: string;
-	structures: Array<Structure>;
 	api_version: string;
-	info: string;
-	wsposlist: Array<any>;
-	freqttattrs: Array<any>;
-	tagsetdoc: string;
-	aligned: Array<any>;
-	structs: Array<any>;
-	wposlist: Array<any>;
-	lang: string;
+	attributes: Array<Attribute>;
+	compiled: string;
+	diachronic?: any;
 	docstructure: string;
+	encoding: string;
+	errsetdoc: string;
+	freqttattrs: Array<any>;
+	gramrels: Array<any>;
+	info: string;
+	infohref: string;
+	is_error_corpus: boolean;
+	lang: string;
+	lposlist: Array<Array<string>>;
+	maxdetail: number;
 	name: string;
-	shortref: string;
-	sizes: Sizes;
+	newversion: string;
 	request: Request;
 	righttoleft: boolean;
-	attributes: Array<Attribute2>;
+	shortref: string;
+	sizes: Sizes;
+	structs: Array<any>;
+	structures: Array<Structure>;
 	subcorpattrs: Array<any>;
-	maxdetail: number;
-	errsetdoc: string;
-}
-
-interface Attribute2 {
-	fromattr: string;
-	id_range: number;
-	dynamic: string;
-	name: string;
-	label: string;
+	subcorpora: Array<Subcorpora>;
+	tagsetdoc: string;
+	termdef: string;
+	unicameral: boolean;
+	wposlist: Array<any>;
+	wsattr: string;
+	wsdef: string;
+	wsposlist: Array<any>;
 }
 
 interface Request {
-	subcorpora: string;
 	corpname: string;
 	format: string;
+	subcorpora: string;
 }
 
 interface Sizes {
-	tokencount: string;
-	sentcount: string;
-	wordcount: string;
+	doccount: string;
 	normsum: string;
 	parcount: string;
-	doccount: string;
+	sentcount: string;
+	tokencount: string;
+	wordcount: string;
 }
 
 interface Structure {
 	attributes: Array<Attribute>;
-	name: string;
 	label: string;
+	name: string;
 }
 
 interface Attribute {
-	fromattr: string;
 	dynamic: string;
-	name: string;
+	fromattr: string;
+	id_range?: number;
 	label: string;
+	name: string;
 }
 
 interface Subcorpora {
-	tokens: number;
+	n: string;
 	relsize: number;
+	tokens: number;
 	user: number;
 	words: number;
-	n: string;
 }
