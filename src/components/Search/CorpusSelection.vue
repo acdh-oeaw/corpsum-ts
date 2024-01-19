@@ -22,13 +22,11 @@ const t = useTranslations("Corpsum");
 				style="flex-grow: 0; min-width: 15rem"
 			></VSelect>
 			<p v-if="corporaStore.selectedCorpus">
-				{{ t("compiledDate") }}: {{ corporaStore.selectedCorpus.compiled }}
+				{{ t("tokencount") }}: {{ corporaStore.selectedCorpus?.sizes.tokencount }}
 				<br />
-				{{ t("tokencount") }}: {{ corporaStore.selectedCorpus.sizes.tokencount }}
+				{{ t("wordcount") }}: {{ corporaStore.selectedCorpus?.sizes.wordcount }}
 				<br />
-				{{ t("wordcount") }}: {{ corporaStore.selectedCorpus.sizes.wordcount }}
-				<br />
-				{{ t('doccount') }}: {{ corporaStore.selectedCorpus.sizes.doccount }}
+				{{ t('doccount') }}: {{ corporaStore.selectedCorpus?.sizes.doccount }}
 			</p>
 		</div>
 		<div class="flex h-full flex-col items-start justify-start">
