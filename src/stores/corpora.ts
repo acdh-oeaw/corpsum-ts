@@ -50,8 +50,6 @@ export const useCorporaStore = defineStore(
 
 		async function fetchSubCorpora() {
 			subCorporaLoading.value = true;
-			// console.log({ before: before, after });
-			// console.log("corporaStore.selectedCorpus changed");
 			selectedSubCorpus.value = null;
 			subCorpora.value = [];
 			if (!selectedCorpus.value) return console.error("no corpus selected");
@@ -68,16 +66,12 @@ export const useCorporaStore = defineStore(
 			else {
 				if (!_subCorpora.value) return console.error("could not fetch subcorpora");
 				const subCorporaResponseData = _subCorpora.value as unknown as CorpInfoResponse;
-
 				subCorpora.value = subCorporaResponseData.subcorpora;
-				// corporaStore.selectedSubCorpus = subCorpora.value[0];
-			}
+					}
 		}
 
-		// auto-fetch subcorpora when selectedCorpus changes
 		watch(selectedCorpus, async (before, after) => {
-			if (!after || before?.name === after.name) return; //console.log("no change")
-			// console.log({ selectedCorpus, before, after, isSame: before?.name === after.name });
+			if (!after || before?.name === after.name) return;
 			await fetchSubCorpora();
 		});
 

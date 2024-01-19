@@ -10,7 +10,6 @@ type SearchFunctionKey =
 	| "regionalFrequencies"
 	| "wordFormFrequencies"
 	| "yearlyFrequencies";
-
 interface KeywordInContext {
 	date: string;
 	source: string;
