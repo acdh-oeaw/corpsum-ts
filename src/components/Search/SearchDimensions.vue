@@ -22,6 +22,7 @@ const { selectedSearches, possibleSearchKeys } = storeToRefs(searchSettings);
 		</template>
 
 		<template v-slot:item="{ props, item }">
+			<!-- @vue-ignore -->
 			<VListItem
 				v-bind="props"
 				:title="t(item.value)"
