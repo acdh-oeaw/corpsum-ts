@@ -22,7 +22,7 @@ const { selectedSearches, possibleSearchKeys } = storeToRefs(searchSettings);
 		</template>
 
 		<template v-slot:item="{ props, item }">
-			<!-- @vue-ignore -->
+			<!-- @vue-ignore i18n typing doesn't seem to work for templated strings -->
 			<VListItem
 				v-bind="props"
 				:title="t(item.value)"
