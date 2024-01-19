@@ -10,13 +10,12 @@ export const useSearchSettingsStore = defineStore(
 		const { getRegionsFrequencies } = useRegionsSearch();
 		const { getKeywordInContext } = useKeywordInContextSearch();
 
-		const t = useTranslations("Corpsum");
-		const possibleSearchKeys: Ref<Array<{ value: SearchFunctionKey; title: string }>> = ref([
-			{ value: "yearlyFrequencies", title: t("yearlyFrequencies") },
-			{ value: "wordFormFrequencies", title: t("wordFormFrequencies") },
-			{ value: "regionalFrequencies", title: t("regionalFrequencies") },
-			{ value: "mediaSources", title: t("mediaSources") },
-			{ value: "keywordInContext", title: t("keywordInContext") },
+		const possibleSearchKeys: Ref<Array<string>> = ref([
+			"yearlyFrequencies",
+			"wordFormFrequencies",
+			"regionalFrequencies",
+			"mediaSources",
+			"keywordInContext",
 		]);
 
 		const searchFunctions: Record<SearchFunctionKey, (query: CorpusQuery) => Promise<void>> = {
@@ -40,8 +39,6 @@ export const useSearchSettingsStore = defineStore(
 		]);
 
 		async function doSearches(query: CorpusQuery) {
-			// console.log({ selsearchVal: selectedSearches.value });
-
 			return await Promise.all(
 				selectedSearches.value.map(
 					(a: SearchFunctionKey) =>
@@ -82,7 +79,11 @@ export const useSearchSettingsStore = defineStore(
 			doSearches,
 		};
 	},
-	{ persist: true },
+	{
+		persist: {
+			paths: ["selectedSearches"],
+		},
+	},
 );
 
 if (import.meta.hot) {
