@@ -16,5 +16,17 @@ const { selectedSearches, possibleSearchKeys } = storeToRefs(searchSettings);
 		clearable
 		chips
 		:items="possibleSearchKeys"
-	/>
+	>
+		<template v-slot:chip="{ props, item }">
+			<VChip v-bind="props" :text="t(item.value)"></VChip>
+		</template>
+
+		<template v-slot:item="{ props, item }">
+			<VListItem
+				v-bind="props"
+				:title="t(item.value)"
+				:subtitle="t(`${item.value}Desc`)"
+			></VListItem>
+		</template>
+	</VAutocomplete>
 </template>
