@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
+
 const t = useTranslations("Corpsum");
 
 const searchSettings = useSearchSettingsStore();

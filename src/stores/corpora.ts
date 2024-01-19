@@ -67,7 +67,7 @@ export const useCorporaStore = defineStore(
 				if (!_subCorpora.value) return console.error("could not fetch subcorpora");
 				const subCorporaResponseData = _subCorpora.value as unknown as CorpInfoResponse;
 				subCorpora.value = subCorporaResponseData.subcorpora;
-					}
+			}
 		}
 
 		watch(selectedCorpus, async (before, after) => {
