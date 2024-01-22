@@ -43,9 +43,10 @@ const { corporaForSearchWithoutSubCorpus, selectedCorpus } = storeToRefs(corpora
 async function createSubcorpus() {
 	const { isConfirmed } = await Swal.fire({
 		title: t("createSubcorpus"),
-		text: `${t("createSubcorpusConfirm1")} '${subCorpusName.value}' ${t("createSubcorpusConfirm2")} ${
-			selected.value.length || 0
-		} ${t("createSubcorpusConfirm3")} ${selectedCorpus.value?.name}?`,
+		text: `${t("createSubcorpusConfirm1")} '${subCorpusName.value}' ${t(
+			"createSubcorpusConfirm2",
+		)} ${selected.value.length || 0} ${t("createSubcorpusConfirm3")} ${selectedCorpus.value
+			?.name}?`,
 		showDenyButton: true,
 	});
 
@@ -75,7 +76,7 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 			<VCheckbox v-model="createSubcorpusMode" :label="t('showSubcorpusCreation')"></VCheckbox>
 			<div v-if="createSubcorpusMode">
 				<p>
-					{{t('createSubcorpus')}} {{t('fromSelection')}} ({{ selected.length }}) in Corpus
+					{{ t("createSubcorpus") }} {{ t("fromSelection") }} ({{ selected.length }}) in Corpus
 					{{ selectedCorpus?.name }}
 				</p>
 				<VTextField
