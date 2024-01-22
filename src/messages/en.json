@@ -44,7 +44,7 @@
 		"regionalFrequenciesDesc": "Shows absolute and relative Values.",
 		"mediaSources": "Media Sources",
 		"mediaSourcesDesc": "Shows absolute and relative Values.",
-		"keywordInContext": "keyword In Context",
+		"keywordInContext": "Keyword In Context",
 		"keywordInContextDesc": "",
 		"compiledDate": "Date of compilation",
 		"tokencount": "Number of tokens",
@@ -59,7 +59,15 @@
 		"docid": "Document",
 		"topic": "Topic",
 		"toknum": "Token Number",
-		"link": "Link"
+		"link": "Link",
+		"showSubcorpusCreation": "Show Subcorpus Creation",
+		"createSubcorpus": "Create Subcorpus",
+		"fromSelection": "from Selection",
+		"inCorpus": "in Corpus",
+		"createSubcorpusConfirm1": "Do you really want to create a subcorpus named",
+		"createSubcorpusConfirm2": "containing",
+		"createSubcorpusConfirm3": "documents from Corpus",
+		"corpusCreated": "Subcorpus created successfully!"
 	},
 	"DefaultLayout": {
 		"meta": {

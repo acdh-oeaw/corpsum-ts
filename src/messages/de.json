@@ -59,7 +59,15 @@
 		"docid": "Dokument",
 		"topic": "Thema",
 		"toknum": "Token Nummer",
-		"link": "Link"
+		"link": "Link",
+		"showSubcorpusCreation": "Subkorpusmaske anzeigen",
+		"createSubcorpus": "Subkorpus erstellen",
+		"fromSelection": "mit der Auswahl",
+		"inCorpus": "im Korpus",
+		"createSubcorpusConfirm1": "Moechten Sie einen Subkorpus erstellen mit dem Namen",
+		"createSubcorpusConfirm2": "und einem Inhalt von",
+		"createSubcorpusConfirm3": "Dokumenten aus dem Korpus",
+		"corpusCreated": "Subkorpus erfolgreich erstellt!"
 	},
 	"DefaultLayout": {
 		"meta": {

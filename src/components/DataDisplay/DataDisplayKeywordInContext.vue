@@ -42,10 +42,10 @@ const corporaStore = useCorporaStore();
 const { corporaForSearchWithoutSubCorpus, selectedCorpus } = storeToRefs(corporaStore);
 async function createSubcorpus() {
 	const { isConfirmed } = await Swal.fire({
-		title: "Create Subcorpus",
-		text: `Do you really want to create a subcorpus named '${subCorpusName.value}' containing ${
+		title: t("createSubcorpus"),
+		text: `${t("createSubcorpusConfirm1")} '${subCorpusName.value}' ${t("createSubcorpusConfirm2")} ${
 			selected.value.length || 0
-		} documents in subcorpus ${selectedCorpus.value?.name}?`,
+		} ${t("createSubcorpusConfirm3")} ${selectedCorpus.value?.name}?`,
 		showDenyButton: true,
 	});
 
@@ -55,9 +55,8 @@ async function createSubcorpus() {
 			`${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus.value};subcname=${
 				subCorpusName.value
 			};create=True;${selected.value.map((docid: string) => `sca_doc.id=${docid}`).join(";")}`,
-			// 			"${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus};reload=;subcname=testcorbussi;create=Trueundefined;sca_doc.id=APA_19860220_APA0002;sca_doc.id=APA_19860220_APA0003",
 		);
-		Swal.fire("Confirmed", "Subcorpus created successfully!").then().catch(console.error);
+		Swal.fire("Confirmed", t("corpusCreated")).then().catch(console.error);
 		await corporaStore.fetchSubCorpora();
 	}
 }
@@ -67,12 +66,16 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 
 <template>
 	<VCard>
-		<VCardItem title="Keyword in Context View"></VCardItem>
+		<VCardItem :title="t('keywordInContext')">
+			<template #subtitle>
+				{{ t("keywordInContextDesc") }}
+			</template>
+		</VCardItem>
 		<VCardText class="py-0">
-			<VCheckbox v-model="createSubcorpusMode" label="Show Subcorpus Creation"></VCheckbox>
+			<VCheckbox v-model="createSubcorpusMode" :label="t('showSubcorpusCreation')"></VCheckbox>
 			<div v-if="createSubcorpusMode">
 				<p>
-					Create Sub-Corpus from Selection ({{ selected.length }}) in Corpus
+					{{t('createSubcorpus')}} {{t('fromSelection')}} ({{ selected.length }}) in Corpus
 					{{ selectedCorpus?.name }}
 				</p>
 				<VTextField
