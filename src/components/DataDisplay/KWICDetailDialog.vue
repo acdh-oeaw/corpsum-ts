@@ -28,12 +28,6 @@ async function getDetails() {
 				props.kwic.toknum
 			};struct=doc;format=json`,
 		},
-		// params: {
-		// 	...corporaForSearchKeys,
-		// 	pos: props.kwic.toknum,
-		// 	struct:'doc',
-		// 	format:'json',
-		// },
 	});
 	loading.value = false;
 

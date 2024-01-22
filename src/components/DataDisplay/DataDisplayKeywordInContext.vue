@@ -10,20 +10,21 @@ import { useCorporaStore } from "@/stores/corpora";
 import CorpusChip from "../Search/CorpusChip.vue";
 import KWICDetailDialog from "./KWICDetailDialog.vue";
 
+const t = useTranslations("Corpsum");
 const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
 
 const headers = ref([
-	{ title: "date", key: "date", type: "string" },
-	{ title: "source", key: "source", type: "string" },
-	{ title: "region", key: "region", type: "string" },
-	{ title: "left", key: "left", type: "string" },
-	{ title: "word", key: "word", type: "string" },
-	{ title: "right", key: "right", type: "string" },
-	{ title: "docid", key: "docid", type: "string" },
-	{ title: "topic", key: "topic", type: "string" },
-	{ title: "toknum", key: "toknum", type: "string" },
-	{ title: "open", key: "open", type: "string" },
+	{ title: t("date"), key: "date", type: "string" },
+	{ title: t("source"), key: "source", type: "string" },
+	{ title: t("region"), key: "region", type: "string" },
+	{ title: t("left"), key: "left", type: "string" },
+	{ title: t("word"), key: "word", type: "string" },
+	{ title: t("right"), key: "right", type: "string" },
+	{ title: t("docid"), key: "docid", type: "string" },
+	{ title: t("topic"), key: "topic", type: "string" },
+	{ title: t("toknum"), key: "toknum", type: "string" },
+	{ title: t("link"), key: "open", type: "string" },
 ]);
 
 const { CREATE_SUBCORPUS_URL } = useAPIs();

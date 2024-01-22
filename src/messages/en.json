@@ -49,7 +49,17 @@
 		"compiledDate": "Date of compilation",
 		"tokencount": "Number of tokens",
 		"wordcount": "Number of words",
-		"doccount": "Number of documents"
+		"doccount": "Number of documents",
+		"date": "Date",
+		"source": "Source",
+		"region": "Region",
+		"left": "Left",
+		"word": "Word",
+		"right": "Right",
+		"docid": "Document",
+		"topic": "Topic",
+		"toknum": "Token Number",
+		"link": "Link"
 	},
 	"DefaultLayout": {
 		"meta": {
