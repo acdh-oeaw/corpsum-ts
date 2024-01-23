@@ -14,7 +14,7 @@
 	},
 	"Corpsum": {
 		"meta": {
-			"title": "Corpsum",
+			"title": "Corpsum - Search",
 			"description": ""
 		},
 		"title": "Corpsum",
@@ -113,8 +113,5 @@
 			"title": "Page not found"
 		},
 		"title": "Page not found"
-	},
-	"corpusSelection": {
-		"title": "Corpus Auswählen"
 	}
 }
