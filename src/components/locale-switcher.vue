@@ -15,7 +15,7 @@ const switchLocalePath = useSwitchLocalePath();
 				<span class="sr-only">
 					{{ t("switch-locale", { locale: t(`locales.${locale}`) }) }}
 				</span>
-				<span aria-hidden="true">{{ locale }}</span>
+				<span aria-hidden="true">{{ locale.toUpperCase() }}</span>
 			</NuxtLink>
 			<span v-else>
 				<span class="sr-only font-bold">
