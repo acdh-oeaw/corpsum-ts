@@ -30,6 +30,11 @@ jobs:
       - name: Checkout respository
         uses: actions/checkout@v3
 
+      # necessary because `actions/setup-node` does not yet support `corepack`.
+      # @see https://github.com/actions/setup-node/issues/531
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
