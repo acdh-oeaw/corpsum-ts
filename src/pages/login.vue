@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+const t = useTranslations("LoginPage");
 definePageMeta({
 	title: "LoginPage.meta.title",
 });
@@ -9,7 +10,7 @@ const password = ref("");
 
 async function login() {
 	if (!(await auth.login(username.value, password.value)))
-		return alert("Username or Password wrong");
+		return alert(t('WrongCredentials'));
 	await navigateTo("/");
 }
 
@@ -24,9 +25,9 @@ onMounted(async () => {
 			<VContainer class="flex justify-center">
 				<div class="flex w-full flex-col sm:w-1/2">
 					<h1>Please Login</h1>
-					<VTextField v-model="username" placeholder="username"></VTextField>
-					<VTextField v-model="password" type="password" placeholder="password"></VTextField>
-					<VBtn type="submit" block>Login</VBtn>
+					<VTextField v-model="username" :placeholder="t('username')"></VTextField>
+					<VTextField v-model="password" type="password" :placeholder="t('password')"></VTextField>
+					<VBtn type="submit" block>{{t('login')}}</VBtn>
 				</div>
 			</VContainer>
 		</VForm>

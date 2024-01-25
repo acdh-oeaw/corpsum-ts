@@ -92,7 +92,11 @@
 	"LoginPage": {
 		"meta": {
 			"title": "Login"
-		}
+		},
+		"WrongCredentials": "Username or Password wrong",
+		"username": "Username",
+		"password": "Password",
+		"login": "Login"
 	},
 	"IndexPage": {
 		"meta": {
