@@ -25,8 +25,8 @@ onMounted(async () => {
 			<VContainer class="flex justify-center">
 				<div class="flex w-full flex-col sm:w-1/2">
 					<h1>Please Login</h1>
-					<VTextField v-model="username" :placeholder="t('username')" ></VTextField>
-					<VTextField v-model="password" type="password" :placeholder="t('password')" ></VTextField>
+					<VTextField v-model="username" :label="t('username')" ></VTextField>
+					<VTextField v-model="password" type="password" :label="t('password')"></VTextField>
 					<VBtn type="submit" block>{{t('login')}}</VBtn>
 				</div>
 			</VContainer>
