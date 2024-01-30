@@ -51,13 +51,12 @@ export default defineNuxtConfig({
 		langDir: "./messages",
 		lazy: true,
 		locales: Object.values(locales),
-		strategy: "prefix_except_default",
+		strategy: "prefix",
 	},
 	modules: [
 		"@nuxt/content",
 		"@nuxt/devtools",
 		"@nuxtjs/i18n",
-		"@nuxt/image",
 		"nuxt-vitest",
 		"@pinia/nuxt",
 		"@pinia-plugin-persistedstate/nuxt",
@@ -82,6 +81,7 @@ export default defineNuxtConfig({
 		NODE_ENV: process.env.NODE_ENV,
 		public: {
 			apiBaseUrl: "",
+			redmineId: "",
 			NUXT_PUBLIC_APP_BASE_URL: process.env.NUXT_PUBLIC_APP_BASE_URL,
 			NUXT_PUBLIC_MATOMO_BASE_URL: process.env.NUXT_PUBLIC_MATOMO_BASE_URL,
 			NUXT_PUBLIC_MATOMO_ID: process.env.NUXT_PUBLIC_MATOMO_ID,

@@ -6,13 +6,13 @@ const t = useTranslations("AppHeader");
 const auth = useAuth();
 
 const links = {
-	home: { href: { path: "/" }, label: t("links.home") },
+	home: { href: { path: "/en" }, label: t("links.home") },
 	// corpsum: { href: { path: "/corpsum" }, label: t("links.corpsum") },
 } satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
 
 async function logout() {
 	auth.logout();
-	await navigateTo("/login");
+	await navigateTo("/en/login");
 }
 </script>
 

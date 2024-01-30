@@ -1,8 +1,9 @@
 <script setup lang="ts">
 const auth = useAuth();
+const route = useRoute()
 
 onMounted(async () => {
-	if (!auth.basicAuthToken) await navigateTo("/login");
+	if (!auth.username && (route.path === "/en" || route.path === "/de")) return navigateTo("/en/login");
 });
 </script>
 
