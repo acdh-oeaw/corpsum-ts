@@ -5,7 +5,7 @@ test.describe("home page", () => {
 		await page.goto("/login");
 		await expect(page).toHaveTitle("Login | ACDH-CH App");
 
-		await page.goto("/de/imprint");
+		await page.goto("/de/login");
 		await expect(page).toHaveTitle("Login | ACDH-CH App");
 	});
 });
