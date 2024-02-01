@@ -11,7 +11,7 @@ const localePath = useLocalePath();
 </script>
 
 <template>
-	<NuxtLink :href="localePath(props.href as any /** Type mismatch. */)">
+	<NuxtLink :href="localePath(props.href)">
 		<slot />
 	</NuxtLink>
 </template>
