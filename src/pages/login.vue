@@ -4,6 +4,9 @@ definePageMeta({
 	title: "LoginPage.meta.title",
 });
 
+const localeRoute = useLocaleRoute()
+const { locale } = useI18n()
+
 const auth = useAuth();
 const username = ref("");
 const password = ref("");
@@ -11,11 +14,11 @@ const password = ref("");
 async function login() {
 	if (!(await auth.login(username.value, password.value)))
 		return alert(t('WrongCredentials'));
-	await navigateTo("/");
+	await navigateTo(localeRoute('/', locale.value));
 }
 
 onMounted(async () => {
-	if (auth.basicAuthToken) await navigateTo("/");
+	if (auth.basicAuthToken) await navigateTo(localeRoute('/', locale.value));
 });
 </script>
 
