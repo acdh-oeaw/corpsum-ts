@@ -70,7 +70,7 @@ export const useCorporaStore = defineStore(
 			}
 		}
 
-		watch(selectedCorpus, async (before, after) => {
+		watch(selectedCorpus, async (after, before) => {
 			if (!after || before?.name === after.name) return;
 			await fetchSubCorpora();
 		});
