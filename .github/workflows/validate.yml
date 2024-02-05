@@ -60,7 +60,7 @@ jobs:
           NUXT_PUBLIC_REDMINE_ID: "${{ vars.NUXT_PUBLIC_REDMINE_ID }}"
 
       - name: Install Browsers for E2E tests
-        run: pnpm exec playwright install
+        run: pnpm exec playwright install --with-deps
 
       - name: Test
         run: pnpm run test
