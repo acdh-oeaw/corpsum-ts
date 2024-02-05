@@ -4,21 +4,20 @@ definePageMeta({
 	title: "LoginPage.meta.title",
 });
 
-const localeRoute = useLocaleRoute()
-const { locale } = useI18n()
+const localeRoute = useLocaleRoute();
+const { locale } = useI18n();
 
 const auth = useAuth();
 const username = ref("");
 const password = ref("");
 
 async function login() {
-	if (!(await auth.login(username.value, password.value)))
-		return alert(t('WrongCredentials'));
-	await navigateTo(localeRoute('/', locale.value));
+	if (!(await auth.login(username.value, password.value))) return alert(t("WrongCredentials"));
+	await navigateTo(localeRoute("/", locale.value));
 }
 
 onMounted(async () => {
-	if (auth.basicAuthToken) await navigateTo(localeRoute('/', locale.value));
+	if (auth.basicAuthToken) await navigateTo(localeRoute("/", locale.value));
 });
 </script>
 
@@ -28,9 +27,9 @@ onMounted(async () => {
 			<VContainer class="flex justify-center">
 				<div class="flex w-full flex-col sm:w-1/2">
 					<h1>Please Login</h1>
-					<VTextField v-model="username" :label="t('username')" ></VTextField>
+					<VTextField v-model="username" :label="t('username')"></VTextField>
 					<VTextField v-model="password" type="password" :label="t('password')"></VTextField>
-					<VBtn type="submit" block>{{t('login')}}</VBtn>
+					<VBtn type="submit" block>{{ t("login") }}</VBtn>
 				</div>
 			</VContainer>
 		</VForm>

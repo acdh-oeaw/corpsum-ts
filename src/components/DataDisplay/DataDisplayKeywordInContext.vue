@@ -45,8 +45,9 @@ async function createSubcorpus() {
 		title: t("createSubcorpus"),
 		text: `${t("createSubcorpusConfirm1")} '${subCorpusName.value}' ${t(
 			"createSubcorpusConfirm2",
-		)} ${selected.value.length || 0} ${t("createSubcorpusConfirm3")} ${selectedCorpus.value
-			?.name}?`,
+		)} ${selected.value.length || 0} ${t("createSubcorpusConfirm3")} ${
+			selectedCorpus.value?.name
+		}?`,
 		showDenyButton: true,
 	});
 
