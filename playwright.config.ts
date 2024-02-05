@@ -25,6 +25,10 @@ export default defineConfig({
 			name: "firefox",
 			use: { ...devices["Desktop Firefox"] },
 		},
+		{
+			name: "webkit",
+			use: { ...devices["Desktop Safari"] },
+		},
 		// {
 		//   name: 'Mobile Chrome',
 		//   use: { ...devices['Pixel 5'] },
@@ -43,7 +47,7 @@ export default defineConfig({
 		// },
 	],
 	webServer: {
-		command: "pnpm run start",
+		command: "pnpm run start --dotenv ./.env.local",
 		url: baseUrl,
 		reuseExistingServer: !process.env.CI,
 	},

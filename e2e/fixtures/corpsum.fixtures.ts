@@ -33,6 +33,3 @@ export const search = login.extend<NonNullable<unknown>, { term: string }>({
 		await use(page);
 	},
 });
-
-
-export { expect } from '@playwright/test';

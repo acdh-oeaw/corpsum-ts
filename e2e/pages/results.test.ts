@@ -1,13 +1,12 @@
 import { expect } from '@playwright/test';
 
-import { search } from '../fixtures/corpsum.fixtures';
+import { search as test } from '../fixtures/corpsum.fixtures';
 
 const account = { username: process.env.TEST_USER!, password: process.env.TEST_PASSWORD! };
+test.use({ account, term: 'haus' });
 
-search.use({ account, term: 'haus' });
-
-search.describe("Search Result Display", () => {
-	search('should be able to display result information on selected searches', async ({page}) => {
+test.describe("Search Result Display", () => {
+	test('should be able to display result information on selected searches', async ({page}) => {
 		await expect(page.locator('div:nth-child(1) > .v-card-title > div > .text-xl')).toBeVisible();
 		await expect(page.locator('div:nth-child(1) > .v-card-title > div > .text-xl')).toHaveText('haus');
 		await expect(page.locator('.flex > span > .v-chip__content').first()).toBeVisible()

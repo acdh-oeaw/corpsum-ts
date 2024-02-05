@@ -1,12 +1,12 @@
 import { expect } from '@playwright/test';
 
-import { login } from '../fixtures/corpsum.fixtures';
+import { login as test } from '../fixtures/corpsum.fixtures';
 
 const account = { username: process.env.TEST_USER!, password: process.env.TEST_PASSWORD! };
-login.use({ account });
+test.use({ account });
 
-login.describe("Query Interface", () => {
-	login('should be able to display information on multiple queries', async ({ page }) => {
+test.describe("Query Interface", () => {
+	test('should be able to display information on multiple queries', async ({ page }) => {
 		await page.getByRole('combobox').first().click();
 		const corpusPromise = page.waitForResponse('https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_4.2&subcorpora=1&format=json');
 		await page.getByRole('option', { name: 'amc_4.2' }).click();
@@ -35,7 +35,7 @@ login.describe("Query Interface", () => {
 		await expect(page.locator('div:nth-child(2) > .v-card-text > .flex > span > .v-chip__content').nth(1)).toBeVisible();
 		await expect(page.locator('div:nth-child(2) > .v-card-text > .flex > span > .v-chip__content').nth(1)).toHaveText('wordrow');
 	});
-	login('should be able select a corpus and select the available subcorpora', async ({ page }) => {
+	test('should be able select a corpus and select the available subcorpora', async ({ page }) => {
 		await page.getByRole('combobox').first().click();
 		const corpusPromise = page.waitForResponse('https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_4.2&subcorpora=1&format=json');
 		await page.getByRole('option', { name: 'amc_4.2' }).click();
@@ -44,6 +44,5 @@ login.describe("Query Interface", () => {
 		await page.getByRole('combobox').nth(1).click();
 		await page.locator('div').filter({ hasText: /^AustriazismenSFB$/ }).first().click();
 		await expect(page.locator('form')).toContainText('tokens:');
-
 	});
 });
