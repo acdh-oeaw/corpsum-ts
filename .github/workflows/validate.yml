@@ -59,6 +59,9 @@ jobs:
           NUXT_PUBLIC_APP_BASE_URL: "http://localhost:3000"
           NUXT_PUBLIC_REDMINE_ID: "${{ vars.NUXT_PUBLIC_REDMINE_ID }}"
 
+      - name: Install Browsers for E2E tests
+        run: pnpm exec playwright install
+
       - name: Test
         run: pnpm run test
 
