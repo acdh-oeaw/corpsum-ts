@@ -53,14 +53,14 @@ jobs:
       - name: Typecheck
         run: pnpm run types:check
 
-      - name: Test
-        run: pnpm run test
-
       - name: Build app
         run: pnpm run build
         env:
           NUXT_PUBLIC_APP_BASE_URL: "http://localhost:3000"
           NUXT_PUBLIC_REDMINE_ID: "${{ vars.NUXT_PUBLIC_REDMINE_ID }}"
+
+      - name: Test
+        run: pnpm run test
 
       - uses: actions/upload-artifact@v3
         if: always()
