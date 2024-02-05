@@ -64,6 +64,9 @@ jobs:
 
       - name: Test
         run: pnpm run test
+        env:
+          TEST_USER: "${{ secrets.TEST_USER }}"
+          TEST_PASSWORD: "${{ secrets.TEST_PASSWORD }}"
 
       - uses: actions/upload-artifact@v3
         if: always()
