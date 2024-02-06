@@ -3,7 +3,8 @@ import { expect } from "@playwright/test";
 import { search as test } from "../fixtures/corpsum.fixtures";
 
 const account = { username: process.env.TEST_USER!, password: process.env.TEST_PASSWORD! };
-test.use({ account, term: "haus", corpus: "amc_4.2" });
+const search = { term: "haus", corpus: "amc_4.2" };
+test.use({ account, search });
 
 test.describe("Search Result Display", () => {
 	test("should be able to display result information on selected searches", async ({ page }) => {

@@ -5,9 +5,14 @@ interface Account {
 	password: string;
 }
 
+interface Search {
+	term: string;
+	corpus: string;
+}
+
 export const login = base.extend<NonNullable<unknown>, { account: Account }>({
 	account: [{ username: "", password: "" }, { scope: "worker" }],
-	page: async ({ page, account }, use) => {
+	page: async ({ page, context,account }, use) => {
 		const { username, password } = account;
 		await page.goto("/en/login");
 		await page.getByLabel("Username").fill(username);
@@ -18,13 +23,14 @@ export const login = base.extend<NonNullable<unknown>, { account: Account }>({
 		await page.locator("#main-content").getByRole("button", { name: "Login" }).click();
 		await loginPromise;
 		await use(page);
+		await context.close();
 	},
 });
 
-export const search = login.extend<NonNullable<unknown>, { term: string, corpus: string }>({
-	term: ["", { scope: "worker" }],
-	corpus: ["", { scope: "worker" }],
-	page: async ({ page, term, corpus }, use) => {
+export const search = login.extend<NonNullable<unknown>, { search: Search }>({
+	search: [{term: "", corpus: ""}, { scope: "worker" }],
+	page: async ({ page, search }, use) => {
+		const { term, corpus } = search;
 		await page.getByRole("combobox").first().click();
 		const corpusPromise = page.waitForResponse(
 			`https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=${corpus}&subcorpora=1&format=json`,
