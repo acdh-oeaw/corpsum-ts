@@ -29,7 +29,7 @@ export const login = base.extend<NonNullable<unknown>, { account: Account }>({
 
 export const search = login.extend<NonNullable<unknown>, { search: Search }>({
 	search: [{ term: "", corpus: "" }, { scope: "worker" }],
-	page: async ({ page, search }, use) => {
+	page: async ({ page, context, search }, use) => {
 		const { term, corpus } = search;
 		await page.getByRole("combobox").first().click();
 		const corpusPromise = page.waitForResponse(
@@ -44,5 +44,6 @@ export const search = login.extend<NonNullable<unknown>, { search: Search }>({
 		await page.getByPlaceholder("Your search term").press("Enter");
 		await wordformFreqsPromise;
 		await use(page);
+		await context.close();
 	},
 });
