@@ -12,7 +12,7 @@ interface Search {
 
 export const login = base.extend<NonNullable<unknown>, { account: Account }>({
 	account: [{ username: "", password: "" }, { scope: "worker" }],
-	page: async ({ page, context,account }, use) => {
+	page: async ({ page, context, account }, use) => {
 		const { username, password } = account;
 		await page.goto("/en/login");
 		await page.getByLabel("Username").fill(username);
@@ -28,7 +28,7 @@ export const login = base.extend<NonNullable<unknown>, { account: Account }>({
 });
 
 export const search = login.extend<NonNullable<unknown>, { search: Search }>({
-	search: [{term: "", corpus: ""}, { scope: "worker" }],
+	search: [{ term: "", corpus: "" }, { scope: "worker" }],
 	page: async ({ page, search }, use) => {
 		const { term, corpus } = search;
 		await page.getByRole("combobox").first().click();
