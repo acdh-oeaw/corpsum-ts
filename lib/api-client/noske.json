@@ -339,6 +339,101 @@
 					}
 				}
 			}
+		},
+		"/wordlist": {
+			"get": {
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/001_corpname"
+					},
+					{
+						"$ref": "#/components/parameters/010_wlattr"
+					},
+					{
+						"$ref": "#/components/parameters/002_usesubcorp"
+					},
+					{
+						"$ref": "#/components/parameters/011_wlnums"
+					},
+					{
+						"$ref": "#/components/parameters/072_wlmaxfreq"
+					},
+					{
+						"$ref": "#/components/parameters/012_wlminfreq"
+					},
+					{
+						"$ref": "#/components/parameters/014_wlpat"
+					},
+					{
+						"$ref": "#/components/parameters/015_wlsort"
+					},
+					{
+						"$ref": "#/components/parameters/019_wlblacklist"
+					},
+					{
+						"$ref": "#/components/parameters/073_include_nonwords"
+					},
+					{
+						"$ref": "#/components/parameters/091_relfreq"
+					},
+					{
+						"$ref": "#/components/parameters/092_reldocf"
+					},
+					{
+						"$ref": "#/components/parameters/018_wlfile"
+					},
+					{
+						"$ref": "#/components/parameters/071_wlicase"
+					},
+					{
+						"$ref": "#/components/parameters/013_wlmaxitems"
+					},
+					{
+						"$ref": "#/components/parameters/093_wlpage"
+					},
+					{
+						"$ref": "#/components/parameters/008_format"
+					},
+					{
+						"$ref": "#/components/parameters/074_random"
+					},
+					{
+						"$ref": "#/components/parameters/089_wltype"
+					},
+					{
+						"$ref": "#/components/parameters/063_ngrams_n"
+					},
+					{
+						"$ref": "#/components/parameters/087_ngrams_max_n"
+					},
+					{
+						"$ref": "#/components/parameters/112_nest_ngrams"
+					},
+					{
+						"$ref": "#/components/parameters/057_simple_n"
+					},
+					{
+						"$ref": "#/components/parameters/088_usengrams"
+					}
+				],
+				"tags": [
+					"Corpus Search"
+				],
+				"summary": "A list of word frequencies from the specified corpus.",
+				"description": "This method can be used for generating frequency lists of all tokens, lemmas, word forms etc. or for retrieving frequencies of concrete items. Regex can be used for detailed criteria.",
+				"responses": {
+					"200": {
+						"description": "`OK`",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/02_wordlist"
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	},
 	"components": {
@@ -443,6 +538,84 @@
 				},
 				"description": "The `format` of the output. `Empty value` is interpreted as `JSON`. Not every endpoint supports all formats."
 			},
+			"010_wlattr": {
+				"in": "query",
+				"name": "wlattr",
+				"schema": {
+					"type": "string",
+					"example": "lc"
+				},
+				"required": true,
+				"description": "Sets the corpus attribute you want to work with. Some corpora may have specific additional attributes.\n\n Basic examples:\n - word\n - lc\n - lemma\n - lemma_lc\n - lempos\n - lempos_lc\n - tag\n - pos\n\n For list of available word list attributes see **/ca/api/corpora/{corpusId}**"
+			},
+			"011_wlnums": {
+				"in": "query",
+				"name": "wlnums",
+				"schema": {
+					"type": "string",
+					"default": "frq",
+					"enum": [
+						"frq",
+						"docf",
+						"arf"
+					]
+				},
+				"description": "The type of frequency. The values stand for: `frq` -> absolute or raw frequency, `docf` -> document frequency. `arf` -> average reduced frequency."
+			},
+			"012_wlminfreq": {
+				"in": "query",
+				"name": "wlminfreq",
+				"schema": {
+					"type": "integer"
+				},
+				"description": "Sets the minimum frequency limit. Items with a lower frequency will not be included."
+			},
+			"013_wlmaxitems": {
+				"in": "query",
+				"name": "wlmaxitems",
+				"schema": {
+					"type": "integer"
+				},
+				"description": "Sets the number of items to be returned in the API response. It is not limited for user corpora, in preloaded corpora can be some limitation. This parameter is often used with wlpage to help with pagination in frontend development.",
+				"example": 100
+			},
+			"014_wlpat": {
+				"in": "query",
+				"name": "wlpat",
+				"schema": {
+					"type": "string"
+				},
+				"description": "Sets a regex to filter the results. Relevant only in a simple wordlist.",
+				"example": ".*"
+			},
+			"015_wlsort": {
+				"in": "query",
+				"name": "wlsort",
+				"schema": {
+					"type": "string",
+					"enum": [
+						"frq",
+						"docf"
+					]
+				},
+				"description": "Sets the sorting of the results. The default is `frq`, i.e. by absolute frequency. Docf means document frequency."
+			},
+			"018_wlfile": {
+				"in": "query",
+				"name": "wlfile",
+				"schema": {
+					"type": "string"
+				},
+				"description": "Defines the allow list (formerly known as whitelist), the list of words which should be included in the list. See also `wlblacklist`."
+			},
+			"019_wlblacklist": {
+				"in": "query",
+				"name": "wlblacklist",
+				"schema": {
+					"type": "string"
+				},
+				"description": "A deny list (formerly known as blacklist) is a list of items that should be excluded from the result. The values should be be separated by a newline symbol (without commas between values). In the URL, the newline symbol is `%0A`."
+			},
 			"025_lpos": {
 				"in": "query",
 				"name": "lpos",
@@ -533,6 +706,19 @@
 				},
 				"description": "Set to `1` if the corpus should be deleted. Only user subcorpora can be deleted. Nothing will be deleted if left empty (default value == 0)."
 			},
+			"057_simple_n": {
+				"in": "query",
+				"name": "simple_n",
+				"schema": {
+					"type": "string",
+					"default": 1,
+					"enum": [
+						1,
+						0
+					]
+				},
+				"description": "The smoothing parameter for (simple maths) [https://www.sketchengine.eu/documentation/simple-maths/]."
+			},
 			"058_attrs": {
 				"in": "query",
 				"name": "attrs",
@@ -541,6 +727,66 @@
 					"default": "word"
 				},
 				"description": "A list of comma-delimited attributes that are returned together with each token. Other examples are:`word, lc, lemma, tag` etc.."
+			},
+			"063_ngrams_n": {
+				"in": "query",
+				"name": "ngrams_n",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						2,
+						3,
+						4,
+						5
+					]
+				},
+				"description": "The minimum n-gram length. Usually used with `ngrams_max_n` and `usengrams`."
+			},
+			"071_wlicase": {
+				"in": "query",
+				"name": "wlicase",
+				"schema": {
+					"type": "integer",
+					"default": 0,
+					"enum": [
+						1,
+						0
+					]
+				},
+				"description": "Sets the case sensitivity of the corpus, i.e. the data are extracted from a lowercased version of the corpus. It is used for case insensitive analysis. Parameter \"1\" means case sensitivity, \"0\" means case insensitivity."
+			},
+			"072_wlmaxfreq": {
+				"in": "query",
+				"name": "wlmaxfreq",
+				"schema": {
+					"type": "integer"
+				},
+				"description": "Sets the maximum frequency limit in the wordlist."
+			},
+			"073_include_nonwords": {
+				"in": "query",
+				"name": "include_nonwords",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						1,
+						0
+					]
+				},
+				"description": "Includes, or excludes, nonwords in the in the result. Nonwords are tokens which do not start with letter of the alphabet (e.g. numbers, punctuation). The regex to match the nonwords is `[^[:alpha:]].*`. Certain specialized corpora may use their own specific definition of nonwords."
+			},
+			"074_random": {
+				"in": "query",
+				"name": "random",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						1,
+						0
+					]
+				},
+				"description": "Parameter that represents if the wordlist is created from the first 10 milions lines of corpus. One if yes, no if he wordlist is created from the whole corpus.",
+				"deprecated": true
 			},
 			"077_default_attr": {
 				"in": "query",
@@ -643,6 +889,79 @@
 				},
 				"description": "The size of the right context in KWIC view. Number of tokens."
 			},
+			"087_ngrams_max_n": {
+				"in": "query",
+				"name": "ngrams_max_n",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						2,
+						3,
+						4,
+						5,
+						6
+					]
+				},
+				"description": "The maximum n-gram length. The maximum is `6`."
+			},
+			"088_usengrams": {
+				"in": "query",
+				"name": "usengrams",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						0,
+						1
+					]
+				},
+				"description": "Represent if n-grams should be extracted or just simple keywords."
+			},
+			"089_wltype": {
+				"in": "query",
+				"name": "wltype",
+				"schema": {
+					"type": "string",
+					"enum": [
+						"simple",
+						"struct_wordlist"
+					],
+					"example": "simple"
+				},
+				"description": "Parameter to set the format of ouput. Is it always set to `simple`, for the `struct_wordlist` is another enpoint called `struct_wordlist`.",
+				"deprecated": true
+			},
+			"091_relfreq": {
+				"in": "query",
+				"name": "relfreq",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						1,
+						0
+					]
+				},
+				"description": "Includes the relative frequency of each item in the result."
+			},
+			"092_reldocf": {
+				"in": "query",
+				"name": "reldocf",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						1,
+						0
+					]
+				},
+				"description": "Calculate the document frequency for each item in the result. Must be used with `addfreqs` set to `docf`."
+			},
+			"093_wlpage": {
+				"in": "query",
+				"name": "wlpage",
+				"schema": {
+					"type": "integer"
+				},
+				"description": "To select page of the response. The number of items on the page is specified by parameter wlmaxitems."
+			},
 			"094_fpage": {
 				"in": "query",
 				"name": "fpage",
@@ -734,6 +1053,18 @@
 					"example": "-1<0"
 				},
 				"description": " Position of the selected attribute in the concordance. **Minus** means **left** context (-1<0). **Plus** means **right** context (6>0). **At least one attribute is required, the others are optional.** Every attribute (ml1attr, ml2attr. etc.) needs it's **own** context position (e.g. if 3 attributes are selected three context position **needs to** be set ml1ctx, ml2ctx, ml3ctx).\n\n\n**Positions can be referenced as follows:**\n\n `integer number` - where **0** is the first token in **KWIC**, **-1** the rightmost token in the left context etc.\n\n `1:x` - where **x** is one of the corpus structures (e.g. “doc” or “s” if the corpus has the particular markup). Its meaning is the first token in the structure, except when it is the right boundary of a range - then it is the last token in the structure. Also, other numbers can be used, e.g. -2:x, 3:x, etc. (-1 is the same as 1 with meaning “structure containing KWIC”)\n\n `a<0` - where **a** stands for a position reference as described in the first two points with meaning '**a** positions before/after the firs KWIC position' (so this is equivalent to **a**)\n\n `a>0` - where **a** stands for the same position reference with meaning 'positions before/after the last KWIC position'\n\n in the previous two points, if **0** is substituted with a natural number **k**, it means 'before/after **k**-th collocation' instead of 'before/after KWIC'. Collocations are special token groups in the context, that can be added using positive filters (see below).\n\n\n`Ranges` can be referenced as a~b where **a**, **b** stand for token identifiers as above. Examples of positions and ranges:\n\n `-1<0` - rightmost token in the left context\n\n `3>0` - third token in right context\n\n `0>0` - last token in KWIC\n\n `0<0` - first token in KWIC\n\n `0<0~0>0` - range of KWIC\n\n `-1<0~1>0` - range of KWIC with one token from the left context and one from the right context\n\n `1:s` - first token in the sentence containing KWIC (or its first token)\n\n `1:s>0` - first token in the sentence containing KWIC (or its last token)\n\n `0<1` - first token of the first-added collocation.\n\n\n`Examples:`\n\n sword/ **1>0~3>0**\n\n sword/ **1>0~3>0**\n\n slemma/ **0<0~0>0**\n\n sword/i **-1**\n\n sword/ **0** word/ir **-1<0** tag/r **-2<0**\n\n "
+			},
+			"112_nest_ngrams": {
+				"in": "query",
+				"name": "nest_ngrams",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						1,
+						0
+					]
+				},
+				"description": "N-grams which are sub-ngrams of a longer n-gram will be grouped together with the longer n-gram. Nesting only works when a `ngrams_n` and `ngrams_max_n` are different values."
 			},
 			"127_concordance_query_queryselector": {
 				"in": "query",
@@ -1458,6 +1789,142 @@
 							"struct_attr_stats": {
 								"type": "string",
 								"example": "1"
+							},
+							"corpname": {
+								"type": "string",
+								"example": "preloaded/bnc2_tt21"
+							}
+						}
+					}
+				}
+			},
+			"02_wordlist": {
+				"type": "object",
+				"properties": {
+					"new_maxitems": {
+						"type": "integer",
+						"example": 20000
+					},
+					"wllimit": {
+						"type": "integer",
+						"example": 1000,
+						"description": "Word list limit, amount of words to be display."
+					},
+					"lastpage": {
+						"type": "integer",
+						"example": 0
+					},
+					"note": {
+						"type": "string",
+						"example": "You are allowed to see only 1000 items.",
+						"description": "An additional note to displayed results."
+					},
+					"total": {
+						"type": "integer",
+						"example": 165953,
+						"description": "Number if displayed items (word - frequency)."
+					},
+					"totalfrq": {
+						"type": "integer",
+						"example": 111680004,
+						"description": "Sum of all frequencies."
+					},
+					"items": {
+						"description": "A result list.",
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"str": {
+									"type": "string",
+									"example": "the",
+									"description": "The word to which the frequency has been calculated."
+								},
+								"frq": {
+									"type": "integer",
+									"example": 6054939,
+									"description": "The word frequency."
+								},
+								"relfreq": {
+									"type": "integer",
+									"example": 53895.59026,
+									"description": "The relative word frequency. Relative frequency is a way of expressing how often something happens compared to other events or items in a given group."
+								}
+							}
+						}
+					},
+					"wlattr_label": {
+						"type": "string",
+						"example": "word(lowercase)"
+					},
+					"frtp": {
+						"type": "string",
+						"example": "frequency",
+						"description": "Frequency type. Other possible values can be `average reduced frequency`, `document frequency`, `score`."
+					},
+					"api_version": {
+						"type": "string",
+						"example": "5.62.3"
+					},
+					"manatee_version": {
+						"type": "string",
+						"example": "2.36.7-SkE-2.219.2"
+					},
+					"request": {
+						"description": "Just summary section of parsed query parameters used in this endpoint call. These parameters are all documented in the beggining of every endpoint box.",
+						"type": "object",
+						"properties": {
+							"wlminfreq": {
+								"type": "string",
+								"example": "5"
+							},
+							"random": {
+								"type": "string",
+								"example": "0"
+							},
+							"include_nonwords": {
+								"type": "string",
+								"example": "1"
+							},
+							"wltype": {
+								"type": "string",
+								"example": "simple"
+							},
+							"wlmaxitems": {
+								"type": "string",
+								"example": "20000"
+							},
+							"wlsort": {
+								"type": "string",
+								"example": "frq"
+							},
+							"wlicase": {
+								"type": "string",
+								"example": "1"
+							},
+							"wlpage": {
+								"type": "string",
+								"example": "1"
+							},
+							"reldocf": {
+								"type": "string",
+								"example": "1"
+							},
+							"wlpat": {
+								"type": "string",
+								"example": ".*"
+							},
+							"relfreq": {
+								"type": "string",
+								"example": "1"
+							},
+							"wlattr": {
+								"type": "string",
+								"example": "lc"
+							},
+							"wlmaxfreq": {
+								"type": "string",
+								"example": "0"
 							},
 							"corpname": {
 								"type": "string",
