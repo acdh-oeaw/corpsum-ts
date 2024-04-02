@@ -229,6 +229,116 @@
 					}
 				}
 			}
+		},
+		"/concordance": {
+			"get": {
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/001_corpname"
+					},
+					{
+						"$ref": "#/components/parameters/041_q"
+					},
+					{
+						"$ref": "#/components/parameters/127_concordance_query_queryselector"
+					},
+					{
+						"$ref": "#/components/parameters/128_concordance_query_iquery"
+					},
+					{
+						"$ref": "#/components/parameters/129_concordance_query_cql"
+					},
+					{
+						"$ref": "#/components/parameters/130_concordance_query_lemma"
+					},
+					{
+						"$ref": "#/components/parameters/131_concordance_query_char"
+					},
+					{
+						"$ref": "#/components/parameters/132_concordance_query_word"
+					},
+					{
+						"$ref": "#/components/parameters/133_concordance_query_phrase"
+					},
+					{
+						"$ref": "#/components/parameters/002_usesubcorp"
+					},
+					{
+						"$ref": "#/components/parameters/025_lpos"
+					},
+					{
+						"$ref": "#/components/parameters/077_default_attr"
+					},
+					{
+						"$ref": "#/components/parameters/058_attrs"
+					},
+					{
+						"$ref": "#/components/parameters/078_refs"
+					},
+					{
+						"$ref": "#/components/parameters/079_attr_allpos"
+					},
+					{
+						"$ref": "#/components/parameters/080_viewmode"
+					},
+					{
+						"$ref": "#/components/parameters/081_cup_hl"
+					},
+					{
+						"$ref": "#/components/parameters/082_structs"
+					},
+					{
+						"$ref": "#/components/parameters/083_fromp"
+					},
+					{
+						"$ref": "#/components/parameters/084_pagesize"
+					},
+					{
+						"$ref": "#/components/parameters/085_kwicleftctx"
+					},
+					{
+						"$ref": "#/components/parameters/086_kwicrightctx"
+					},
+					{
+						"$ref": "#/components/parameters/134_errcorr_switch"
+					},
+					{
+						"$ref": "#/components/parameters/135_cup_err_code"
+					},
+					{
+						"$ref": "#/components/parameters/136_cup_err"
+					},
+					{
+						"$ref": "#/components/parameters/137_cup_corr"
+					},
+					{
+						"$ref": "#/components/parameters/040_json"
+					},
+					{
+						"$ref": "#/components/parameters/039_asyn"
+					},
+					{
+						"$ref": "#/components/parameters/008_format"
+					}
+				],
+				"tags": [
+					"Corpus Search"
+				],
+				"summary": "Concordance - shows the search word or phrase in context.",
+				"description": "The concordance allows complex criteria for searching the corpus. The queries can combine any data, metadata and annotations found in the corpus.\n\n `To make basic concordance its enough to use just corpname and q parameters.`",
+				"responses": {
+					"200": {
+						"description": "`OK`",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/06_concordance"
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	},
 	"components": {
@@ -333,6 +443,34 @@
 				},
 				"description": "The `format` of the output. `Empty value` is interpreted as `JSON`. Not every endpoint supports all formats."
 			},
+			"025_lpos": {
+				"in": "query",
+				"name": "lpos",
+				"schema": {
+					"type": "string",
+					"enum": [
+						"-n",
+						"-v",
+						"-j",
+						"-a",
+						"-d",
+						"-i"
+					]
+				},
+				"description": "The part of speech of the lemma. The concrete values depend on the corpus. If the corpus contains the `lempos` attribute and `lpos` is empty, the result defaults to the most frequent part of speech of the lemma."
+			},
+			"039_asyn": {
+				"in": "query",
+				"name": "asyn",
+				"schema": {
+					"type": "integer",
+					"enum": [
+						0,
+						1
+					]
+				},
+				"description": "Switches the asynchronous processing on/off. ON = partial results are returned as soon as the first page is filled with results. OFF = results are returned only after the search is completed. Normally, ON is used in the web interface and OFF when using the API."
+			},
 			"040_json": {
 				"in": "query",
 				"name": "json",
@@ -394,6 +532,116 @@
 					]
 				},
 				"description": "Set to `1` if the corpus should be deleted. Only user subcorpora can be deleted. Nothing will be deleted if left empty (default value == 0)."
+			},
+			"058_attrs": {
+				"in": "query",
+				"name": "attrs",
+				"schema": {
+					"type": "string",
+					"default": "word"
+				},
+				"description": "A list of comma-delimited attributes that are returned together with each token. Other examples are:`word, lc, lemma, tag` etc.."
+			},
+			"077_default_attr": {
+				"in": "query",
+				"name": "default_attr",
+				"schema": {
+					"type": "string"
+				},
+				"description": "The attribute applied to tokens in the query which do not have an attribute specified explicitly as part of the query."
+			},
+			"078_refs": {
+				"in": "query",
+				"name": "refs",
+				"schema": {
+					"type": "string",
+					"example": "=bncdoc.alltyp"
+				},
+				"description": "The text type (metadata) for which statistics should be calculated from the concordance. The default is `bncdoc.alltyp` (all available text types are included). Text types (attributes and there values) differ between corpora). You can find them in the response of `corpus_info` method in `freqttattrs` or `subcorpattrs` keys. Not all of them have attributes to show."
+			},
+			"079_attr_allpos": {
+				"in": "query",
+				"name": "attr_allpos",
+				"schema": {
+					"type": "string",
+					"default": "all",
+					"enum": [
+						"kw",
+						"all"
+					]
+				},
+				"description": "Determines which tokens will be returned with additional attributes defined in `attrs`. `kw` will add the attributes to the KWIC only. `all` will return them with all tokens."
+			},
+			"080_viewmode": {
+				"in": "query",
+				"name": "viewmode",
+				"schema": {
+					"type": "string",
+					"enum": [
+						"sen",
+						"kwic"
+					]
+				},
+				"description": "Switches between sentence view and the KWIC view. `sen` returns complete sentences without trimming them. `kwic` returns the KWIC view with the query in the centre and some context left and right."
+			},
+			"081_cup_hl": {
+				"in": "query",
+				"name": "cup_hl",
+				"schema": {
+					"type": "string",
+					"enum": [
+						"q",
+						"e",
+						"c",
+						"b"
+					]
+				},
+				"description": "Only used with error-annotated corpora. It determines what should be highlighted. It is set to 'q' for corpora without error annotation. Meaning of individual options:\n\n - `q` -> to higlight query result.\n\n - `e` -> to higlight errors.\n\n - `c` -> to highlight corrections.\n\n - `b` -> to highlight both erros and corrections.\n\n Example of such a corpus can be `preloaded/enwiki_error_sample_sentences`."
+			},
+			"082_structs": {
+				"in": "query",
+				"name": "structs",
+				"schema": {
+					"type": "string",
+					"example": "s,g"
+				},
+				"description": "A list of comma-delimited structures (=structure tags) that should be included in the result."
+			},
+			"083_fromp": {
+				"in": "query",
+				"name": "fromp",
+				"schema": {
+					"type": "integer",
+					"example": "1"
+				},
+				"description": "The number of the page that should be returned."
+			},
+			"084_pagesize": {
+				"in": "query",
+				"name": "pagesize",
+				"schema": {
+					"type": "integer",
+					"example": "20"
+				},
+				"description": "The number of lines in the concordance."
+			},
+			"085_kwicleftctx": {
+				"in": "query",
+				"name": "kwicleftctx",
+				"schema": {
+					"type": "string",
+					"example": "100#"
+				},
+				"description": "The size of the left context in KWIC view. Number of tokens."
+			},
+			"086_kwicrightctx": {
+				"in": "query",
+				"name": "kwicrightctx",
+				"schema": {
+					"type": "string",
+					"example": "100#"
+				},
+				"description": "The size of the right context in KWIC view. Number of tokens."
 			},
 			"094_fpage": {
 				"in": "query",
@@ -486,6 +734,115 @@
 					"example": "-1<0"
 				},
 				"description": " Position of the selected attribute in the concordance. **Minus** means **left** context (-1<0). **Plus** means **right** context (6>0). **At least one attribute is required, the others are optional.** Every attribute (ml1attr, ml2attr. etc.) needs it's **own** context position (e.g. if 3 attributes are selected three context position **needs to** be set ml1ctx, ml2ctx, ml3ctx).\n\n\n**Positions can be referenced as follows:**\n\n `integer number` - where **0** is the first token in **KWIC**, **-1** the rightmost token in the left context etc.\n\n `1:x` - where **x** is one of the corpus structures (e.g. “doc” or “s” if the corpus has the particular markup). Its meaning is the first token in the structure, except when it is the right boundary of a range - then it is the last token in the structure. Also, other numbers can be used, e.g. -2:x, 3:x, etc. (-1 is the same as 1 with meaning “structure containing KWIC”)\n\n `a<0` - where **a** stands for a position reference as described in the first two points with meaning '**a** positions before/after the firs KWIC position' (so this is equivalent to **a**)\n\n `a>0` - where **a** stands for the same position reference with meaning 'positions before/after the last KWIC position'\n\n in the previous two points, if **0** is substituted with a natural number **k**, it means 'before/after **k**-th collocation' instead of 'before/after KWIC'. Collocations are special token groups in the context, that can be added using positive filters (see below).\n\n\n`Ranges` can be referenced as a~b where **a**, **b** stand for token identifiers as above. Examples of positions and ranges:\n\n `-1<0` - rightmost token in the left context\n\n `3>0` - third token in right context\n\n `0>0` - last token in KWIC\n\n `0<0` - first token in KWIC\n\n `0<0~0>0` - range of KWIC\n\n `-1<0~1>0` - range of KWIC with one token from the left context and one from the right context\n\n `1:s` - first token in the sentence containing KWIC (or its first token)\n\n `1:s>0` - first token in the sentence containing KWIC (or its last token)\n\n `0<1` - first token of the first-added collocation.\n\n\n`Examples:`\n\n sword/ **1>0~3>0**\n\n sword/ **1>0~3>0**\n\n slemma/ **0<0~0>0**\n\n sword/i **-1**\n\n sword/ **0** word/ir **-1<0** tag/r **-2<0**\n\n "
+			},
+			"127_concordance_query_queryselector": {
+				"in": "query",
+				"name": "concordance_query[queryselector]",
+				"schema": {
+					"type": "string",
+					"enum": [
+						"iquery",
+						"cqlrow",
+						"lemmarow",
+						"charrow",
+						"wordrow",
+						"phraserow"
+					]
+				},
+				"description": "The query type. You can send it directly or via the `json` parameter, the results are the same."
+			},
+			"128_concordance_query_iquery": {
+				"in": "query",
+				"name": "concordance_query[iquery]",
+				"schema": {
+					"type": "string"
+				},
+				"description": "Only works when `queryselector` is set to `iqueryrow`. Type a word or phrase.\n\n These special wildcards are supported .\n\nUse the `asterisk (*)` for any number of unspecified characters. Use a `question mark (?)` for exactly one unspecified character. Use the `pipe (|)` to include more than one word or phrase. Use `two hyphens (--)` to find a word which is  hyphenated, non-hyphenated or spelt as two separate words."
+			},
+			"129_concordance_query_cql": {
+				"in": "query",
+				"name": "concordance_query[cql]",
+				"schema": {
+					"type": "string"
+				},
+				"description": "Only works when `queryselector` is set to `cqlrow`. Type the query using the [cql](https://www.sketchengine.eu/documentation/corpus-querying/) query language."
+			},
+			"130_concordance_query_lemma": {
+				"in": "query",
+				"name": "concordance_query[lemma]",
+				"schema": {
+					"type": "string"
+				},
+				"description": "Only works when `queryselector` is set to `lemmarow`. Type the lemma. Regex is supported."
+			},
+			"131_concordance_query_char": {
+				"in": "query",
+				"name": "concordance_query[char]",
+				"schema": {
+					"type": "string"
+				},
+				"description": "Only works when `queryselector` is set to `charrow`. Type the characters that the tokens should contain. Regex is supported."
+			},
+			"132_concordance_query_word": {
+				"in": "query",
+				"name": "concordance_query[word]",
+				"schema": {
+					"type": "string"
+				},
+				"description": "Only works when `queryselector` is set to `wordrow`. Type the word form. Regex is supported."
+			},
+			"133_concordance_query_phrase": {
+				"in": "query",
+				"name": "concordance_query[phrase]",
+				"schema": {
+					"type": "string"
+				},
+				"description": "Only works when `queryselector` is set to `phraserow`. Type the phrase. Regex is supported."
+			},
+			"134_errcorr_switch": {
+				"in": "query",
+				"name": "errcorr_switch",
+				"schema": {
+					"type": "string",
+					"enum": [
+						"corr",
+						"err"
+					]
+				},
+				"description": "(Only for error-annotated corpora.) Determines what should be highlighted. Corr means **correction** and err means **error**. An **example** of such a corpus is `preloaded/enwiki_error_sample_sentences`."
+			},
+			"135_cup_err_code": {
+				"in": "query",
+				"name": "cup_err_code",
+				"schema": {
+					"type": "string",
+					"enum": [
+						".*",
+						"lexicosemantic",
+						"punct",
+						"spelling",
+						"style",
+						"typographical",
+						"unclassified"
+					]
+				},
+				"description": "(Only for error-annotated corpora). Determines which error type to higlight. An example of such a corpus is `preloaded/enwiki_error_sample_sentences`."
+			},
+			"136_cup_err": {
+				"in": "query",
+				"name": "cup_err",
+				"schema": {
+					"type": "string"
+				},
+				"description": "(Only for error-annotated corpora.) An error token to search."
+			},
+			"137_cup_corr": {
+				"in": "query",
+				"name": "cup_corr",
+				"schema": {
+					"type": "string"
+				},
+				"description": "(Only for error-annotated corpora.) A correction token to search."
 			},
 			"141_ml2attr": {
 				"in": "query",
@@ -1225,6 +1582,272 @@
 					"docstructure": {
 						"type": "string",
 						"description": "Structure in which individual documents should be wrapped. Usually `doc`."
+					}
+				}
+			},
+			"06_concordance": {
+				"type": "object",
+				"properties": {
+					"Lines": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"toknum": {
+									"type": "integer",
+									"example": 10336
+								},
+								"hitlen": {
+									"type": "integer",
+									"example": 1
+								},
+								"Refs": {
+									"type": "array",
+									"items": {
+										"type": "string",
+										"example": "Written books and periodicals"
+									}
+								},
+								"Tbl_refs": {
+									"type": "array",
+									"items": {
+										"type": "string",
+										"example": "Written books and periodicals"
+									}
+								},
+								"Left": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"strc": {
+												"type": "string",
+												"example": "<s>"
+											}
+										}
+									}
+								},
+								"Kwic": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"str": {
+												"type": "string",
+												"example": "dogs"
+											},
+											"coll": {
+												"type": "integer",
+												"example": 1
+											}
+										}
+									}
+								},
+								"Right": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"str": {
+												"type": "string",
+												"example": "</s>"
+											}
+										}
+									}
+								},
+								"Links": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								},
+								"linegroup": {
+									"type": "string",
+									"example": "_"
+								},
+								"linegroup_id": {
+									"type": "integer",
+									"example": 0
+								}
+							}
+						}
+					},
+					"fromp": {
+						"type": "integer",
+						"example": 1
+					},
+					"concsize": {
+						"type": "integer",
+						"example": 12087
+					},
+					"concordance_size_limit": {
+						"type": "integer",
+						"example": 10000
+					},
+					"Sort_idx": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"righttoleft": {
+						"type": "boolean",
+						"example": false
+					},
+					"Aligned_rtl": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"numofcolls": {
+						"type": "integer",
+						"example": 0
+					},
+					"finished": {
+						"type": "integer",
+						"example": 1
+					},
+					"fullsize": {
+						"type": "integer",
+						"example": 12087
+					},
+					"relsize": {
+						"type": "integer",
+						"example": 107.59
+					},
+					"q": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"example": "q[lc=\\\"dog\\\" | lemma_lc=\\\"dog\\\"]"
+						}
+					},
+					"Desc": {
+						"type": "object",
+						"properties": {
+							"op": {
+								"type": "string",
+								"example": "Query"
+							},
+							"arg": {
+								"type": "string",
+								"example": "[lc=\\\"dog\\\" | lemma_lc=\\\"dog\\\"]"
+							},
+							"nicearg": {
+								"type": "string",
+								"example": "dog"
+							},
+							"rel": {
+								"type": "integer",
+								"example": 107.59
+							},
+							"size": {
+								"type": "integer",
+								"example": 12087
+							},
+							"tourl": {
+								"type": "string",
+								"example": "q=q%5Blc%3D%22dog%22+%7C+lemma_lc%3D%22dog%22%5D"
+							}
+						}
+					},
+					"port": {
+						"type": "integer",
+						"example": 0
+					},
+					"gdex_scores": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"sc_strcts": {
+						"type": "array",
+						"items": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"example": "bncdoc"
+							}
+						}
+					},
+					"api_version": {
+						"type": "string",
+						"example": "5.63.1"
+					},
+					"manatee_version": {
+						"type": "string",
+						"example": "2.36.7-SkE-2.221"
+					},
+					"request": {
+						"type": "object",
+						"properties": {
+							"concordance_query": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"queryselector": {
+											"type": "string",
+											"example": "iqueryrow"
+										},
+										"iquery": {
+											"type": "string",
+											"example": "dog"
+										}
+									}
+								}
+							},
+							"corpname": {
+								"type": "string",
+								"example": "preloaded/bnc2_tt21"
+							},
+							"kwicleftctx": {
+								"type": "string",
+								"example": "100#"
+							},
+							"structs": {
+								"type": "string",
+								"example": "s,g"
+							},
+							"viewmode": {
+								"type": "string",
+								"example": "sen"
+							},
+							"attr_allpos": {
+								"type": "string",
+								"example": "all"
+							},
+							"fromp": {
+								"type": "string",
+								"example": "1"
+							},
+							"json": {
+								"type": "string",
+								"example": "{\\\"concordance_query\\\":[{\\\"queryselector\\\":\\\"iqueryrow\\\",\\\"iquery\\\":\\\"dog\\\"}]}"
+							},
+							"kwicrightctx": {
+								"type": "string",
+								"example": "100#"
+							},
+							"refs": {
+								"type": "string",
+								"example": "=bncdoc.alltyp"
+							},
+							"cup_hl": {
+								"type": "string",
+								"example": "q"
+							},
+							"attrs": {
+								"type": "string",
+								"example": "word"
+							},
+							"pagesize": {
+								"type": "string",
+								"example": "20"
+							}
+						}
 					}
 				}
 			},
