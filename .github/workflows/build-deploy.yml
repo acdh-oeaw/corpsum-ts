@@ -81,7 +81,6 @@ jobs:
       APP_NAME: "corpsum-ts-${{ github.ref_name }}"
       APP_ROOT: "/"
       SERVICE_ID: "${{ vars.NUXT_PUBLIC_REDMINE_ID }}"
-      PUBLIC_URL: "https://corpsum-ts-${{ github.ref_name }}.acdh-ch-dev.oeaw.ac.at"
       POSTGRES_ENABLED: false
       environment: ${{ needs.env.outputs.environment }}
       default_port: "3000"
