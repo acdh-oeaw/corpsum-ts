@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { useSearchSettingsStore } from "../stores/searchSettings";
 
 const corporaStore = useCorporaStore();
-const { corpora, selectedCorpus, tracker } = storeToRefs(corporaStore);
+const { corpora, selectedCorpus, tracker, subCorpora, corpInfoResponse } = storeToRefs(corporaStore);
 
 const query = useQuery();
 const { queries, nextQueryId } = storeToRefs(query);
@@ -29,7 +29,7 @@ function refresh() {
 
 				<div>
 					<h2>Corpora</h2>
-					<p>Corpora:</p>
+
 					<JsonViewer
 						v-if="!disabled"
 						preview-mode
@@ -48,6 +48,16 @@ function refresh() {
 						boxed
 						@click.alt="refresh()"
 					></JsonViewer>
+					<p>corpInfoResponse:</p>
+					<JsonViewer
+						v-if="!disabled"
+						preview-mode
+						:value="corpInfoResponse"
+						:expand-depth="5"
+						boxed
+						@click.alt="refresh()"
+					></JsonViewer>
+
 
 					<p>tracker</p>
 					<JsonViewer

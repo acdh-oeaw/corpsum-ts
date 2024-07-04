@@ -30,6 +30,7 @@ const t = useTranslations("Corpsum");
 				<br />
 				{{ t("doccount") }}: {{ corporaStore.selectedCorpus?.sizes.doccount }}
 			</p>
+
 		</div>
 		<div class="flex h-full flex-col items-start justify-start">
 			<VAutocomplete

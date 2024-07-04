@@ -28,10 +28,6 @@ export function useAPIs() {
 	// yearly Frequencies:
 	// q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.year;fcrit=doc.id;flimit=0;format=json`,
 
-	// todo this is something else, prob docs, but not entirely sure yet
-	// https://corpsum-proxy.acdh-dev.oeaw.ac.at/run.cgi/collx?q=aword%2C%5Bword%3D%22arbeit%22%5D%20within%20%3Cdoc%20year%3D%222017%22%2F%3E;corpname=amc_3.2;cfromw=-5;ctow=5;cminfreq=5;cminbgr=3;cmaxitems=10;cbgrfns=d;csortfn=d;format=json
-	//const FREQUENCIES_TIME_URL = `${BASE_URL}/run.cgi/collx`
-
 	// used for region and keywrdInContext
 	const VIEWSATTRSX_URL = `${BASE_URL}/run.cgi/concordance`;
 	// region param:

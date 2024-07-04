@@ -22,6 +22,27 @@ export type usedYear =
 	| 2021
 	| 2022;
 
+
+interface KWICAttribute {
+	name: string;
+	id_range?: number;
+	label: string;
+	dynamic: string;
+	fromattr: string;
+	size?: string;
+}
+
+interface KWICStructure {
+	name: string;
+	label: string;
+	attributes: KWICAttribute[];
+	size: string;
+}
+interface SelectedCorpusKWICViewInfo {
+	attributes: Array<KWICAttribute>;
+	structures: Array<KWICStructure>;
+}
+
 export const useCorporaStore = defineStore(
 	"corpora",
 	() => {
@@ -44,9 +65,25 @@ export const useCorporaStore = defineStore(
 			return true;
 		}
 
+
+
 		const selectedCorpus: Ref<Corpus | null> = ref(null);
 		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
+		const corpInfoResponse: Ref<any> = ref(null);
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
+		const emptySelectedCorpusKWICViewInfo: SelectedCorpusKWICViewInfo = {
+			attributes: [],
+			structures: [],
+		}
+		const selectedCorpusKWICViewInfo: Ref<SelectedCorpusKWICViewInfo> = ref(emptySelectedCorpusKWICViewInfo);
+
+		const existingCorpusKWICSecetion = computed(() => {
+			if (!corpInfoResponse.value || !selectedCorpusKWICViewInfo.value) return emptySelectedCorpusKWICViewInfo;
+			return {
+				attributes: selectedCorpusKWICViewInfo.value.attributes.filter(a => corpInfoResponse.value.attributes.find(ca => ca.name === a.name)),
+				structures: selectedCorpusKWICViewInfo.value.structures.filter(a => corpInfoResponse.value.structures.find(ca => ca.name === a.name)),
+			}
+		})
 
 		async function fetchSubCorpora() {
 			subCorporaLoading.value = true;
@@ -63,11 +100,13 @@ export const useCorporaStore = defineStore(
 			subCorporaLoading.value = false;
 
 			if (error.value) return console.error("upsie whoopsie");
-			else {
-				if (!_subCorpora.value) return console.error("could not fetch subcorpora");
-				const subCorporaResponseData = _subCorpora.value as unknown as CorpInfoResponse;
-				subCorpora.value = subCorporaResponseData.subcorpora;
-			}
+
+			corpInfoResponse.value = _subCorpora.value;
+
+			if (!_subCorpora.value) return console.error("could not fetch subcorpora");
+			const subCorporaResponseData = _subCorpora.value as unknown as CorpInfoResponse;
+			subCorpora.value = subCorporaResponseData.subcorpora;
+
 		}
 
 		watch(selectedCorpus, async (after, before) => {
@@ -77,8 +116,7 @@ export const useCorporaStore = defineStore(
 
 		const corporaForSearch = computed(
 			() =>
-				`corpname=${selectedCorpus.value?.corpname}${
-					selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
+				`corpname=${selectedCorpus.value?.corpname}${selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
 				}`,
 		);
 
@@ -103,15 +141,18 @@ export const useCorporaStore = defineStore(
 			corpora,
 			fetchCorpora,
 			subCorpora,
+			corpInfoResponse,
 			fetchSubCorpora,
 			selectedCorpus,
 			selectedSubCorpus,
+			selectedCorpusKWICViewInfo,
 			tracker,
 			corporaForSearch,
 			corporaForSearchKeys,
 			corporaLoading,
 			corporaForSearchWithoutSubCorpus,
 			subCorporaLoading,
+			existingCorpusKWICSecetion,
 		};
 	},
 	{ persist: { storage: persistedState.localStorage } },

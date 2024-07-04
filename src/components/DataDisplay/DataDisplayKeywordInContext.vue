@@ -89,7 +89,9 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 				/>
 			</div>
 
+			<KWICAttributeSelect />
 			<div v-for="query of queries" :key="query.id">
+
 				<div v-if="!query.loading.keywordInContext">
 					<span :style="`color: ${query.color}`">
 						{{ query.type }}: {{ query.userInput }}

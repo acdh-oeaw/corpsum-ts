@@ -30,6 +30,9 @@ const { queries } = storeToRefs(queryStore);
 
 			<Search></Search>
 			<!-- <v-data-table /> -->
+						<Dev></Dev>
+
+
 			<VContainer>
 				<div class="" :class="['grid', 'gap-3', `grid-cols-1`]">
 					<!-- <DisplayCard v-for="i in 2" :key="i" :title="titles[i]"></DisplayCard> -->
