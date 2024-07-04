@@ -67,7 +67,10 @@
 		"createSubcorpusConfirm1": "Do you really want to create a subcorpus named",
 		"createSubcorpusConfirm2": "containing",
 		"createSubcorpusConfirm3": "documents from Corpus",
-		"corpusCreated": "Subcorpus created successfully!"
+		"corpusCreated": "Subcorpus created successfully!",
+		"Attributes": "Attributes",
+		"Structures": "Structures",
+		"Attributes and Structures": "Attributes and Structures"
 	},
 	"DefaultLayout": {
 		"meta": {
