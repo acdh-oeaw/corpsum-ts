@@ -29,7 +29,7 @@ export function useAPIs() {
 	// q: `${query.preparedQuery};${corpora.corporaForSearch};fttattr=doc.year;fcrit=doc.id;flimit=0;format=json`,
 
 	// used for region and keywrdInContext
-	const VIEWSATTRSX_URL = `${BASE_URL}/run.cgi/concordance`;
+	const CINCORDANCE_URL = `${BASE_URL}/run.cgi/concordance`;
 	// region param:
 	// q: `aword,${query.finalQuery} within <doc region="${region}"/>;${corporaForSearch.value};attrs=word;viewmode=kwic;ctxattrs=word;setattrs=word;allpos=kw;setrefs==doc.id;setrefs==doc.region;pagesize=10;newctxsize=5;async=0;format=json`,
 
@@ -44,47 +44,19 @@ export function useAPIs() {
 	const WORDLIST_URL = `${BASE_URL}/run.cgi/wordlist`;
 	// https://noske-amc.acdh.oeaw.ac.at/bonito/run.cgi/wordlist?corpname=amc4_demo&results_url=https%3A%2F%2Fnoske-amc.acdh.oeaw.ac.at%2Fcrystal%2F%23wordlist%3Fcorpname%3Damc4_demo%26tab%3Dbasic%26find%3Dlemma%26keyword%3Dauto%26filter%3Dcontaining%26wlminfreq%3D0%26include_nonwords%3D1%26itemsPerPage%3D50%26cols%3D%255B%2522frq%2522%255D%26showresults%3D1&wlmaxitems=20000&wlsort=frq&wlattr=lemma&wlpat=(.*auto.*)&wlminfreq=0&wlicase=1&wlmaxfreq=0&wltype=simple&include_nonwords=1&random=0&relfreq=1&reldocf=1&wlpage=1
 
-	/**
-	 * corpname: amc4_demo
-	results_url: https://noske-amc.acdh.oeaw.ac.at/crystal/#wordlist?corpname=amc4_demo&tab=basic&find=lemma&keyword=auto&filter=containing&wlminfreq=0&include_nonwords=1&itemsPerPage=50&cols=%5B%22frq%22%5D&showresults=1
-	wlmaxitems: 20000
-	wlsort: frq
-	wlattr: lemma
-	wlpat: (.*auto.*)
-	wlminfreq: 0
-	wlicase: 1
-	wlmaxfreq: 0
-	wltype: simple
-	include_nonwords: 1
-	random: 0
-	relfreq: 1
-	reldocf: 1
-	wlpage: 1
-	 *
-	 */
 
-	// wordlist params:
-	// (maybe adapt to same format as old corpsum where everything is under corpname param)
-	// params: {
-	// 	corpname: selectedCorpus.value.corpname,
-	// 	wlmaxitems: 1000,
-	// 	wlattr: "doc.docsrc",
-	// 	wlminfreq: 1,
-	// 	include_nonwords: 1,
-	// 	wlsort: "f",
-	// 	wlnums: "docf",
-	// 	format: "json",
-	// },
+	const FULL_REF_URL = `${BASE_URL}/run.cgi/fullref`;
 
 	return {
 		BASE_URL,
 		SUB_CORPUS_URL,
 		FREQUENCIES_TIME_URL,
 		WORDLIST_URL,
-		VIEWSATTRSX_URL,
+		CINCORDANCE_URL,
 		CORPORA_LIST_URL,
 		FREQUENCIES_MULTI_LEVEL_URL,
 		STRUCTCTX_URL,
 		CREATE_SUBCORPUS_URL,
+		FULL_REF_URL,
 	};
 }

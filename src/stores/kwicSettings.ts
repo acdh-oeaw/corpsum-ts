@@ -14,7 +14,7 @@ interface KWICAttribute {
 interface KWICStructure {
 	name: string;
 	label: string;
-	attributes: KWICAttribute[];
+	attributes: Array<KWICAttribute>;
 	size: string;
 }
 interface SelectedCorpusKWICViewInfo {
@@ -34,26 +34,40 @@ export const useKWICSettings = defineStore(
 		const corporaStore = useCorporaStore();
 		const { corpInfoResponse } = storeToRefs(corporaStore)
 
-		const selectedAttributeKeys: Ref<Array<String>> = ref([])
-		const selectedStructureKeys: Ref<Array<String>> = ref([])
+		// const selectedAttributeKeys: Ref<Array<String>> = ref([])
+		// const selectedStructureKeys: Ref<Array<String>> = ref([])
 
+		const selectedCorpusKWICViewInfo: Ref<SelectedCorpusKWICViewInfo> = ref(emptySelectedCorpusKWICViewInfo);
 
 		const existingCorpusKWICSecetion = computed(() => {
-			if (!corpInfoResponse.value) return emptySelectedCorpusKWICViewInfo;
+			if (!corpInfoResponse.value || !selectedCorpusKWICViewInfo.value) return emptySelectedCorpusKWICViewInfo;
 			return {
-				attributes: corpInfoResponse.value.attributes.filter(a => selectedAttributeKeys.value.find(ca => ca === a.name)),
-				structures: corpInfoResponse.value.structures.filter(a => selectedStructureKeys.value.find(ca => ca === a.name)),
+				attributes: selectedCorpusKWICViewInfo.value.attributes.filter(a => corpInfoResponse.value.attributes.find(ca => ca.name === a.name)),
+				structures: selectedCorpusKWICViewInfo.value.structures.filter(a => corpInfoResponse.value.structures.find(ca => ca.name === a.name)),
 			}
 		})
 
-		return {
-			selectedAttributeKeys,
-			selectedStructureKeys,
+		const KWICqueryString = computed(() => {
+			const attributePart = existingCorpusKWICSecetion.value.attributes.map(attr => attr.name).join(',');
+			const structurePart = existingCorpusKWICSecetion.value.structures.map(struct => struct.name).join(',');
+			return `setattrs=${attributePart};setstructs=${structurePart}`;
+		})
 
+		const KWICqueryAttrs = computed(() => (
+			{
+				attrs: existingCorpusKWICSecetion.value.attributes.map(attr => attr.name).join(','),
+				structs: existingCorpusKWICSecetion.value.structures.map(struct => struct.name).join(','),
+			}
+		));
+
+		return {
+			selectedCorpusKWICViewInfo,
 			existingCorpusKWICSecetion,
+			KWICqueryString,
+			KWICqueryAttrs,
 		};
 	},
-	// { persist: { storage: persistedState.localStorage } },
+	{ persist: { storage: persistedState.localStorage } },
 );
 
 if (import.meta.hot) {

@@ -1,23 +1,41 @@
 import { useQuery } from "../stores/query";
 
 export function useKeywordInContextSearch() {
-	const { VIEWSATTRSX_URL } = useAPIs();
+	const { CINCORDANCE_URL } = useAPIs();
 	const queryStore = useQuery();
 
 	// const queryStore = useQuery();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
 
+	const kwicSettings = useKWICSettings();
+	const { KWICqueryAttrs } = storeToRefs(kwicSettings);
+
 	const getKeywordInContext = async (query: CorpusQuery) => {
 		query.loading.keywordInContext = true;
+		const options = {
+			method: "POST",
+			query: {
 
-		const { data } = await authenticatedFetch(VIEWSATTRSX_URL, {
-			params: {
-				q: `${query.preparedQuery};${queryStore.corporaForSearch(
-					query,
-				)};viewmode=kwic;attrs=word;ctxattrs=word;setattrs=word;allpos=kw;refs==doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name;pagesize=1000;newctxsize=30;async=0;format=json`,
-			},
-		});
+				...queryStore.corporaForSearchKeys(query),
+				...KWICqueryAttrs.value,
+
+				refs: '=doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name',
+				attr_allpos: 'all',
+				viewmode: 'kwic',
+				// cup_hl: q,
+
+				// fromp: 1,
+				pagesize: 1000,
+				kwicleftctx: 100,
+				kwicrightctx: 100,
+				json: { concordance_query: query.concordance_query },
+
+
+			}
+		};
+		console.log({ options, }, JSON.stringify(options, null, 2))
+		const { data } = await authenticatedFetch(CINCORDANCE_URL, options);
 		const keywordInContext = data.value as KeywordInContextData;
 		// console.log('keywordInContext', { keywordInContext: keywordInContext.value });
 		// eslint-disable require-atomic-updates

@@ -7,7 +7,7 @@ import { useAuthenticatedFetch } from "../../composables/useAuthenticatedFetch";
 
 const props = defineProps<{ kwic: KeywordInContext | null; query: CorpusQuery }>();
 defineEmits(["close"]);
-const { STRUCTCTX_URL } = useAPIs();
+const { FULL_REF_URL } = useAPIs();
 const active = computed(() => Boolean(props.kwic));
 const queryStore = useQuery();
 
@@ -22,11 +22,10 @@ async function getDetails() {
 	if (!props.kwic) return;
 	loading.value = true;
 	details.value = null;
-	const { data: _details } = await authenticatedFetch(STRUCTCTX_URL, {
+	const { data: _details } = await authenticatedFetch(FULL_REF_URL, {
 		params: {
-			q: `ignored=niceapi;${queryStore.corporaForSearchWithoutSubCorpus(props.query)};pos=${
-				props.kwic.toknum
-			};struct=doc;format=json`,
+			pos: props.kwic.toknum,
+			corpname: props.query.corpus,
 		},
 	});
 	loading.value = false;
@@ -40,12 +39,12 @@ watch(active, async () => {
 	await getDetails();
 });
 
-const parsedText = computed(() => {
-	if (!details.value?.content) return "not loaded yet.";
-	const html = details.value.content.map((a) => a.str).join(" ");
-	const text = convert(html.replaceAll("</p>", "</p>\n\n"), { preserveNewlines: true });
-	return text;
-});
+// const parsedText = computed(() => {
+// 	if (!details.value?.content) return "not loaded yet.";
+// 	const html = details.value.content.map((a) => a.str).join(" ");
+// 	const text = convert(html.replaceAll("</p>", "</p>\n\n"), { preserveNewlines: true });
+// 	return text;
+// });
 </script>
 
 <template>
@@ -57,43 +56,15 @@ const parsedText = computed(() => {
 
 			<VCardText>
 				<VContainer>
-					<!-- {{ kwic }} -->
-
-					<!-- <p>
-						{{ kwic.left }}
-					</p>
-					<p class="text-fuchsia-600">{{ kwic.word }}</p>
-					<p>
-						{{ kwic.right }}
-					</p> -->
-
 					<div v-if="!loading">
-						<TextHighlight :search-words="[kwic.word]" :text-to-highlight="parsedText" />
-
-						<!-- <br />
-						<br />
-						<br />
-						<br />
-						<br /> -->
-						<!-- {{ details }} -->
+						<!-- <TextHighlight :search-words="[kwic.word]" :text-to-highlight="parsedText" /> -->
 					</div>
-					<VProgressCircular v-else indeterminate></VProgressCircular>
 
-					<!-- <VCol cols="12" sm="6" md="4">
-							<VTextField v-model="editedItem.name" label="Dessert name"></VTextField>
-						</VCol>
-						<VCol cols="12" sm="6" md="4">
-							<VTextField v-model="editedItem.calories" label="Calories"></VTextField>
-						</VCol>
-						<VCol cols="12" sm="6" md="4">
-							<VTextField v-model="editedItem.fat" label="Fat (g)"></VTextField>
-						</VCol>
-						<VCol cols="12" sm="6" md="4">
-							<VTextField v-model="editedItem.carbs" label="Carbs (g)"></VTextField>
-						</VCol>
-						<VCol cols="12" sm="6" md="4">
-							<VTextField v-model="editedItem.protein" label="Protein (g)"></VTextField>
-						</VCol> -->
+					<div v-if="loading">
+						<VProgressCircular indeterminate></VProgressCircular>
+						<span>Loading the full ref</span>
+					</div>
+					<JsonViewer v-if="!loading" :expand-depth="2" :value="details"></JsonViewer>
 				</VContainer>
 			</VCardText>
 

@@ -38,9 +38,11 @@ export const useSearchSettingsStore = defineStore(
 			"keywordInContext",
 		]);
 
-		async function doSearches(query: CorpusQuery) {
+		async function doSearches(query: CorpusQuery, onlySpecificSearches = possibleSearchKeys.value) {
 			return await Promise.all(
-				selectedSearches.value.map(
+				selectedSearches.value.filter(a =>
+					onlySpecificSearches.includes(a)
+				).map(
 					(a: SearchFunctionKey) =>
 						(searchFunctions[a] as unknown as (query: CorpusQuery) => Promise<void>)(
 							query,
@@ -52,13 +54,19 @@ export const useSearchSettingsStore = defineStore(
 		const queriesStore = useQuery();
 		const { queries } = storeToRefs(queriesStore);
 
+
+		async function doSearchesForAllQueries(onlySpecificSearches = possibleSearchKeys.value) {
+			// eslint-disable-next-line
+			if (!queriesStore.queries) return;
+			await Promise.all(queries.value.map((query: CorpusQuery) => doSearches(query, onlySpecificSearches)));
+		}
+
 		// run undone queries on change of dimensions
 		watch(selectedSearches, async (before, after) => {
 			// console.log({ selectedSearches, before, after, isSame: before === after });
 			// eslint-disable-next-line
 			if (!after || before === after) return; //console.log("no change")
 			// find querys with undone searches // or just do all and set queries do Only do if no data
-
 			const functionsToRun: Array<Promise<void>> = [];
 			// eslint-disable-next-line
 			if (!queriesStore.queries) return;
@@ -70,12 +78,14 @@ export const useSearchSettingsStore = defineStore(
 				});
 			});
 			await Promise.all(functionsToRun);
+
 		});
 
 		return {
 			possibleSearchKeys,
 			searchFunctions,
 			selectedSearches,
+			doSearchesForAllQueries,
 			doSearches,
 		};
 	},

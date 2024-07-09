@@ -15,15 +15,15 @@ const queryStore = useQuery();
 const { queries } = storeToRefs(queryStore);
 
 const headers = ref([
-	{ title: t("date"), key: "date", type: "string" },
+	{ title: t("docid"), key: "docid", type: "string" },
+	// { title: t("date"), key: "date", type: "string" },
 	{ title: t("source"), key: "source", type: "string" },
 	{ title: t("region"), key: "region", type: "string" },
 	{ title: t("left"), key: "left", type: "string" },
 	{ title: t("word"), key: "word", type: "string" },
 	{ title: t("right"), key: "right", type: "string" },
-	{ title: t("docid"), key: "docid", type: "string" },
-	{ title: t("topic"), key: "topic", type: "string" },
-	{ title: t("toknum"), key: "toknum", type: "string" },
+	// { title: t("topic"), key: "topic", type: "string" },
+	// { title: t("toknum"), key: "toknum", type: "string" },
 	{ title: t("link"), key: "open", type: "string" },
 ]);
 
@@ -31,6 +31,7 @@ const { CREATE_SUBCORPUS_URL } = useAPIs();
 
 const selected = ref([]);
 const createSubcorpusMode = ref(false);
+const showViewOptionsMode = ref(false);
 
 function open(item: KeywordInContext) {
 	selectedKWIC.value = item;
@@ -74,12 +75,23 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 			</template>
 		</VCardItem>
 		<VCardText class="py-0">
-			<VCheckbox v-model="createSubcorpusMode" :label="t('showSubcorpusCreation')"></VCheckbox>
+			<div class="flex gap-1" style="border: 1px solid red">
+				<VCheckbox
+					v-model="createSubcorpusMode"
+					style="border: 1px solid blue"
+					:label="t('showSubcorpusCreation')"
+				></VCheckbox>
+				<VCheckbox
+					v-model="showViewOptionsMode"
+					style="border: 1px solid blue"
+					:label="t('viewOptions')"
+				></VCheckbox>
+			</div>
 			<div v-if="createSubcorpusMode">
-				<p>
+				<h2 class="text-lg">
 					{{ t("createSubcorpus") }} {{ t("fromSelection") }} ({{ selected.length }}) in Corpus
 					{{ selectedCorpus?.name }}
-				</p>
+				</h2>
 				<VTextField
 					v-model="subCorpusName"
 					label="Name"
@@ -89,10 +101,10 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 				/>
 			</div>
 
-			<KWICAttributeSelect />
-			<div v-for="query of queries" :key="query.id" class="mt-2">
+			<KWICAttributeSelect v-if="showViewOptionsMode" />
 
-				<div v-if="!query.loading.keywordInContext" >
+			<div v-for="query of queries" :key="query.id" class="mt-2">
+				<div v-if="!query.loading.keywordInContext">
 					<span :style="`color: ${query.color}`">
 						{{ query.type }}: {{ query.userInput }}
 						<CorpusChip :query="query" />
@@ -108,6 +120,14 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 					>
 						<template #[`item.open`]="{ item }">
 							<VIcon size="small" class="me-2" icon="mdi-open-in-new" @click="open(item)" />
+						</template>
+						<template #[`item.docid`]="{ item }">
+							<div class="group relative inline-block">
+								<div class="hidden group-hover:inline" :title="item.docid">
+									{{ item.docid }}
+								</div>
+								<div class="inline group-hover:hidden">...{{ item.docid.slice(-5) }}</div>
+							</div>
 						</template>
 					</VDataTable>
 					<KWICDetailDialog :query="query" :kwic="selectedKWIC" @close="selectedKWIC = null" />

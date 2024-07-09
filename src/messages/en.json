@@ -70,7 +70,9 @@
 		"corpusCreated": "Subcorpus created successfully!",
 		"Attributes": "Attributes",
 		"Structures": "Structures",
-		"Attributes and Structures": "Attributes and Structures"
+		"Attributes and Structures": "Attributes and Structures",
+		"viewOptions": "Show view options",
+		"Reload KWIC with selected Attributes": "Reload KWIC with selected Attributes"
 	},
 	"DefaultLayout": {
 		"meta": {

@@ -1,7 +1,7 @@
 {
 	"css.validate": false,
 	"editor.codeActionsOnSave": {
-		"source.fixAll": true
+		"source.fixAll": "explicit"
 	},
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"editor.formatOnSave": true,
@@ -10,9 +10,15 @@
 	"editor.quickSuggestions": {
 		"strings": true
 	},
-	"editor.rulers": [100],
+	"editor.rulers": [
+		100
+	],
 	"eslint.enable": true,
-	"eslint.validate": ["javascript", "typescript", "vue"],
+	"eslint.validate": [
+		"javascript",
+		"typescript",
+		"vue"
+	],
 	"files.associations": {
 		"*.css": "tailwindcss"
 	},
@@ -21,8 +27,18 @@
 	"less.validate": false,
 	"scss.validate": false,
 	"stylelint.enable": true,
-	"stylelint.snippet": ["css", "postcss", "tailwindcss", "vue"],
-	"stylelint.validate": ["css", "postcss", "tailwindcss", "vue"],
+	"stylelint.snippet": [
+		"css",
+		"postcss",
+		"tailwindcss",
+		"vue"
+	],
+	"stylelint.validate": [
+		"css",
+		"postcss",
+		"tailwindcss",
+		"vue"
+	],
 	"tailwindCSS.validate": true,
 	"terminal.integrated.enablePersistentSessions": false,
 	"typescript.enablePromptUseWorkspaceTsdk": true,
@@ -34,5 +50,7 @@
 		"editor.wordWrap": "on"
 	},
 	"nuxt.isNuxtApp": false,
-	"i18n-ally.localesPaths": ["src/messages"]
+	"i18n-ally.localesPaths": [
+		"src/messages"
+	]
 }

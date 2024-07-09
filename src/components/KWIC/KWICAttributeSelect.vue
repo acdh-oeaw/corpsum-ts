@@ -3,27 +3,48 @@ import { storeToRefs } from "pinia";
 
 // const query = useQuery();
 const corporaStore = useCorporaStore();
-const kwicStore = useKWICSettings();
-const {  existingCorpusKWICSecetion, selectedAttributeKeys, selectedStructureKeys } = storeToRefs(kwicStore);
+const kwicSettingsStore = useKWICSettings();
+const { existingCorpusKWICSecetion, selectedCorpusKWICViewInfo } = storeToRefs(kwicSettingsStore);
 const { corpInfoResponse, corporaLoading } = storeToRefs(corporaStore);
 const t = useTranslations("Corpsum");
-
+const search = useSearchSettingsStore();
 </script>
 
 <template>
-	<VExpansionPanels v-if="!corporaLoading && corpInfoResponse">
-		<VExpansionPanel>
-			<VExpansionPanelTitle>{{t('Attributes and Structures')}}</VExpansionPanelTitle>
-			<VExpansionPanelText>
-						<div class="flex flex-row gap-3 w-full justify-start p-0">
-			<VAutocomplete :label="t('Attributes')" dese clearable placeholer="please select" chips multiple v-model="selectedAttributeKeys" item-title="name" :items="corpInfoResponse.attributes" />
+	<div v-if="!corporaLoading && corpInfoResponse">
+		<h2 class="text-lg">{{ t("Attributes and Structures") }}</h2>
 
-			<VAutocomplete :label="t('Structures')" dese clearable placeholer="please select" chips multiple v-model="selectedStructureKeys" item-title="name" :items="corpInfoResponse.structures" />
-			<!-- <VCheckbox  v-model="selectedAttributeKeys"  v-for="attribute of corpInfoResponse.attributes" :key="attribute.name" :label="attribute.name" :value="attribute"></VCheckbox> -->
-			</div>
+		<div class="flex w-full flex-row justify-start gap-3 p-0">
+			<VAutocomplete
+				v-model="selectedCorpusKWICViewInfo.attributes"
+				:label="t('Attributes')"
+				return-object
+				dese
+				closable-chips
+				placeholer="please select"
+				chips
+				multiple
+				item-title="name"
+				:items="corpInfoResponse.attributes"
+			/>
 
-				<VBtn>Reaload KWIC with selected Attributes</VBtn>
-		</VExpansionPanelText>
-	</VExpansionPanel>
-	</VExpansionPanels>
+			<VAutocomplete
+				v-model="selectedCorpusKWICViewInfo.structures"
+				:label="t('Structures')"
+				return-object
+				dese
+				closable-chips
+				placeholer="please select"
+				chips
+				multiple
+				item-title="name"
+				:items="corpInfoResponse.structures"
+			/>
+		</div>
+
+		<VBtn @click="search.doSearchesForAllQueries(['keywordInContext'])">
+			{{ t("Reload KWIC with selected Attributes") }}
+		</VBtn>
+		<!-- {{ existingCorpusKWICSecetion }} -->
+	</div>
 </template>
