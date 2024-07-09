@@ -2,7 +2,7 @@ export function useMediaSourceSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
-	const queryStore = useQuery();
+	const queryStore = useQueryStore();
 
 	const getMediaSourceFrequencies = async (query: CorpusQuery) => {
 		// doc.docsrc

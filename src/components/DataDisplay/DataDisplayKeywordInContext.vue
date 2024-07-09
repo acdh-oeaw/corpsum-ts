@@ -3,16 +3,19 @@ import { storeToRefs } from "pinia";
 import Swal from "sweetalert2";
 import type { Ref } from "vue";
 
-import { useAPIs } from "@/composables/useAPIs";
-import { useAuthenticatedFetch } from "@/composables/useAuthenticatedFetch";
-import { useCorporaStore } from "@/stores/corpora";
+import {useCreateSubcorpus} from "@/composables/useCreateSubcorpus.ts";
 
 import CorpusChip from "../Search/CorpusChip.vue";
 import KWICDetailDialog from "./KWICDetailDialog.vue";
 
 const t = useTranslations("Corpsum");
-const queryStore = useQuery();
+const queryStore = useQueryStore();
+const corporaStore = useCorporaStore();
+
 const { queries } = storeToRefs(queryStore);
+const { selectedCorpus } = storeToRefs(corporaStore);
+
+
 
 const headers = ref([
 	{ title: t("date"), key: "date", type: "string" },
@@ -27,8 +30,7 @@ const headers = ref([
 	{ title: t("link"), key: "open", type: "string" },
 ]);
 
-const { CREATE_SUBCORPUS_URL } = useAPIs();
-
+const subCorpusName = ref("");
 const selected = ref([]);
 const createSubcorpusMode = ref(false);
 
@@ -36,10 +38,6 @@ function open(item: KeywordInContext) {
 	selectedKWIC.value = item;
 }
 
-const subCorpusName = ref("");
-const { authenticatedFetch } = useAuthenticatedFetch();
-const corporaStore = useCorporaStore();
-const { corporaForSearchWithoutSubCorpus, selectedCorpus } = storeToRefs(corporaStore);
 async function createSubcorpus() {
 	const { isConfirmed } = await Swal.fire({
 		title: t("createSubcorpus"),
@@ -53,13 +51,14 @@ async function createSubcorpus() {
 
 	if (isConfirmed) {
 		// todo send results
-		await authenticatedFetch(
-			`${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus.value};subcname=${
-				subCorpusName.value
-			};create=True;${selected.value.map((docid: string) => `sca_doc.id=${docid}`).join(";")}`,
+		let res = await useCreateSubcorpus(
+			selectedCorpus.value!.name,
+			subCorpusName.value,
+			undefined,
+			{ "sca_doc.id": selected.value.map((docid: string) => docid) },
 		);
 		Swal.fire("Confirmed", t("corpusCreated")).then().catch(console.error);
-		await corporaStore.fetchSubCorpora();
+		corporaStore.fetchSubCorpora();
 	}
 }
 

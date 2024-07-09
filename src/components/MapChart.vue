@@ -2,13 +2,13 @@
 import { mapAustria } from "./utils/mapAustria";
 // import { CorpusQuery } from "~/types/query";
 
-const props = defineProps<{ query: CorpusQuery; mode: string }>();
+const props = defineProps<{ query: CorpusQuery; resdata: Array<never>, mode: string }>();
 // const props = defineProps(["query"]);
 
 const usedRegion = ["amitte", "aost", "asuedost", "awest"];
 
 const chartOptions = computed(() => {
-	const data = props.query.data.regionalFrequencies.map(({ region, relative, absolute }) => [
+	const data = props.resdata.map(({ region, relative, absolute }) => [
 		region,
 		props.mode === "relative" ? relative : absolute,
 	]);

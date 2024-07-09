@@ -47,7 +47,9 @@
 		"sweetalert2": "^11.10.1",
 		"vue-highlight-words": "^3.0.1",
 		"vue-json-viewer": "3",
-		"zipcelx": "^1.6.2"
+		"zipcelx": "^1.6.2",
+		"@tanstack/vue-query": "^5.36.0",
+		"nanoid": "^5.0.7"
 	},
 	"devDependencies": {
 		"@acdh-oeaw/eslint-config": "^1.0.0",
@@ -64,7 +66,7 @@
 		"@playwright/test": "^1.36.1",
 		"@tailwindcss/typography": "^0.5.9",
 		"@types/html-to-text": "^9.0.4",
-		"@types/node": "^20.7.0",
+		"@types/node": "^20.11.0",
 		"autoprefixer": "^10.4.14",
 		"eslint": "^8.45.0",
 		"eslint-plugin-tailwindcss": "^3.13.0",

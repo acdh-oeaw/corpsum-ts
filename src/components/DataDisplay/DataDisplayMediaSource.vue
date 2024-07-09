@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia";
 
 const t = useTranslations("Corpsum");
-const queryStore = useQuery();
+const queryStore = useQueryStore();
 const { queries } = storeToRefs(queryStore);
 
 const mode = ref("relative");

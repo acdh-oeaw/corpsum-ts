@@ -1,7 +1,7 @@
 export function useRegionsSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
-	const queryStore = useQuery();
-	// const queryStore = useQuery();
+	const queryStore = useQueryStore();
+	// const queryStore = useQueryStore();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
 

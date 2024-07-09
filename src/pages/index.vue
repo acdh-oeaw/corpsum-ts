@@ -5,7 +5,7 @@ import DataDisplayKeywordInContext from "../components/DataDisplay/DataDisplayKe
 import DataDisplayMediaSource from "../components/DataDisplay/DataDisplayMediaSource.vue";
 import DataDisplayRegionalFrequencies from "../components/DataDisplay/DataDisplayRegionalFrequencies.vue";
 import DataDisplayWordFormFrequencies from "../components/DataDisplay/DataDisplayWordFormFrequencies.vue";
-import { useQuery } from "../stores/query";
+import { useQueryStore } from "../stores/query";
 import { useSearchSettingsStore } from "../stores/searchSettings";
 
 definePageMeta({
@@ -17,7 +17,7 @@ const { selectedSearches } = storeToRefs(searchSettings);
 
 const t = useTranslations("Corpsum");
 
-const queryStore = useQuery();
+const queryStore = useQueryStore();
 const { queries } = storeToRefs(queryStore);
 </script>
 

@@ -12,7 +12,7 @@ const keyToKey = {
 	wordrow: "word",
 };
 
-export const useQuery = defineStore(
+export const useQueryStore = defineStore(
 	"queryNew",
 	() => {
 		const nextQueryId = ref(0);
@@ -108,5 +108,5 @@ export const useQuery = defineStore(
 );
 
 if (import.meta.hot) {
-	import.meta.hot.accept(acceptHMRUpdate(useQuery, import.meta.hot));
+	import.meta.hot.accept(acceptHMRUpdate(useQueryStore, import.meta.hot));
 }

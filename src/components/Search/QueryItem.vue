@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useQuery } from "../../stores/query";
+import { useQueryStore } from "../../stores/query";
 
 const props = defineProps<{ query: CorpusQuery }>();
-const queries = useQuery();
+const queries = useQueryStore();
 
 const i = queries.queries.findIndex((q) => q.id === props.query.id);
 const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unknown as CorpusQuery;

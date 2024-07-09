@@ -17,7 +17,7 @@ async function login() {
 }
 
 onMounted(async () => {
-	if (auth.basicAuthToken) await navigateTo(localeRoute("/", locale.value));
+	if (auth.isLoggedIn()) await navigateTo(localeRoute("/", locale.value));
 });
 </script>
 

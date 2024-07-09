@@ -1,10 +1,10 @@
-import { useQuery } from "../stores/query";
+import { useQueryStore } from "../stores/query";
 
 export function useKeywordInContextSearch() {
 	const { VIEWSATTRSX_URL } = useAPIs();
-	const queryStore = useQuery();
+	const queryStore = useQueryStore();
 
-	// const queryStore = useQuery();
+	// const queryStore = useQueryStore();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
 

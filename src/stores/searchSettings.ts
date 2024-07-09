@@ -4,7 +4,6 @@ import { type Ref, ref, watch } from "vue";
 export const useSearchSettingsStore = defineStore(
 	"searchSettings",
 	() => {
-		const { getYearlyFrequencies } = useYearlyFrequenciesSearch();
 		const { getWordFormFrequencies } = useWordFormsSearch();
 		const { getMediaSourceFrequencies } = useMediaSourceSearch();
 		const { getRegionsFrequencies } = useRegionsSearch();
@@ -19,8 +18,6 @@ export const useSearchSettingsStore = defineStore(
 		]);
 
 		const searchFunctions: Record<SearchFunctionKey, (query: CorpusQuery) => Promise<void>> = {
-			yearlyFrequencies: getYearlyFrequencies,
-
 			wordFormFrequencies: getWordFormFrequencies,
 
 			regionalFrequencies: getRegionsFrequencies,
@@ -49,7 +46,7 @@ export const useSearchSettingsStore = defineStore(
 			);
 		}
 
-		const queriesStore = useQuery();
+		const queriesStore = useQueryStore();
 		const { queries } = storeToRefs(queriesStore);
 
 		// run undone queries on change of dimensions

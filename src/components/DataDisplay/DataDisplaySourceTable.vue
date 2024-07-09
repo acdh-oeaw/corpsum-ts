@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-const props = defineProps<{ queries: Array<CorpusQuery>; datatype: SearchFunctionKey }>();
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+	datatype: SearchFunctionKey
+	loading: Array<boolean>;
+	data: Array<never>
+}>();
 const tab = ref(null);
 </script>
 
@@ -15,13 +20,13 @@ const tab = ref(null);
 
 		<VCardText>
 			<VWindow v-model="tab">
-				<div v-for="query of props.queries" :key="query.id">
+				<div v-for="(query, index) of props.queries" :key="query.id">
 					<VWindowItem :value="query.id">
-						<div v-if="!query.loading[props.datatype]">
+						<div v-if="!loading[index]">
 							<span :style="`color: ${query.color}`">
 								<CorpusChip :query="query" />
 							</span>
-							<VDataTable :items="query.data[props.datatype]" density="compact" />
+							<VDataTable :items="data" density="compact" />
 						</div>
 						<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 					</VWindowItem>

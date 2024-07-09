@@ -1,7 +1,7 @@
 // this file incoperates the actual search for the yearly frequency data
 export function useWordFormsSearch() {
 	const { FREQUENCIES_MULTI_LEVEL_URL } = useAPIs();
-	const queryStore = useQuery();
+	const queryStore = useQueryStore();
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
 
