@@ -12,8 +12,18 @@ const keyToKey = {
 	wordrow: "word",
 };
 
+
+
+
+
+const emptySelectedCorpusKWICViewInfo: KWICAttrsStructs = {
+	attributes: [],
+	structures: [],
+}
+
+
 export const useQuery = defineStore(
-	"queryNew",
+	"queryyyyyyy",
 	() => {
 		const nextQueryId = ref(0);
 		const queries = ref([]) as Ref<Array<CorpusQuery>>;
@@ -55,6 +65,11 @@ export const useQuery = defineStore(
 				concordance_query: concordance_query as ConcordanceQuery,
 				preparedQuery: `aword,${finalQuery}`, // note: this is done in the old project, so we do it here too
 				showPicker: false,
+				KWICAttrsStructs: { ...emptySelectedCorpusKWICViewInfo },
+				KWICAttrsStructsOptions: {
+					attributes: corporaStore.corpInfoResponse.attributes,
+					structures: corporaStore.corpInfoResponse.structures,
+				},
 				data: {
 					yearlyFrequencies: [],
 					wordFormFrequencies: [],
@@ -94,6 +109,13 @@ export const useQuery = defineStore(
 			return val;
 		};
 
+
+		const getKWICqueryAttrStrcs = (query: CorpusQuery) => (
+			{
+				attrs: query.KWICAttrsStructs.attributes.map(attr => attr.name).join(','),
+				structs: query.KWICAttrsStructs.structures.map(struct => struct.name).join(','),
+			});
+
 		return {
 			nextQueryId,
 			queries,
@@ -101,6 +123,7 @@ export const useQuery = defineStore(
 			corporaForSearch,
 			corporaForSearchWithoutSubCorpus,
 			corporaForSearchKeys,
+			getKWICqueryAttrStrcs,
 		};
 	},
 	{ persist: { storage: persistedState.localStorage } },

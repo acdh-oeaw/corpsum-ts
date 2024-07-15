@@ -47,6 +47,10 @@ export function useAPIs() {
 
 	const FULL_REF_URL = `${BASE_URL}/run.cgi/fullref`;
 
+
+	const FACETTING_URL = `${BASE_URL}/run.cgi/texttypes_with_norms`
+	const ATTR_VALS_URL = `${BASE_URL}/run.cgi/attr_vals`
+
 	return {
 		BASE_URL,
 		SUB_CORPUS_URL,
@@ -58,5 +62,7 @@ export function useAPIs() {
 		STRUCTCTX_URL,
 		CREATE_SUBCORPUS_URL,
 		FULL_REF_URL,
+		FACETTING_URL,
+		ATTR_VALS_URL,
 	};
 }

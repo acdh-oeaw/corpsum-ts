@@ -6,6 +6,8 @@ const queries = useQuery();
 
 const i = queries.queries.findIndex((q) => q.id === props.query.id);
 const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unknown as CorpusQuery;
+
+const showFacettingInterface = ref(false);
 </script>
 
 <template>
@@ -19,6 +21,7 @@ const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unkno
 						icon="mdi-palette"
 						@click="storeQuery.showPicker = !storeQuery.showPicker"
 					></VBtn>
+					<VBtn density="compact" icon="mdi-filter" @click="showFacettingInterface = true"></VBtn>
 				</div>
 				<span class="text-xl" :style="`color: ${props.query.color}`">
 					{{ props.query.userInput }}
@@ -29,8 +32,14 @@ const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unkno
 			<div class="mt-2 flex items-center justify-between"></div>
 		</VCardTitle>
 
+		<div v-if="showFacettingInterface">
+			JOOO
+			<FacettingModal :query="storeQuery" @close="showFacettingInterface = false" />
+		</div>
+
 		<VCardText class="flex justify-between" :style="`color: ${props.query.color}`">
 			<JsonViewer preview-mode :value="query.concordance_query" boxed></JsonViewer>
+			<JsonViewer preview-mode :value="query.KWICAttrsStructs" boxed></JsonViewer>
 			<div class="flex flex-col gap-1">
 				<CorpusChip :query="query"></CorpusChip>
 				<VChip>{{ props.query.type }}</VChip>

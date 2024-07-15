@@ -35,10 +35,10 @@ interface KWICAttribute {
 interface KWICStructure {
 	name: string;
 	label: string;
-	attributes: KWICAttribute[];
+	attributes: Array<KWICAttribute>;
 	size: string;
 }
-interface SelectedCorpusKWICViewInfo {
+interface KWICAttrsStructs {
 	attributes: Array<KWICAttribute>;
 	structures: Array<KWICStructure>;
 }
@@ -71,17 +71,17 @@ export const useCorporaStore = defineStore(
 		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
 		const corpInfoResponse: Ref<any> = ref(null);
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
-		const emptySelectedCorpusKWICViewInfo: SelectedCorpusKWICViewInfo = {
+		const emptySelectedCorpusKWICViewInfo: KWICAttrsStructs = {
 			attributes: [],
 			structures: [],
 		}
-		const selectedCorpusKWICViewInfo: Ref<SelectedCorpusKWICViewInfo> = ref(emptySelectedCorpusKWICViewInfo);
+		const KWICAttrsStructs: Ref<KWICAttrsStructs> = ref(emptySelectedCorpusKWICViewInfo);
 
-		const existingCorpusKWICSecetion = computed(() => {
-			if (!corpInfoResponse.value || !selectedCorpusKWICViewInfo.value) return emptySelectedCorpusKWICViewInfo;
+		const KWICAttrsStructsOptions = computed(() => {
+			if (!corpInfoResponse.value || !KWICAttrsStructs.value) return emptySelectedCorpusKWICViewInfo;
 			return {
-				attributes: selectedCorpusKWICViewInfo.value.attributes.filter(a => corpInfoResponse.value.attributes.find(ca => ca.name === a.name)),
-				structures: selectedCorpusKWICViewInfo.value.structures.filter(a => corpInfoResponse.value.structures.find(ca => ca.name === a.name)),
+				attributes: KWICAttrsStructs.value.attributes.filter(a => corpInfoResponse.value.attributes.find(ca => ca.name === a.name)),
+				structures: KWICAttrsStructs.value.structures.filter(a => corpInfoResponse.value.structures.find(ca => ca.name === a.name)),
 			}
 		})
 
@@ -145,14 +145,14 @@ export const useCorporaStore = defineStore(
 			fetchSubCorpora,
 			selectedCorpus,
 			selectedSubCorpus,
-			selectedCorpusKWICViewInfo,
+			KWICAttrsStructs,
 			tracker,
 			corporaForSearch,
 			corporaForSearchKeys,
 			corporaLoading,
 			corporaForSearchWithoutSubCorpus,
 			subCorporaLoading,
-			existingCorpusKWICSecetion,
+			KWICAttrsStructsOptions,
 		};
 	},
 	{ persist: { storage: persistedState.localStorage } },

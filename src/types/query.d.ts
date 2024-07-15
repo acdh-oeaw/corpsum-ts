@@ -45,6 +45,27 @@ interface QueryData {
 	keywordInContext: Array<KeywordInContext>;
 }
 
+
+interface KWICAttribute {
+	name: string;
+	id_range?: number;
+	label: string;
+	dynamic: string;
+	fromattr: string;
+	size?: string;
+}
+
+interface KWICStructure {
+	name: string;
+	label: string;
+	attributes: Array<KWICAttribute>;
+	size: string;
+}
+interface KWICAttrsStructs {
+	attributes: Array<KWICAttribute>;
+	structures: Array<KWICStructure>;
+}
+
 type ConcordanceQuery = Record<"queryselector", CorpusQueryType> &
 	Record<CorpusQueryTypeValue, string>;
 interface CorpusQuery {
@@ -58,6 +79,8 @@ interface CorpusQuery {
 	corpus: string;
 	subCorpus: string;
 	concordance_query: ConcordanceQuery;
+	KWICAttrsStructs: KWICAttrsStructs;
+	KWICAttrsStructsOptions: KWICAttrsStructs; // ToDo: this will be refactored to come from a query. -> will eb deleted
 	loading: {
 		yearlyFrequencies: boolean;
 		wordFormFrequencies: boolean;

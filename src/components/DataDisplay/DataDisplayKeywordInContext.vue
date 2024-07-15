@@ -65,6 +65,7 @@ async function createSubcorpus() {
 }
 
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
+const showIds = ref(false);
 </script>
 
 <template>
@@ -101,9 +102,8 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 				/>
 			</div>
 
-			<KWICAttributeSelect v-if="showViewOptionsMode" />
-
 			<div v-for="query of queries" :key="query.id" class="mt-2">
+				<KWICAttributeSelect v-if="showViewOptionsMode" :query="query" />
 				<div v-if="!query.loading.keywordInContext">
 					<span :style="`color: ${query.color}`">
 						{{ query.type }}: {{ query.userInput }}
@@ -122,11 +122,13 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 							<VIcon size="small" class="me-2" icon="mdi-open-in-new" @click="open(item)" />
 						</template>
 						<template #[`item.docid`]="{ item }">
-							<div class="group relative inline-block">
-								<div class="hidden group-hover:inline" :title="item.docid">
+							<div class="group relative inline-block cursor-pointer">
+								<div v-if="showIds" @click="showIds = false">
 									{{ item.docid }}
 								</div>
-								<div class="inline group-hover:hidden">...{{ item.docid.slice(-5) }}</div>
+								<div v-else :title="item.docid" @click="showIds = true">
+									...{{ item.docid.slice(-5) }}
+								</div>
 							</div>
 						</template>
 					</VDataTable>

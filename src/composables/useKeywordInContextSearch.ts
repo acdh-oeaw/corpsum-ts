@@ -8,9 +8,6 @@ export function useKeywordInContextSearch() {
 
 	const { authenticatedFetch } = useAuthenticatedFetch();
 
-	const kwicSettings = useKWICSettings();
-	const { KWICqueryAttrs } = storeToRefs(kwicSettings);
-
 	const getKeywordInContext = async (query: CorpusQuery) => {
 		query.loading.keywordInContext = true;
 		const options = {
@@ -18,7 +15,7 @@ export function useKeywordInContextSearch() {
 			query: {
 
 				...queryStore.corporaForSearchKeys(query),
-				...KWICqueryAttrs.value,
+				...queryStore.getKWICqueryAttrStrcs(query),
 
 				refs: '=doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name',
 				attr_allpos: 'all',
@@ -27,11 +24,9 @@ export function useKeywordInContextSearch() {
 
 				// fromp: 1,
 				pagesize: 1000,
-				kwicleftctx: 100,
-				kwicrightctx: 100,
+				kwicleftctx: '100#',
+				kwicrightctx: '100#',
 				json: { concordance_query: query.concordance_query },
-
-
 			}
 		};
 		console.log({ options, }, JSON.stringify(options, null, 2))
