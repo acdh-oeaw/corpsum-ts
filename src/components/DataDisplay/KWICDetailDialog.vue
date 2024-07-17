@@ -3,7 +3,7 @@ import { convert } from "html-to-text";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { useGetWideCtx } from "@/composables/useGetWideCtx.ts";
-import  { type HttpResponse, type Type16Widectx } from "~/lib/api-client";
+import { type HttpResponse, type Type16Widectx } from "~/lib/api-client";
 
 const props = defineProps<{ kwic: KeywordInContext | null; query: CorpusQuery }>();
 defineEmits(["close"]);

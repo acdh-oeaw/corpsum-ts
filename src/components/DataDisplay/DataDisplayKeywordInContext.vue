@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
-import  { type Ref } from "vue";
+import { type Ref } from "vue";
 
-import  { type Type06Concordance } from "~/lib/api-client";
+import { type Type06Concordance } from "~/lib/api-client";
 
 import CorpusChip from "../Search/CorpusChip.vue";
 import KWICDetailDialog from "./KWICDetailDialog.vue";

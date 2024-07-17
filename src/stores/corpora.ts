@@ -1,7 +1,7 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, type Ref, ref } from "vue";
 
-import  { type Type03CorporaList } from "~/lib/api-client";
+import { type Type03CorporaList } from "~/lib/api-client";
 
 /**
  * This Holds a
