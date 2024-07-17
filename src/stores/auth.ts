@@ -1,23 +1,26 @@
 import { defineStore } from "pinia";
 
-import { useCorporaStore } from "./corpora";
+import { useApiClient } from "@/composables/use-api-client.ts";
 
 export const useAuth = defineStore(
 	"newAuth",
 	() => {
+		const authtoken = ref("");
 		const username = ref("");
-		const basicAuthToken = ref("");
+		const api = useApiClient();
 
-		async function login(_username: string, password: string) {
-			if (_username) {
-				basicAuthToken.value = btoa(`${_username}:${password}`);
-				const copora = useCorporaStore();
-				const corpora = await copora.fetchCorpora();
-				if (!corpora) {
-					basicAuthToken.value = "";
+		async function login(_username: string, _password: string) {
+			if (_username && _password) {
+				api.setSecurityData({
+					token: "Basic " + btoa(_username + ":" + _password),
+				});
+				const corpora = await api.ca.getCorpora();
+				if (!Array.isArray(corpora.data.data)) {
+					authtoken.value = "";
 					return false;
 				}
 				username.value = _username;
+				authtoken.value = "Basic " + btoa(_username + ":" + _password);
 				return true;
 			}
 			return false;
@@ -25,13 +28,24 @@ export const useAuth = defineStore(
 
 		function logout() {
 			username.value = "";
-			basicAuthToken.value = "";
+			authtoken.value = "";
+			api.setSecurityData({
+				token: "",
+			});
 		}
 
-		return { username, basicAuthToken, login, logout };
+		function isLoggedIn(): boolean {
+			if (authtoken.value !== "" && username.value !== "") return true;
+			return false;
+		}
+
+		return { login, logout, isLoggedIn, authtoken, username };
 	},
-	{ persist: true },
-	//{ persist: { storage: persistedState.localStorage }, },
+	{
+		persist: {
+			paths: ["authtoken", "username"],
+		},
+	},
 );
 
 if (import.meta.hot) {

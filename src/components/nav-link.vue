@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { NuxtLinkProps } from "#app";
+import { type NuxtLinkProps } from "#app";
 
 export interface NavLinkProps
 	extends Omit<NuxtLinkProps, "href" | "to">,

@@ -2,47 +2,36 @@
 import { convert } from "html-to-text";
 import { computed, type Ref, ref, watch } from "vue";
 
-import { useAPIs } from "../../composables/useAPIs";
-import { useAuthenticatedFetch } from "../../composables/useAuthenticatedFetch";
+import { useGetWideCtx } from "@/composables/useGetWideCtx.ts";
+import { type HttpResponse, type Type16Widectx } from "~/lib/api-client";
 
 const props = defineProps<{ kwic: KeywordInContext | null; query: CorpusQuery }>();
 defineEmits(["close"]);
-const { STRUCTCTX_URL } = useAPIs();
 const active = computed(() => Boolean(props.kwic));
-const queryStore = useQuery();
+const queryStore = useQueryStore();
 
-const { authenticatedFetch } = useAuthenticatedFetch();
+const _isPending = ref(false);
 
-const loading = ref(false);
+const _data: Ref<HttpResponse<Type16Widectx, unknown>> | Ref<null> = ref(null);
 
-// todo: better type this
-const details: Ref<StructCtxDocumentResponse | null> = ref(null);
-
-async function getDetails() {
+function getDetails() {
 	if (!props.kwic) return;
-	loading.value = true;
-	details.value = null;
-	const { data: _details } = await authenticatedFetch(STRUCTCTX_URL, {
-		params: {
-			q: `ignored=niceapi;${queryStore.corporaForSearchWithoutSubCorpus(props.query)};pos=${
-				props.kwic.toknum
-			};struct=doc;format=json`,
-		},
+	return useGetWideCtx({
+		corpname: queryStore.corporaForSearchWithoutSubCorpus(props.query),
+		pos: props.kwic.toknum,
+		tokencount: 100,
 	});
-	loading.value = false;
-
-	details.value = _details.value as StructCtxDocumentResponse;
 }
 
 watch(active, async () => {
-	if (!active.value) details.value = null;
+	if (!active.value) _data.value = null;
 	if (!active.value || !props.kwic) return;
-	await getDetails();
+	getDetails();
 });
 
 const parsedText = computed(() => {
-	if (!details.value?.content) return "not loaded yet.";
-	const html = details.value.content.map((a) => a.str).join(" ");
+	if (!_data.value?.data?.content) return "not loaded yet.";
+	const html = _data.value.data.content.map((a) => a.str).join(" ");
 	const text = convert(html.replaceAll("</p>", "</p>\n\n"), { preserveNewlines: true });
 	return text;
 });
@@ -67,7 +56,7 @@ const parsedText = computed(() => {
 						{{ kwic.right }}
 					</p> -->
 
-					<div v-if="!loading">
+					<div v-if="!isPending">
 						<TextHighlight :search-words="[kwic.word]" :text-to-highlight="parsedText" />
 
 						<!-- <br />

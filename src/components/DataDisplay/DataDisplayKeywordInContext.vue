@@ -1,17 +1,16 @@
 <script lang="ts" setup>
+import { useQueries } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
-import Swal from "sweetalert2";
-import type { Ref } from "vue";
+import { type Ref } from "vue";
 
-import { useAPIs } from "@/composables/useAPIs";
-import { useAuthenticatedFetch } from "@/composables/useAuthenticatedFetch";
-import { useCorporaStore } from "@/stores/corpora";
+import { type Type06Concordance } from "~/lib/api-client";
 
 import CorpusChip from "../Search/CorpusChip.vue";
 import KWICDetailDialog from "./KWICDetailDialog.vue";
 
 const t = useTranslations("Corpsum");
-const queryStore = useQuery();
+const queryStore = useQueryStore();
+
 const { queries } = storeToRefs(queryStore);
 
 const headers = ref([
@@ -27,40 +26,56 @@ const headers = ref([
 	{ title: t("link"), key: "open", type: "string" },
 ]);
 
-const { CREATE_SUBCORPUS_URL } = useAPIs();
+const api = useApiClient();
 
-const selected = ref([]);
-const createSubcorpusMode = ref(false);
+const KWICresults: Ref<Array<Array<never>>> = ref([]);
+const KWICresultsLoading: Ref<Array<boolean>> = ref([]);
+
+const q = computed(() =>
+	queries.value.map((query, index) => {
+		return {
+			queryKey: ["get-concordance", query.corpus, query.subCorpus, query.finalQuery] as const,
+			queryFn: async () => {
+				KWICresultsLoading.value[index] = true;
+				const response = await api.search.getConcordance({
+					corpname: query.corpus,
+					usesubcorp: query.subCorpus,
+					viewmode: "kwic",
+					attrs: "word",
+					refs: "=doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name",
+					pagesize: 1000,
+					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					format: "json",
+				});
+				return response.data;
+			},
+			select: (data: Type06Concordance) => {
+				KWICresults.value[index] =
+					data.Lines?.map(({ Tbl_refs, Left, Kwic, toknum, Right }) => {
+						// this mapping is directly taken from the ancient code
+						return {
+							refs: Tbl_refs,
+							date: Tbl_refs![1] ?? "",
+							source: Tbl_refs![4] ?? "",
+							region: Tbl_refs![2] ?? "",
+							left: Left!.map(({ str }: { str: string }) => str).join(" "),
+							word: typeof Kwic![0] !== "undefined" ? Kwic![0].str : "",
+							right: Right!.map(({ str }: { str: string }) => str).join(" "),
+							docid: Tbl_refs![0] ?? "",
+							topic: Tbl_refs![3] ?? "",
+							toknum,
+						};
+					}) ?? [];
+				KWICresultsLoading.value[index] = false;
+			},
+		};
+	}),
+);
+
+useQueries({ queries: q });
 
 function open(item: KeywordInContext) {
 	selectedKWIC.value = item;
-}
-
-const subCorpusName = ref("");
-const { authenticatedFetch } = useAuthenticatedFetch();
-const corporaStore = useCorporaStore();
-const { corporaForSearchWithoutSubCorpus, selectedCorpus } = storeToRefs(corporaStore);
-async function createSubcorpus() {
-	const { isConfirmed } = await Swal.fire({
-		title: t("createSubcorpus"),
-		text: `${t("createSubcorpusConfirm1")} '${subCorpusName.value}' ${t(
-			"createSubcorpusConfirm2",
-		)} ${selected.value.length || 0} ${t("createSubcorpusConfirm3")} ${
-			selectedCorpus.value?.name
-		}?`,
-		showDenyButton: true,
-	});
-
-	if (isConfirmed) {
-		// todo send results
-		await authenticatedFetch(
-			`${CREATE_SUBCORPUS_URL}?${corporaForSearchWithoutSubCorpus.value};subcname=${
-				subCorpusName.value
-			};create=True;${selected.value.map((docid: string) => `sca_doc.id=${docid}`).join(";")}`,
-		);
-		Swal.fire("Confirmed", t("corpusCreated")).then().catch(console.error);
-		await corporaStore.fetchSubCorpora();
-	}
 }
 
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
@@ -74,34 +89,17 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 			</template>
 		</VCardItem>
 		<VCardText class="py-0">
-			<VCheckbox v-model="createSubcorpusMode" :label="t('showSubcorpusCreation')"></VCheckbox>
-			<div v-if="createSubcorpusMode">
-				<p>
-					{{ t("createSubcorpus") }} {{ t("fromSelection") }} ({{ selected.length }}) in Corpus
-					{{ selectedCorpus?.name }}
-				</p>
-				<VTextField
-					v-model="subCorpusName"
-					label="Name"
-					append-inner-icon="mdi-send-circle"
-					@keydown.enter="createSubcorpus"
-					@click:append-inner="createSubcorpus"
-				/>
-			</div>
-
-			<div v-for="query of queries" :key="query.id">
-				<div v-if="!query.loading.keywordInContext">
+			<div v-for="(query, index) of queries" :key="query.id">
+				<div v-if="!KWICresultsLoading[index]">
 					<span :style="`color: ${query.color}`">
 						{{ query.type }}: {{ query.userInput }}
 						<CorpusChip :query="query" />
 					</span>
 					<VDataTable
-						v-model="selected"
 						density="compact"
 						:headers="headers"
 						item-value="docid"
-						:show-select="createSubcorpusMode"
-						:items="query.data.keywordInContext"
+						:items="KWICresults[index] as KeywordInContext[]"
 						dense
 					>
 						<template #[`item.open`]="{ item }">
