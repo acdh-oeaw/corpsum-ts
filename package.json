@@ -20,7 +20,7 @@
 		"lint:code:fix": "pnpm run lint:code:check --fix",
 		"lint:styles:check": "stylelint \"./**/*.@(css|vue)\" --cache --ignore-path ./.gitignore",
 		"lint:styles:fix": "pnpm run lint:styles:check --fix",
-		"postinstall": "nuxt prepare",
+		"postinstall": "nuxt prepare && pnpm run generate:api-client",
 		"prepare": "run-s setup",
 		"setup": "simple-git-hooks || exit 0",
 		"start": "nuxt preview",
