@@ -1,4 +1,6 @@
-import {useApiClient} from "@/composables/use-api-client.ts";
+import { useQuery } from "@tanstack/vue-query";
+
+import { useApiClient } from "@/composables/use-api-client.ts";
 
 interface params {
 	corpname: string;
