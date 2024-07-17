@@ -1,4 +1,4 @@
-import {Api, type RequestParams } from "~/lib/api-client";
+import { Api, type RequestParams } from "~/lib/api-client";
 
 interface authtoken {
 	token: string;

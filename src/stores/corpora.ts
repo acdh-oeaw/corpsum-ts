@@ -1,7 +1,7 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, type Ref, ref } from "vue";
 
-import type { Type03CorporaList } from "~/lib/api-client";
+import  { type Type03CorporaList } from "~/lib/api-client";
 
 /**
  * This Holds a
@@ -9,7 +9,6 @@ import type { Type03CorporaList } from "~/lib/api-client";
 export const useCorporaStore = defineStore(
 	"corpora",
 	() => {
-
 		const corpora = ref([]) as Ref<Array<Type03CorporaList>>;
 		const corporaLoading = ref(false);
 		const subCorporaLoading = ref(false);

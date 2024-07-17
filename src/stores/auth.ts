@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import {useApiClient} from "@/composables/use-api-client.ts";
+import { useApiClient } from "@/composables/use-api-client.ts";
 
 export const useAuth = defineStore(
 	"newAuth",
@@ -12,7 +12,7 @@ export const useAuth = defineStore(
 		async function login(_username: string, _password: string) {
 			if (_username && _password) {
 				api.setSecurityData({
-					token: "Basic " + btoa(_username + ":" + _password)
+					token: "Basic " + btoa(_username + ":" + _password),
 				});
 				const corpora = await api.ca.getCorpora();
 				if (!Array.isArray(corpora.data.data)) {
@@ -41,9 +41,11 @@ export const useAuth = defineStore(
 
 		return { login, logout, isLoggedIn, authtoken, username };
 	},
-	{ persist: {
+	{
+		persist: {
 			paths: ["authtoken", "username"],
-		} },
+		},
+	},
 );
 
 if (import.meta.hot) {

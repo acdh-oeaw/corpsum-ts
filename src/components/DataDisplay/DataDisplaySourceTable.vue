@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
-	datatype: SearchFunctionKey
+	datatype: SearchFunctionKey;
 	loading: Array<boolean>;
-	data: Array<never>
+	data: Array<never>;
 }>();
 const tab = ref(null);
 </script>

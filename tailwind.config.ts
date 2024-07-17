@@ -1,5 +1,5 @@
 import typographyPlugin from "@tailwindcss/typography";
-import type { Config } from "tailwindcss";
+import  { type Config } from "tailwindcss";
 import colors from "tailwindcss/colors.js";
 import animatePlugin from "tailwindcss-animate";
 

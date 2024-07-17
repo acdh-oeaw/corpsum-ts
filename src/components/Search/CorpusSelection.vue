@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {useQuery} from "@tanstack/vue-query";
+import { useQuery } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 
 const api = useApiClient();
@@ -7,10 +7,10 @@ const api = useApiClient();
 const corporaStore = useCorporaStore();
 const { selectedCorpus, selectedSubCorpus } = storeToRefs(corporaStore);
 
-const subCorpFetchingIsEnabled = computed(() => selectedCorpus.value !== null );
+const subCorpFetchingIsEnabled = computed(() => selectedCorpus.value !== null);
 
 const { data: corpora, isPending: corporaLoading } = useQuery({
-	placeholderData: {data: []},
+	placeholderData: { data: [] },
 	queryKey: ["get-corpora"] as const,
 	async queryFn() {
 		const response = await api.ca.getCorpora();

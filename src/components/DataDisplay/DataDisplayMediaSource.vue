@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {useQueries} from "@tanstack/vue-query";
+import { useQueries } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 
-import  {type Type11Freqml} from "~/lib/api-client";
+import { type Type11Freqml } from "~/lib/api-client";
 
 const t = useTranslations("Corpsum");
 const queryStore = useQueryStore();
@@ -19,46 +19,55 @@ interface IsourceDistribution {
 	relative: number;
 }
 
-const sourceDistributions: Ref<Array<Array<IsourceDistribution>>>  = ref([]);
+const sourceDistributions: Ref<Array<Array<IsourceDistribution>>> = ref([]);
 const sourceDistributionsLoading: Ref<Array<boolean>> = ref([]);
 
-const q = computed(() => queries.value.map((query, index) => {
-	return {
-		queryKey: ["get-source-distribution", query.corpus, query.subCorpus, query.finalQuery] as const,
-		queryFn: async () => {
-			sourceDistributionsLoading .value[index] = true;
-			const response = await api.search.getFreqMl({
-				corpname: query.corpus,
-				usesubcorp: query.subCorpus,
-				fmaxitems: 5000,
-				fpage: 1,
-				group: 0,
-				showpoc: 1,
-				showreltt: 1,
-				showrel: 1,
-				freqlevel: 1,
-				ml1attr: "doc.docsrc",
-				ml1ctx: "0~0 > 0",
-				json: JSON.stringify({ concordance_query: query.concordance_query }),
-			});
-			return response.data;
-		},
-		select: (data: Type11Freqml) => {
-			sourceDistributions.value[index] = data.Blocks?.map((block) => block.Items?.map(item => {
-					return {
-						absolute: item.frq!,
-						relative: item.reltt!,
-						media: item.Word![0]!.n!,
-					};
-				}) ?? []
-			)[0] ?? [];
-			sourceDistributionsLoading.value[index] = false;
-		},
-	};
-}));
+const q = computed(() =>
+	queries.value.map((query, index) => {
+		return {
+			queryKey: [
+				"get-source-distribution",
+				query.corpus,
+				query.subCorpus,
+				query.finalQuery,
+			] as const,
+			queryFn: async () => {
+				sourceDistributionsLoading.value[index] = true;
+				const response = await api.search.getFreqMl({
+					corpname: query.corpus,
+					usesubcorp: query.subCorpus,
+					fmaxitems: 5000,
+					fpage: 1,
+					group: 0,
+					showpoc: 1,
+					showreltt: 1,
+					showrel: 1,
+					freqlevel: 1,
+					ml1attr: "doc.docsrc",
+					ml1ctx: "0~0 > 0",
+					json: JSON.stringify({ concordance_query: query.concordance_query }),
+				});
+				return response.data;
+			},
+			select: (data: Type11Freqml) => {
+				sourceDistributions.value[index] =
+					data.Blocks?.map(
+						(block) =>
+							block.Items?.map((item) => {
+								return {
+									absolute: item.frq!,
+									relative: item.reltt!,
+									media: item.Word![0]!.n!,
+								};
+							}) ?? [],
+					)[0] ?? [];
+				sourceDistributionsLoading.value[index] = false;
+			},
+		};
+	}),
+);
 
-
-useQueries({	queries: q });
+useQueries({ queries: q });
 
 const categories = computed(() => {
 	const allCats: Array<string> = [];

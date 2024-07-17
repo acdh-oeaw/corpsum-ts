@@ -2,8 +2,8 @@
 import { convert } from "html-to-text";
 import { computed, type Ref, ref, watch } from "vue";
 
-import {useGetWideCtx} from "@/composables/useGetWideCtx.ts";
-import type {HttpResponse, Type16Widectx} from "~/lib/api-client";
+import { useGetWideCtx } from "@/composables/useGetWideCtx.ts";
+import  { type HttpResponse, type Type16Widectx } from "~/lib/api-client";
 
 const props = defineProps<{ kwic: KeywordInContext | null; query: CorpusQuery }>();
 defineEmits(["close"]);
@@ -16,14 +16,11 @@ const _data: Ref<HttpResponse<Type16Widectx, unknown>> | Ref<null> = ref(null);
 
 function getDetails() {
 	if (!props.kwic) return;
-	return useGetWideCtx(
-		{
-			corpname: queryStore.corporaForSearchWithoutSubCorpus(props.query),
-			pos: props.kwic.toknum,
-			tokencount: 100
-		}
-	);
-
+	return useGetWideCtx({
+		corpname: queryStore.corporaForSearchWithoutSubCorpus(props.query),
+		pos: props.kwic.toknum,
+		tokencount: 100,
+	});
 }
 
 watch(active, async () => {
