@@ -1686,9 +1686,6 @@
 				"summary": "Uploads a new document.",
 				"parameters": [
 					{
-						"$ref": "#/components/parameters/01_corpus_id"
-					},
-					{
 						"$ref": "#/components/parameters/07_fileset_id_query"
 					},
 					{
