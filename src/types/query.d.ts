@@ -88,8 +88,6 @@ interface CorpusQuery {
 		keywordInContext: boolean;
 		mediaSources: boolean;
 	};
-
-	data: QueryData;
 }
 
 // structure taken from response

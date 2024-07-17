@@ -2,46 +2,24 @@
 import { convert } from "html-to-text";
 import { computed, type Ref, ref, watch } from "vue";
 
-import { useAPIs } from "../../composables/useAPIs";
-import { useAuthenticatedFetch } from "../../composables/useAuthenticatedFetch";
+import { useGetWideCtx } from "@/composables/useGetWideCtx.ts";
+import type { HttpResponse, Type16Widectx } from "~/lib/api-client";
 
-const props = defineProps<{ kwic: KeywordInContext | null; query: CorpusQuery }>();
+const props = defineProps<{ kwic: KeywordInContext; query: CorpusQuery }>();
 defineEmits(["close"]);
-const { FULL_REF_URL } = useAPIs();
 const active = computed(() => Boolean(props.kwic));
-const queryStore = useQuery();
 
-const { authenticatedFetch } = useAuthenticatedFetch();
+// const _data: Ref<HttpResponse<Type16Widectx, unknown>> | Ref<null> = ref(null);
 
-const loading = ref(false);
-
-// todo: better type this
-const details: Ref<StructCtxDocumentResponse | null> = ref(null);
-
-async function getDetails() {
-	if (!props.kwic) return;
-	loading.value = true;
-	details.value = null;
-	const { data: _details } = await authenticatedFetch(FULL_REF_URL, {
-		params: {
-			pos: props.kwic.toknum,
-			corpname: props.query.corpus,
-		},
-	});
-	loading.value = false;
-
-	details.value = _details.value as StructCtxDocumentResponse;
-}
-
-watch(active, async () => {
-	if (!active.value) details.value = null;
-	if (!active.value || !props.kwic) return;
-	await getDetails();
+const { data: details, status } = useGetWideCtx({
+	corpname: props.query.corpus,
+	pos: props.kwic.toknum,
+	tokencount: 100,
 });
 
 // const parsedText = computed(() => {
-// 	if (!details.value?.content) return "not loaded yet.";
-// 	const html = details.value.content.map((a) => a.str).join(" ");
+// 	if (!data.value?.data?.content) return "not loaded yet.";
+// 	const html = data.value.data.content.map((a) => a.str).join(" ");
 // 	const text = convert(html.replaceAll("</p>", "</p>\n\n"), { preserveNewlines: true });
 // 	return text;
 // });
@@ -56,15 +34,31 @@ watch(active, async () => {
 
 			<VCardText>
 				<VContainer>
-					<div v-if="!loading">
-						<!-- <TextHighlight :search-words="[kwic.word]" :text-to-highlight="parsedText" /> -->
-					</div>
+					<!-- {{ kwic }} -->
 
-					<div v-if="loading">
+					<!-- <p>
+						{{ kwic.left }}
+					</p>
+					<p class="text-fuchsia-600">{{ kwic.word }}</p>
+					<p>
+						{{ kwic.right }}
+					</p> -->
+
+					<div v-if="status !== 'pending'">
+						<!-- <TextHighlight :search-words="[kwic.word]" :text-to-highlight="parsedText" /> -->
+
+						<!-- <br />
+						<br />
+						<br />
+						<br />
+						<br /> -->
+						<!-- {{ details }} -->
+					</div>
+					<div v-if="status === 'pending'">
 						<VProgressCircular indeterminate></VProgressCircular>
 						<span>Loading the full ref</span>
 					</div>
-					<JsonViewer v-if="!loading" :expand-depth="2" :value="details"></JsonViewer>
+					<JsonViewer v-else :expand-depth="2" :value="details"></JsonViewer>
 				</VContainer>
 			</VCardText>
 

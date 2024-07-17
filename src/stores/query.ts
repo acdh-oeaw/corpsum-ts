@@ -22,8 +22,8 @@ const emptySelectedCorpusKWICViewInfo: KWICAttrsStructs = {
 }
 
 
-export const useQuery = defineStore(
-	"queryyyyyyy",
+export const useQueryStore = defineStore(
+	"newQueryStore",
 	() => {
 		const nextQueryId = ref(0);
 		const queries = ref([]) as Ref<Array<CorpusQuery>>;
@@ -70,13 +70,6 @@ export const useQuery = defineStore(
 					attributes: corporaStore.corpInfoResponse.attributes,
 					structures: corporaStore.corpInfoResponse.structures,
 				},
-				data: {
-					yearlyFrequencies: [],
-					wordFormFrequencies: [],
-					regionalFrequencies: [],
-					keywordInContext: [],
-					mediaSources: [],
-				},
 				loading: {
 					yearlyFrequencies: false,
 					wordFormFrequencies: false,
@@ -91,25 +84,6 @@ export const useQuery = defineStore(
 			return foundQuery;
 		}
 
-		const corporaForSearch = (query: CorpusQuery) =>
-			`corpname=${query.corpus}${query.subCorpus ? `;usesubcorp=${query.subCorpus}` : ""}`;
-
-		const corporaForSearchWithoutSubCorpus = (query: CorpusQuery) => `corpname=${query.corpus}`;
-
-		const corporaForSearchKeys = (query: CorpusQuery) => {
-			let val: Record<string, string | undefined> = {
-				usecorp: query.corpus,
-				corpname: query.corpus,
-			};
-			if (query.subCorpus)
-				val = {
-					...val,
-					usesubcorp: query.subCorpus,
-				};
-			return val;
-		};
-
-
 		const getKWICqueryAttrStrcs = (query: CorpusQuery) => (
 			{
 				attrs: query.KWICAttrsStructs.attributes.map(attr => attr.name).join(','),
@@ -120,9 +94,6 @@ export const useQuery = defineStore(
 			nextQueryId,
 			queries,
 			addQuery,
-			corporaForSearch,
-			corporaForSearchWithoutSubCorpus,
-			corporaForSearchKeys,
 			getKWICqueryAttrStrcs,
 		};
 	},
@@ -131,5 +102,5 @@ export const useQuery = defineStore(
 );
 
 if (import.meta.hot) {
-	import.meta.hot.accept(acceptHMRUpdate(useQuery, import.meta.hot));
+	import.meta.hot.accept(acceptHMRUpdate(useQueryStore, import.meta.hot));
 }

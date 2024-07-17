@@ -2,7 +2,7 @@
 import QueryItem from "./QueryItem.vue";
 import SearchDimensions from "./SearchDimensions.vue";
 
-const query = useQuery();
+const query = useQueryStore();
 const t = useTranslations("Corpsum");
 
 const newSelectedType: Ref<CorpusQueryType> = ref("iqueryrow");
@@ -22,7 +22,6 @@ async function addQuery() {
 	const addedQuery = query.addQuery(newUserInput.value, newSelectedType.value);
 	// newSelectedType.value = "word";
 	newUserInput.value = "";
-	await searchSettings.doSearches(addedQuery);
 }
 
 const _alert = (msg: string) => {

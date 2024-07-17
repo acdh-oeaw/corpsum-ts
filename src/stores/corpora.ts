@@ -1,118 +1,25 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
-import { useAuthenticatedFetch } from "@/composables/useAuthenticatedFetch";
+import type { Type03CorporaList } from "~/lib/api-client";
 
-export type usedYear =
-	| 2005
-	| 2006
-	| 2007
-	| 2008
-	| 2009
-	| 2010
-	| 2012
-	| 2013
-	| 2014
-	| 2015
-	| 2016
-	| 2017
-	| 2018
-	| 2019
-	| 2020
-	| 2021
-	| 2022;
-
-
-interface KWICAttribute {
-	name: string;
-	id_range?: number;
-	label: string;
-	dynamic: string;
-	fromattr: string;
-	size?: string;
-}
-
-interface KWICStructure {
-	name: string;
-	label: string;
-	attributes: Array<KWICAttribute>;
-	size: string;
-}
-interface KWICAttrsStructs {
-	attributes: Array<KWICAttribute>;
-	structures: Array<KWICStructure>;
-}
-
+/**
+ * This Holds a
+ */
 export const useCorporaStore = defineStore(
 	"corpora",
 	() => {
-		const { SUB_CORPUS_URL, CORPORA_LIST_URL } = useAPIs();
-		const { authenticatedFetch } = useAuthenticatedFetch();
 
-		const corpora = ref([]) as Ref<Array<Corpus>>;
+		const corpora = ref([]) as Ref<Array<Type03CorporaList>>;
 		const corporaLoading = ref(false);
 		const subCorporaLoading = ref(false);
-		const tracker = ref(0);
-		async function fetchCorpora() {
-			corporaLoading.value = true;
-			const { data } = await authenticatedFetch(CORPORA_LIST_URL, {});
-			corporaLoading.value = false;
 
-			if (!data.value) return false;
-			const corporaInfo = data.value as CorporaInfo;
-			corpora.value = [...corporaInfo.data];
-			tracker.value++;
-			return true;
-		}
-
-
-
-		const selectedCorpus: Ref<Corpus | null> = ref(null);
-		const subCorpora: Ref<Array<SubCorpus>> = ref([]);
+		const selectedCorpus: Ref<Type03CorporaList | null> = ref(null);
+		const subCorpora: Ref<Array<unknown>> = ref([]);
 		const corpInfoResponse: Ref<any> = ref(null);
+
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
-		const emptySelectedCorpusKWICViewInfo: KWICAttrsStructs = {
-			attributes: [],
-			structures: [],
-		}
-		const KWICAttrsStructs: Ref<KWICAttrsStructs> = ref(emptySelectedCorpusKWICViewInfo);
 
-		const KWICAttrsStructsOptions = computed(() => {
-			if (!corpInfoResponse.value || !KWICAttrsStructs.value) return emptySelectedCorpusKWICViewInfo;
-			return {
-				attributes: KWICAttrsStructs.value.attributes.filter(a => corpInfoResponse.value.attributes.find(ca => ca.name === a.name)),
-				structures: KWICAttrsStructs.value.structures.filter(a => corpInfoResponse.value.structures.find(ca => ca.name === a.name)),
-			}
-		})
-
-		async function fetchSubCorpora() {
-			subCorporaLoading.value = true;
-			selectedSubCorpus.value = null;
-			subCorpora.value = [];
-			if (!selectedCorpus.value) return console.error("no corpus selected");
-			const { data: _subCorpora, error } = await authenticatedFetch(SUB_CORPUS_URL, {
-				params: {
-					corpname: selectedCorpus.value.corpname,
-					subcorpora: 1,
-					format: "json",
-				},
-			});
-			subCorporaLoading.value = false;
-
-			if (error.value) return console.error("upsie whoopsie");
-
-			corpInfoResponse.value = _subCorpora.value;
-
-			if (!_subCorpora.value) return console.error("could not fetch subcorpora");
-			const subCorporaResponseData = _subCorpora.value as unknown as CorpInfoResponse;
-			subCorpora.value = subCorporaResponseData.subcorpora;
-
-		}
-
-		watch(selectedCorpus, async (after, before) => {
-			if (!after || before?.name === after.name) return;
-			await fetchSubCorpora();
-		});
 
 		const corporaForSearch = computed(
 			() =>
@@ -139,20 +46,15 @@ export const useCorporaStore = defineStore(
 
 		return {
 			corpora,
-			fetchCorpora,
 			subCorpora,
 			corpInfoResponse,
-			fetchSubCorpora,
 			selectedCorpus,
 			selectedSubCorpus,
-			KWICAttrsStructs,
-			tracker,
 			corporaForSearch,
 			corporaForSearchKeys,
 			corporaLoading,
 			corporaForSearchWithoutSubCorpus,
 			subCorporaLoading,
-			KWICAttrsStructsOptions,
 		};
 	},
 	{ persist: { storage: persistedState.localStorage } },

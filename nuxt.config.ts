@@ -31,6 +31,7 @@ export default defineNuxtConfig({
 	},
 	experimental: {
 		componentIslands: true,
+		renderJsonPayloads: false,
 	},
 	pinia: {
 		// @ts-ignore
@@ -40,7 +41,6 @@ export default defineNuxtConfig({
 		cookieOptions: {
 			sameSite: "strict",
 		},
-		// storage: 'localStorage'
 	},
 	i18n: {
 		baseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL,

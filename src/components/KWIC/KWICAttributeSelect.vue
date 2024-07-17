@@ -5,11 +5,12 @@ import { storeToRefs } from "pinia";
 const corporaStore = useCorporaStore();
 const { corpInfoResponse, corporaLoading } = storeToRefs(corporaStore);
 const t = useTranslations("Corpsum");
-const search = useSearchSettingsStore();
 
 const props = defineProps<{ query: CorpusQuery }>();
 
-const queryStore = useQuery();
+const queryStore = useQueryStore();
+
+const emits = defineEmits(["refresh"]);
 
 const _query = queryStore.queries.find((q) => q.id === props.query.id);
 // emits('update:modelValue', props.modelValue);
@@ -46,7 +47,7 @@ const _query = queryStore.queries.find((q) => q.id === props.query.id);
 			/>
 		</div>
 
-		<VBtn @click="search.doSearchesForAllQueries(['keywordInContext'])">
+		<VBtn @click="emits('refresh')">
 			{{ t("Reload KWIC with selected Attributes") }}
 		</VBtn>
 		<!-- {{ KWICAttrsStructsOptions }} -->
