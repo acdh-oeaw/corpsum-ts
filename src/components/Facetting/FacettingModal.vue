@@ -35,52 +35,43 @@ const getOptions = async (attr: string, avpat = ".*") => {
 	return options.value.suggestions;
 };
 const suggestions = ref({});
-const loadAllSuggs = async () => {
-	for (let i = 0; i < data.value.Blocks.length; i++) {
-		const element = data.value.Blocks[i].Line[0];
-		if (element.Values) {
-			suggestions.value[element.name] = element.Values.map(({ v }) => v);
-		} else suggestions.value[element.name] = await getOptions(element.name);
-	}
-};
-const selected = ref("");
+// const loadAllSuggs = async () => {
+// 	for (let i = 0; i < data.value.Blocks.length; i++) {
+// 		const element = data.value.Blocks[i].Line[0];
+// 		if (element.Values) {
+// 			suggestions.value[element.name] = element.Values.map(({ v }) => v);
+// 		} else suggestions.value[element.name] = await getOptions(element.name);
+// 	}
+// };
+function removeFromSelection(name, index) {
+	vals.value[name].splice(index, 1);
+}
+const selected = ref({});
 const vals = ref({});
-
-const addToSelection = (sugg: string) => {
-	console.log("ayo", { sugg, selected: selected.value }, !vals.value[selected.value]);
-
-	if (!vals.value[selected.value]) {
-		vals.value[selected.value] = [];
-		console.log("happens", vals.value[selected.value]);
-	}
-	const isIn = vals.value[selected.value].findIndex((s) => s === sugg);
-	if (isIn >= 0) vals.value[selected.value].splice(isIn, 1);
-	else vals.value[selected.value].push(sugg);
-};
-const search = ref("");
-
-const doSearch = async (key: string, search1: string) => {
-	console.log(key, search1);
-	const foundOptions = await getOptions(key, `.*${search1}.*`);
-	suggestions.value[key] = foundOptions;
-};
 </script>
 
 <template>
 	<VDialog v-model="dialog" persistent>
 		<VCard class="size-full">
-			<h1 class="text-xl">WORK IN PROGRESS</h1>
-			<VBtn @click="emits('close')">close</VBtn>
-			{{ query.corpus }}
-			<VBtn @click="loadAllSuggs()">load all</VBtn>
+			<h1 class="flex justify-between text-xl">
+				WORK IN PROGRESS
+				<VBtn @click="emits('close')">close</VBtn>
+			</h1>
+
+			<!-- {{ query.corpus }}
+			<VBtn @click="loadAllSuggs()">load all</VBtn> -->
 
 			<div class="flex">
 				<div class="flex flex-col">
 					<div v-for="entry of data.Blocks" :key="entry.name">
 						<button
 							class="flex w-full justify-start text-lg"
-							:class="{ 'bg-blue-300': selected === entry.Line[0].name }"
-							@click="selected = entry.Line[0].name"
+							:class="{
+								'bg-blue-300': selected.name === entry.Line[0].name,
+								'bg-yellow-100':
+									selected.name !== entry.Line[0].name && vals[entry.Line[0].name]?.length,
+							}"
+							@click="selected = entry.Line[0]"
 						>
 							{{ entry.Line[0].name }}
 						</button>
@@ -88,30 +79,32 @@ const doSearch = async (key: string, search1: string) => {
 							<span
 								v-for="(val, i) of vals[entry.Line[0].name]"
 								:key="i"
-								class="flex w-full justify-start text-xs"
+								class="flex w-full justify-between text-xs"
 							>
 								{{ val }}
+
+								<button
+									class="rounded border border-solid"
+									@click="removeFromSelection(entry.Line[0].name, i)"
+								>
+									x
+								</button>
 							</span>
 						</div>
 					</div>
 				</div>
-				<div class="flex flex-col border-l-2">
-					<div v-if="selected.length">
-						<input v-model="search" type="text" @change="doSearch(selected, search)" />
-						<div v-for="sugg of suggestions[selected]" :key="sugg">
-							<button
-								class="text-lg"
-								:class="{ 'bg-blue-400': vals[selected] && vals[selected].includes(sugg) }"
-								@click="addToSelection(sugg)"
-							>
-								{{ sugg }}
-							</button>
-						</div>
+				<div class="flex w-full flex-col border-l-2">
+					<div v-if="selected?.name" class="w-full">
+						{{ selected.name }} {{ selected.Values?.length }}
+						<FacettingSelection
+							v-model="vals[selected.name]"
+							:element="selected"
+							:query="query"
+						></FacettingSelection>
 					</div>
 				</div>
-				<div></div>
 			</div>
-			<div class="flex flex-col gap-2">
+			<!-- <div class="flex flex-col gap-2">
 				<div v-for="entry of data.Blocks" :key="entry.name">
 					<h2 class="text-xl">{{ entry.Line[0].name }}</h2>
 					<JsonViewer preview-mode :value="entry.Line[0]" :expand-depth="1" boxed></JsonViewer>
@@ -119,7 +112,7 @@ const doSearch = async (key: string, search1: string) => {
 						{{ suggestions[entry.Line[0].name] }}
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</VCard>
 	</VDialog>
 </template>

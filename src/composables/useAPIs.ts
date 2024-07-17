@@ -46,8 +46,6 @@ export function useAPIs() {
 
 
 	const FULL_REF_URL = `${BASE_URL}/run.cgi/fullref`;
-
-
 	const FACETTING_URL = `${BASE_URL}/run.cgi/texttypes_with_norms`
 	const ATTR_VALS_URL = `${BASE_URL}/run.cgi/attr_vals`
 
