@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-import type {Type11Freqml} from "~/lib/api-client";
 import {useQueries} from "@tanstack/vue-query";
+import { storeToRefs } from "pinia";
+
+import type {Type11Freqml} from "~/lib/api-client";
 
 const t = useTranslations("Corpsum");
 const queryStore = useQueryStore             ();
@@ -20,17 +21,8 @@ const q = computed(() => queries.value.map((query, index) => {
 			const response = await api.search.getFreqMl({
 				corpname: query.corpus,
 				usesubcorp: query.subCorpus,
-				default_attr: "lemma",
-				attrs: "word",
-				refs: "=doc.id",
-				attr_allpos: "all",
-				viewmode: "kwic",
-				cup_hl: "q",
-				structs: "s, g",
-				fromp: 1,
-				pagesize: 20,
-				kwicleftctx: "100#",
-				kwicrightctx: "100#",
+				ml1attr: "",
+				ml1ctx: "",
 				json: JSON.stringify({ concordance_query: query.concordance_query }),
 			});
 			return response.data;

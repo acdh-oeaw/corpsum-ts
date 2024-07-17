@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-import type {Type11Freqml} from "~/lib/api-client";
 import {useQueries} from "@tanstack/vue-query";
+import { storeToRefs } from "pinia";
+
+import  {type Type11Freqml} from "~/lib/api-client";
 
 const t = useTranslations("Corpsum");
 const queryStore = useQueryStore();

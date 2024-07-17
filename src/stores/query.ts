@@ -55,13 +55,6 @@ export const useQueryStore = defineStore(
 				concordance_query: concordance_query as ConcordanceQuery,
 				preparedQuery: `aword,${finalQuery}`, // note: this is done in the old project, so we do it here too
 				showPicker: false,
-				data: {
-					yearlyFrequencies: [],
-					wordFormFrequencies: [],
-					regionalFrequencies: [],
-					keywordInContext: [],
-					mediaSources: [],
-				},
 				loading: {
 					yearlyFrequencies: false,
 					wordFormFrequencies: false,
@@ -76,31 +69,10 @@ export const useQueryStore = defineStore(
 			return foundQuery;
 		}
 
-		const corporaForSearch = (query: CorpusQuery) =>
-			`corpname=${query.corpus}${query.subCorpus ? `;usesubcorp=${query.subCorpus}` : ""}`;
-
-		const corporaForSearchWithoutSubCorpus = (query: CorpusQuery) => `corpname=${query.corpus}`;
-
-		const corporaForSearchKeys = (query: CorpusQuery) => {
-			let val: Record<string, string | undefined> = {
-				usecorp: query.corpus,
-				corpname: query.corpus,
-			};
-			if (query.subCorpus)
-				val = {
-					...val,
-					usesubcorp: query.subCorpus,
-				};
-			return val;
-		};
-
 		return {
 			nextQueryId,
 			queries,
 			addQuery,
-			corporaForSearch,
-			corporaForSearchWithoutSubCorpus,
-			corporaForSearchKeys,
 		};
 	},
 	{ persist: { storage: persistedState.localStorage } },
