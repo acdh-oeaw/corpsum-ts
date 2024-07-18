@@ -29,7 +29,7 @@ const q = computed(() =>
 					usesubcorp: query.subCorpus,
 					ml1attr: "",
 					ml1ctx: "",
-					json: { concordance_query: query.concordance_query },
+					json: JSON.stringify({ concordance_query: query.concordance_query }),
 				});
 				return response.data;
 			},

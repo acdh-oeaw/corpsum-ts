@@ -28,7 +28,7 @@ export default defineNuxtPlugin((nuxt) => {
 					error instanceof Response
 						? // @ts-expect-error Set by api client.
 
-							(error.error?.title as string | undefined) ?? error.statusText
+						  (error.error?.title as string | undefined) ?? error.statusText
 						: error.message;
 
 				if (process.client) {

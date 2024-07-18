@@ -3309,7 +3309,7 @@
 				"in": "query",
 				"name": "json",
 				"schema": {
-					"type": "object",
+					"type": "string",
 					"example": {
 						"concordance_query": [
 							{

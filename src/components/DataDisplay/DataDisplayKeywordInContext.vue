@@ -44,7 +44,7 @@ const q = computed(() =>
 					attrs: "word",
 					refs: "=doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name",
 					pagesize: 1000,
-					json: { concordance_query: query.concordance_query },
+					json: JSON.stringify({ concordance_query: query.concordance_query }),
 					format: "json",
 				});
 				return response.data;

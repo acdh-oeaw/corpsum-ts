@@ -42,7 +42,7 @@ const q = computed(() =>
 					freqlevel: 1,
 					ml1attr: "doc.year",
 					ml1ctx: "0~0 > 0",
-					json: { concordance_query: query.concordance_query },
+					json: JSON.stringify({ concordance_query: query.concordance_query }),
 				});
 				return response.data;
 			},
