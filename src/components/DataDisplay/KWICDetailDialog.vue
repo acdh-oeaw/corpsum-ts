@@ -8,16 +8,15 @@ import { type HttpResponse, type Type16Widectx } from "~/lib/api-client";
 const props = defineProps<{ kwic: KeywordInContext | null; query: CorpusQuery }>();
 defineEmits(["close"]);
 const active = computed(() => Boolean(props.kwic));
-const queryStore = useQueryStore();
 
-const _isPending = ref(false);
+const isPending = ref(false);
 
 const _data: Ref<HttpResponse<Type16Widectx, unknown>> | Ref<null> = ref(null);
 
 function getDetails() {
 	if (!props.kwic) return;
 	return useGetWideCtx({
-		corpname: queryStore.corporaForSearchWithoutSubCorpus(props.query),
+		corpname: props.query.corpus,
 		pos: props.kwic.toknum,
 		tokencount: 100,
 	});
@@ -30,7 +29,9 @@ watch(active, async () => {
 });
 
 const parsedText = computed(() => {
+	//@ts-expect-error this is broken and will be rewritten
 	if (!_data.value?.data?.content) return "not loaded yet.";
+	//@ts-expect-error this is broken and will be rewritten
 	const html = _data.value.data.content.map((a) => a.str).join(" ");
 	const text = convert(html.replaceAll("</p>", "</p>\n\n"), { preserveNewlines: true });
 	return text;

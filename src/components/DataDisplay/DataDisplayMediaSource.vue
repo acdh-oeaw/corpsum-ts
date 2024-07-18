@@ -66,7 +66,7 @@ const q = computed(() =>
 		};
 	}),
 );
-
+//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 const categories = computed(() => {
@@ -139,7 +139,13 @@ const series = computed(() => {
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<DataDisplaySourceTable :queries="queries" datatype="mediaSources"></DataDisplaySourceTable>
+			<!-- @vue-expect-error TODO properly type this -->
+			<DataDisplaySourceTable
+				:queries="queries"
+				datatype="mediaSources"
+				:data="sourceDistributions"
+				:loading="sourceDistributionsLoading"
+			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>
