@@ -45,7 +45,7 @@ const q = computed(() =>
 					freqlevel: 1,
 					ml1attr: "doc.docsrc",
 					ml1ctx: "0~0 > 0",
-					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					json: { concordance_query: query.concordance_query },
 				});
 				return response.data;
 			},
@@ -66,7 +66,7 @@ const q = computed(() =>
 		};
 	}),
 );
-
+//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 const categories = computed(() => {
@@ -139,7 +139,13 @@ const series = computed(() => {
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<DataDisplaySourceTable :queries="queries" datatype="mediaSources"></DataDisplaySourceTable>
+			<!-- @vue-expect-error TODO properly type this -->
+			<DataDisplaySourceTable
+				:queries="queries"
+				datatype="mediaSources"
+				:data="sourceDistributions"
+				:loading="sourceDistributionsLoading"
+			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>

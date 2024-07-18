@@ -42,7 +42,7 @@ const q = computed(() =>
 					freqlevel: 1,
 					ml1attr: "doc.year",
 					ml1ctx: "0~0 > 0",
-					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					json: { concordance_query: query.concordance_query },
 				});
 				return response.data;
 			},
@@ -63,7 +63,7 @@ const q = computed(() =>
 		};
 	}),
 );
-
+//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 const series = computed(() =>
@@ -118,6 +118,7 @@ const series = computed(() =>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
+			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
 				:queries="queries"
 				:data="yearlyFrequencies"

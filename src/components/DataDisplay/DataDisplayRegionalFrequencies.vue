@@ -34,11 +34,12 @@ const q = computed(() =>
 					freqlevel: 1,
 					ml1attr: "doc.region",
 					ml1ctx: "0~0 > 0",
-					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					json: { concordance_query: query.concordance_query },
 				});
 				return response.data;
 			},
 			select: (data: Type11Freqml) => {
+				//@ts-expect-error TODO properly type this
 				regionalFrequencies.value[index] =
 					data.Blocks?.map(
 						(block) =>
@@ -55,7 +56,7 @@ const q = computed(() =>
 		};
 	}),
 );
-
+//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 const mode = ref("relative");
@@ -97,6 +98,7 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
+			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
 				:queries="regionalFrequencies"
 				datatype="regionalFrequencies"

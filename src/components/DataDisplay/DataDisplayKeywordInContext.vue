@@ -44,12 +44,13 @@ const q = computed(() =>
 					attrs: "word",
 					refs: "=doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name",
 					pagesize: 1000,
-					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					json: { concordance_query: query.concordance_query },
 					format: "json",
 				});
 				return response.data;
 			},
 			select: (data: Type06Concordance) => {
+				//@ts-expect-error TODO properly type this
 				KWICresults.value[index] =
 					data.Lines?.map(({ Tbl_refs, Left, Kwic, toknum, Right }) => {
 						// this mapping is directly taken from the ancient code
@@ -58,8 +59,10 @@ const q = computed(() =>
 							date: Tbl_refs![1] ?? "",
 							source: Tbl_refs![4] ?? "",
 							region: Tbl_refs![2] ?? "",
+							// @ts-expect-error TODO properly type this
 							left: Left!.map(({ str }: { str: string }) => str).join(" "),
 							word: typeof Kwic![0] !== "undefined" ? Kwic![0].str : "",
+							// @ts-expect-error TODO properly type this
 							right: Right!.map(({ str }: { str: string }) => str).join(" "),
 							docid: Tbl_refs![0] ?? "",
 							topic: Tbl_refs![3] ?? "",
@@ -72,6 +75,7 @@ const q = computed(() =>
 	}),
 );
 
+//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 function open(item: KeywordInContext) {

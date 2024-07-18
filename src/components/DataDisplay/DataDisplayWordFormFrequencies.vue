@@ -29,11 +29,12 @@ const q = computed(() =>
 					usesubcorp: query.subCorpus,
 					ml1attr: "",
 					ml1ctx: "",
-					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					json: { concordance_query: query.concordance_query },
 				});
 				return response.data;
 			},
 			select: (data: Type11Freqml) => {
+				//@ts-expect-error TODO properly type this
 				wordFormFrequencies.value[index] =
 					data.Blocks?.map(
 						(block) =>
@@ -50,7 +51,7 @@ const q = computed(() =>
 		};
 	}),
 );
-
+//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 const mode = ref("relative");
@@ -110,6 +111,7 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
+			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
 				:queries="wordFormFrequencies"
 				datatype="wordFormFrequencies"
