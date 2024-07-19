@@ -35,7 +35,12 @@ const KWICresultsLoading: Ref<Array<boolean>> = ref([]);
 const q = computed(() =>
 	queries.value.map((query, index) => {
 		return {
-			queryKey: ["get-concordance", query.corpus, query.subCorpus, query.finalQuery] as const,
+			queryKey: [
+				"get-concordance",
+				query.corpus,
+				query.subCorpus,
+				JSON.stringify(queryStore.getQueryWithFacetting(query)),
+			] as const,
 			queryFn: async () => {
 				KWICresultsLoading.value[index] = true;
 				const response = await api.search.getConcordance({
@@ -45,7 +50,7 @@ const q = computed(() =>
 					attrs: "word",
 					refs: "=doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name",
 					pagesize: 1000,
-					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
 					format: "json",
 				});
 				return response.data;

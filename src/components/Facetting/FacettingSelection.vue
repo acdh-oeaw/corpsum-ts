@@ -1,29 +1,66 @@
 <script lang="ts" setup>
 import { watch } from "vue";
+import { useQuery } from "@tanstack/vue-query";
 
-const { ATTR_VALS_URL } = useAPIs();
-
-const suggestions = ref([]);
+const suggestions: Ref<Array<string>> = ref([]);
 const props = defineProps<{ query: CorpusQuery; element: any }>();
-const { authenticatedFetch } = useAuthenticatedFetch();
 
-const vals = defineModel<Array<string> | string>();
+const vals = defineModel<Array<string> | FacettingRegexSearch>();
+
+const api = useApiClient();
 
 let avfrom = 0;
 let lastSearch = "";
-const getOptions = async (avpat = ".*") => {
-	const { data: options } = await authenticatedFetch(ATTR_VALS_URL, {
-		params: {
+
+const search = ref("");
+
+const modes = ["containing", "starts with", "ends with", "regex"];
+const modeIndex = ref(0);
+
+const compSearch = computed(() => {
+	if (!search.value) return ".*";
+	switch (modeIndex.value) {
+		case 0:
+			return `(?i).*${search.value}.*`;
+		case 1:
+			return `(?i)${search.value}.*`;
+		case 2:
+			return `(?i).*${search.value}`;
+		case 3:
+			return `${search.value}`;
+		default:
+			return `(?i).*${search.value}.*`;
+	}
+});
+const { refetch } = useQuery({
+	queryKey: [
+		"get-attr-vals",
+		props.query.corpus,
+		props.element.name,
+		avfrom,
+		compSearch.value,
+	] as const,
+	queryFn: async () => {
+		if (lastSearch !== compSearch.value) {
+			avfrom = 0;
+			suggestions.value = [];
+		}
+		lastSearch = compSearch.value;
+		const response = await api.search.getAttrVals({
 			corpname: props.query.corpus,
 			avattr: props.element.name,
-			avmaxitems: "15",
+			avmaxitems: 15,
 			avfrom,
-			avpat,
-			icase: "1",
-		},
-	});
-	return options.value.suggestions;
-};
+			avpat: compSearch.value,
+			icase: 1,
+		});
+		if (response.data.suggestions) {
+			avfrom += 15;
+			suggestions.value = [...suggestions.value, ...response.data.suggestions];
+		}
+		return response.data.suggestions;
+	},
+});
 
 watch(
 	() => props.element.name,
@@ -33,34 +70,25 @@ watch(
 	},
 );
 
-const doSearch = async () => {
-	if (lastSearch !== search.value) {
-		avfrom = 0;
-		suggestions.value = [];
-	}
-	lastSearch = search.value;
-	const foundOptions = await getOptions(`.*${search.value}.*`);
-	suggestions.value = [...suggestions.value, ...foundOptions];
-	avfrom += 15;
-};
-
 const regexSelection = () => {
-	vals.value = [`REGEXSEARCH_${search.value}`];
+	vals.value = {
+		key: `fsca_${props.element.name}`,
+		value: compSearch.value,
+	};
 };
 
-const isRegExSearch = computed(
-	() => vals.value?.length && vals.value[0].startsWith("REGEXSEARCH_"),
-);
+const isRegExSearch = computed(() => vals.value?.key);
 
 const changeSuggs = async () => {
 	if (!vals.value) vals.value = [];
 	avfrom = 0;
 	if (props.element.Values) {
 		suggestions.value = props.element.Values.map(({ v }) => v);
-	} else suggestions.value = await getOptions();
-	avfrom += 15;
+	} else {
+		suggestions.value = [];
+		await refetch();
+	}
 };
-const search = ref("");
 
 const addToSelection = (sugg: string) => {
 	const isIn = vals.value.findIndex((s) => s === sugg);
@@ -68,35 +96,33 @@ const addToSelection = (sugg: string) => {
 	else vals.value.push(sugg);
 };
 await changeSuggs();
-const modes = ["containing", "starts with", "ends with", "regex"];
-const modeIndex = ref(0);
 </script>
 
 <template>
-	<div class="w-full">
-		<!-- {{ props.element.name }}
-		vals {{ vals }} -->
-		{{ isRegExSearch }}
-		<div class="flex w-full gap-2">
-			<VBtn @click="modeIndex = (modeIndex + 1) % modes.length">{{ modes[modeIndex] }}</VBtn>
-			<VTextField
-				v-model="search"
-				label="Search"
-				type="text"
-				class="flex-1 rounded-sm border-black"
-				@change="doSearch()"
-			/>
-			<button
-				v-if="search"
-				class="rounded-sm border border-solid border-black"
-				@click="regexSelection()"
-			>
-				use '{{ search }}' as '{{ modes[modeIndex] }}'
-				<br />
-				for search
-				<br />
-				(this clears the rest of the selection)
-			</button>
+	<div class="w-full mx-2">
+		<div class="flex w-full gap-2" v-if="!isRegExSearch">
+			<div class="w-full flex gap-1 items-end">
+				<div class="flex flex-col items-start gap-1">
+					<Label for="search">Mode</Label>
+					<Button
+						variant="outline"
+						@click="modeIndex = (modeIndex + 1) % modes.length"
+						class="flex gap-1"
+					>
+						<VIcon icon="mdi-swap-horizontal" />
+						{{ modes[modeIndex] }}
+					</Button>
+				</div>
+				<div class="flex flex-col items-start gap-1">
+					<Label for="search">Search</Label>
+					<Input id="search" v-model="search" type="text" @change="refetch()" />
+				</div>
+				<Button @click="refetch()">Search</Button>
+				<Button v-if="search" variant="secondary" @click="regexSelection()">
+					use '{{ search }}' as '{{ modes[modeIndex] }}' for search (this clears the rest of the
+					selection)
+				</Button>
+			</div>
 		</div>
 		<template v-if="!isRegExSearch">
 			<div v-for="sugg of suggestions" :key="sugg">
@@ -108,11 +134,12 @@ const modeIndex = ref(0);
 					{{ sugg }}
 				</button>
 			</div>
-			<VBtn v-if="!props.element.Values && !isRegExSearch" @click="doSearch()">Load more</VBtn>
+			<VBtn v-if="!props.element.Values && !isRegExSearch" @click="refetch()">Load more</VBtn>
 		</template>
-		<div v-else>
+		<div class="" v-else>
+			<Badge variant="outline">{{ vals.value }}</Badge>
 			regexp selection. clear selection to select values.
-			<button class="rounded border border-solid" @click="vals = []">CLEAR SELECTION</button>
+			<Button class="inline" variant="outline" @click="vals = []">Clear Selection</Button>
 		</div>
 	</div>
 </template>

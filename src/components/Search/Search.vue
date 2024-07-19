@@ -57,7 +57,7 @@ const _alert = (msg: string) => {
 		</div>
 		<SearchDimensions />
 		<div class="mt-4 grid grid-cols-2 gap-1">
-			<QueryItem v-for="(q, i) of query.queries" :key="i" :query="q"></QueryItem>
+			<QueryItem v-for="q of query.queries" :key="q.id" :query="q"></QueryItem>
 		</div>
 	</VContainer>
 </template>

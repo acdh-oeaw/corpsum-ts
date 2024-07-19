@@ -20,7 +20,7 @@ const q = computed(() =>
 				"get-wordform-frequencies",
 				query.corpus,
 				query.subCorpus,
-				query.finalQuery,
+				JSON.stringify(queryStore.getQueryWithFacetting(query)),
 			] as const,
 			queryFn: async () => {
 				wordFormFrequenciesLoading.value[index] = true;
@@ -29,7 +29,7 @@ const q = computed(() =>
 					usesubcorp: query.subCorpus,
 					ml1attr: "",
 					ml1ctx: "",
-					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
 				});
 				return response.data;
 			},

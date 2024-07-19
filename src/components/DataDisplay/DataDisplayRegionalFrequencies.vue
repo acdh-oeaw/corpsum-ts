@@ -20,7 +20,7 @@ const q = computed(() =>
 				"get-regional-frequencies",
 				query.corpus,
 				query.subCorpus,
-				query.finalQuery,
+				JSON.stringify(queryStore.getQueryWithFacetting(query)),
 			] as const,
 			queryFn: async () => {
 				regionalFrequenciesLoading.value[index] = true;
@@ -34,7 +34,7 @@ const q = computed(() =>
 					freqlevel: 1,
 					ml1attr: "doc.region",
 					ml1ctx: "0~0 > 0",
-					json: JSON.stringify({ concordance_query: query.concordance_query }),
+					json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
 				});
 				return response.data;
 			},

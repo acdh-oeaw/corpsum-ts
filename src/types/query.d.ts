@@ -68,6 +68,13 @@ interface KWICAttrsStructs {
 
 type ConcordanceQuery = Record<"queryselector", CorpusQueryType> &
 	Record<CorpusQueryTypeValue, string>;
+
+interface FacettingRegexSearch {
+	key: string;
+	value: string;
+}
+
+type FacettingValues = Record<string, Array<string> | FacettingRegexSearch>
 interface CorpusQuery {
 	id: number;
 	type: CorpusQueryType;
@@ -81,6 +88,7 @@ interface CorpusQuery {
 	concordance_query: ConcordanceQuery;
 	KWICAttrsStructs: KWICAttrsStructs;
 	KWICAttrsStructsOptions: KWICAttrsStructs; // ToDo: this will be refactored to come from a query. -> will eb deleted
+	facettingValues: FacettingValues;
 	loading: {
 		yearlyFrequencies: boolean;
 		wordFormFrequencies: boolean;

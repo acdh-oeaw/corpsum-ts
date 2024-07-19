@@ -4,8 +4,12 @@ import { useQueryStore } from "../../stores/query";
 const props = defineProps<{ query: CorpusQuery }>();
 const queries = useQueryStore();
 
-const i = queries.queries.findIndex((q) => q.id === props.query.id);
 const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unknown as CorpusQuery;
+
+const deleteQuery = () => {
+	const i = queries.queries.findIndex((q) => q.id === props.query.id);
+	queries.queries.splice(i, 1);
+};
 
 const showFacettingInterface = ref(false);
 </script>
@@ -15,7 +19,7 @@ const showFacettingInterface = ref(false);
 		<VCardTitle>
 			<div class="flex justify-between gap-2">
 				<div class="flex gap-1">
-					<VBtn density="compact" icon="mdi-trash-can" @click="queries.queries.splice(i, 1)"></VBtn>
+					<VBtn density="compact" icon="mdi-trash-can" @click="deleteQuery()"></VBtn>
 					<VBtn
 						density="compact"
 						icon="mdi-palette"
@@ -37,14 +41,16 @@ const showFacettingInterface = ref(false);
 			<FacettingModal :query="storeQuery" @close="showFacettingInterface = false" />
 		</div>
 
-		<VCardText class="flex justify-between" :style="`color: ${props.query.color}`">
-			<JsonViewer preview-mode :value="query.concordance_query" boxed></JsonViewer>
-			<JsonViewer preview-mode :value="query.KWICAttrsStructs" boxed></JsonViewer>
+		<VCardText class="flex justify-between gap-1" :style="`color: ${props.query.color}`">
+			<div class="flex justify-between flex-col">
+				<!-- <JsonViewer preview-mode :value="query.concordance_query" boxed></JsonViewer> -->
+				<JsonViewer preview-mode :value="queries.getQueryWithFacetting(query)" boxed></JsonViewer>
+				<JsonViewer preview-mode :value="query.KWICAttrsStructs" boxed></JsonViewer>
+			</div>
 			<div class="flex flex-col gap-1">
 				<CorpusChip :query="query"></CorpusChip>
 				<VChip>{{ props.query.type }}</VChip>
 			</div>
-
 			<!-- <p>userInput: {{ props.query.userInput }}</p> -->
 		</VCardText>
 

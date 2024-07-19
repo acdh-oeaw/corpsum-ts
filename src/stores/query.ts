@@ -70,6 +70,7 @@ export const useQueryStore = defineStore(
 					attributes: corporaStore.corpInfoResponse.attributes,
 					structures: corporaStore.corpInfoResponse.structures,
 				},
+				facettingValues: {},
 				loading: {
 					yearlyFrequencies: false,
 					wordFormFrequencies: false,
@@ -90,11 +91,27 @@ export const useQueryStore = defineStore(
 				structs: query.KWICAttrsStructs.structures.map(struct => struct.name).join(','),
 			});
 
+		const getQueryWithFacetting = (query: CorpusQuery) => {
+			const result = { ...query.concordance_query };
+			for (const key in query.facettingValues) {
+				const elem = query.facettingValues[key];
+				if (!elem) continue;
+				// console.log({ key, elem })
+				if (Array.isArray(elem)) {
+					if (!elem.length) continue;
+					result[`sca_${key}`] = elem;
+				}
+				else
+					result[elem.key] = elem.value
+			}
+			return result
+		};
 		return {
 			nextQueryId,
 			queries,
 			addQuery,
 			getKWICqueryAttrStrcs,
+			getQueryWithFacetting,
 		};
 	},
 	{ persist: { storage: persistedState.localStorage } },
