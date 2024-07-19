@@ -53,14 +53,26 @@ export default defineNuxtConfig({
 		locales: Object.values(locales),
 		strategy: "prefix",
 	},
+	shadcn: {
+		/**
+		 * Prefix for all the imported component
+		 */
+		prefix: '',
+		/**
+		 * Directory that the component lives in.
+		 * @default "./components/ui"
+		 */
+		componentDir: './src/components/ui'
+	},
 	modules: [
-		"@nuxt/content",
-		"@nuxt/devtools",
-		"@nuxtjs/i18n",
-		"nuxt-vitest",
-		"@pinia/nuxt",
-		"@pinia-plugin-persistedstate/nuxt",
-	],
+        "@nuxt/content",
+        "@nuxt/devtools",
+        "@nuxtjs/i18n",
+        "nuxt-vitest",
+        "@pinia/nuxt",
+        "@pinia-plugin-persistedstate/nuxt",
+        "shadcn-nuxt"
+    ],
 	nitro: {
 		compressPublicAssets: true,
 	},
