@@ -920,7 +920,7 @@
 				}
 			}
 		},
-		"/search/textypes_with_norms": {
+		"/search/texttypes_with_norms": {
 			"get": {
 				"operationId": "getTextTypesWithNorms",
 				"description": "-",
