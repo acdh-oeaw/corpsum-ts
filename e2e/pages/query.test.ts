@@ -9,7 +9,7 @@ test.describe("Query Interface", () => {
 	test("should be able to display information on multiple queries", async ({ page }) => {
 		await page.getByRole("combobox").first().click();
 		const corpusPromise = page.waitForResponse(
-			"https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_4.2&subcorpora=1&format=json",
+			"https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at/search/corp_info?corpname=amc_4.2&subcorpora=1",
 		);
 		await page.getByRole("option", { name: "amc_4.2" }).click();
 		await corpusPromise;
@@ -52,7 +52,7 @@ test.describe("Query Interface", () => {
 	test("should be able select a corpus and select the available subcorpora", async ({ page }) => {
 		await page.getByRole("combobox").first().click();
 		const corpusPromise = page.waitForResponse(
-			"https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at/run.cgi/corp_info?corpname=amc_4.2&subcorpora=1&format=json",
+			"https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at/search/corp_info?corpname=amc_4.2&subcorpora=1",
 		);
 		await page.getByRole("option", { name: "amc_4.2" }).click();
 		await corpusPromise;
