@@ -72,7 +72,15 @@
 		"Structures": "Structures",
 		"Attributes and Structures": "Attributes and Structures",
 		"viewOptions": "Show view options",
-		"Reload KWIC with selected Attributes": "Reload KWIC with selected Attributes"
+		"Reload KWIC with selected Attributes": "Reload KWIC with selected Attributes",
+		"Facetting filters for": "Facetting filters for",
+		"Mode": "Mode",
+		"containing": "containing",
+		"starts with": "starts with",
+		"ends with": "ends with",
+		"regex": "regex",
+		"Load more": "Load more",
+		"Search": "Search"
 	},
 	"DefaultLayout": {
 		"meta": {
@@ -122,5 +130,8 @@
 			"title": "Page not found"
 		},
 		"title": "Page not found"
-	}
+	},
+	"use-search-as-modes-modeindex-for-search-this-clears-the-rest-of-the-selection": "use '{0}' as '{1}' for search (this clears the rest of the selection)",
+	"regexp-selection-clear-selection-to-select-values": "regexp selection. clear selection to select values.",
+	"clear-selection": "Clear Selection"
 }

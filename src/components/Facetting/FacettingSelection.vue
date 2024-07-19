@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/vue-query";
 const suggestions: Ref<Array<string>> = ref([]);
 const props = defineProps<{ query: CorpusQuery; element: any }>();
 
+const t = useTranslations("Corpsum");
+
 const vals = defineModel<Array<string> | FacettingRegexSearch>();
 
 const api = useApiClient();
@@ -14,7 +16,7 @@ let lastSearch = "";
 
 const search = ref("");
 
-const modes = ["containing", "starts with", "ends with", "regex"];
+const modes = [t("containing"), t("starts with"), t("ends with"), t("regex")];
 const modeIndex = ref(0);
 
 const compSearch = computed(() => {
@@ -103,7 +105,7 @@ await changeSuggs();
 		<div class="flex w-full gap-2" v-if="!isRegExSearch">
 			<div class="w-full flex gap-1 items-end">
 				<div class="flex flex-col items-start gap-1">
-					<Label for="search">Mode</Label>
+					<Label for="search">{{ t("Mode") }}</Label>
 					<Button
 						variant="outline"
 						@click="modeIndex = (modeIndex + 1) % modes.length"
@@ -114,13 +116,17 @@ await changeSuggs();
 					</Button>
 				</div>
 				<div class="flex flex-col items-start gap-1">
-					<Label for="search">Search</Label>
+					<Label for="search">{{ t("Search") }}</Label>
 					<Input id="search" v-model="search" type="text" @change="refetch()" />
 				</div>
-				<Button @click="refetch()">Search</Button>
+				<Button @click="refetch()">{{ t("Search") }}</Button>
 				<Button v-if="search" variant="secondary" @click="regexSelection()">
-					use '{{ search }}' as '{{ modes[modeIndex] }}' for search (this clears the rest of the
-					selection)
+					{{
+						$t("use-search-as-modes-modeindex-for-search-this-clears-the-rest-of-the-selection", [
+							search,
+							modes[modeIndex],
+						])
+					}}
 				</Button>
 			</div>
 		</div>
@@ -134,12 +140,16 @@ await changeSuggs();
 					{{ sugg }}
 				</button>
 			</div>
-			<VBtn v-if="!props.element.Values && !isRegExSearch" @click="refetch()">Load more</VBtn>
+			<VBtn v-if="!props.element.Values && !isRegExSearch" @click="refetch()">
+				{{ t("Load more") }}
+			</VBtn>
 		</template>
 		<div class="" v-else>
 			<Badge variant="outline">{{ vals.value }}</Badge>
-			regexp selection. clear selection to select values.
-			<Button class="inline" variant="outline" @click="vals = []">Clear Selection</Button>
+			{{ $t("regexp-selection-clear-selection-to-select-values") }}
+			<Button class="inline" variant="outline" @click="vals = []">
+				{{ $t("clear-selection") }}
+			</Button>
 		</div>
 	</div>
 </template>

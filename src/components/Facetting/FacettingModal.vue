@@ -9,6 +9,8 @@ const emits = defineEmits(["close"]);
 
 const api = useApiClient();
 
+const t = useTranslations("Corpsum");
+
 // todo  fetch the corpus results
 // const corpusStore = useCorporaStore();
 // const { corpInfoResponse } = storeToRefs(corpusStore);
@@ -45,7 +47,7 @@ const selected = ref({});
 		<VCard class="size-full">
 			<h1 class="flex justify-between text-xl p-2">
 				<span>
-					Facetting filters for
+					{{ t("Facetting filters for") }}
 					<span class="font-bold" :style="`color: ${query.color}`">{{ query.userInput }}</span>
 				</span>
 				<Button variant="outline" @click="emits('close')">close</Button>
