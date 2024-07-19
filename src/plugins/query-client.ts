@@ -27,8 +27,8 @@ export default defineNuxtPlugin((nuxt) => {
 				const message =
 					error instanceof Response
 						? // @ts-expect-error Set by api client.
-							// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-						(error.error?.title as string | undefined) ?? error.statusText
+
+							(error.error?.title as string | undefined) ?? error.statusText
 						: error.message;
 
 				if (process.client) {

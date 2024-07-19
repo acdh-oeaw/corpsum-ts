@@ -3,13 +3,11 @@ import { convert } from "html-to-text";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { useGetWideCtx } from "@/composables/useGetWideCtx.ts";
-import type { HttpResponse, Type16Widectx } from "~/lib/api-client";
+// import type { HttpResponse, Type16Widectx } from "~/lib/api-client";
 
 const props = defineProps<{ kwic: KeywordInContext; query: CorpusQuery }>();
 defineEmits(["close"]);
 const active = computed(() => Boolean(props.kwic));
-
-// const _data: Ref<HttpResponse<Type16Widectx, unknown>> | Ref<null> = ref(null);
 
 const { data: details, status } = useGetWideCtx({
 	corpname: props.query.corpus,
@@ -17,12 +15,6 @@ const { data: details, status } = useGetWideCtx({
 	tokencount: 100,
 });
 
-// const parsedText = computed(() => {
-// 	if (!data.value?.data?.content) return "not loaded yet.";
-// 	const html = data.value.data.content.map((a) => a.str).join(" ");
-// 	const text = convert(html.replaceAll("</p>", "</p>\n\n"), { preserveNewlines: true });
-// 	return text;
-// });
 </script>
 
 <template>

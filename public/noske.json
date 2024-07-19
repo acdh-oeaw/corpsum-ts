@@ -83,9 +83,7 @@
 						"$ref": "#/components/parameters/008_format"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Statistics and information about the whole corpus.",
 				"description": "-",
 				"responses": {
@@ -179,9 +177,7 @@
 						"$ref": "#/components/parameters/088_usengrams"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "A list of word frequencies from the specified corpus.",
 				"description": "This method can be used for generating frequency lists of all tokens, lemmas, word forms etc. or for retrieving frequencies of concrete items. Regex can be used for detailed criteria.",
 				"responses": {
@@ -263,9 +259,7 @@
 						"$ref": "#/components/parameters/089_wltype"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Provides a list of frequencies in the specified corpus. Offers more flexibility.",
 				"description": "The difference from the wordlist is that this enpoint allows to customize how the results are displayed.",
 				"responses": {
@@ -374,9 +368,7 @@
 						"$ref": "#/components/parameters/008_format"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Concordance - shows the search word or phrase in context.",
 				"description": "The concordance allows complex criteria for searching the corpus. The queries can combine any data, metadata and annotations found in the corpus.\n\n `To make basic concordance its enough to use just corpname and q parameters.`",
 				"responses": {
@@ -406,9 +398,7 @@
 				],
 				"summary": "Returns all metadata of one concordance line.",
 				"description": "Displays all available text types (metadata) related to the concrete KWIC (hit) defined by its position in the corpus.",
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"responses": {
 					"200": {
 						"description": "`OK`",
@@ -448,9 +438,7 @@
 				],
 				"summary": "Returns extended context the KWIC in a concrete concordance line.",
 				"description": "This is the equivalent of clicking KWIC in one concordance line which displays a popup with an extended context.",
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"responses": {
 					"200": {
 						"description": "`OK`",
@@ -468,9 +456,7 @@
 		"/search/freqml": {
 			"get": {
 				"operationId": "getFreqMl",
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Calculates frequencies of words, lemmas… in the concordance.",
 				"description": "The frequency of any [positional attribute] (https://www.sketchengine.eu/my_keywords/positional-attribute/) such as word forms, lemmas, tags can be counted with this method. Structure attributes (metadata/text types) can also be counted.",
 				"parameters": [
@@ -625,9 +611,7 @@
 				],
 				"summary": "Provides the distribution of hits in the corpus",
 				"description": "-",
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"responses": {
 					"200": {
 						"description": "`OK`",
@@ -672,9 +656,7 @@
 						"$ref": "#/components/parameters/165_json_freqdist"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Utility for web interface only. Provides relative frequency data for wordlist graphs within a specific time period, only for trend corpora.",
 				"responses": {
 					"200": {
@@ -695,9 +677,7 @@
 				"operationId": "getCollx",
 				"description": "-",
 				"summary": "Computes collocation candidates from a concordance.",
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"parameters": [
 					{
 						"$ref": "#/components/parameters/001_corpname"
@@ -779,9 +759,7 @@
 						"$ref": "#/components/parameters/008_format"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Get a list of subcorpora in the corpus or create/delete a subcorpus.",
 				"description": "There is two option how to create subcorpora in Sketch Engine from `text types` => json parameter (corpus must be annotated for text types) or from `concordances` => q + struct parameters.",
 				"responses": {
@@ -813,9 +791,7 @@
 						"$ref": "#/components/parameters/159_new_subcorp_name"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Rename subcorpus.",
 				"responses": {
 					"200": {
@@ -843,9 +819,7 @@
 						"$ref": "#/components/parameters/054_subcname"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Statistics about the subcorpus.",
 				"responses": {
 					"200": {
@@ -929,9 +903,7 @@
 						"$ref": "#/components/parameters/008_format"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Identifies keywords, key n-grams, key collocations and terms.",
 				"description": "Keywords, key n-grams, key collocations and terms are identified by comparing the focus corpus (or a subcorpus) to a refrence corpus (or a subcorpus). It is the equivalent of using the Keywords and terms tool or using the key option in n-grams or the word sketch.",
 				"responses": {
@@ -958,9 +930,7 @@
 					}
 				],
 				"summary": "Returns a list of text types with values.",
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"responses": {
 					"200": {
 						"description": "`OK`",
@@ -1001,9 +971,7 @@
 						"$ref": "#/components/parameters/008_format"
 					}
 				],
-				"tags": [
-					"Corpus Search"
-				],
+				"tags": ["Corpus Search"],
 				"summary": "Utility for web interface only. A list of values for a given structure attribute (avattr).",
 				"description": "Not to be used outside the web interface. Replaced by a more powerful wordlist.",
 				"responses": {
@@ -1024,9 +992,7 @@
 			"get": {
 				"operationId": "getCorpora",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Returns a list of all corpora accessible to you.",
 				"responses": {
 					"200": {
@@ -1051,9 +1017,7 @@
 			},
 			"post": {
 				"operationId": "createCorpus",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Creates a new user corpus.",
 				"description": "Creates a new empty corpus. Use **Documents** endpoints (and optionally **Filesets**) to add data to the corpus.",
 				"requestBody": {
@@ -1095,9 +1059,7 @@
 			"get": {
 				"operationId": "getCorpus",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Retrieves a user corpus.",
 				"responses": {
 					"200": {
@@ -1135,9 +1097,7 @@
 			"put": {
 				"operationId": "updateCorpus",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Updates a user corpus.",
 				"requestBody": {
 					"description": " - `expert_mode` => Set to **True** if you are hard-core. (boolean) \n\n  - `name` => Corpus name. **Given by user**. (string) \n\n  - `info` => Additional info about corpus. (string) \n\n  - `document_order` => Can be set to enforce document order within the corpus. (list of integers) \n\n  - `structures` => Available structures or tags in the corpus. Structures like **s** (sentence), **g** (glue), **doc** (document).(list) \n\n    - `name` => Structure name. Example: **s**. (string) \n\n    - `attributes` => A list of used attributes in corpus. (list) \n\n      - `name` => The name of used attribute. (string) \n\n  - `file_structure` => The structure in which individual documents should be wrapped. Usually **doc**. (string) \n\n  - `onion_structure` => The structure for deduplication. Usually **p** (paragraph) or **Null** (no deduplication). (string) \n\n  - `docstructure` => Structure in which individual documents should be wrapped. Usually **doc**. (string) \n\n  - `sketch_grammar_id` => Name of sketch grammar file. For sketch grammars querying. Sketch grammar is a series of rules written in the CQL query  language that search for collocations in a text corpus and categorize them according to their  grammatical relations. Example: **preloaded/english-penn_tt-3.3.wsdef.m4**. (string) \n\n  - `term_grammar_ir` => Name of term grammar file. Term grammar tells Sketch Engine which words and phrases should indentify as terms. Example: **/corpora/wsdef/english-penn_tt-terms-3.1.termdef.m4**. (string)",
@@ -1190,9 +1150,7 @@
 			"delete": {
 				"operationId": "deleteCorpus",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Deletes a user corpus.",
 				"responses": {
 					"204": {
@@ -1231,9 +1189,7 @@
 			"post": {
 				"operationId": "checkCompilable",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Checks if the corpus fulfills all conditions to be compiled. (RPC)",
 				"requestBody": {
 					"description": " In this documentation, an empty request is used mostly used with the **RPC style** method where the content in a request is not needed (in most cases). RPC style endpoints focus on performing **one action** right (procedures, command) easier than **REST API**-based endpoints. It is not as scalable as REST API style. RPC is mostly used with HTTP: GET (to fetch information) and POST (to everything else) in CA api is it used with POST HTTP method. ",
@@ -1298,9 +1254,7 @@
 			"post": {
 				"operationId": "getCompilationProgress",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Retrieves the current progress of the corpus compilation. (RPC)",
 				"requestBody": {
 					"description": " In this documentation, an empty request is used mostly used with the **RPC style** method where the content in a request is not needed (in most cases). RPC style endpoints focus on performing **one action** right (procedures, command) easier than **REST API**-based endpoints. It is not as scalable as REST API style. RPC is mostly used with HTTP: GET (to fetch information) and POST (to everything else) in CA api is it used with POST HTTP method. ",
@@ -1356,9 +1310,7 @@
 			"post": {
 				"operationId": "compileCorpus",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Performs the corpus compilation. (RPC)",
 				"requestBody": {
 					"description": " `Structures` or `structure attributes` in corpus which should be compiled. Usually: `all`. (string) ",
@@ -1436,9 +1388,7 @@
 			],
 			"get": {
 				"operationId": "getCompilationLog",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Show the compilation log file '.log' of the corpus.",
 				"description": "If **logName** == **last.log** it shows the latest version of the log file.",
 				"responses": {
@@ -1485,9 +1435,7 @@
 			],
 			"get": {
 				"operationId": "getCorpusSource",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Downloads the documents from which the corpus was created (the source files).",
 				"description": "Example call can be: **https://app.sketchengine.eu/ca/api/corpora/{corpusId}/download?format=vert&file_structure=doc**.",
 				"responses": {
@@ -1525,9 +1473,7 @@
 			"post": {
 				"operationId": "cancelJob",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Cancels running tasks (e.g. compilation) relatated to the corpus. (RPC)",
 				"requestBody": {
 					"description": " In this documentation, an empty request is used mostly used with the **RPC style** method where the content in a request is not needed (in most cases). RPC style endpoints focus on performing **one action** right (procedures, command) easier than **REST API**-based endpoints. It is not as scalable as REST API style. RPC is mostly used with HTTP: GET (to fetch information) and POST (to everything else) in CA api is it used with POST HTTP method. ",
@@ -1577,9 +1523,7 @@
 			"post": {
 				"operationId": "compileAlignedCorpus",
 				"description": "-",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Compiles a parallel corpus (consisting of two or more aligned corpora). (RPC)",
 				"requestBody": {
 					"description": "List of corpus IDs used in aligned compilation. \n\n  - `corpus_ids` => A list of **Corpus ID** of multilingual corpora. (integer) \n\n  - `structures` => Represent if **all** structures should be used during compilation (in that case it should be contain just **all**) or just some of them. (string) ",
@@ -1628,9 +1572,7 @@
 		"/ca/api/corpora/align": {
 			"post": {
 				"operationId": "segmentAlign",
-				"tags": [
-					"Corpora"
-				],
+				"tags": ["Corpora"],
 				"summary": "Creates segment representing the same line in two languages in a parallel corpus. (RPC)",
 				"description": "Run if documents inserted into the corpus are not aligned.",
 				"requestBody": {
@@ -1699,9 +1641,7 @@
 			"get": {
 				"operationId": "getAllDocuments",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Retrieves a list of all documents in the corpus.",
 				"responses": {
 					"200": {
@@ -1742,14 +1682,9 @@
 			"post": {
 				"operationId": "createNewDocument",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Uploads a new document.",
 				"parameters": [
-					{
-						"$ref": "#/components/parameters/01_corpus_id"
-					},
 					{
 						"$ref": "#/components/parameters/07_fileset_id_query"
 					},
@@ -1822,9 +1757,7 @@
 			"put": {
 				"operationId": "updateDocumentMetadata",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Edits the metadata of a document.",
 				"requestBody": {
 					"description": "  - `id` => Unique numeric `document ID`. (integer) \n\n  - `metadata` => Pairs of `attribute_name`:`value`.",
@@ -1895,9 +1828,7 @@
 			"get": {
 				"operationId": "getDocument",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Retrieves a specific document.",
 				"responses": {
 					"200": {
@@ -1945,9 +1876,7 @@
 			"put": {
 				"operationId": "updateDocument",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Updates documents to corpus.",
 				"requestBody": {
 					"description": " - `filename_display` => Name of documents. (string) \n\n  - `id` => Unique numeric **document ID** to identify individual documents. (integer) \n\n  - `inProgress` => Represents whether the currently edited document is in use. (boolean) \n\n  - `isArchive` => Represents if the updated document is in a format like .zip (created via some archive manager). (boolean) \n\n  - `metadata` => Metadata of document. For example, additional attributes and values. \n\n  - `parameters` => Parameters for plaintext extraction. \n\n    - `encoding` => Encoding standard of the document. Usually, **UTF-8**. (string) \n\n    - `justext_stoplist` => Represent the list of unimportant words, in a specified language, from an NLP point of view. (string) \n\n    - `permutation` => Changing the order of columns (applies only to **type=vert**). (integer) \n\n    - `tmx_lang` => TMX (translation memory exchange). Language of document used for parallel corpus creation. (string) \n\n    - `tmx_struct` => Alignment structure to be used for multilingual documents, **align** is the most used structure. Used within segment distinction, which sentence is in which language and to put sentences with the same meaning into one segment. (string) \n\n    - `tmx_untranslated` => Placeholder for empty segments in multilingual documents. The segments which have no counterpart in a second language of parallel corpus. (string) \n\n    - `type` => File format (.csv, .doc, .docx, .htm, .html). (string) \n\n    - `unlegalese` => Convert **all-caps** text to **normal case**. (boolean) \n\n  - `temporary` => Is document temporary or not. (boolean) \n\n  - `word_count` => Total number of **words** (tokens minus punctuation etc.) in document. (integer) \n\n  - `vertical_progress` => Progress of **vertical file** creation. (integer) \n\n  - `vertical_error` => An error occured while creating the vertical file. If the creation was succesfull the value is **Null**. (string)",
@@ -2014,9 +1943,7 @@
 			},
 			"delete": {
 				"operationId": "deleteDocuments",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Deletes one or more documents from the corpus.",
 				"description": "To delete more documents, separate document ids with commas. Example call: `https://app.sketchengine.eu/ca/api/corpora/{corpusId}/documents/{documentId_1},{documentId_2}`",
 				"responses": {
@@ -2078,9 +2005,7 @@
 			],
 			"post": {
 				"operationId": "updateDocumentParameters",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Updates document parameters. (RPC)",
 				"description": "Updates parameters like: `File Type`, `Encoding`, etc.",
 				"requestBody": {
@@ -2129,9 +2054,7 @@
 			"get": {
 				"operationId": "getDocumentOriginal",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Downloads a corpus file in its original format (the format that was uploaded). This method cannot be simulated in this online documentation.",
 				"responses": {
 					"200": {
@@ -2173,9 +2096,7 @@
 			"get": {
 				"operationId": "getDocumentPlaintext",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Retrieves 1KB of data in plaintext format. Can load more than 1KB.",
 				"responses": {
 					"206": {
@@ -2219,9 +2140,7 @@
 			"get": {
 				"operationId": "getDocumentVertical",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Retrieves 1KB of data in vertical format. Can load more than 1KB.",
 				"responses": {
 					"206": {
@@ -2265,9 +2184,7 @@
 			"post": {
 				"operationId": "expandArchive",
 				"description": "-",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Expands a ZIP file. (if the corpus files were uploaded as a zip archive). Expanding is not necessary for the corpus to work.(RPC)",
 				"requestBody": {
 					"description": " In this documentation, an empty request is used mostly used with the **RPC style** method where the content in a request is not needed (in most cases). RPC style endpoints focus on performing **one action** right (procedures, command) easier than **REST API**-based endpoints. It is not as scalable as REST API style. RPC is mostly used with HTTP: GET (to fetch information) and POST (to everything else) in CA api is it used with POST HTTP method. ",
@@ -2327,9 +2244,7 @@
 			],
 			"post": {
 				"operationId": "cancelDocumentJob",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Cancels running task which is in direct relation to the document. (RPC)",
 				"description": "An example task that can be canceled is `uploading file`.",
 				"requestBody": {
@@ -2387,9 +2302,7 @@
 			],
 			"post": {
 				"operationId": "getProgress",
-				"tags": [
-					"Documents"
-				],
+				"tags": ["Documents"],
 				"summary": "Shows the actual progress of the currently running task related to documents. (RPC)",
 				"description": "Used in tasks like `uploading` new files which will be used to create or expand the corpora.",
 				"requestBody": {
@@ -2448,9 +2361,7 @@
 			"get": {
 				"operationId": "getFileSets",
 				"description": "-",
-				"tags": [
-					"Filesets"
-				],
+				"tags": ["Filesets"],
 				"summary": "List of \"subdirectories\", i.e. unzipped archives or WebBootCaT runs for a given corpus.",
 				"responses": {
 					"200": {
@@ -2505,9 +2416,7 @@
 			},
 			"post": {
 				"operationId": "createFileSet",
-				"tags": [
-					"Filesets"
-				],
+				"tags": ["Filesets"],
 				"summary": "Creates new fileset by the web-crawler.",
 				"description": "Used within creating or expanding corpus.",
 				"requestBody": {
@@ -2592,9 +2501,7 @@
 			"get": {
 				"operationId": "getFileSet",
 				"description": "-",
-				"tags": [
-					"Filesets"
-				],
+				"tags": ["Filesets"],
 				"summary": "Returns information about a specific \"subdirectory\".",
 				"responses": {
 					"200": {
@@ -2647,9 +2554,7 @@
 			"delete": {
 				"operationId": "deleteFileSet",
 				"description": "-",
-				"tags": [
-					"Filesets"
-				],
+				"tags": ["Filesets"],
 				"summary": "Deletes subdirectory containing document (for creating corpus).",
 				"responses": {
 					"204": {
@@ -2710,9 +2615,7 @@
 			],
 			"post": {
 				"operationId": "cancelFileSetJob",
-				"tags": [
-					"Filesets"
-				],
+				"tags": ["Filesets"],
 				"summary": "Cancel running task. (RPC)",
 				"description": "Example: cancel downloading data from websites by web-crawler.",
 				"requestBody": {
@@ -2780,9 +2683,7 @@
 			],
 			"post": {
 				"operationId": "getFileSetProgress",
-				"tags": [
-					"Filesets"
-				],
+				"tags": ["Filesets"],
 				"summary": "Shows the actual progress of a running task related to filesets. (RPC)",
 				"description": "A task like `downloading content from web` to create corpus with web crawler.",
 				"requestBody": {
@@ -2833,9 +2734,7 @@
 			"get": {
 				"operationId": "getLanguages",
 				"description": "-",
-				"tags": [
-					"Languages"
-				],
+				"tags": ["Languages"],
 				"summary": "Retrieves a list of all languages.",
 				"responses": {
 					"200": {
@@ -2863,9 +2762,7 @@
 			"post": {
 				"operationId": "uploadAligendDocuments",
 				"description": "-",
-				"tags": [
-					"Somefiles"
-				],
+				"tags": ["Somefiles"],
 				"summary": "Upload aligned documents for creating parallel corpus.",
 				"requestBody": {
 					"description": "Aligned multilingual file (mostly in '.tmx' file type).",
@@ -2911,9 +2808,7 @@
 			"get": {
 				"operationId": "getAlignedDocuments",
 				"description": "-",
-				"tags": [
-					"Somefiles"
-				],
+				"tags": ["Somefiles"],
 				"summary": "Retrieves specific multilingual file metadata.",
 				"responses": {
 					"200": {
@@ -2941,9 +2836,7 @@
 			"put": {
 				"operationId": "updateAlignedDocs",
 				"description": "-",
-				"tags": [
-					"Somefiles"
-				],
+				"tags": ["Somefiles"],
 				"summary": "Updates multilingual file metadata.",
 				"requestBody": {
 					"description": " - `corpora` \n\n    - `guessed_language_code` \n\n      - `language_id` => Language iso-code. **ISO 639-1**. (string) \n\n      - `name` => Language name in **English**. (string) ",
@@ -3003,9 +2896,7 @@
 			"get": {
 				"operationId": "getUserTemplate",
 				"description": "-",
-				"tags": [
-					"Templates"
-				],
+				"tags": ["Templates"],
 				"summary": "Retrieves details of specified user template / tagset.",
 				"responses": {
 					"200": {
@@ -3053,9 +2944,7 @@
 			"put": {
 				"operationId": "updateUserTemplate",
 				"description": "-",
-				"tags": [
-					"Templates"
-				],
+				"tags": ["Templates"],
 				"summary": "Updates specified user template/tagset.",
 				"requestBody": {
 					"description": " - `id` => Alphanumeric **template/tagset ID**. The terms **tagset** and **templates** are interchangeable. (string) \n\n  - `name` => Name of **template/tagset** file. (string) \n\n  - `owner_id` => Unique numeric owner ID (usually you). If tagset/template is preloaded Null. (integer) \n\n  - `owner_name` => Tagset/template owner name (usually you). If tagset/template is preloaded Null. (string) \n\n  - `has_pipeline` => Vertical creation is supported. False for legacy templates. (boolean) \n\n  - `has_tags` => Morphological tagging is supported. (boolean) \n\n  - `has_lemmas` => Lemmatization is supported. (boolean) \n\n  - `static_attributes` => A list of attributes which can appear in corpus. \n\n  - `structures` => A list of used structures. Examples \\<s>, \\<g>. \n\n  - `tagsetdoc` => URL leading to template/tagset documentation. (string) \n\n  - `content` => Content of tagset. (string) \n\n  - `default_sketchgrammar_id` => Not ID, as you probably imagine, but filename of preselected sketchgrammar (.m4 format). (string) \n\n  - `default_termgrammar_id` => Not ID, as you probably imagine, but filename of preselected sketchgrammar (.m4 format). (string) \n\n  - `sharing` => List. \n\n  - `users` => The ID of user you share template with. \n\n  - `id` => The ID of group you share template with.",
@@ -3128,9 +3017,7 @@
 			"delete": {
 				"operationId": "deleteUserTemplate",
 				"description": "-",
-				"tags": [
-					"Templates"
-				],
+				"tags": ["Templates"],
 				"summary": "Deletes user template.",
 				"responses": {
 					"204": {
@@ -3184,9 +3071,7 @@
 			"post": {
 				"operationId": "getUsedSpace",
 				"description": "-",
-				"tags": [
-					"Users"
-				],
+				"tags": ["Users"],
 				"summary": "Retrieves the user's current word space state (default 1 000 000 words). (RPC)",
 				"requestBody": {
 					"description": " In this documentation, an empty request is used mostly used with the **RPC style** method where the content in a request is not needed (in most cases). RPC style endpoints focus on performing **one action** right (procedures, command) easier than **REST API**-based endpoints. It is not as scalable as REST API style. RPC is mostly used with HTTP: GET (to fetch information) and POST (to everything else) in CA api is it used with POST HTTP method. ",
@@ -3248,10 +3133,7 @@
 				"name": "gramrels",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "A list of grammatical relations from the correspoding `sketch grammar`."
 			},
@@ -3260,10 +3142,7 @@
 				"name": "corpcheck",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "Results of the last corpcheck (if available in the compilation log)."
 			},
@@ -3272,10 +3151,7 @@
 				"name": "registry",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "The content of the registry file (registry_dump and registry_text)."
 			},
@@ -3284,10 +3160,7 @@
 				"name": "subcorpora",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "A parameter to obtain the list of subcorpora and their sizes (e.g. number of tokens, words)."
 			},
@@ -3296,10 +3169,7 @@
 				"name": "struct_attr_stats",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "The lexicon sizes of structure attributes."
 			},
@@ -3308,14 +3178,7 @@
 				"name": "format",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"json",
-						"xml",
-						"csv",
-						"tsv",
-						"txt",
-						"xls"
-					]
+					"enum": ["json", "xml", "csv", "tsv", "txt", "xls"]
 				},
 				"description": "The `format` of the output. `Empty value` is interpreted as `JSON`. Not every endpoint supports all formats."
 			},
@@ -3335,11 +3198,7 @@
 				"schema": {
 					"type": "string",
 					"default": "frq",
-					"enum": [
-						"frq",
-						"docf",
-						"arf"
-					]
+					"enum": ["frq", "docf", "arf"]
 				},
 				"description": "The type of frequency. The values stand for: `frq` -> absolute or raw frequency, `docf` -> document frequency. `arf` -> average reduced frequency."
 			},
@@ -3374,10 +3233,7 @@
 				"name": "wlsort",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"frq",
-						"docf"
-					]
+					"enum": ["frq", "docf"]
 				},
 				"description": "Sets the sorting of the results. The default is `frq`, i.e. by absolute frequency. Docf means document frequency."
 			},
@@ -3436,14 +3292,7 @@
 				"name": "lpos",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"-n",
-						"-v",
-						"-j",
-						"-a",
-						"-d",
-						"-i"
-					]
+					"enum": ["-n", "-v", "-j", "-a", "-d", "-i"]
 				},
 				"description": "The part of speech of the lemma. The concrete values depend on the corpus. If the corpus contains the `lempos` attribute and `lpos` is empty, the result defaults to the most frequent part of speech of the lemma."
 			},
@@ -3452,10 +3301,7 @@
 				"name": "asyn",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "Switches the asynchronous processing on/off. ON = partial results are returned as soon as the first page is filled with results. OFF = results are returned only after the search is completed. Normally, ON is used in the web interface and OFF when using the API."
 			},
@@ -3463,7 +3309,7 @@
 				"in": "query",
 				"name": "json",
 				"schema": {
-					"type": "object",
+					"type": "string",
 					"example": {
 						"concordance_query": [
 							{
@@ -3499,10 +3345,7 @@
 				"schema": {
 					"type": "string",
 					"default": "frq",
-					"enum": [
-						"frq",
-						"rel"
-					]
+					"enum": ["frq", "rel"]
 				},
 				"description": "The identifier of the sorted column. Use `frq` (default) to sort by frequency."
 			},
@@ -3574,17 +3417,7 @@
 				"schema": {
 					"type": "string",
 					"default": "m",
-					"enum": [
-						"t",
-						"m",
-						"3",
-						"l",
-						"s",
-						"p",
-						"r",
-						"f",
-						"d"
-					]
+					"enum": ["t", "m", "3", "l", "s", "p", "r", "f", "d"]
 				},
 				"description": "Function according to which the result is sorted."
 			},
@@ -3603,10 +3436,7 @@
 				"schema": {
 					"type": "integer",
 					"default": 0,
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "Set to `1` if the corpus should be deleted. Only user subcorpora can be deleted. Nothing will be deleted if left empty (default value == 0)."
 			},
@@ -3625,10 +3455,7 @@
 				"schema": {
 					"type": "string",
 					"default": "1",
-					"enum": [
-						"1",
-						"0"
-					]
+					"enum": ["1", "0"]
 				},
 				"description": "The smoothing parameter for (simple maths) [https://www.sketchengine.eu/documentation/simple-maths/]."
 			},
@@ -3647,10 +3474,7 @@
 				"schema": {
 					"type": "integer",
 					"default": 1,
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Limits the results to items containing only alphanumeric characters."
 			},
@@ -3660,10 +3484,7 @@
 				"schema": {
 					"type": "integer",
 					"default": 1,
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Limits the results to items containing at least one alphanumberic character. Words such as 16-year-old or 3D will be included."
 			},
@@ -3681,12 +3502,7 @@
 				"name": "ngrams_n",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						2,
-						3,
-						4,
-						5
-					]
+					"enum": [2, 3, 4, 5]
 				},
 				"description": "The minimum n-gram length. Usually used with `ngrams_max_n` and `usengrams`."
 			},
@@ -3696,10 +3512,7 @@
 				"schema": {
 					"type": "integer",
 					"default": 0,
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Sets the case sensitivity of the corpus, i.e. the data are extracted from a lowercased version of the corpus. It is used for case insensitive analysis. Parameter \"1\" means case sensitivity, \"0\" means case insensitivity."
 			},
@@ -3716,10 +3529,7 @@
 				"name": "include_nonwords",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Includes, or excludes, nonwords in the in the result. Nonwords are tokens which do not start with letter of the alphabet (e.g. numbers, punctuation). The regex to match the nonwords is `[^[:alpha:]].*`. Certain specialized corpora may use their own specific definition of nonwords."
 			},
@@ -3728,10 +3538,7 @@
 				"name": "random",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Parameter that represents if the wordlist is created from the first 10 milions lines of corpus. One if yes, no if he wordlist is created from the whole corpus.",
 				"deprecated": true
@@ -3759,10 +3566,7 @@
 				"schema": {
 					"type": "string",
 					"default": "all",
-					"enum": [
-						"kw",
-						"all"
-					]
+					"enum": ["kw", "all"]
 				},
 				"description": "Determines which tokens will be returned with additional attributes defined in `attrs`. `kw` will add the attributes to the KWIC only. `all` will return them with all tokens."
 			},
@@ -3771,10 +3575,7 @@
 				"name": "viewmode",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"sen",
-						"kwic"
-					]
+					"enum": ["sen", "kwic"]
 				},
 				"description": "Switches between sentence view and the KWIC view. `sen` returns complete sentences without trimming them. `kwic` returns the KWIC view with the query in the centre and some context left and right."
 			},
@@ -3783,12 +3584,7 @@
 				"name": "cup_hl",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"q",
-						"e",
-						"c",
-						"b"
-					]
+					"enum": ["q", "e", "c", "b"]
 				},
 				"description": "Only used with error-annotated corpora. It determines what should be highlighted. It is set to 'q' for corpora without error annotation. Meaning of individual options:\n\n - `q` -> to higlight query result.\n\n - `e` -> to higlight errors.\n\n - `c` -> to highlight corrections.\n\n - `b` -> to highlight both erros and corrections.\n\n Example of such a corpus can be `preloaded/enwiki_error_sample_sentences`."
 			},
@@ -3842,13 +3638,7 @@
 				"name": "ngrams_max_n",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						2,
-						3,
-						4,
-						5,
-						6
-					]
+					"enum": [2, 3, 4, 5, 6]
 				},
 				"description": "The maximum n-gram length. The maximum is `6`."
 			},
@@ -3857,10 +3647,7 @@
 				"name": "usengrams",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "Represent if n-grams should be extracted or just simple keywords."
 			},
@@ -3869,10 +3656,7 @@
 				"name": "wltype",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"simple",
-						"struct_wordlist"
-					],
+					"enum": ["simple", "struct_wordlist"],
 					"example": "simple"
 				},
 				"description": "Parameter to set the format of ouput. Is it always set to `simple`, for the `struct_wordlist` is another enpoint called `struct_wordlist`.",
@@ -3883,12 +3667,7 @@
 				"name": "wlstruct_attr1",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"word",
-						"lemma",
-						"tag",
-						"lempos"
-					]
+					"enum": ["word", "lemma", "tag", "lempos"]
 				},
 				"description": "Sets the attributes used for generating the wordlist. Up to 3 attributes are allowed (see wlstruct_attr2 and wlstruct_attr3). Some corpora may contain additional specific attributes.",
 				"required": true
@@ -3898,10 +3677,7 @@
 				"name": "relfreq",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Includes the relative frequency of each item in the result."
 			},
@@ -3910,10 +3686,7 @@
 				"name": "reldocf",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Calculate the document frequency for each item in the result. Must be used with `addfreqs` set to `docf`."
 			},
@@ -3938,10 +3711,7 @@
 				"name": "group",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "If there are more attributes (e.g. m1attr, m2attr), the results can be grouped by the first column/attribute."
 			},
@@ -3950,10 +3720,7 @@
 				"name": "showpoc",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Includes the percentage of the concordance in the result."
 			},
@@ -3962,10 +3729,7 @@
 				"name": "showreltt",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Includes relative in text types value in the result."
 			},
@@ -3974,10 +3738,7 @@
 				"name": "showrel",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Includes the relative frequency in the result."
 			},
@@ -3986,14 +3747,7 @@
 				"name": "freqlevel",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						2,
-						3,
-						4,
-						5,
-						6
-					]
+					"enum": [1, 2, 3, 4, 5, 6]
 				},
 				"description": "The number of attributes for which the frequencies should be counted."
 			},
@@ -4022,12 +3776,7 @@
 				"name": "wlstruct_attr2",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"word",
-						"lemma",
-						"tag",
-						"lempos"
-					]
+					"enum": ["word", "lemma", "tag", "lempos"]
 				},
 				"description": "Additional optional attribute that should be included in the result."
 			},
@@ -4036,12 +3785,7 @@
 				"name": "wlstruct_attr3",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"word",
-						"lemma",
-						"tag",
-						"lempos"
-					]
+					"enum": ["word", "lemma", "tag", "lempos"]
 				},
 				"description": "Additional optional attribute that should be included in the result."
 			},
@@ -4050,10 +3794,7 @@
 				"name": "icase",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "Switches to the `lc` attribute, i.e. the lower-cased version of the corpus to allow case insensitive searching. `1` means that case sensitivity is off, `0` means it is on."
 			},
@@ -4071,10 +3812,7 @@
 				"name": "nest_ngrams",
 				"schema": {
 					"type": "integer",
-					"enum": [
-						1,
-						0
-					]
+					"enum": [1, 0]
 				},
 				"description": "N-grams which are sub-ngrams of a longer n-gram will be grouped together with the longer n-gram. Nesting only works when a `ngrams_n` and `ngrams_max_n` are different values."
 			},
@@ -4084,12 +3822,7 @@
 				"schema": {
 					"type": "string",
 					"default": "word",
-					"enum": [
-						"lemma",
-						"word",
-						"TERM",
-						"WSCOLLOC"
-					]
+					"enum": ["lemma", "word", "TERM", "WSCOLLOC"]
 				},
 				"description": "Switches between the computation of keywords, terms, key n-grams and key collocations. With keywords and n-grams, it also sets the attribute to be used for the computation.\n\n For keywords, set to the required attribute, usually `lc`, `word` or `lemma`.\n\n For n-grams, set to the required attribute and set `usengrams`, `ngrams_n` and `ngrams_max_n`.\n\n For terms, set the attribute to `TERM`.\n\n For collocations (word sketch triples, equivalent of using the Word Sketch with AS A LIST option in the web interace), set the attribute to `WSCOLLOC`. Consider using `wlpat`. "
 			},
@@ -4170,14 +3903,7 @@
 				"name": "concordance_query[queryselector]",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"iquery",
-						"cqlrow",
-						"lemmarow",
-						"charrow",
-						"wordrow",
-						"phraserow"
-					]
+					"enum": ["iquery", "cqlrow", "lemmarow", "charrow", "wordrow", "phraserow"]
 				},
 				"description": "The query type. You can send it directly or via the `json` parameter, the results are the same."
 			},
@@ -4234,10 +3960,7 @@
 				"name": "errcorr_switch",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"corr",
-						"err"
-					]
+					"enum": ["corr", "err"]
 				},
 				"description": "(Only for error-annotated corpora.) Determines what should be highlighted. Corr means **correction** and err means **error**. An **example** of such a corpus is `preloaded/enwiki_error_sample_sentences`."
 			},
@@ -4429,17 +4152,7 @@
 								"iquery": "test"
 							}
 						],
-						"cbgrfns": [
-							"t",
-							"m",
-							"3",
-							"l",
-							"s",
-							"p",
-							"r",
-							"f",
-							"d"
-						]
+						"cbgrfns": ["t", "m", "3", "l", "s", "p", "r", "f", "d"]
 					}
 				},
 				"description": "An optinal way of **wraping parameters**. It is possible to send all relevant parametres via this parameter only. It is classic JSON format.\n\n The most frequent uses are:\n\n `queryselector`: To select the query type. Supported options are: **cqlrow**, **iqueryrow**, **lemmarow**, **charrow**, **phraserow**, **wordrow**.\n\n `iquery`: Use with `iqueryrow`. \n\n `cql`: Use with `cqlrow`.\n\n `lemma`: Use with `lemmarow`.\n\n `lpos`: The part of speech of the lemma.\n\n `qmcase`: Sets the attribute to its lowercased version, i.e. the data are extracted from a lowercased version of the corpus. It used for case insensitive analysis. 1 = case sensitive), 0 = lowercased corpus/case insensitive).\n\n `char`: Use with charrow.\n\n `phrase`: Use with phraserow.\n\n `word`: Use with wordrow\n\n `cbgrfns`: If you need to send more cbgrfnsDefines the types of statistics (association measures) to be computed. See example."
@@ -4450,10 +4163,7 @@
 				"schema": {
 					"type": "integer",
 					"default": 0,
-					"enum": [
-						0,
-						1
-					]
+					"enum": [0, 1]
 				},
 				"description": "Set to `1` if new subcorpus should be created. Subcorpus will not be created if left empty (default value == 0)."
 			},
@@ -4499,9 +4209,7 @@
 				"schema": {
 					"type": "object",
 					"example": {
-						"sca_bncdoc.alltyp": [
-							"Spoken context-governed"
-						]
+						"sca_bncdoc.alltyp": ["Spoken context-governed"]
 					}
 				},
 				"description": "Used to specify text types for a subcorpus. Takes a JSON object as input, where the key-value pairs define the specific attributes. The attributes can vary depending on the corpus.\n\n When using the json parameter in a query, you can define a JSON object with one or more attributes. Each attribute can have a single value or an array of values.\n\n\nThe list of available text types for specific corpus can be obtained via `/search/corp_info` just add `sca_` in front the name (see examples).\n\n\n`Examples:`\n\n\n - To create a subcorpus based on a specific spoken text type from the BNC corpus: \n\n    **{\"sca_bncdoc.alltyp\":[\"Spoken context-governed\"]}**\n\n\n - To filter texts from the BNC corpus that are both spoken context-governed and spoken demographic: \n\n    **{\"sca_bncdoc.alltyp\":[\"Spoken context-governed\",\"Spoken demographic\"]}**\n\n\n - To select texts from the BNC corpus from a specific time period (1960-1974): \n\n    **{\"sca_bncdoc.alltim\":[\"1960-1974\"]}**\n\n\n - To create a subcorpus with texts from specific authors and time periods, along with regional specifications: \n\n    **{\"sca_bncdoc.author\": [\"Author1\",\"Author2\",...],\"sca_bncdoc.alltim\": [\"1985-1993\",\"1975-1984\"], \"sca_bncdoc.wripp\": [\"UK (unspecific)\",\"Ireland\"]}**\n\n\n - To filter texts from the Ententen corpus based on domain and topic: \n\n    **{\"sca_doc.tld\":[\"org\",\"com\"], \"sca_doc.topic\": [\"arts\",\"beauty & fashion\",\"cars & bikes\",\"culture & entertainment\"]}**\n\n\n - For a user-specific corpus, filtering based on document ID and filename: \n\n    **{\"sca_doc.id\":[\"file29173711\"],\"sca_doc.filename\":[\"Filename.pdf\"]}**"
@@ -4530,10 +4238,7 @@
 				"name": "sse",
 				"schema": {
 					"type": "string",
-					"enum": [
-						"1",
-						"0"
-					]
+					"enum": ["1", "0"]
 				},
 				"required": true,
 				"description": "`1`: display results during calculation\n`0`: display results after all data has been calculated (can take quite a lot of time)."
@@ -7194,10 +6899,7 @@
 							"type": "integer",
 							"description": "A list of `Corpus ID` of multilingual corpora."
 						},
-						"example": [
-							842464,
-							842463
-						]
+						"example": [842464, 842463]
 					}
 				}
 			},
@@ -7220,10 +6922,7 @@
 							"type": "integer",
 							"description": "A list of `Corpus ID` of multilingual corpus. ID's in example does not exist."
 						},
-						"example": [
-							842464,
-							842463
-						]
+						"example": [842464, 842463]
 					}
 				}
 			},

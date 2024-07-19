@@ -1,5 +1,5 @@
 // @ts-nocheck
-/* eslint-disable */
+
 // sadly this function is just js, so need to disable typechecker for it
 import zipcelx from "zipcelx";
 

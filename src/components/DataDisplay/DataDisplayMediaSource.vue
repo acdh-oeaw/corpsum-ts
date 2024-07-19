@@ -2,7 +2,7 @@
 import { useQueries } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 
-import type { Type11Freqml } from "~/lib/api-client";
+import { type Type11Freqml } from "~/lib/api-client";
 
 const t = useTranslations("Corpsum");
 const queryStore = useQueryStore();
@@ -66,7 +66,7 @@ const q = computed(() =>
 		};
 	}),
 );
-
+//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 const categories = computed(() => {
@@ -139,11 +139,12 @@ const series = computed(() => {
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
+			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
-				datatype="mediaSources"
 				:queries="queries"
-				:loading="sourceDistributionsLoading"
+				datatype="mediaSources"
 				:data="sourceDistributions"
+				:loading="sourceDistributionsLoading"
 			></DataDisplaySourceTable>
 		</VExpandTransition>
 

@@ -16,10 +16,8 @@ const CORPUS_QUERY_TYPES = [
 	{ value: "cqlrow", description: t("cqlrow") },
 ];
 
-const searchSettings = useSearchSettingsStore();
-// getRegionsFrequencies
 async function addQuery() {
-	const addedQuery = query.addQuery(newUserInput.value, newSelectedType.value);
+	query.addQuery(newUserInput.value, newSelectedType.value);
 	// newSelectedType.value = "word";
 	newUserInput.value = "";
 }

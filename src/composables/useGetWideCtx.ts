@@ -1,15 +1,14 @@
 import { useQuery } from "@tanstack/vue-query";
 
+import { useApiClient } from "@/composables/use-api-client.ts";
+
 interface params {
-	corpname: string,
-	pos: number,
-	tokencount: number,
+	corpname: string;
+	pos: number;
+	tokencount: number;
 }
 
-export function useGetWideCtx(
-	params: MaybeRef<params>,
-	options?: { enabled?: boolean },
-) {
+export function useGetWideCtx(params: MaybeRef<params>, options?: { enabled?: boolean }) {
 	const api = useApiClient();
 
 	return useQuery({

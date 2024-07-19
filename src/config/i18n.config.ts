@@ -1,4 +1,4 @@
-import type { LocaleObject } from "vue-i18n-routing";
+import { type LocaleObject } from "vue-i18n-routing";
 
 import type messages from "@/messages/en.json";
 
