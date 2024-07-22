@@ -11,6 +11,14 @@ const deleteQuery = () => {
 	queries.queries.splice(i, 1);
 };
 
+const setFilters = computed(() => {
+	const keys = Object.keys(props.query.facettingValues).filter(
+		(key) => props.query.facettingValues[key]?.length || props.query.facettingValues[key]?.val,
+	);
+	keys;
+	return keys;
+});
+
 const showFacettingInterface = ref(false);
 </script>
 
@@ -25,8 +33,18 @@ const showFacettingInterface = ref(false);
 						icon="mdi-palette"
 						@click="storeQuery.showPicker = !storeQuery.showPicker"
 					></VBtn>
-					<VBtn density="compact" icon="mdi-filter" @click="showFacettingInterface = true"></VBtn>
+
+					<VBadge :color="query.color" v-if="setFilters.length" :content="setFilters.length">
+						<VBtn density="compact" icon="mdi-filter" @click="showFacettingInterface = true"></VBtn>
+					</VBadge>
+					<VBtn
+						v-else
+						density="compact"
+						icon="mdi-filter"
+						@click="showFacettingInterface = true"
+					></VBtn>
 				</div>
+
 				<span class="text-xl" :style="`color: ${props.query.color}`">
 					{{ props.query.userInput }}
 					<VTooltip activator="parent">{{ props.query.userInput }}</VTooltip>
@@ -37,7 +55,6 @@ const showFacettingInterface = ref(false);
 		</VCardTitle>
 
 		<div v-if="showFacettingInterface">
-			JOOO
 			<FacettingModal :query="storeQuery" @close="showFacettingInterface = false" />
 		</div>
 
