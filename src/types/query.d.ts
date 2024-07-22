@@ -106,3 +106,10 @@ interface SubCorpus {
 	words: number;
 	n: string;
 }
+
+
+interface IsourceDistribution {
+	media: string;
+	absolute: number;
+	relative: number;
+}

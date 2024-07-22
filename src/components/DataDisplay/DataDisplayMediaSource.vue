@@ -13,12 +13,6 @@ const expand = ref(false);
 
 const api = useApiClient();
 
-interface IsourceDistribution {
-	media: string;
-	absolute: number;
-	relative: number;
-}
-
 const sourceDistributions: Ref<Array<Array<IsourceDistribution>>> = ref([]);
 const sourceDistributionsLoading: Ref<Array<boolean>> = ref([]);
 
@@ -69,29 +63,9 @@ const q = computed(() =>
 //@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
-const categories = computed(() => {
-	const allCats: Array<string> = [];
-	queries.value.forEach((query: CorpusQuery, i) => {
-		sourceDistributions.value[i]?.forEach((qm) => allCats.push(qm.media));
-	});
-	return [...new Set(allCats)];
-});
+const chartMode: "seperate" | "stack" = ref("stack");
 
-const series = computed(() => {
-	const allSeries = queries.value.map((query: CorpusQuery, i) => {
-		return {
-			color: query.color,
-			name: `${query.type}: ${query.userInput} (${query.corpus}${
-				query.subCorpus ? ` / ${query.subCorpus})` : ")"
-			}`,
-			data: categories.value
-				.map((category) => sourceDistributions.value[i]?.find(({ media }) => category === media))
-				// @ts-ignore
-				.map((a) => (a ? a[mode.value] : 0)),
-		};
-	});
-	return allSeries;
-});
+const isStacked = computed(() => chartMode.value === "stack");
 </script>
 
 <template>
@@ -104,38 +78,40 @@ const series = computed(() => {
 		</VCardItem>
 
 		<VCardText>
-			<VBtnToggle v-model="mode" density="compact">
-				<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
-				<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
-			</VBtnToggle>
+			<div class="flex gap-2 items-center">
+				<VBtnToggle v-model="chartMode" density="compact">
+					<VBtn variant="outlined" value="stack">
+						<VIcon icon="mdi-chart-bar-stacked" />
+						<VTooltip location="top" activator="parent">stacked bar chart</VTooltip>
+					</VBtn>
+					<VBtn variant="outlined" value="seperate">
+						<VIcon icon="mdi-poll" />
+						<VTooltip location="top" activator="parent">seperated bar chart</VTooltip>
+					</VBtn>
+				</VBtnToggle>
+
+				<VBtnToggle v-model="mode" density="compact">
+					<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
+					<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
+				</VBtnToggle>
+			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div v-if="sourceDistributionsLoading[index]">
 					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
 					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
 				</div>
 			</div>
-			<HighCharts
-				style="height: 1200px"
-				:options="{
-					chart: {
-						type: 'bar',
-					},
-					title: {
-						text: `${series.length} ${t('queries')}`,
-						align: 'center',
-					},
-					xAxis: {
-						categories: categories,
-					},
+			<!-- {{ series }} -->
+			<!-- {{ chartMode }} -->
 
-					yAxis: {
-						title: {
-							text: t('sources'),
-						},
-					},
-					series,
-				}"
-			></HighCharts>
+			<template v-if="sourceDistributions && queries">
+				<MediaStackedBarChart
+					:queries="queries"
+					:source-distributions="sourceDistributions"
+					:mode="mode"
+					:stack="isStacked"
+				/>
+			</template>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
