@@ -19,6 +19,8 @@ const setFilters = computed(() => {
 	return keys;
 });
 
+const queryWithFacetting = computed(() => queries.getQueryWithFacetting(props.query));
+
 const showFacettingInterface = ref(false);
 </script>
 
@@ -61,7 +63,7 @@ const showFacettingInterface = ref(false);
 		<VCardText class="flex justify-between gap-1" :style="`color: ${props.query.color}`">
 			<div class="flex justify-between flex-col">
 				<!-- <JsonViewer preview-mode :value="query.concordance_query" boxed></JsonViewer> -->
-				<JsonViewer preview-mode :value="queries.getQueryWithFacetting(query)" boxed></JsonViewer>
+				<JsonViewer preview-mode :value="queryWithFacetting" boxed></JsonViewer>
 				<JsonViewer preview-mode :value="query.KWICAttrsStructs" boxed></JsonViewer>
 			</div>
 			<div class="flex flex-col gap-1">
