@@ -36,7 +36,12 @@ const showFacettingInterface = ref(false);
 						@click="storeQuery.showPicker = !storeQuery.showPicker"
 					></VBtn>
 
-					<VBadge :color="query.color" v-if="setFilters.length" :content="setFilters.length">
+					<VBadge
+						location="bottom end"
+						:color="query.color"
+						v-if="setFilters.length"
+						:content="setFilters.length"
+					>
 						<VBtn density="compact" icon="mdi-filter" @click="showFacettingInterface = true"></VBtn>
 					</VBadge>
 					<VBtn
