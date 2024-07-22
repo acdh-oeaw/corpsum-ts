@@ -34,6 +34,7 @@ const compSearch = computed(() => {
 			return `(?i).*${search.value}.*`;
 	}
 });
+const loading = ref(false);
 const { refetch } = useQuery({
 	queryKey: [
 		"get-attr-vals",
@@ -43,7 +44,9 @@ const { refetch } = useQuery({
 		compSearch.value,
 	] as const,
 	queryFn: async () => {
-		if (lastSearch !== compSearch.value) {
+		if (loading.value) return;
+		loading.value = true;
+		if (lastSearch !== compSearch.value || props.element.Values) {
 			avfrom = 0;
 			suggestions.value = [];
 		}
@@ -60,6 +63,7 @@ const { refetch } = useQuery({
 			avfrom += 15;
 			suggestions.value = [...suggestions.value, ...response.data.suggestions];
 		}
+		loading.value = false;
 		return response.data.suggestions;
 	},
 });
@@ -140,9 +144,9 @@ await changeSuggs();
 					{{ sugg }}
 				</button>
 			</div>
-			<VBtn v-if="!props.element.Values && !isRegExSearch" @click="refetch()">
+			<Button variant="outline" v-if="!props.element.Values && !isRegExSearch" @click="refetch()">
 				{{ t("Load more") }}
-			</VBtn>
+			</Button>
 		</template>
 		<div class="" v-else>
 			<Badge variant="outline">{{ vals.value }}</Badge>
