@@ -10,10 +10,7 @@ const props = defineProps<{ query: CorpusQuery }>();
 
 const queryStore = useQueryStore();
 
-const emits = defineEmits(["refresh"]);
-
 const _query = queryStore.queries.find((q) => q.id === props.query.id);
-// emits('update:modelValue', props.modelValue);
 </script>
 
 <template>
@@ -46,10 +43,5 @@ const _query = queryStore.queries.find((q) => q.id === props.query.id);
 				:items="_query.KWICAttrsStructsOptions.structures"
 			/>
 		</div>
-
-		<VBtn @click="emits('refresh')">
-			{{ t("Reload KWIC with selected Attributes") }}
-		</VBtn>
-		<!-- {{ KWICAttrsStructsOptions }} -->
 	</div>
 </template>

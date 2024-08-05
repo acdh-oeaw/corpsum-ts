@@ -39,6 +39,7 @@ const q = computed(() =>
 				"get-concordance",
 				query.corpus,
 				query.subCorpus,
+				JSON.stringify(queryStore.getKWICqueryAttrStrcs(query)),
 				JSON.stringify(queryStore.getQueryWithFacetting(query)),
 			] as const,
 			queryFn: async () => {
@@ -47,7 +48,7 @@ const q = computed(() =>
 					corpname: query.corpus,
 					usesubcorp: query.subCorpus,
 					viewmode: "kwic",
-					attrs: "word",
+					...queryStore.getKWICqueryAttrStrcs(query),
 					refs: "=doc.id,=doc.datum,=doc.region,=doc.ressort2,=doc.docsrc_name",
 					pagesize: 1000,
 					json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
