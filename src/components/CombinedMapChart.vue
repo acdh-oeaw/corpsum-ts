@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { mapAustria } from "./utils/mapAustria";
-// import { CorpusQuery } from "~/types/query";
-import { centroidMultiPolygon } from "polygon-utils";
+
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	resdata: Array<Array<never>>;
 	mode: string;
 }>();
-// const props = defineProps(["query"]);
+
+const t = useTranslations("Corpsum");
 
 const usedRegion = ["amitte", "aost", "asuedost", "awest"];
 
@@ -16,12 +16,7 @@ const pieSize = "15%";
 
 interface PieInfo {
 	region: Region;
-	center: Array<String>;
-	// data: {
-	// 	y: number;
-	// 	name: string;
-	// 	color: string;
-	// };
+	center: Array<string>;
 }
 
 interface PieInfoWithData extends PieInfo {
@@ -48,7 +43,7 @@ const pieInfoWithData: ComputedRef<Array<PieInfoWithData>> = computed(() => {
 			name: query.userInput,
 		}));
 		const data = values.map((value, index) => ({
-			y: value,
+			y: Math.round(value * 100) / 100,
 			...queryData[index],
 			// color: colors[index],
 		}));
@@ -88,11 +83,6 @@ const dataByRegion = computed(() => {
 	);
 
 	return result.map((r) => [...r, getValue(r)]);
-
-	// const result = usedRegion.map((r) => [r]);
-	// return props.resdata.map((rdata, i) =>
-	// 	rdata.map(({ relative, absolute }) => (props.mode === "relative" ? relative : absolute)),
-	// );
 });
 
 // used for the chart; see https://api.highcharts.com/highcharts/tooltip.pointFormatter
@@ -106,7 +96,7 @@ function pointFormatter() {
 ${queryArray
 	.map(
 		(line) =>
-			`<span style="color:${line[2]}">\u25CF</span> ${line[0]}: ${Math.floor(line[1] * 100) / 100}<br/>`,
+			`<span style="color:${line[2]}">\u25CF</span> ${line[0]}: ${Math.round(line[1] * 100) / 100}<br/>`,
 	)
 	.join("")}`;
 }
@@ -116,7 +106,7 @@ const pieSeries = computed(() =>
 	pieInfoWithData.value.map((piwd) => ({
 		type: "pie",
 		zIndex: 6,
-		size: "15%",
+		size: pieSize,
 		...piwd,
 		region: undefined,
 		name: piwd.region,
@@ -155,45 +145,8 @@ const series = computed(() => [
 			enabled: false,
 		},
 	},
-	// ...centerPercentages.map(([x, y]) => ({
-	// 	type: "pie",
-	// 	name: "amitte",
-	// 	center: [x, y],
-
-	// 	// center: chart.value.fromLatLonToPoint(1518705.2199238702, 6084644.836807582),
-	// 	zIndex: 6, // Keep pies above connector lines
-
-	// 	data: [
-	// 		{
-	// 			y: 13.791194224464975,
-	// 			color: "#2ecc71",
-	// 			name: "fish",
-	// 		},
-	// 		{
-	// 			y: 24.3949835367869,
-	// 			color: "#f39c12",
-	// 			name: "fleisch",
-	// 		},
-	// 		{
-	// 			y: 19.94995400868113,
-	// 			color: "#9b59b6",
-	// 			name: "brot",
-	// 		},
-	// 	],
-	// 	size: "15%",
-	// 	dataLabels: {
-	// 		enabled: false,
-	// 	},
-	// 	tooltip: {
-	// 		// pointFormat: "{point.name}asdfsdaf: <b>{point.y}</b>",
-	// 	},
-	// })),
-
 	...pieSeries.value,
 ]);
-
-// @ts-expect-error todo how to type Highchart ref
-const chart: Ref<any> = ref(null);
 
 const colorAxis = computed(() => ({
 	dataClasses: props.queries.map((query, i) => ({
@@ -203,187 +156,30 @@ const colorAxis = computed(() => ({
 		name: query.userInput,
 	})),
 }));
+
 const chartOptions = computed(() => {
-	const data = props.resdata.map(({ region, relative, absolute }) => [
-		region,
-		props.mode === "relative" ? relative : absolute,
-	]);
-	const max = data
-		.filter(([region]) => {
-			// console.log({ region });
-			return usedRegion.includes(region as unknown as string);
-		})
-		.map(([, a]) => a)
-		.reduce((a, b) => Number(Number(a) > Number(b) ? a : b), 0);
-	// console.log({ max });
 	return {
 		chart: {
 			map: mapAustria,
 			animation: false,
 		},
-
 		accessibility: {
-			description: "Map showing the different query frequencies relating to the region",
+			description: t("map-showing-the-different-query-frequencies-relating-to-the-region"),
 		},
-		// mapNavigation: {
-		// 	enabled: true,
-		// },
 		colorAxis: colorAxis.value,
-		//	max: Number(max) > 10 ? max : 10,
+
 		type: "logarithmic",
 		minColor: "#eee",
-		// maxColor: props.query.color,
-		plotOptions: {
-			pie: {
-				borderColor: "rgba(255,255,255,0.4)",
-				borderWidth: 1,
-				clip: true,
-				dataLabels: {
-					enabled: false,
-				},
-				states: {
-					hover: {
-						halo: {
-							size: 5,
-						},
-					},
-				},
-			},
-		},
 		title: {
-			text: "All Queries in one Chart",
+			text: t("all-queries-in-one-chart"),
 		},
 		series: series.value,
 	};
 });
-
-onMounted(() => {
-	setTimeout(() => {
-		console.log({
-			chart: chart.value.chart,
-			coords: chart.value.chart.mapView.lonLatToPixels({
-				lat: 43,
-				lon: 21,
-			}),
-		});
-	}, 1000);
-});
-// onMounted(() => {
-// 	   chart.series[0].points.forEach(region => {
-//         // Add the pie for this region
-//         chart.addSeries({
-//             type: 'pie',
-//             name: region.id,
-//             zIndex: 6, // Keep pies above connector lines
-//             minSize: 15,
-//             maxSize: 55,
-//             onPoint: {
-//                 id: region.id,
-//                 z: (() => {
-//                     const mapView = chart.mapView,
-//                         zoomFactor = mapView.zoom / mapView.minZoom;
-
-//                     return Math.max(
-//                         chart.chartWidth / 45 * zoomFactor, // Min size
-//                         chart.chartWidth /
-//                         11 * zoomFactor * region.sumVotes / maxVotes
-//                     );
-//                 })()
-//             },
-//             states: {
-//                 inactive: {
-//                     enabled: false
-//                 }
-//             },
-//             accessibility: {
-//                 enabled: false
-//             },
-//             tooltip: {
-//                 // Use the region tooltip for the pies as well
-//                 pointFormatter() {
-//                     return region.series.tooltipOptions.pointFormatter.call({
-//                         id: region.id,
-//                         // hoverVotes: this.name,
-//                         demVotes: region.demVotes,
-//                         repVotes: region.repVotes,
-//                         libVotes: region.libVotes,
-//                         grnVotes: region.grnVotes,
-//                         sumVotes: region.sumVotes
-//                     });
-//                 }
-//             },
-//             data: [{
-//                 name: 'Democrats',
-//                 y: region.demVotes,
-//                 color: demColor
-//             }, {
-//                 name: 'Republicans',
-//                 y: region.repVotes,
-//                 color: repColor
-//             }, {
-//                 name: 'Libertarians',
-//                 y: region.libVotes,
-//                 color: libColor
-//             }, {
-//                 name: 'Green',
-//                 y: region.grnVotes,
-//                 color: grnColor
-//             }]
-//         }, false);
-//     });
-// })
 </script>
 
 <template>
 	<div>
-		<!-- data {{ chartOptions.series }} -->
-		keys {{ keys }}
-
-		shit that works
-		<JsonViewer
-			preview-mode
-			:value="
-				centerPercentages.map(([x, y]) => ({
-					type: 'pie',
-					name: 'amitte',
-					center: [x, y],
-
-					// center: chart.value.fromLatLonToPoint(1518705.2199238702, 6084644.836807582),
-					zIndex: 6, // Keep pies above connector lines
-
-					data: [
-						{
-							y: 13.791194224464975,
-							color: '#2ecc71',
-							name: 'fish',
-						},
-						{
-							y: 24.3949835367869,
-							color: '#f39c12',
-							name: 'fleisch',
-						},
-						{
-							y: 19.94995400868113,
-							color: '#9b59b6',
-							name: 'brot',
-						},
-					],
-					size: '15%',
-					dataLabels: {
-						enabled: false,
-					},
-				}))
-			"
-			:expand-depth="5"
-			boxed
-		></JsonViewer>
-		pie
-		<JsonViewer preview-mode :value="pieSeries" :expand-depth="5" boxed></JsonViewer>
-
-		<!-- colorAxis -->
-		<!-- <JsonViewer preview-mode :value="colorAxis" :expand-depth="5" boxed></JsonViewer> -->
-		<HighCharts ref="chart" :constructor-type="'mapChart'" :options="chartOptions" />
-		<!-- chartOptions {{ chartOptions }} -->
+		<HighCharts :constructor-type="'mapChart'" :options="chartOptions" />
 	</div>
-	<!-- <HighCharts :constructor-type="'mapChart'" :options="chartWorldOptions" /> -->
 </template>
