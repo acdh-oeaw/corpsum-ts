@@ -13,6 +13,10 @@ const api = useApiClient();
 const regionalFrequencies: Ref<Array<Array<never>>> = ref([]);
 const regionalFrequenciesLoading: Ref<Array<boolean>> = ref([]);
 
+const chartMode: Ref<"seperate" | "combined"> = ref("combined");
+
+const isCombined = computed(() => chartMode.value === "combined");
+
 const q = computed(() =>
 	queries.value.map((query, index) => {
 		return {
@@ -73,10 +77,22 @@ const expand = ref(false);
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<VBtnToggle v-model="mode" density="compact">
-				<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
-				<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
-			</VBtnToggle>
+			<div class="flex gap-2 items-center">
+				<VBtnToggle v-model="chartMode" density="compact">
+					<VBtn variant="outlined" value="combined">
+						<VIcon icon="mdi-chart-bar-stacked" />
+						<VTooltip location="top" activator="parent">combined map chart</VTooltip>
+					</VBtn>
+					<VBtn variant="outlined" value="seperate">
+						<VIcon icon="mdi-map" />
+						<VTooltip location="top" activator="parent">seperated map charts</VTooltip>
+					</VBtn>
+				</VBtnToggle>
+				<VBtnToggle v-model="mode" density="compact">
+					<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
+					<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
+				</VBtnToggle>
+			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div v-if="regionalFrequenciesLoading[index]">
 					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
@@ -91,9 +107,18 @@ const expand = ref(false);
 					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
 					<CorpusChip :query="query" />
 					<ClientOnly>
-						<MapChart :query="query" :resdata="regionalFrequencies[index]!" :mode="mode" />
+						<MapChart
+							v-if="!isCombined"
+							:query="query"
+							:resdata="regionalFrequencies[index]!"
+							:mode="mode"
+						/>
 					</ClientOnly>
 				</div>
+			</div>
+			<div v-if="isCombined">
+				<CombinedMapChart :queries="queries" :resdata="regionalFrequencies" :mode="mode" />
+				<!-- <DemoChart /> -->
 			</div>
 		</VCardText>
 

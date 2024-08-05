@@ -63,7 +63,7 @@ const q = computed(() =>
 //@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
-const chartMode: "seperate" | "stack" = ref("stack");
+const chartMode: Ref<"seperate" | "stack"> = ref("stack");
 
 const isStacked = computed(() => chartMode.value === "stack");
 </script>

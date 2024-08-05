@@ -56,6 +56,9 @@ const chartOptions = computed(() => {
 </script>
 
 <template>
-	<HighCharts :constructor-type="'mapChart'" :options="chartOptions" />
+	<div>
+		data {{ chartOptions.series }}
+		<HighCharts :constructor-type="'mapChart'" :options="chartOptions" />
+	</div>
 	<!-- <HighCharts :constructor-type="'mapChart'" :options="chartWorldOptions" /> -->
 </template>
