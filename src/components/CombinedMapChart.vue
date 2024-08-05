@@ -11,6 +11,62 @@ const props = defineProps<{
 
 const usedRegion = ["amitte", "aost", "asuedost", "awest"];
 
+// data required for pies:
+const pieSize = "15%";
+
+interface PieInfo {
+	region: Region;
+	center: Array<String>;
+	// data: {
+	// 	y: number;
+	// 	name: string;
+	// 	color: string;
+	// };
+}
+
+interface PieInfoWithData extends PieInfo {
+	data: Array<{
+		y: number;
+		name: string;
+		color: string;
+	}>;
+}
+const pieInfo: Array<PieInfo> = [
+	{ region: "amitte", center: ["54.7%", "25%"] },
+	{ region: "aost", center: ["70%", "25%"] },
+	{ region: "asuedost", center: ["64.5%", "77.6%"] },
+	{ region: "awest", center: ["35%", "49%"] },
+];
+
+const pieInfoWithData: ComputedRef<Array<PieInfoWithData>> = computed(() => {
+	return dataByRegion.value.map((regionData) => {
+		const [region] = regionData;
+		let [_, ...values] = regionData;
+		values.pop();
+		const queryData = props.queries.map((query) => ({
+			color: query.color,
+			name: query.userInput,
+		}));
+		const data = values.map((value, index) => ({
+			y: value,
+			...queryData[index],
+			// color: colors[index],
+		}));
+		return {
+			region: region,
+			data,
+			center: pieInfo.find((pInfo) => pInfo.region === region)?.center,
+		};
+	});
+});
+
+const centerPercentages = [
+	["54.7%", "25%"],
+	["70%", "25%"],
+	["64.5%", "77.6%"],
+	["35%", "49%"],
+];
+
 function getValue(arr: Array<any>) {
 	let max = -1;
 	arr.forEach((v) => {
@@ -39,31 +95,6 @@ const dataByRegion = computed(() => {
 	// );
 });
 
-const coordinates = computed(() => {
-	const coordinates: Record<Region, Array<number>> = {};
-	usedRegion.forEach((region: Region) => {
-		// @ts-expect-error
-		coordinates[region] = centroidMultiPolygon([
-			mapAustria.features.find((feature) => feature.properties["hc-key"] === region)?.geometry
-				.coordinates,
-		]);
-	});
-	return coordinates;
-});
-
-onMounted(() => {
-	console.log(
-		// usedRegion.map((region) => ({
-		// 	region,
-		// 	center: centroidMultiPolygon([
-		// 		mapAustria.features.find((feature) => feature.properties["hc-key"] === region)?.geometry
-		// 			.coordinates,
-		// 	]),
-		// })),
-		{ coordinates: coordinates.value },
-	);
-});
-
 // used for the chart; see https://api.highcharts.com/highcharts/tooltip.pointFormatter
 function pointFormatter() {
 	const queryArray = props.queries
@@ -82,42 +113,18 @@ ${queryArray
 const keys = computed(() => ["id", ...props.queries.map((q) => q.userInput), "value"]);
 
 const pieSeries = computed(() =>
-	usedRegion.map((region: Region) => {
-		const series = mapDataByRegionToPieSeries(
-			dataByRegion.value,
-			props.queries.map((q) => q.color),
-			coordinates.value,
-		);
-		return series;
-	}),
+	pieInfoWithData.value.map((piwd) => ({
+		type: "pie",
+		zIndex: 6,
+		size: "15%",
+		...piwd,
+		region: undefined,
+		name: piwd.region,
+		dataLabels: {
+			enabled: false,
+		},
+	})),
 );
-
-const mapDataByRegionToPieSeries = (data, colors, coords) => {
-	return data
-		.map((regionData) => {
-			const [region] = regionData;
-			let [_, ...values] = regionData;
-			values.pop();
-			const [lang, lat] = coords[region];
-			if (!lang) return;
-			const pieData = values.map((value, index) => ({
-				y: value,
-				color: colors[index],
-			}));
-
-			return {
-				type: "pie",
-				name: region,
-				center: [lang, lat],
-				data: pieData,
-				size: "15%",
-				dataLabels: {
-					enabled: false,
-				},
-			};
-		})
-		.filter((a) => !!a);
-};
 
 const series = computed(() => [
 	{
@@ -148,56 +155,41 @@ const series = computed(() => [
 			enabled: false,
 		},
 	},
-	// {
+	// ...centerPercentages.map(([x, y]) => ({
 	// 	type: "pie",
-	// 	name: "at-west",
+	// 	name: "amitte",
+	// 	center: [x, y],
+
+	// 	// center: chart.value.fromLatLonToPoint(1518705.2199238702, 6084644.836807582),
 	// 	zIndex: 6, // Keep pies above connector lines
-	// 	minSize: 15,
-	// 	maxSize: 55,
-	// 	onPoint: {
-	// 		id: "at-west",
-	// 		z: 11,
-	// 	},
-	// 	states: {
-	// 		inactive: {
-	// 			enabled: false,
+
+	// 	data: [
+	// 		{
+	// 			y: 13.791194224464975,
+	// 			color: "#2ecc71",
+	// 			name: "fish",
 	// 		},
-	// 	},
-	// 	accessibility: {
+	// 		{
+	// 			y: 24.3949835367869,
+	// 			color: "#f39c12",
+	// 			name: "fleisch",
+	// 		},
+	// 		{
+	// 			y: 19.94995400868113,
+	// 			color: "#9b59b6",
+	// 			name: "brot",
+	// 		},
+	// 	],
+	// 	size: "15%",
+	// 	dataLabels: {
 	// 		enabled: false,
 	// 	},
 	// 	tooltip: {
-	// 		// Use the region tooltip for the pies as well
-	// 		pointFormatter,
+	// 		// pointFormat: "{point.name}asdfsdaf: <b>{point.y}</b>",
 	// 	},
-	// 	data: dataByRegion.value[3],
-	// },
-	{
-		type: "pie",
-		name: "amitte",
-		//center: [1518705.2199238702, 6084644.836807582],
-		zIndex: 6, // Keep pies above connector lines
+	// })),
 
-		data: [
-			{
-				y: 13.791194224464975,
-				color: "#2ecc71",
-			},
-			{
-				y: 24.3949835367869,
-				color: "#f39c12",
-			},
-			{
-				y: 19.94995400868113,
-				color: "#9b59b6",
-			},
-		],
-		size: "15%",
-		dataLabels: {
-			enabled: false,
-		},
-	},
-	//...pieSeries.value,
+	...pieSeries.value,
 ]);
 
 // @ts-expect-error todo how to type Highchart ref
@@ -256,9 +248,6 @@ const chartOptions = computed(() => {
 						},
 					},
 				},
-				tooltip: {
-					headerFormat: "",
-				},
 			},
 		},
 		title: {
@@ -268,6 +257,17 @@ const chartOptions = computed(() => {
 	};
 });
 
+onMounted(() => {
+	setTimeout(() => {
+		console.log({
+			chart: chart.value.chart,
+			coords: chart.value.chart.mapView.lonLatToPixels({
+				lat: 43,
+				lon: 21,
+			}),
+		});
+	}, 1000);
+});
 // onMounted(() => {
 // 	   chart.series[0].points.forEach(region => {
 //         // Add the pie for this region
@@ -339,8 +339,47 @@ const chartOptions = computed(() => {
 		<!-- data {{ chartOptions.series }} -->
 		keys {{ keys }}
 
-		pieSeries
+		shit that works
+		<JsonViewer
+			preview-mode
+			:value="
+				centerPercentages.map(([x, y]) => ({
+					type: 'pie',
+					name: 'amitte',
+					center: [x, y],
+
+					// center: chart.value.fromLatLonToPoint(1518705.2199238702, 6084644.836807582),
+					zIndex: 6, // Keep pies above connector lines
+
+					data: [
+						{
+							y: 13.791194224464975,
+							color: '#2ecc71',
+							name: 'fish',
+						},
+						{
+							y: 24.3949835367869,
+							color: '#f39c12',
+							name: 'fleisch',
+						},
+						{
+							y: 19.94995400868113,
+							color: '#9b59b6',
+							name: 'brot',
+						},
+					],
+					size: '15%',
+					dataLabels: {
+						enabled: false,
+					},
+				}))
+			"
+			:expand-depth="5"
+			boxed
+		></JsonViewer>
+		pie
 		<JsonViewer preview-mode :value="pieSeries" :expand-depth="5" boxed></JsonViewer>
+
 		<!-- colorAxis -->
 		<!-- <JsonViewer preview-mode :value="colorAxis" :expand-depth="5" boxed></JsonViewer> -->
 		<HighCharts ref="chart" :constructor-type="'mapChart'" :options="chartOptions" />
