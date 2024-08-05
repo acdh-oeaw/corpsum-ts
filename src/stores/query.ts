@@ -13,9 +13,6 @@ const keyToKey = {
 };
 
 
-
-
-
 const emptySelectedCorpusKWICViewInfo: KWICAttrsStructs = {
 	attributes: [],
 	structures: [],
