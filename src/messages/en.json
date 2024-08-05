@@ -80,7 +80,9 @@
 		"ends with": "ends with",
 		"regex": "regex",
 		"Load more": "Load more",
-		"Search": "Search"
+		"Search": "Search",
+		"all-queries-in-one-chart": "All Queries in one Chart",
+		"map-showing-the-different-query-frequencies-relating-to-the-region": "Map showing the different query frequencies relating to the region"
 	},
 	"DefaultLayout": {
 		"meta": {
