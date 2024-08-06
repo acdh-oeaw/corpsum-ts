@@ -77,7 +77,6 @@ const dataByRegion = computed(() => {
 	props.resdata.forEach((rdata, i) =>
 		rdata.map(({ region, relative, absolute }) => {
 			const idx = usedRegion.findIndex((r) => r === region);
-			// console.log(idx, region);
 			if (idx > -1) result[idx]!.push(props.mode === "relative" ? relative : absolute);
 		}),
 	);
