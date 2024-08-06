@@ -80,11 +80,14 @@ const expand = ref(false);
 			<div class="flex gap-2 items-center">
 				<VBtnToggle v-model="chartMode" density="compact">
 					<VBtn variant="outlined" value="combined">
-						<VIcon icon="mdi-chart-bar-stacked" />
+						<VIcon icon="mdi-map" />
+						<VIcon icon="mdi-chart-pie-outline" class="ml-[-0.3rem]" />
+
 						<VTooltip location="top" activator="parent">combined map chart</VTooltip>
 					</VBtn>
 					<VBtn variant="outlined" value="seperate">
-						<VIcon icon="mdi-map" />
+						<VIcon icon="mdi-map" class="z-30 bg-white" />
+						<VIcon icon="mdi-map" class="z-20 ml-[-0.80rem] mt-[-0.5rem]" />
 						<VTooltip location="top" activator="parent">seperated map charts</VTooltip>
 					</VBtn>
 				</VBtnToggle>
@@ -93,6 +96,8 @@ const expand = ref(false);
 					<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
 				</VBtnToggle>
 			</div>
+			<JsonViewer boxed :value="regionalFrequencies" :expand-depth="5"></JsonViewer>
+
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div v-if="regionalFrequenciesLoading[index]">
 					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
