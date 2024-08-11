@@ -55,32 +55,24 @@ const pieInfoWithData: ComputedRef<Array<PieInfoWithData>> = computed(() => {
 	});
 });
 
-const centerPercentages = [
-	["54.7%", "25%"],
-	["70%", "25%"],
-	["64.5%", "77.6%"],
-	["35%", "49%"],
-];
-
-function getValue(arr: Array<any>) {
+// calculates biggest value and sets it as index
+function getValue(arr: Array<number | undefined>) {
 	let max = -1;
 	arr.forEach((v) => {
 		if (typeof v !== "number" || max > v) return;
 		max = v;
 	});
-
 	return arr.findIndex((a) => a === max) - 2;
 }
 
 const dataByRegion = computed(() => {
 	const result = usedRegion.map((r) => [r]);
-	props.resdata.forEach((rdata, i) =>
-		rdata.map(({ region, relative, absolute }) => {
+	props.resdata.forEach((rdata) =>
+		rdata.data.forEach(({ region, relative, absolute }) => {
 			const idx = usedRegion.findIndex((r) => r === region);
 			if (idx > -1) result[idx]!.push(props.mode === "relative" ? relative : absolute);
 		}),
 	);
-
 	return result.map((r) => [...r, getValue(r)]);
 });
 

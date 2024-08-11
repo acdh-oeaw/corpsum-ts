@@ -44,17 +44,21 @@ const q = computed(() =>
 			},
 			select: (data: Type11Freqml) => {
 				//@ts-expect-error TODO properly type this
-				regionalFrequencies.value[index] =
-					data.Blocks?.map(
-						(block) =>
-							block.Items?.map((item) => {
-								return {
-									region: item.Word![0]!.n,
-									absolute: item.frq,
-									relative: item.reltt,
-								};
-							}) ?? [],
-					)[0] ?? [];
+				regionalFrequencies.value[index] = {
+					//@ts-expect-error TODO properly type this
+					query: query.id,
+					data:
+						data.Blocks?.map(
+							(block) =>
+								block.Items?.map((item) => {
+									return {
+										region: item.Word![0]!.n,
+										absolute: item.frq,
+										relative: item.reltt,
+									};
+								}) ?? [],
+						)[0] ?? [],
+				};
 				regionalFrequenciesLoading.value[index] = false;
 			},
 		};
@@ -62,6 +66,23 @@ const q = computed(() =>
 );
 //@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
+
+const loading = computed(() => {
+	return regionalFrequenciesLoading.value.reduce((a, b) => a || b, false);
+});
+
+// sadly this is needed to redraw the combined chart. also kills the data that is from a removed query
+watch(queries.value, () => {
+	// console.log("queries chagened", queries.value);
+	const queryIds = queries.value.map(({ id }) => id);
+	regionalFrequencies.value = regionalFrequencies.value.filter(({ query }) =>
+		queryIds.includes(query),
+	);
+	// sometimes there end up duplicates in the regionalFrequencies. prop due to the useQueries, if a query is being deleted
+	regionalFrequencies.value = regionalFrequencies.value.filter(
+		(a, idx) => regionalFrequencies.value.findIndex((b) => b.query === a.query) === idx,
+	);
+});
 
 const mode = ref("relative");
 const expand = ref(false);
@@ -96,10 +117,10 @@ const expand = ref(false);
 					<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
 				</VBtnToggle>
 			</div>
-			<JsonViewer boxed :value="regionalFrequencies" :expand-depth="5"></JsonViewer>
+			<!-- <JsonViewer boxed :value="regionalFrequencies" :expand-depth="5"></JsonViewer> -->
 
 			<div v-for="(query, index) of queries" :key="query.id">
-				<div v-if="regionalFrequenciesLoading[index]">
+				<div v-if="regionalFrequenciesLoading[index]" class="mt-1">
 					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
 					<span :style="`color: ${query.color}`">
 						{{ query.type }}: {{ query.userInput }}
@@ -115,13 +136,13 @@ const expand = ref(false);
 						<MapChart
 							v-if="!isCombined"
 							:query="query"
-							:resdata="regionalFrequencies[index]!"
+							:resdata="regionalFrequencies[index].data"
 							:mode="mode"
 						/>
 					</ClientOnly>
 				</div>
 			</div>
-			<div v-if="isCombined">
+			<div v-if="isCombined && !loading && queries.length > 0">
 				<CombinedMapChart :queries="queries" :resdata="regionalFrequencies" :mode="mode" />
 				<!-- <DemoChart /> -->
 			</div>
