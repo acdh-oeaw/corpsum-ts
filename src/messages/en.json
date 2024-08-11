@@ -82,7 +82,11 @@
 		"Load more": "Load more",
 		"Search": "Search",
 		"all-queries-in-one-chart": "All Queries in one Chart",
-		"map-showing-the-different-query-frequencies-relating-to-the-region": "Map showing the different query frequencies relating to the region"
+		"map-showing-the-different-query-frequencies-relating-to-the-region": "Map showing the different query frequencies relating to the region",
+		"collocations": "Collocations",
+		"collocationsDesc": "Collocations of given Query",
+		"total frequency": "Total Frequency",
+		"collocational frequency": "Collocational Frequency"
 	},
 	"DefaultLayout": {
 		"meta": {

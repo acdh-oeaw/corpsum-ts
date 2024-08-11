@@ -76,6 +76,11 @@ const q = computed(() =>
 	}),
 );
 
+watch(mode, () => {
+	// console.log("mode.value changed", mode.value);
+	if (!mode.value) mode.value = "collocational frequency";
+});
+
 watch(queries.value, () => {
 	// console.log("queries chagened", queries.value);
 	const queryIds = queries.value.map(({ id }) => id);
@@ -91,7 +96,6 @@ watch(queries.value, () => {
 const series = computed(() =>
 	collocations.value.map((collocation, index) => {
 		if (collocationsLoading.value[index]) return [];
-		console.log({ collocation });
 		return [
 			{
 				type: "wordcloud",
@@ -158,7 +162,7 @@ function pointFormatter() {
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :query="query" :loading="collocationsLoading[index]" />
-				<JsonViewer :value="series[index]"></JsonViewer>
+				<!-- <JsonViewer :value="series[index]"></JsonViewer> -->
 				<HighCharts
 					v-if="!collocationsLoading[index]"
 					:options="{
