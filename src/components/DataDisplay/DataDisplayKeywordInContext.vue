@@ -108,12 +108,10 @@ const showIds = ref(false);
 			<div v-for="(query, index) of queries" :key="query.id">
 				<VCheckbox v-model="showViewOptionsMode" :label="t('viewOptions')"></VCheckbox>
 				<KWICAttributeSelect v-if="showViewOptionsMode" :query="query" @refresh="refresh()" />
-				<div v-if="!KWICresultsLoading[index]">
-					<span :style="`color: ${query.color}`">
-						{{ query.type }}: {{ query.userInput }}
-						<CorpusChip :query="query" />
-					</span>
+				<div>
+					<QueryDisplay :query="query" :loading="KWICresultsLoading[index]" />
 					<VDataTable
+						v-if="!KWICresultsLoading[index]"
 						density="compact"
 						:headers="headers"
 						item-value="docid"
@@ -141,7 +139,6 @@ const showIds = ref(false);
 						@close="selectedKWIC = null"
 					/>
 				</div>
-				<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 			</div>
 		</VCardText>
 

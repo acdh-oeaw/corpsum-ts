@@ -14,7 +14,6 @@ const { data: details, status } = useGetWideCtx({
 	pos: props.kwic.toknum,
 	tokencount: 100,
 });
-
 </script>
 
 <template>
@@ -50,7 +49,17 @@ const { data: details, status } = useGetWideCtx({
 						<VProgressCircular indeterminate></VProgressCircular>
 						<span>Loading the full ref</span>
 					</div>
-					<JsonViewer v-else :expand-depth="2" :value="details"></JsonViewer>
+					<!-- <JsonViewer v-if="status !== 'pending'" :expand-depth="2" :value="details"></JsonViewer> -->
+					<div v-if="status !== 'pending'">
+						<div
+							class="flex justify-between w-[40rem]"
+							v-for="ref of details.data.Refs"
+							:key="ref.id"
+						>
+							<span>{{ ref.name }}</span>
+							<span>{{ ref.val }}</span>
+						</div>
+					</div>
 				</VContainer>
 			</VCardText>
 

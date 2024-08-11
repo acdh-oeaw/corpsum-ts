@@ -73,10 +73,7 @@ const expand = ref(false);
 				<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
 			</VBtnToggle>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<div v-if="wordFormFrequenciesLoading[index]">
-					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
-					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
-				</div>
+				<QueryDisplay :query="query" :loading="wordFormFrequenciesLoading[index]" />
 				<HighCharts
 					:options="{
 						chart: {
