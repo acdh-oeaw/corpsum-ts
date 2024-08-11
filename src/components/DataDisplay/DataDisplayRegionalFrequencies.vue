@@ -120,19 +120,9 @@ const expand = ref(false);
 			<!-- <JsonViewer boxed :value="regionalFrequencies" :expand-depth="5"></JsonViewer> -->
 
 			<div v-for="(query, index) of queries" :key="query.id">
-				<div v-if="regionalFrequenciesLoading[index]" class="mt-1">
-					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
-					<span :style="`color: ${query.color}`">
-						{{ query.type }}: {{ query.userInput }}
-						<CorpusChip :query="query" />
-					</span>
-				</div>
-			</div>
-			<div v-for="(query, index) of queries" :key="query.id">
-				<div v-if="!regionalFrequenciesLoading[index]" class="mt-1">
-					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
-					<CorpusChip :query="query" />
-					<ClientOnly>
+				<div class="mt-1">
+					<QueryDisplay :query="query" :loading="regionalFrequenciesLoading[index]" />
+					<ClientOnly v-if="!regionalFrequenciesLoading[index]">
 						<MapChart
 							v-if="!isCombined"
 							:query="query"

@@ -97,8 +97,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div v-if="sourceDistributionsLoading[index]">
-					<VProgressCircular :color="query.color" indeterminate></VProgressCircular>
-					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
+					<QueryDisplay :query="query" :loading="sourceDistributionsLoading[index]" />
 				</div>
 			</div>
 			<!-- {{ series }} -->
