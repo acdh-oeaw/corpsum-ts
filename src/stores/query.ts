@@ -74,6 +74,7 @@ export const useQueryStore = defineStore(
 					regionalFrequencies: false,
 					keywordInContext: false,
 					mediaSources: false,
+					collocations: false,
 				},
 			};
 			queries.value.push(query);

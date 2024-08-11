@@ -52,6 +52,12 @@ const { queries } = storeToRefs(queryStore);
 						v-if="selectedSearches.includes('mediaSources' as unknown as SearchFunctionKey)"
 						:queries="queries"
 					/>
+
+					<DataDisplayCollocations
+						v-if="selectedSearches.includes('collocations' as unknown as SearchFunctionKey)"
+						:queries="queries"
+					></DataDisplayCollocations>
+
 					<DataDisplayKeywordInContext
 						v-if="selectedSearches.includes('keywordInContext' as unknown as SearchFunctionKey)"
 						:queries="queries"

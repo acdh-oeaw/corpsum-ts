@@ -5,6 +5,7 @@ type CorpusQueryTypeValue = "char" | "cql" | "iquery" | "lemma" | "phrase" | "wo
 type Region = "agesamt" | "amitte" | "aost" | "asuedost" | "awest" | "spezifisch";
 
 type SearchFunctionKey =
+	| "collocations"
 	| "keywordInContext"
 	| "mediaSources"
 	| "regionalFrequencies"
@@ -95,6 +96,7 @@ interface CorpusQuery {
 		regionalFrequencies: boolean;
 		keywordInContext: boolean;
 		mediaSources: boolean;
+		collocations: boolean;
 	};
 }
 
