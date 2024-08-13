@@ -24,27 +24,12 @@ const { data: details, status } = useGetWideCtx({
 			</VCardTitle>
 
 			<VCardText>
+				<div class="flex gap-2">
+					{{ kwic.left }}
+					<span class="font-semibold">{{ kwic.word }}</span>
+					{{ kwic.right }}
+				</div>
 				<VContainer>
-					<!-- {{ kwic }} -->
-
-					<!-- <p>
-						{{ kwic.left }}
-					</p>
-					<p class="text-fuchsia-600">{{ kwic.word }}</p>
-					<p>
-						{{ kwic.right }}
-					</p> -->
-
-					<div v-if="status !== 'pending'">
-						<!-- <TextHighlight :search-words="[kwic.word]" :text-to-highlight="parsedText" /> -->
-
-						<!-- <br />
-						<br />
-						<br />
-						<br />
-						<br /> -->
-						<!-- {{ details }} -->
-					</div>
 					<div v-if="status === 'pending'">
 						<VProgressCircular indeterminate></VProgressCircular>
 						<span>Loading the full ref</span>
