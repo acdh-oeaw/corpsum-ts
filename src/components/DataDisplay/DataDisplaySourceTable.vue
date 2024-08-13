@@ -8,10 +8,8 @@ const props = defineProps<{
 const tab = ref(null);
 
 const columns = computed(() => {
-	if (!props.data || !props.data[0] || !props.data[0][0]) return [];
+	if (!props.data?.[0]?.[0]) return [];
 	return Object.keys(props.data[0][0]).map((key) => {
-		console.log({ key });
-
 		return {
 			accessorKey: key,
 			header: () => h("div", { class: "text-right" }, key),
