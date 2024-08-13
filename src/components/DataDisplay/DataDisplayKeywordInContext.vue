@@ -97,7 +97,7 @@ const columns = getKWICColumns(open);
 				<div>
 					<QueryDisplay :query="query" :loading="KWICresultsLoading[index]" />
 
-					<KWICDataTable
+					<CorpsumDataTable
 						v-if="!KWICresultsLoading[index]"
 						:columns="columns"
 						:data="KWICresults[index]"
