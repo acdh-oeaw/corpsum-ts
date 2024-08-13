@@ -2,7 +2,7 @@
 import { useQueries } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 
-import { type Type11Freqml } from "~/lib/api-client";
+import type { Type11Freqml } from "~/lib/api-client";
 
 const t = useTranslations("Corpsum");
 const queryStore = useQueryStore();
@@ -13,7 +13,7 @@ const api = useApiClient();
 const regionalFrequencies: Ref<Array<Array<never>>> = ref([]);
 const regionalFrequenciesLoading: Ref<Array<boolean>> = ref([]);
 
-const chartMode: Ref<"seperate" | "combined"> = ref("combined");
+const chartMode: Ref<"combined" | "seperate"> = ref("combined");
 
 const isCombined = computed(() => chartMode.value === "combined");
 
@@ -98,7 +98,7 @@ const expand = ref(false);
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<div class="flex gap-2 items-center">
+			<div class="flex items-center gap-2">
 				<VBtnToggle v-model="chartMode" density="compact">
 					<VBtn variant="outlined" value="combined">
 						<VIcon icon="mdi-map" />

@@ -57,22 +57,22 @@ export default defineNuxtConfig({
 		/**
 		 * Prefix for all the imported component
 		 */
-		prefix: '',
+		prefix: "",
 		/**
 		 * Directory that the component lives in.
 		 * @default "./components/ui"
 		 */
-		componentDir: './src/components/ui'
+		componentDir: "./src/components/ui",
 	},
 	modules: [
-        "@nuxt/content",
-        "@nuxt/devtools",
-        "@nuxtjs/i18n",
-        "nuxt-vitest",
-        "@pinia/nuxt",
-        "@pinia-plugin-persistedstate/nuxt",
-        "shadcn-nuxt"
-    ],
+		"@nuxt/content",
+		"@nuxt/devtools",
+		"@nuxtjs/i18n",
+		"nuxt-vitest",
+		"@pinia/nuxt",
+		"@pinia-plugin-persistedstate/nuxt",
+		"shadcn-nuxt",
+	],
 	nitro: {
 		compressPublicAssets: true,
 	},

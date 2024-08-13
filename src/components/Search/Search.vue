@@ -16,7 +16,7 @@ const CORPUS_QUERY_TYPES = [
 	{ value: "cqlrow", description: t("cqlrow") },
 ];
 
-async function addQuery() {
+function addQuery() {
 	query.addQuery(newUserInput.value, newSelectedType.value);
 	// newSelectedType.value = "word";
 	newUserInput.value = "";

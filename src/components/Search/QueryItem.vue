@@ -37,9 +37,9 @@ const showFacettingInterface = ref(false);
 					></VBtn>
 
 					<VBadge
+						v-if="setFilters.length"
 						location="bottom end"
 						:color="query.color"
-						v-if="setFilters.length"
 						:content="setFilters.length"
 					>
 						<VBtn density="compact" icon="mdi-filter" @click="showFacettingInterface = true"></VBtn>
@@ -66,7 +66,7 @@ const showFacettingInterface = ref(false);
 		</div>
 
 		<VCardText class="flex justify-between gap-1" :style="`color: ${props.query.color}`">
-			<div class="flex justify-between flex-col">
+			<div class="flex flex-col justify-between">
 				<!-- <JsonViewer preview-mode :value="query.concordance_query" boxed></JsonViewer> -->
 				<JsonViewer preview-mode :value="queryWithFacetting" boxed></JsonViewer>
 				<JsonViewer preview-mode :value="query.KWICAttrsStructs" boxed></JsonViewer>

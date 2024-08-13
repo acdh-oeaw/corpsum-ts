@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/table";
 
 const props = defineProps<{
-	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
+	columns: Array<ColumnDef<TData, TValue>>;
+	data: Array<TData>;
 }>();
 
 const table = useVueTable({
@@ -34,7 +34,7 @@ const table = useVueTable({
 </script>
 
 <template>
-	<div class="border rounded-md">
+	<div class="rounded-md border">
 		<Table>
 			<TableHeader>
 				<TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
@@ -68,7 +68,7 @@ const table = useVueTable({
 			</TableBody>
 		</Table>
 		<div class="flex items-center justify-end space-x-2 py-4">
-			<div class="flex-1 text-sm text-muted-foreground ml-2">
+			<div class="ml-2 flex-1 text-sm">
 				{{ table.getState().pagination.pageIndex }} / {{ table.getPageCount() }}. Total of
 				{{ data.length }} entries.
 			</div>

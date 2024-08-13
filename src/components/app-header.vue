@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { type NavLinkProps } from "@/components/nav-link.vue";
-import {Button} from "@/components/ui/button";
+import type { NavLinkProps } from "@/components/nav-link.vue";
+import { Button } from "@/components/ui/button";
 
 const t = useTranslations("AppHeader");
 
@@ -31,7 +31,7 @@ async function logout() {
 			</nav>
 
 			<LocaleSwitcher />
-			<Button size="lg" v-if="auth.isLoggedIn()" @click="logout">Logout {{ auth.username }}</Button>
+			<Button v-if="auth.isLoggedIn()" size="lg" @click="logout">Logout {{ auth.username }}</Button>
 			<Button v-else @click="navigateTo('/en/login')">Login</Button>
 		</div>
 	</header>

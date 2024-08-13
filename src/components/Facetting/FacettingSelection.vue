@@ -1,9 +1,20 @@
 <script lang="ts" setup>
-import { watch } from "vue";
 import { useQuery } from "@tanstack/vue-query";
+import { watch } from "vue";
+
+interface Entry {
+	name?: string;
+	label?: string;
+	attr_doc?: string;
+	attr_doc_label?: string;
+	Values?: {
+		v?: string;
+		xcnt?: number;
+	};
+}
 
 const suggestions: Ref<Array<string>> = ref([]);
-const props = defineProps<{ query: CorpusQuery; element: any }>();
+const props = defineProps<{ query: CorpusQuery; element: Entry }>();
 
 const t = useTranslations("Corpsum");
 
@@ -70,8 +81,7 @@ const { refetch } = useQuery({
 
 watch(
 	() => props.element.name,
-	async (val) => {
-		console.log("changeSuggs", val);
+	async () => {
 		await changeSuggs();
 	},
 );
@@ -105,15 +115,15 @@ await changeSuggs();
 </script>
 
 <template>
-	<div class="w-full mx-2">
-		<div class="flex w-full gap-2" v-if="!isRegExSearch">
-			<div class="w-full flex gap-1 items-end">
+	<div class="mx-2 w-full">
+		<div v-if="!isRegExSearch" class="flex w-full gap-2">
+			<div class="flex w-full items-end gap-1">
 				<div class="flex flex-col items-start gap-1">
 					<Label for="search">{{ t("Mode") }}</Label>
 					<Button
 						variant="outline"
-						@click="modeIndex = (modeIndex + 1) % modes.length"
 						class="flex gap-1"
+						@click="modeIndex = (modeIndex + 1) % modes.length"
 					>
 						<VIcon icon="mdi-swap-horizontal" />
 						{{ modes[modeIndex] }}
@@ -144,11 +154,11 @@ await changeSuggs();
 					{{ sugg }}
 				</button>
 			</div>
-			<Button variant="outline" v-if="!props.element.Values && !isRegExSearch" @click="refetch()">
+			<Button v-if="!props.element.Values && !isRegExSearch" variant="outline" @click="refetch()">
 				{{ t("Load more") }}
 			</Button>
 		</template>
-		<div class="" v-else>
+		<div v-else class="">
 			<Badge variant="outline">{{ vals.value }}</Badge>
 			{{ $t("regexp-selection-clear-selection-to-select-values") }}
 			<Button class="inline" variant="outline" @click="vals = []">
@@ -157,5 +167,3 @@ await changeSuggs();
 		</div>
 	</div>
 </template>
-
-<style lang="postcss" scoped></style>

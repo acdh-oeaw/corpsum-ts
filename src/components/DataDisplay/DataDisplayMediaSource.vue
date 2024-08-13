@@ -2,7 +2,7 @@
 import { useQueries } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 
-import { type Type11Freqml } from "~/lib/api-client";
+import type { Type11Freqml } from "~/lib/api-client";
 
 const t = useTranslations("Corpsum");
 const queryStore = useQueryStore();
@@ -78,7 +78,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 		</VCardItem>
 
 		<VCardText>
-			<div class="flex gap-2 items-center">
+			<div class="flex items-center gap-2">
 				<VBtnToggle v-model="chartMode" density="compact">
 					<VBtn variant="outlined" value="stack">
 						<VIcon icon="mdi-chart-bar-stacked" />

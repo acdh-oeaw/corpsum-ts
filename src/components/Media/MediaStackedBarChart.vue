@@ -76,5 +76,3 @@ const highChartsOptions = computed(() => ({
 		:options="highChartsOptions"
 	></HighCharts>
 </template>
-
-<style lang="postcss" scoped></style>

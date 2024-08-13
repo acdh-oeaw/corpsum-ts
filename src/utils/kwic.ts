@@ -1,8 +1,10 @@
 import type { ColumnDef } from "@tanstack/vue-table";
-import type { KeywordInContext } from '@types/query';
 
+import type { KeywordInContext } from "@/types/query";
 
-export const getKWICColumns = (open: (keyword: KeywordInContext) => void): Array<ColumnDef<KeywordInContext>> => [
+export const getKWICColumns = (
+	open: (keyword: KeywordInContext) => void,
+): Array<ColumnDef<KeywordInContext>> => [
 	{
 		accessorKey: "docid",
 		header: () => h("div", { class: "text-right" }, "DocID"),

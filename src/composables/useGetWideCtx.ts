@@ -15,14 +15,12 @@ export function useGetWideCtx(params: MaybeRef<params>, options?: { enabled?: bo
 		enabled: options?.enabled,
 		queryKey: ["get-wide-ctx", params] as const,
 		async queryFn({ queryKey: [, params] }) {
-			const response = await api.search.getFullRef(
-				{
-					corpname: params.corpname,
-					pos: params.pos,
-					// detail_left_ctx: params.tokencount,
-					// detail_right_ctx: params.tokencount,
-				}
-			);
+			const response = await api.search.getFullRef({
+				corpname: params.corpname,
+				pos: params.pos,
+				// detail_left_ctx: params.tokencount,
+				// detail_right_ctx: params.tokencount,
+			});
 			return response;
 		},
 	});

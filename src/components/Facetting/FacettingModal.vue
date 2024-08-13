@@ -29,15 +29,15 @@ const { data } = useQuery({
 	},
 });
 
-// todo This is all basically just prep work / heavy work in progress
+const queryStore = useQueryStore();
 
-// attr_vals?corpname=amc_4.2&avattr=doc.id&avmaxitems=15&avfrom=0&avpat=.*&icase=1
+const _query = ref(queryStore.queries.find((q) => q.id === props.query.id)!);
 
-function removeFromSelection(name: string, index) {
-	props.query.facettingValues[name].splice(index, 1);
+function removeFromSelection(name: string, index: number) {
+	(_query.value.facettingValues[name] as unknown as Array<string>).splice(index, 1);
 }
 function clearRegexSearch(name: string) {
-	props.query.facettingValues[name] = [];
+	_query.value.facettingValues[name] = [];
 }
 const selected = ref({});
 </script>
@@ -45,7 +45,7 @@ const selected = ref({});
 <template>
 	<VDialog v-model="dialog" persistent>
 		<VCard class="size-full">
-			<h1 class="flex justify-between text-xl p-2">
+			<h1 class="flex justify-between p-2 text-xl">
 				<span>
 					{{ t("Facetting filters for") }}
 					<span class="font-bold" :style="`color: ${query.color}`">{{ query.userInput }}</span>
@@ -57,10 +57,10 @@ const selected = ref({});
 			<VBtn @click="loadAllSuggs()">load all</VBtn> -->
 
 			<div class="flex">
-				<div class="flex flex-col ml-1" v-if="data?.Blocks">
+				<div v-if="data?.Blocks" class="ml-1 flex flex-col">
 					<div v-for="entry of data.Blocks" :key="entry.name">
 						<button
-							class="flex w-full justify-start text-lg px-1"
+							class="flex w-full justify-start px-1 text-lg"
 							:class="{
 								'bg-blue-300': selected.name === entry.Line[0].name,
 								'bg-yellow-100':
@@ -76,7 +76,7 @@ const selected = ref({});
 								<span
 									v-for="(val, i) of query.facettingValues[entry.Line[0].name]"
 									:key="i"
-									class="flex w-full justify-between text-xs items-center bg-yellow-50"
+									class="flex w-full items-center justify-between bg-yellow-50 text-xs"
 								>
 									<span class="ml-3">
 										{{ val }}
@@ -93,7 +93,7 @@ const selected = ref({});
 								</span>
 							</template>
 							<template v-if="query.facettingValues[entry.Line[0].name]?.key">
-								<span class="flex w-full justify-between text-xs items-center">
+								<span class="flex w-full items-center justify-between text-xs">
 									<Badge variant="outline">
 										{{ query.facettingValues[entry.Line[0].name].value }}
 									</Badge>
@@ -105,13 +105,13 @@ const selected = ref({});
 						</div>
 					</div>
 				</div>
-				<div class="flex w-full flex-col border-l-2" v-if="selected">
+				<div v-if="selected" class="flex w-full flex-col border-l-2">
 					<div v-if="selected?.name" class="w-full">
 						<!-- {{ selected.name }} {{ selected.Values?.length }} -->
 						<FacettingSelection
-							v-model="query.facettingValues[selected.name]"
+							v-model="_query.facettingValues[selected.name]"
 							:element="selected"
-							:query="query"
+							:query="_query"
 						></FacettingSelection>
 					</div>
 				</div>
@@ -119,5 +119,3 @@ const selected = ref({});
 		</VCard>
 	</VDialog>
 </template>
-
-<style lang="postcss" scoped></style>

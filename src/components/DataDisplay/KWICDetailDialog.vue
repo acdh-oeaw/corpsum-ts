@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { convert } from "html-to-text";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed } from "vue";
 
 import { useGetWideCtx } from "@/composables/useGetWideCtx.ts";
-// import type { HttpResponse, Type16Widectx } from "~/lib/api-client";
 
 const props = defineProps<{ kwic: KeywordInContext; query: CorpusQuery }>();
 defineEmits(["close"]);
@@ -37,9 +35,9 @@ const { data: details, status } = useGetWideCtx({
 					<!-- <JsonViewer v-if="status !== 'pending'" :expand-depth="2" :value="details"></JsonViewer> -->
 					<div v-if="status !== 'pending'">
 						<div
-							class="flex justify-between w-[40rem]"
 							v-for="ref of details.data.Refs"
 							:key="ref.id"
+							class="flex w-[40rem] justify-between"
 						>
 							<span>{{ ref.name }}</span>
 							<span>{{ ref.val }}</span>

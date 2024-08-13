@@ -51,6 +51,7 @@ function refresh() {
 					<p>corpInfoResponse:</p>
 					<JsonViewer
 						v-if="!disabled"
+						:show-array-index="false"
 						preview-mode
 						:value="corpInfoResponse"
 						:expand-depth="5"

@@ -10,7 +10,7 @@ export const useSearchSettingsStore = defineStore(
 			"regionalFrequencies",
 			"mediaSources",
 			"keywordInContext",
-			"collocations"
+			"collocations",
 		]);
 
 		const selectedSearches: Ref<Array<SearchFunctionKey>> = ref([

@@ -46,7 +46,6 @@ interface QueryData {
 	keywordInContext: Array<KeywordInContext>;
 }
 
-
 interface KWICAttribute {
 	name: string;
 	id_range?: number;
@@ -75,7 +74,7 @@ interface FacettingRegexSearch {
 	value: string;
 }
 
-type FacettingValues = Record<string, Array<string> | FacettingRegexSearch>
+type FacettingValues = Record<string, Array<string> | FacettingRegexSearch>;
 interface CorpusQuery {
 	id: number;
 	type: CorpusQueryType;
@@ -108,7 +107,6 @@ interface SubCorpus {
 	words: number;
 	n: string;
 }
-
 
 interface IsourceDistribution {
 	media: string;

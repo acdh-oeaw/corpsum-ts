@@ -2,7 +2,7 @@
 import { useQueries } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 
-import { type Type10Collx } from "~/lib/api-client";
+import type { Type10Collx } from "~/lib/api-client";
 
 const t = useTranslations("Corpsum");
 const queryStore = useQueryStore();
@@ -77,8 +77,7 @@ const q = computed(() =>
 );
 
 watch(mode, () => {
-	// console.log("mode.value changed", mode.value);
-	if (!mode.value) mode.value = "collocational frequency";
+	if (!(mode.value as unknown)) mode.value = "collocational frequency";
 });
 
 watch(queries.value, () => {

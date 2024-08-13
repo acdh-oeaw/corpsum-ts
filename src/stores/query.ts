@@ -12,12 +12,10 @@ const keyToKey = {
 	wordrow: "word",
 };
 
-
 const emptySelectedCorpusKWICViewInfo: KWICAttrsStructs = {
 	attributes: [],
 	structures: [],
-}
-
+};
 
 export const useQueryStore = defineStore(
 	"newQueryStore",
@@ -64,7 +62,9 @@ export const useQueryStore = defineStore(
 				showPicker: false,
 				KWICAttrsStructs: { ...emptySelectedCorpusKWICViewInfo },
 				KWICAttrsStructsOptions: {
+					// eslint-disable-next-line
 					attributes: corporaStore.corpInfoResponse.attributes,
+					// eslint-disable-next-line
 					structures: corporaStore.corpInfoResponse.structures,
 				},
 				facettingValues: {},
@@ -83,11 +83,10 @@ export const useQueryStore = defineStore(
 			return foundQuery;
 		}
 
-		const getKWICqueryAttrStrcs = (query: CorpusQuery) => (
-			{
-				attrs: query.KWICAttrsStructs.attributes.map(attr => attr.name).join(','),
-				structs: query.KWICAttrsStructs.structures.map(struct => struct.name).join(','),
-			});
+		const getKWICqueryAttrStrcs = (query: CorpusQuery) => ({
+			attrs: query.KWICAttrsStructs.attributes.map((attr) => attr.name).join(","),
+			structs: query.KWICAttrsStructs.structures.map((struct) => struct.name).join(","),
+		});
 
 		const getQueryWithFacetting = (query: CorpusQuery) => {
 			const result = { ...query.concordance_query };
@@ -98,11 +97,9 @@ export const useQueryStore = defineStore(
 				if (Array.isArray(elem)) {
 					if (!elem.length) continue;
 					result[`sca_${key}`] = elem;
-				}
-				else
-					result[elem.key] = elem.value
+				} else result[elem.key] = elem.value;
 			}
-			return result
+			return result;
 		};
 		return {
 			nextQueryId,

@@ -14,5 +14,3 @@ defineProps<{ query: CorpusQuery; loading: { type: boolean; default: false } }>(
 		<CorpusChip class="ml-1" :query="query" />
 	</div>
 </template>
-
-<style lang="postcss" scoped></style>

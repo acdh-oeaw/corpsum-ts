@@ -1,7 +1,7 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { computed, type Ref, ref } from "vue";
 
-import { type Type03CorporaList } from "~/lib/api-client";
+import type { Type01CorpInfo, Type03CorporaList } from "~/lib/api-client";
 
 /**
  * This Holds a
@@ -15,14 +15,14 @@ export const useCorporaStore = defineStore(
 
 		const selectedCorpus: Ref<Type03CorporaList | null> = ref(null);
 		const subCorpora: Ref<Array<unknown>> = ref([]);
-		const corpInfoResponse: Ref<any> = ref(null);
+		const corpInfoResponse: Ref<Type01CorpInfo | null> = ref(null);
 
 		const selectedSubCorpus: Ref<SubCorpus | null> = ref(null);
 
-
 		const corporaForSearch = computed(
 			() =>
-				`corpname=${selectedCorpus.value?.corpname}${selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
+				`corpname=${selectedCorpus.value?.corpname}${
+					selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
 				}`,
 		);
 
