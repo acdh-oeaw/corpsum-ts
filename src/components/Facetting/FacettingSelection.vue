@@ -70,11 +70,12 @@ const { refetch } = useQuery({
 			avpat: compSearch.value,
 			icase: 1,
 		});
-		if (response.data.suggestions) {
+		if (response.data.suggestions && response.data.request?.avattr === props.element.name) {
 			avfrom += 15;
 			suggestions.value = [...suggestions.value, ...response.data.suggestions];
 		}
 		loading.value = false;
+
 		return response.data.suggestions;
 	},
 });
