@@ -31,6 +31,8 @@ const table = useVueTable({
 	getCoreRowModel: getCoreRowModel(),
 	getPaginationRowModel: getPaginationRowModel(),
 });
+
+const t = useTranslations("Corpsum");
 </script>
 
 <template>
@@ -62,15 +64,17 @@ const table = useVueTable({
 				</template>
 				<template v-else>
 					<TableRow>
-						<TableCell :colspan="columns.length" class="h-24 text-center">No results.</TableCell>
+						<TableCell :colspan="columns.length" class="h-24 text-center">
+							{{ t("No results.") }}
+						</TableCell>
 					</TableRow>
 				</template>
 			</TableBody>
 		</Table>
 		<div class="flex items-center justify-end space-x-2 py-4">
 			<div class="ml-2 flex-1 text-sm">
-				{{ table.getState().pagination.pageIndex }} / {{ table.getPageCount() }}. Total of
-				{{ data.length }} entries.
+				{{ table.getState().pagination.pageIndex + 1 }} / {{ table.getPageCount() }}.
+				{{ t("total-of-n-entries", [data.length]) }}
 			</div>
 			<div class="space-x-2">
 				<Button
@@ -79,7 +83,7 @@ const table = useVueTable({
 					:disabled="!table.getCanPreviousPage()"
 					@click="table.previousPage()"
 				>
-					Previous
+					{{ t("previous") }}
 				</Button>
 				<Button
 					variant="outline"
@@ -88,7 +92,7 @@ const table = useVueTable({
 					:disabled="!table.getCanNextPage()"
 					@click="table.nextPage()"
 				>
-					Next
+					{{ t("next") }}
 				</Button>
 			</div>
 		</div>
