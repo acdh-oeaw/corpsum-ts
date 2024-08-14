@@ -36,11 +36,10 @@ const columns = computed(() => {
 			<VWindow v-model="tab">
 				<div v-for="(query, index) of props.queries" :key="query.id">
 					<VWindowItem :value="query.id">
-						<div v-if="!loading[index]">
-							<QueryDisplay :query="query" />
-							<CorpsumDataTable :columns="columns" :data="data[index]" />
+						<div>
+							<QueryDisplay :query="query" :loading="loading[index]" />
+							<CorpsumDataTable v-if="!loading[index]" :columns="columns" :data="data[index]" />
 						</div>
-						<VProgressCircular v-else :color="query.color" indeterminate></VProgressCircular>
 					</VWindowItem>
 				</div>
 			</VWindow>
