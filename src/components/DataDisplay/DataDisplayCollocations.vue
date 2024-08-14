@@ -10,9 +10,9 @@ const { queries } = storeToRefs(queryStore);
 
 const api = useApiClient();
 
-type Mode = "collocational frequency" | "total frequency";
+type Mode = "coll_freq" | "freq";
 
-const mode: Ref<Mode> = ref("collocational");
+const mode: Ref<Mode> = ref("coll_freq");
 
 const expand = ref(false);
 // const collocations: Ref<Array<Array<ICollocations>>> = ref([]);
@@ -76,8 +76,20 @@ const q = computed(() =>
 	}),
 );
 
+const sortedCollocations = computed(() =>
+	collocations.value.map((collocation) =>
+		collocation.sort((a, b) => b[mode.value] - a[mode.value]),
+	),
+);
+
+const loading = ref(false);
+
 watch(mode, () => {
-	if (!(mode.value as unknown)) mode.value = "collocational frequency";
+	if (!(mode.value as unknown)) mode.value = "coll_freq";
+	loading.value = true;
+	setTimeout(() => {
+		loading.value = false;
+	}, 10);
 });
 
 watch(queries.value, () => {
@@ -90,8 +102,6 @@ watch(queries.value, () => {
 	);
 });
 
-// const loading = computed(() => collocationsLoading.value.reduce((a, b) => a || b, false));
-
 const series = computed(() =>
 	collocations.value.map((collocation, index) => {
 		if (collocationsLoading.value[index]) return [];
@@ -100,10 +110,9 @@ const series = computed(() =>
 				type: "wordcloud",
 				data: collocation.map((a) => ({
 					...a,
-					weight: mode.value !== "total frequency" ? a.freq : a.coll_freq,
+					weight: a[mode.value],
 				})),
-				name:
-					mode.value === "total frequency" ? t("total frequency") : t("collocational frequency"),
+				name: t(mode.value),
 				rotation: {
 					from: 0,
 					to: 0,
@@ -153,21 +162,20 @@ function pointFormatter() {
 
 		<VCardText class="py-0">
 			<VBtnToggle v-model="mode" density="compact">
-				<VBtn variant="outlined" value="collocational frequency">
-					{{ t("collocational frequency") }}
+				<VBtn variant="outlined" value="coll_freq">
+					{{ t("coll_freq") }}
 				</VBtn>
-				<VBtn variant="outlined" value="total frequency">{{ t("total frequency") }}</VBtn>
+				<VBtn variant="outlined" value="freq">{{ t("freq") }}</VBtn>
 			</VBtnToggle>
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :query="query" :loading="collocationsLoading[index]" />
-				<!-- <JsonViewer :value="series[index]"></JsonViewer> -->
 				<HighCharts
 					v-if="!collocationsLoading[index]"
 					:options="{
 						series: series[index],
 						title: {
-							text: `${mode} for ${query.userInput}`,
+							text: `${t(mode)} for ${query.userInput}`,
 							align: 'center',
 						},
 					}"
@@ -178,8 +186,9 @@ function pointFormatter() {
 		<VExpandTransition v-if="expand">
 			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
+				v-if="!loading"
 				:queries="queries"
-				:data="collocations"
+				:data="sortedCollocations"
 				:loading="collocationsLoading"
 				datatype="collocations"
 			></DataDisplaySourceTable>
