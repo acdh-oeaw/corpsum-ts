@@ -74,7 +74,7 @@ const t = useTranslations("Corpsum");
 		<div class="flex items-center justify-end space-x-2 py-4">
 			<div class="ml-2 flex-1 text-sm">
 				{{ table.getState().pagination.pageIndex + 1 }} / {{ table.getPageCount() }}.
-				{{ t("total-of-n-entries", [data.length]) }}
+				{{ t("total-of-n-entries", [data?.length || 0]) }}
 			</div>
 			<div class="space-x-2">
 				<Button
