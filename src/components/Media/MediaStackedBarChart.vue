@@ -2,7 +2,7 @@
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	sourceDistributions: Array<Array<IsourceDistribution>>;
-	mode: string;
+	mode: "absolute" | "relative";
 	stack: boolean;
 }>();
 
@@ -10,10 +10,17 @@ const t = useTranslations("Corpsum");
 
 const categories = computed(() => {
 	const allCats: Array<string> = [];
+
+	const mediaSorting: Record<string, number> = {};
+
 	props.queries.forEach((query: CorpusQuery, i) => {
-		props.sourceDistributions[i]?.forEach((qm) => allCats.push(qm.media));
+		props.sourceDistributions[i]?.forEach((qm) => {
+			if (!mediaSorting[qm.media]) mediaSorting[qm.media] = 0;
+			mediaSorting[qm.media]! += qm[props.mode];
+			allCats.push(qm.media);
+		});
 	});
-	return [...new Set(allCats)];
+	return [...new Set(allCats)].sort((a, b) => mediaSorting[b]! - mediaSorting[a]!);
 });
 
 const series = computed(() => {
