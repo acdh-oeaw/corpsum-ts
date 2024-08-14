@@ -12,6 +12,8 @@ const { data: details, status } = useGetWideCtx({
 	pos: props.kwic.toknum,
 	tokencount: 100,
 });
+
+const t = useTranslations("Corpsum");
 </script>
 
 <template>
@@ -30,10 +32,10 @@ const { data: details, status } = useGetWideCtx({
 				<VContainer>
 					<div v-if="status === 'pending'">
 						<VProgressCircular indeterminate></VProgressCircular>
-						<span>Loading the full ref</span>
+						<span class="ml-2">{{ t("loading-the-full-ref") }}</span>
 					</div>
 					<!-- <JsonViewer v-if="status !== 'pending'" :expand-depth="2" :value="details"></JsonViewer> -->
-					<div v-if="status !== 'pending'">
+					<div v-if="status !== 'pending' && details">
 						<div
 							v-for="ref of details.data.Refs"
 							:key="ref.id"
@@ -48,7 +50,7 @@ const { data: details, status } = useGetWideCtx({
 
 			<VCardActions>
 				<VSpacer></VSpacer>
-				<VBtn color="blue-darken-1" variant="text" @click="$emit('close')">close</VBtn>
+				<VBtn color="blue-darken-1" variant="text" @click="$emit('close')">{{ t("close") }}</VBtn>
 			</VCardActions>
 		</VCard>
 	</VDialog>
