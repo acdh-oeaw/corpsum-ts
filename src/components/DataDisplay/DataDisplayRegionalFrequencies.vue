@@ -144,7 +144,7 @@ const expand = ref(false);
 				datatype="regionalFrequencies"
 				:queries="queries"
 				:loading="regionalFrequenciesLoading"
-				:data="regionalFrequencies"
+				:data="regionalFrequencies.map((a) => a.data)"
 			></DataDisplaySourceTable>
 		</VExpandTransition>
 

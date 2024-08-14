@@ -80,7 +80,7 @@ function open(item: KeywordInContext) {
 
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 
-const columns = getKWICColumns(open);
+const columns = getKWICColumns(t, open);
 </script>
 
 <template>
