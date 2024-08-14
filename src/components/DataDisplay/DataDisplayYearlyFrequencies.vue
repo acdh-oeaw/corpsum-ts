@@ -73,10 +73,9 @@ const series = computed(() =>
 			name: `${query.type}: ${query.userInput} (${query.corpus}${
 				query.subCorpus ? ` / ${query.subCorpus})` : ")"
 			}`,
-			data: yearlyFrequencies.value[index]!.sort((a, b) => b.year - a.year).map((point) => [
-				point.year,
-				mode.value === "relative" ? point.relative : point.absolute,
-			]),
+			data: (yearlyFrequencies.value[index] ?? [])
+				.sort((a, b) => b.year - a.year)
+				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
 			color: query.color,
 		})),
 );
