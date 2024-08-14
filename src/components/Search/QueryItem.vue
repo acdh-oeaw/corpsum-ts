@@ -69,7 +69,7 @@ const showFacettingInterface = ref(false);
 			<div class="flex flex-col justify-between">
 				<!-- <JsonViewer preview-mode :value="query.concordance_query" boxed></JsonViewer> -->
 				<JsonViewer preview-mode :value="queryWithFacetting" boxed></JsonViewer>
-				<JsonViewer preview-mode :value="query.KWICAttrsStructs" boxed></JsonViewer>
+				<!-- <JsonViewer preview-mode :value="query.KWICAttrsStructs" boxed></JsonViewer> -->
 			</div>
 			<div class="flex flex-col gap-1">
 				<CorpusChip :query="query"></CorpusChip>
