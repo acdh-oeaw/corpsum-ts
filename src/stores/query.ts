@@ -62,9 +62,8 @@ export const useQueryStore = defineStore(
 				showPicker: false,
 				KWICAttrsStructs: { ...emptySelectedCorpusKWICViewInfo },
 				KWICAttrsStructsOptions: {
-					// eslint-disable-next-line
 					attributes: corporaStore.corpInfoResponse.attributes,
-					// eslint-disable-next-line
+
 					structures: corporaStore.corpInfoResponse.structures,
 				},
 				facettingValues: {},

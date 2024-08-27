@@ -108,7 +108,7 @@ const expand = ref(false);
 					</VBtn>
 					<VBtn variant="outlined" value="seperate">
 						<VIcon icon="mdi-map" class="z-30 bg-white" />
-						<VIcon icon="mdi-map" class="z-20 ml-[-0.80rem] mt-[-0.5rem]" />
+						<VIcon icon="mdi-map" class="z-20 -mt-2 ml-[-0.80rem]" />
 						<VTooltip location="top" activator="parent">seperated map charts</VTooltip>
 					</VBtn>
 				</VBtnToggle>
