@@ -56,10 +56,10 @@ interface KWICAttribute {
 }
 
 interface KWICStructure {
-	name: string;
-	label: string;
-	attributes: Array<KWICAttribute>;
-	size: string;
+	name?: string | undefined;
+	label?: string | undefined;
+	attributes?: Array<KWICAttribute> | undefined;
+	size?: number | undefined;
 }
 interface KWICAttrsStructs {
 	attributes: Array<KWICAttribute>;

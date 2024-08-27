@@ -40,7 +40,7 @@ const compSearch = computed(() => {
 		case 2:
 			return `(?i).*${search.value}`;
 		case 3:
-			return `${search.value}`;
+			return search.value;
 		default:
 			return `(?i).*${search.value}.*`;
 	}
@@ -55,7 +55,8 @@ const { refetch } = useQuery({
 		compSearch.value,
 	] as const,
 	queryFn: async () => {
-		if (loading.value) return;
+		// TODO: queryFn MUST return a promise, if the request should be prevented that should happen in the component
+		// if (loading.value) return;
 		loading.value = true;
 		if (lastSearch !== compSearch.value || props.element.Values) {
 			avfrom = 0;
@@ -64,7 +65,7 @@ const { refetch } = useQuery({
 		lastSearch = compSearch.value;
 		const response = await api.search.getAttrVals({
 			corpname: props.query.corpus,
-			avattr: props.element.name,
+			avattr: props.element.name!,
 			avmaxitems: 15,
 			avfrom,
 			avpat: compSearch.value,
@@ -108,9 +109,9 @@ const changeSuggs = async () => {
 };
 
 const addToSelection = (sugg: string) => {
-	const isIn = vals.value.findIndex((s) => s === sugg);
-	if (isIn >= 0) vals.value.splice(isIn, 1);
-	else vals.value.push(sugg);
+	const isIn = vals.value!.findIndex((s: string) => s === sugg);
+	if (isIn >= 0) vals.value!.splice(isIn, 1);
+	else vals.value!.push(sugg);
 };
 await changeSuggs();
 </script>
@@ -137,7 +138,7 @@ await changeSuggs();
 				<Button @click="refetch()">{{ t("Search") }}</Button>
 				<Button v-if="search" variant="secondary" @click="regexSelection()">
 					{{
-						$t("use-search-as-modes-modeindex-for-search-this-clears-the-rest-of-the-selection", [
+						t("use-search-as-modes-modeindex-for-search-this-clears-the-rest-of-the-selection", [
 							search,
 							modes[modeIndex],
 						])
@@ -149,7 +150,7 @@ await changeSuggs();
 			<div v-for="sugg of suggestions" :key="sugg">
 				<button
 					class="w-full text-left text-lg"
-					:class="{ 'bg-blue-400': vals && vals.includes(sugg) }"
+					:class="{ 'bg-blue-400': Array.isArray(vals) && vals.includes(sugg) }"
 					@click="addToSelection(sugg)"
 				>
 					{{ sugg }}
@@ -160,10 +161,10 @@ await changeSuggs();
 			</Button>
 		</template>
 		<div v-else class="">
-			<Badge variant="outline">{{ vals.value }}</Badge>
-			{{ $t("regexp-selection-clear-selection-to-select-values") }}
+			<Badge variant="outline">{{ vals }}</Badge>
+			{{ t("regexp-selection-clear-selection-to-select-values") }}
 			<Button class="inline" variant="outline" @click="vals = []">
-				{{ $t("clear-selection") }}
+				{{ t("clear-selection") }}
 			</Button>
 		</div>
 	</div>

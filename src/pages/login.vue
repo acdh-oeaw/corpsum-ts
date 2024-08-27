@@ -13,7 +13,7 @@ const password = ref("");
 
 async function login() {
 	if (!(await auth.login(username.value, password.value))) return alert(t("WrongCredentials"));
-	await navigateTo(localeRoute("/", locale.value));
+	return await navigateTo(localeRoute("/", locale.value));
 }
 
 onMounted(async () => {

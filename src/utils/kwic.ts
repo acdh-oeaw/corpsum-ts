@@ -1,10 +1,8 @@
 import type { ColumnDef } from "@tanstack/vue-table";
 import { VIcon } from "vuetify/components";
 
-import type { KeywordInContext } from "@/types/query";
-
 export const getKWICColumns = (
-	t: (string) => string,
+	t: (arg0: string) => string,
 	open: (keyword: KeywordInContext) => void,
 ): Array<ColumnDef<KeywordInContext>> => [
 	{
