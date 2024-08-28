@@ -87,7 +87,7 @@ export const useQueryStore = defineStore(
 		});
 
 		const getQueryWithFacetting = (query: CorpusQuery) => {
-			const result = { ...query.concordance_query };
+			const result: ConcordanceQuery & Record<string, any> = { ...query.concordance_query };
 			for (const key in query.facettingValues) {
 				const elem = query.facettingValues[key];
 				if (!elem) continue;
