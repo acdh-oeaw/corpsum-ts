@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { mapAustria } from "./utils/mapAustria";
 
-const props = defineProps<{ query: CorpusQuery; resdata: Array<never>; mode: string }>();
+const props = defineProps<{
+	query: CorpusQuery;
+	resdata: Array<RegionalFreqData>;
+	mode: string;
+}>();
 
 const usedRegion = ["amitte", "aost", "asuedost", "awest"];
 

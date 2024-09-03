@@ -60,7 +60,7 @@ const q = computed(() =>
 		};
 	}),
 );
-//@ts-expect-error TODO find out how to properly type this
+
 useQueries({ queries: q });
 
 const chartMode: Ref<"seperate" | "stack"> = ref("stack");
@@ -107,14 +107,13 @@ const isStacked = computed(() => chartMode.value === "stack");
 				<MediaStackedBarChart
 					:queries="queries"
 					:source-distributions="sourceDistributions"
-					:mode="mode"
+					:mode="mode as 'absolute' | 'relative'"
 					:stack="isStacked"
 				/>
 			</template>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
 				:queries="queries"
 				datatype="mediaSources"

@@ -7,10 +7,10 @@ interface Entry {
 	label?: string;
 	attr_doc?: string;
 	attr_doc_label?: string;
-	Values?: {
+	Values?: Array<{
 		v?: string;
 		xcnt?: number;
-	};
+	}>;
 }
 
 const suggestions: Ref<Array<string>> = ref([]);
@@ -64,7 +64,7 @@ const { refetch } = useQuery({
 		lastSearch = compSearch.value;
 		const response = await api.search.getAttrVals({
 			corpname: props.query.corpus,
-			avattr: props.element.name,
+			avattr: props.element.name!,
 			avmaxitems: 15,
 			avfrom,
 			avpat: compSearch.value,
@@ -94,13 +94,15 @@ const regexSelection = () => {
 	};
 };
 
-const isRegExSearch = computed(() => vals.value?.key);
+const isRegExSearch = computed(() => !Array.isArray(vals.value));
 
 const changeSuggs = async () => {
 	if (!vals.value) vals.value = [];
 	avfrom = 0;
 	if (props.element.Values) {
-		suggestions.value = props.element.Values.map(({ v }) => v);
+		suggestions.value = props.element.Values.map(({ v }) => v).filter((a) =>
+			Boolean(a),
+		) as Array<string>;
 	} else {
 		suggestions.value = [];
 		await refetch();
@@ -108,9 +110,9 @@ const changeSuggs = async () => {
 };
 
 const addToSelection = (sugg: string) => {
-	const isIn = vals.value.findIndex((s) => s === sugg);
-	if (isIn >= 0) vals.value.splice(isIn, 1);
-	else vals.value.push(sugg);
+	const isIn = (vals.value as Array<string>).findIndex((s) => s === sugg);
+	if (isIn >= 0) (vals.value as Array<string>).splice(isIn, 1);
+	else (vals.value as Array<string>).push(sugg);
 };
 await changeSuggs();
 </script>
@@ -137,15 +139,16 @@ await changeSuggs();
 				<Button @click="refetch()">{{ t("Search") }}</Button>
 				<Button v-if="search" variant="secondary" @click="regexSelection()">
 					{{
-						$t("use-search-as-modes-modeindex-for-search-this-clears-the-rest-of-the-selection", [
-							search,
-							modes[modeIndex],
-						])
+						// @ts-ignore
+						$t(
+							"Corpsum.use-search-as-modes-modeindex-for-search-this-clears-the-rest-of-the-selection",
+							[search, modes[modeIndex]],
+						)
 					}}
 				</Button>
 			</div>
 		</div>
-		<template v-if="!isRegExSearch">
+		<template v-if="!isRegExSearch && Array.isArray(vals)">
 			<div v-for="sugg of suggestions" :key="sugg">
 				<button
 					class="w-full text-left text-lg"
@@ -159,11 +162,12 @@ await changeSuggs();
 				{{ t("Load more") }}
 			</Button>
 		</template>
-		<div v-else class="">
+		<!-- very stupid that i need to define this eles-if statement -->
+		<div v-else-if="vals && !Array.isArray(vals)" class="">
 			<Badge variant="outline">{{ vals.value }}</Badge>
-			{{ $t("regexp-selection-clear-selection-to-select-values") }}
+			{{ t("regexp-selection-clear-selection-to-select-values") }}
 			<Button class="inline" variant="outline" @click="vals = []">
-				{{ $t("clear-selection") }}
+				{{ t("clear-selection") }}
 			</Button>
 		</div>
 	</div>

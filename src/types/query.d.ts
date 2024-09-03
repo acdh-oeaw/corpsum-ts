@@ -113,3 +113,11 @@ interface IsourceDistribution {
 	absolute: number;
 	relative: number;
 }
+
+interface RegionalFreqData {
+	region: string; relative: number; absolute: number
+}
+interface RegionalFrequency {
+	data: Array<RegionalFreqData>;
+	query: number;
+}

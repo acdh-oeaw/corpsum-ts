@@ -71,7 +71,6 @@ const q = computed(() =>
 	}),
 );
 
-//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 function open(item: KeywordInContext) {
@@ -80,7 +79,7 @@ function open(item: KeywordInContext) {
 
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 
-const columns = getKWICColumns(t, open);
+const columns = getKWICColumns(t as unknown as (s: string) => string, open);
 </script>
 
 <template>
@@ -93,14 +92,14 @@ const columns = getKWICColumns(t, open);
 		<VCardText class="py-0">
 			<div v-for="(query, index) of queries" :key="query.id">
 				<VCheckbox v-model="showViewOptionsMode" :label="t('viewOptions')"></VCheckbox>
-				<KWICAttributeSelect v-if="showViewOptionsMode" :query="query" @refresh="refresh()" />
+				<KWICAttributeSelect v-if="showViewOptionsMode" :query="query" />
 				<div>
 					<QueryDisplay :query="query" :loading="KWICresultsLoading[index]" />
 
 					<CorpsumDataTable
 						v-if="!KWICresultsLoading[index]"
 						:columns="columns"
-						:data="KWICresults[index]"
+						:data="KWICresults[index]!"
 					/>
 
 					<KWICDetailDialog

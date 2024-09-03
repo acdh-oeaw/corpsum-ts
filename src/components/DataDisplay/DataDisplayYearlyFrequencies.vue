@@ -63,7 +63,7 @@ const q = computed(() =>
 		};
 	}),
 );
-//@ts-expect-error TODO find out how to properly type this
+
 useQueries({ queries: q });
 
 const series = computed(() =>
@@ -114,7 +114,6 @@ const series = computed(() =>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
 				:queries="queries"
 				:data="yearlyFrequencies"

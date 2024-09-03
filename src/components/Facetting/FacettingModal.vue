@@ -39,7 +39,19 @@ function removeFromSelection(name: string, index: number) {
 function clearRegexSearch(name: string) {
 	_query.value.facettingValues[name] = [];
 }
-const selected = ref({});
+
+interface EntryLine {
+	name?: string;
+	label?: string;
+	attr_doc?: string;
+	attr_doc_label?: string;
+	Values?: Array<{
+		v?: string;
+		xcnt?: number;
+	}>;
+}
+
+const selected: Ref<EntryLine | null> = ref(null);
 </script>
 
 <template>
@@ -53,57 +65,74 @@ const selected = ref({});
 				<Button variant="outline" @click="emits('close')">close</Button>
 			</h1>
 
-			<!-- {{ query.corpus }}
-			<VBtn @click="loadAllSuggs()">load all</VBtn> -->
-
 			<div class="flex">
 				<div v-if="data?.Blocks" class="ml-1 flex flex-col">
-					<div v-for="entry of data.Blocks" :key="entry.name">
-						<button
-							class="flex w-full justify-start px-1 text-lg"
-							:class="{
-								'bg-blue-300': selected.name === entry.Line[0].name,
-								'bg-yellow-100':
-									selected.name !== entry.Line[0].name &&
-									query.facettingValues[entry.Line[0].name]?.length,
-							}"
-							@click="selected = entry.Line[0]"
-						>
-							{{ entry.Line[0].name }}
-						</button>
-						<div v-if="query.facettingValues[entry.Line[0].name]" class="flex flex-col">
-							<template v-if="Array.isArray(query.facettingValues[entry.Line[0].name])">
-								<span
-									v-for="(val, i) of query.facettingValues[entry.Line[0].name]"
-									:key="i"
-									class="flex w-full items-center justify-between bg-yellow-50 text-xs"
-								>
-									<span class="ml-3">
-										{{ val }}
-									</span>
-
-									<Button
-										variant="outline"
-										size="xs"
-										class="rounded border border-solid"
-										@click="removeFromSelection(entry.Line[0].name, i)"
+					<template v-for="entry of data.Blocks">
+						<div v-if="entry.Line && entry.Line[0]?.name" :key="entry.Line[0]?.name">
+							<button
+								class="flex w-full justify-start px-1 text-lg"
+								:class="{
+									'bg-blue-300': selected?.name === entry.Line[0].name,
+									'bg-yellow-100':
+										selected?.name !== entry.Line[0].name &&
+										((query.facettingValues[entry.Line[0].name] as unknown as Array<string>)
+											?.length ||
+											(query.facettingValues[entry.Line[0].name] as unknown as FacettingRegexSearch)
+												?.value),
+								}"
+								@click="selected = entry.Line[0]"
+							>
+								{{ entry.Line[0].name }}
+							</button>
+							<div v-if="query.facettingValues[entry.Line[0].name]" class="flex flex-col">
+								<template v-if="Array.isArray(query.facettingValues[entry.Line[0].name])">
+									<span
+										v-for="(val, i) of query.facettingValues[entry.Line[0].name]"
+										:key="i"
+										class="flex w-full items-center justify-between bg-yellow-50 text-xs"
 									>
-										x
-									</Button>
-								</span>
-							</template>
-							<template v-if="query.facettingValues[entry.Line[0].name]?.key">
-								<span class="flex w-full items-center justify-between text-xs">
-									<Badge variant="outline">
-										{{ query.facettingValues[entry.Line[0].name].value }}
-									</Badge>
-									<Button variant="outline" size="xs" @click="clearRegexSearch(entry.Line[0].name)">
-										x
-									</Button>
-								</span>
-							</template>
+										<span class="ml-3">
+											{{ val }}
+										</span>
+
+										<Button
+											variant="outline"
+											size="xs"
+											class="rounded border border-solid"
+											@click="removeFromSelection(entry.Line[0].name, i)"
+										>
+											x
+										</Button>
+									</span>
+								</template>
+								<template
+									v-if="
+										(query.facettingValues[entry.Line[0].name] as unknown as FacettingRegexSearch)
+											.key
+									"
+								>
+									<span class="flex w-full items-center justify-between text-xs">
+										<Badge variant="outline">
+											{{
+												(
+													query.facettingValues[
+														entry.Line[0].name
+													] as unknown as FacettingRegexSearch
+												).value
+											}}
+										</Badge>
+										<Button
+											variant="outline"
+											size="xs"
+											@click="clearRegexSearch(entry.Line[0].name)"
+										>
+											x
+										</Button>
+									</span>
+								</template>
+							</div>
 						</div>
-					</div>
+					</template>
 				</div>
 				<div v-if="selected" class="flex w-full flex-col border-l-2">
 					<div v-if="selected?.name" class="w-full">

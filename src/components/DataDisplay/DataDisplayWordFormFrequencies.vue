@@ -51,7 +51,7 @@ const q = computed(() =>
 		};
 	}),
 );
-//@ts-expect-error TODO find out how to properly type this
+
 useQueries({ queries: q });
 
 const mode = ref("relative");
@@ -108,7 +108,6 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
 				:queries="queries"
 				:loading="wordFormFrequenciesLoading"
