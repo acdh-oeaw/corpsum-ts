@@ -11,14 +11,6 @@ const api = useApiClient();
 
 const t = useTranslations("Corpsum");
 
-// todo  fetch the corpus results
-// const corpusStore = useCorporaStore();
-// const { corpInfoResponse } = storeToRefs(corpusStore);
-
-// const { data } = await api.search.getTextTypesWithNorms({
-// 	corpname: props.query.corpus,
-// });
-
 const { data } = useQuery({
 	queryKey: ["get-texttypes-with-norms", props.query.corpus] as const,
 	queryFn: async () => {

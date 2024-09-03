@@ -10,7 +10,8 @@ const { queries } = storeToRefs(queryStore);
 
 const api = useApiClient();
 
-const wordFormFrequencies: Ref<Array<Array<never>>> = ref([]);
+const wordFormFrequencies: Ref<Array<Array<{ word: string; absolute: number; relative: number }>>> =
+	ref([]);
 const wordFormFrequenciesLoading: Ref<Array<boolean>> = ref([]);
 
 const q = computed(() =>
@@ -34,15 +35,14 @@ const q = computed(() =>
 				return response.data;
 			},
 			select: (data: Type11Freqml) => {
-				//@ts-expect-error TODO properly type this
 				wordFormFrequencies.value[index] =
 					data.Blocks?.map(
 						(block) =>
 							block.Items?.map((item) => {
 								return {
-									word: item.Word![0]!.n,
-									absolute: item.frq,
-									relative: item.fpm,
+									word: item.Word![0]!.n!,
+									absolute: item.frq!,
+									relative: item.fpm!,
 								};
 							}) ?? [],
 					)[0] ?? [];
