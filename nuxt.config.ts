@@ -68,7 +68,6 @@ export default defineNuxtConfig({
 		"@nuxt/content",
 		"@nuxt/devtools",
 		"@nuxtjs/i18n",
-		"nuxt-vitest",
 		"@pinia/nuxt",
 		"@pinia-plugin-persistedstate/nuxt",
 		"shadcn-nuxt",
