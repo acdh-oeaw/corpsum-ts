@@ -49,6 +49,7 @@ export const useQueryStore = defineStore(
 			}
 
 			const colorId = nextQueryId.value % colors.length; // so not to overshoot array
+			if (!corporaStore.corpInfoResponse) throw new Error("corpInfoResponse not loaded");
 			const query: CorpusQuery = {
 				id: nextQueryId.value++,
 				color: colors[colorId]!,
@@ -62,8 +63,8 @@ export const useQueryStore = defineStore(
 				showPicker: false,
 				KWICAttrsStructs: { ...emptySelectedCorpusKWICViewInfo },
 				KWICAttrsStructsOptions: {
-					attributes: corporaStore.corpInfoResponse!.attributes as Array<KWICAttribute>,
-					structures: corporaStore.corpInfoResponse!.structures as Array<KWICStructure>,
+					attributes: (corporaStore.corpInfoResponse.attributes ?? [] as unknown) as Array<KWICAttribute>,
+					structures: (corporaStore.corpInfoResponse.structures ?? [] as unknown) as Array<KWICStructure>,
 				},
 				facettingValues: {},
 				loading: {
@@ -87,13 +88,14 @@ export const useQueryStore = defineStore(
 		});
 
 		const getQueryWithFacetting = (query: CorpusQuery) => {
-			const result: ConcordanceQuery & Record<string, any> = { ...query.concordance_query };
+			const result: Record<string, string> = { ...query.concordance_query };
 			for (const key in query.facettingValues) {
 				const elem = query.facettingValues[key];
 				if (!elem) continue;
 				// console.log({ key, elem })
 				if (Array.isArray(elem)) {
 					if (!elem.length) continue;
+					// @ts-ignore
 					result[`sca_${key}`] = elem;
 				} else result[elem.key] = elem.value;
 			}

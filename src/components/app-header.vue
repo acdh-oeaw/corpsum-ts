@@ -33,7 +33,6 @@ async function logout() {
 
 			<LocaleSwitcher />
 			<Button v-if="auth.isLoggedIn()" size="lg" @click="logout">Logout {{ auth.username }}</Button>
-			<Button v-else @click="navigateTo('/en/login')">Login</Button>
 		</div>
 	</header>
 </template>

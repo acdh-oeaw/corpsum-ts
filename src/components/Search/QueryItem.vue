@@ -13,7 +13,8 @@ const deleteQuery = () => {
 
 const setFilters = computed(() => {
 	const keys = Object.keys(props.query.facettingValues).filter(
-		(key) => props.query.facettingValues[key]?.length || props.query.facettingValues[key]?.val,
+		// @ts-expect-error just counts the set filters. if it is undefined that's falsy.
+		(key) => props.query.facettingValues[key]?.length || props.query.facettingValues[key]?.value,
 	);
 	keys;
 	return keys;

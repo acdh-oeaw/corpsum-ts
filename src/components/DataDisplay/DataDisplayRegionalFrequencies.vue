@@ -10,7 +10,7 @@ const { queries } = storeToRefs(queryStore);
 
 const api = useApiClient();
 
-const regionalFrequencies: Ref<Array<Array<never>>> = ref([]);
+const regionalFrequencies: Ref<Array<RegionalFrequency>> = ref([]);
 const regionalFrequenciesLoading: Ref<Array<boolean>> = ref([]);
 
 const chartMode: Ref<"combined" | "seperate"> = ref("combined");
@@ -43,18 +43,16 @@ const q = computed(() =>
 				return response.data;
 			},
 			select: (data: Type11Freqml) => {
-				//@ts-expect-error TODO properly type this
 				regionalFrequencies.value[index] = {
-					//@ts-expect-error TODO properly type this
 					query: query.id,
 					data:
 						data.Blocks?.map(
 							(block) =>
 								block.Items?.map((item) => {
 									return {
-										region: item.Word![0]!.n,
-										absolute: item.frq,
-										relative: item.reltt,
+										region: item.Word![0]!.n!,
+										absolute: item.frq!,
+										relative: item.reltt!,
 									};
 								}) ?? [],
 						)[0] ?? [],
@@ -64,7 +62,7 @@ const q = computed(() =>
 		};
 	}),
 );
-//@ts-expect-error TODO find out how to properly type this
+
 useQueries({ queries: q });
 
 const loading = computed(() => {
@@ -122,7 +120,7 @@ const expand = ref(false);
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div class="mt-1">
 					<QueryDisplay :query="query" :loading="regionalFrequenciesLoading[index]" />
-					<ClientOnly v-if="!regionalFrequenciesLoading[index]">
+					<ClientOnly v-if="!regionalFrequenciesLoading[index] && regionalFrequencies[index]">
 						<MapChart
 							v-if="!isCombined"
 							:query="query"
@@ -139,7 +137,6 @@ const expand = ref(false);
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
 				datatype="regionalFrequencies"
 				:queries="queries"

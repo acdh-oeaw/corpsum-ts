@@ -3,7 +3,7 @@ import { mapAustria } from "./utils/mapAustria";
 
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
-	resdata: Array<Array<never>>;
+	resdata: Array<RegionalFrequency>;
 	mode: string;
 }>();
 
@@ -42,21 +42,24 @@ const pieInfoWithData: ComputedRef<Array<PieInfoWithData>> = computed(() => {
 			color: query.color,
 			name: query.userInput,
 		}));
-		const data = values.map((value, index) => ({
-			y: Math.round(value * 100) / 100,
-			...queryData[index],
-			// color: colors[index],
-		}));
+		const data = values.map(
+			(value, index) =>
+				({
+					y: Math.round(Number(value) * 100) / 100,
+					...queryData[index],
+					// color: colors[index],
+				}) as { y: number; name: string; color: string },
+		);
 		return {
-			region: region,
+			region: region as Region,
 			data,
-			center: pieInfo.find((pInfo) => pInfo.region === region)?.center,
+			center: pieInfo.find((pInfo) => pInfo.region === region)!.center,
 		};
 	});
 });
 
 // calculates biggest value and sets it as index
-function getValue(arr: Array<number | undefined>) {
+function getValue(arr: Array<number | string>) {
 	let max = -1;
 	arr.forEach((v) => {
 		if (typeof v !== "number" || max > v) return;
@@ -66,7 +69,7 @@ function getValue(arr: Array<number | undefined>) {
 }
 
 const dataByRegion = computed(() => {
-	const result = usedRegion.map((r) => [r]);
+	const result: Array<Array<number | string>> = usedRegion.map((r) => [r]);
 	props.resdata.forEach((rdata) =>
 		rdata.data.forEach(({ region, relative, absolute }) => {
 			const idx = usedRegion.findIndex((r) => r === region);
@@ -79,10 +82,10 @@ const dataByRegion = computed(() => {
 // used for the chart; see https://api.highcharts.com/highcharts/tooltip.pointFormatter
 function pointFormatter() {
 	const queryArray = props.queries
-		// @ts-expect-error todo find out how to type thsi function correctly
+		// @ts-expect-error todo find out how to type this function correctly
 		.map((query) => [query.userInput, this[query.userInput], query.color])
 		.sort((a, b) => b[1] - a[1]);
-	// @ts-expect-error todo find out how to type thsi function correctly
+	// @ts-expect-error
 	return `<b>${this.id}</b><br/>
 ${queryArray
 	.map(

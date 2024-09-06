@@ -16,9 +16,22 @@ const mode: Ref<Mode> = ref("coll_freq");
 
 const expand = ref(false);
 // const collocations: Ref<Array<Array<ICollocations>>> = ref([]);
-const collocations: Ref<Array<Array<never>>> = ref([]);
-const collocationsLoading: Ref<Array<boolean>> = ref([]);
+interface CollocationEntry {
+	word: string;
+	freq: number;
+	coll_freq: number;
+	// todo: do this properly once it is known what is wanted
+	d: number;
+	m: number;
+	t: number;
+	name: string;
+	weight: number;
+	color: string;
+}
 
+const collocations: Ref<Array<Array<CollocationEntry>>> = ref([]);
+const collocationsLoading: Ref<Array<boolean>> = ref([]);
+// defines methods of data collocations
 const cbgrfns = "dmt";
 const q = computed(() =>
 	queries.value.map((query, index) => {
@@ -44,32 +57,33 @@ const q = computed(() =>
 					cbgrfns,
 					csortfn: "d",
 					citemsperpage: 10,
+					// @ts-expect-error descrtiption wrong
 					json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
 				});
 				return response.data;
 			},
 			select: (data: Type10Collx) => {
-				collocations.value[index] = data.Items?.map((item) => {
-					const d = item.Stats?.find(({ n }) => n === "d");
-					const m = item.Stats?.find(({ n }) => n === "m");
-					const t = item.Stats?.find(({ n }) => n === "t");
+				collocations.value[index] =
+					data.Items?.map((item) => {
+						const d = item.Stats?.find(({ n }) => n === "d");
+						const m = item.Stats?.find(({ n }) => n === "m");
+						const t = item.Stats?.find(({ n }) => n === "t");
 
-					return {
-						word: item.str,
-						freq: item.freq,
-						coll_freq: item.coll_freq,
-						// todo: do this properly:
-						d: d?.s ?? -1,
-						m: m?.s ?? -1,
-						t: t?.s ?? -1,
-						// stats: item.Stats,
+						return {
+							word: item.str!,
+							freq: item.freq!,
+							coll_freq: item.coll_freq!,
+							d: d?.s ?? -1,
+							m: m?.s ?? -1,
+							t: t?.s ?? -1,
+							// stats: item.Stats,
 
-						// for highCharts
-						name: item.str,
-						weight: item.coll_freq,
-						color: query.color,
-					};
-				});
+							// for highCharts
+							name: item.str!,
+							weight: item.coll_freq!,
+							color: query.color,
+						} as unknown as CollocationEntry;
+					}) ?? [];
 				collocationsLoading.value[index] = false;
 			},
 		};
@@ -92,23 +106,13 @@ watch(mode, () => {
 	}, 10);
 });
 
-watch(queries.value, () => {
-	// console.log("queries chagened", queries.value);
-	const queryIds = queries.value.map(({ id }) => id);
-	collocations.value = collocations.value.filter(({ query }) => queryIds.includes(query));
-	// sometimes there end up duplicates in the regionalFrequencies. prop due to the useQueries, if a query is being deleted
-	collocations.value = collocations.value.filter(
-		(a, idx) => collocations.value.findIndex((b) => b.query === a.query) === idx,
-	);
-});
-
 const series = computed(() =>
 	collocations.value.map((collocation, index) => {
 		if (collocationsLoading.value[index]) return [];
 		return [
 			{
 				type: "wordcloud",
-				data: collocation.map((a) => ({
+				data: collocation.map((a: CollocationEntry) => ({
 					...a,
 					weight: a[mode.value],
 				})),
@@ -117,7 +121,7 @@ const series = computed(() =>
 					from: 0,
 					to: 0,
 				},
-				color: (point) => point.color,
+				color: (point: { color: string }) => point.color,
 				tooltip: {
 					pointFormatter,
 				},
@@ -126,27 +130,32 @@ const series = computed(() =>
 	}),
 );
 
-//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 function pointFormatter() {
 	return (
 		"<b>" +
+		// @ts-expect-error this is used inside the table rendering. -> todo: find out how to type this
 		this.name +
 		"</b><br/>" +
 		"Frequency: " +
+		// @ts-expect-error
 		this.freq +
 		"<br/>" +
 		"Collocational Frequency: " +
+		// @ts-expect-error
 		this.coll_freq +
 		"<br/>" +
 		"D: " +
+		// @ts-expect-error
 		this.d +
 		"<br/>" +
 		"M: " +
+		// @ts-expect-error
 		this.m +
 		"<br/>" +
 		"T: " +
+		// @ts-expect-error
 		this.t
 	);
 }
@@ -184,7 +193,6 @@ function pointFormatter() {
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
-			<!-- @vue-expect-error TODO properly type this -->
 			<DataDisplaySourceTable
 				v-if="!loading"
 				:queries="queries"

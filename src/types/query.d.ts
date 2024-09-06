@@ -87,7 +87,7 @@ interface CorpusQuery {
 	subCorpus: string;
 	concordance_query: ConcordanceQuery;
 	KWICAttrsStructs: KWICAttrsStructs;
-	KWICAttrsStructsOptions: KWICAttrsStructs; // ToDo: this will be refactored to come from a query. -> will eb deleted
+	KWICAttrsStructsOptions: KWICAttrsStructs; // ToDo: this might be refactored to come via requesat whenever needed.
 	facettingValues: FacettingValues;
 	loading: {
 		yearlyFrequencies: boolean;
@@ -112,4 +112,12 @@ interface IsourceDistribution {
 	media: string;
 	absolute: number;
 	relative: number;
+}
+
+interface RegionalFreqData {
+	region: string; relative: number; absolute: number
+}
+interface RegionalFrequency {
+	data: Array<RegionalFreqData>;
+	query: number;
 }

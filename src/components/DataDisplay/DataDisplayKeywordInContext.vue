@@ -16,7 +16,7 @@ const { queries } = storeToRefs(queryStore);
 const api = useApiClient();
 
 const showViewOptionsMode = ref(false);
-const KWICresults: Ref<Array<Array<never>>> = ref([]);
+const KWICresults: Ref<Array<Array<KeywordInContext>>> = ref([]);
 const KWICresultsLoading: Ref<Array<boolean>> = ref([]);
 
 const q = computed(() =>
@@ -44,34 +44,29 @@ const q = computed(() =>
 				return response.data;
 			},
 			select: (data: Type06Concordance) => {
-				//@ts-expect-error TODO properly type this
-				KWICresults.value[index] =
-					data.Lines?.map(({ Tbl_refs, Left, Kwic, toknum, Right }) => {
-						// this mapping is directly taken from the ancient code
-						return {
-							refs: Tbl_refs,
-							date: Tbl_refs![1] ?? "",
-							source: Tbl_refs![4] ?? "",
-							region: Tbl_refs![2] ?? "",
-							left: Left!
-								// @ts-expect-error TODO properly type this
-								.map(({ str, strc }: { str: string; strc: string }) => str || strc)
-								.join(" "),
-							word: typeof Kwic![0] !== "undefined" ? Kwic![0].str : "",
-							// @ts-expect-error TODO properly type this
-							right: Right!.map(({ str }: { str: string }) => str).join(" "),
-							docid: Tbl_refs![0] ?? "",
-							topic: Tbl_refs![3] ?? "",
-							toknum,
-						};
-					}) ?? [];
+				KWICresults.value[index] = (data.Lines?.map(({ Tbl_refs, Left, Kwic, toknum, Right }) => {
+					// this mapping is directly taken from the ancient code
+					return {
+						refs: Tbl_refs,
+						date: Tbl_refs![1] ?? "",
+						source: Tbl_refs![4] ?? "",
+						region: Tbl_refs![2] ?? "",
+						// @ts-ignore wrong types in api lib
+						left: Left!.map(({ str, strc }) => str || strc).join(" "),
+						word: typeof Kwic![0] !== "undefined" ? Kwic![0].str : "",
+						// @ts-ignore wrong types in api lib
+						right: Right!.map(({ str }: { str: string }) => str).join(" "),
+						docid: Tbl_refs![0] ?? "",
+						topic: Tbl_refs![3] ?? "",
+						toknum,
+					};
+				}) ?? []) as unknown as Array<KeywordInContext>;
 				KWICresultsLoading.value[index] = false;
 			},
 		};
 	}),
 );
 
-//@ts-expect-error TODO find out how to properly type this
 useQueries({ queries: q });
 
 function open(item: KeywordInContext) {
@@ -80,7 +75,7 @@ function open(item: KeywordInContext) {
 
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 
-const columns = getKWICColumns(t, open);
+const columns = getKWICColumns(t as unknown as (s: string) => string, open);
 </script>
 
 <template>
@@ -93,14 +88,14 @@ const columns = getKWICColumns(t, open);
 		<VCardText class="py-0">
 			<div v-for="(query, index) of queries" :key="query.id">
 				<VCheckbox v-model="showViewOptionsMode" :label="t('viewOptions')"></VCheckbox>
-				<KWICAttributeSelect v-if="showViewOptionsMode" :query="query" @refresh="refresh()" />
+				<KWICAttributeSelect v-if="showViewOptionsMode" :query="query" />
 				<div>
 					<QueryDisplay :query="query" :loading="KWICresultsLoading[index]" />
 
 					<CorpsumDataTable
 						v-if="!KWICresultsLoading[index]"
 						:columns="columns"
-						:data="KWICresults[index]"
+						:data="KWICresults[index]!"
 					/>
 
 					<KWICDetailDialog

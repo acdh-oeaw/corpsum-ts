@@ -1,9 +1,12 @@
 <script lang="ts" setup>
+// @eslint-ignore-next-line
+type legalAny = unknown;
+
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	datatype: SearchFunctionKey;
 	loading: Array<boolean>;
-	data: Array<never>;
+	data: Array<Array<legalAny>>;
 }>();
 const tab = ref(null);
 
@@ -14,6 +17,7 @@ const columns = computed(() => {
 		return {
 			accessorKey: key,
 			header: () => h("div", { class: "text-right" }, key),
+			// @ts-ignore this comes from tanstack-table
 			cell: ({ row }) => {
 				const value = row.getValue(key);
 				return h("div", { class: "text-right font-medium" }, value as string);
@@ -39,7 +43,7 @@ const columns = computed(() => {
 					<VWindowItem :value="query.id">
 						<div>
 							<QueryDisplay :query="query" :loading="loading[index]" />
-							<CorpsumDataTable v-if="!loading[index]" :columns="columns" :data="data[index]" />
+							<CorpsumDataTable v-if="!loading[index]" :columns="columns" :data="data[index]!" />
 						</div>
 					</VWindowItem>
 				</div>

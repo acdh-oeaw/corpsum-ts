@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+type Mode = "absolute" | "relative";
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	sourceDistributions: Array<Array<IsourceDistribution>>;
-	mode: "absolute" | "relative";
+	mode: Mode;
 	stack: boolean;
 }>();
 
