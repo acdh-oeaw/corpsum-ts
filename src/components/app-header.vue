@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { NavLinkProps } from "@/components/nav-link.vue";
 import { Button } from "@/components/ui/button";
-import {navigateTo} from "#app";
+import { navigateTo } from "#app";
 
 const t = useTranslations("AppHeader");
 

@@ -63,8 +63,10 @@ export const useQueryStore = defineStore(
 				showPicker: false,
 				KWICAttrsStructs: { ...emptySelectedCorpusKWICViewInfo },
 				KWICAttrsStructsOptions: {
-					attributes: (corporaStore.corpInfoResponse.attributes ?? [] as unknown) as Array<KWICAttribute>,
-					structures: (corporaStore.corpInfoResponse.structures ?? [] as unknown) as Array<KWICStructure>,
+					attributes: (corporaStore.corpInfoResponse.attributes ??
+						([] as unknown)) as Array<KWICAttribute>,
+					structures: (corporaStore.corpInfoResponse.structures ??
+						([] as unknown)) as Array<KWICStructure>,
 				},
 				facettingValues: {},
 				loading: {

@@ -11,7 +11,6 @@ const props = defineProps<{
 const tab = ref(null);
 
 const columns = computed(() => {
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	if (!props.data[0]?.[0]) return [];
 	return Object.keys(props.data[0][0]).map((key) => {
 		return {
