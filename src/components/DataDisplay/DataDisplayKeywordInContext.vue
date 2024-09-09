@@ -54,6 +54,7 @@ const q = computed(() =>
 						// @ts-expect-error wrong types in api lib
 						left: Left!.map(({ str, strc }) => str || strc).join(" "),
 						word: typeof Kwic![0] !== "undefined" ? Kwic![0].str : "",
+						// @ts-expect-error wrong types in api lib
 						right: Right!.map(({ str }: { str: string }) => str).join(" "),
 						docid: Tbl_refs![0] ?? "",
 						topic: Tbl_refs![3] ?? "",

@@ -149,7 +149,7 @@ await changeSuggs();
 				</Button>
 			</div>
 		</div>
-		<template v-if="!isRegExSearch">
+		<template v-if="!isRegExSearch && Array.isArray(vals)">
 			<div v-for="sugg of suggestions" :key="sugg">
 				<button
 					class="w-full text-left text-lg"
