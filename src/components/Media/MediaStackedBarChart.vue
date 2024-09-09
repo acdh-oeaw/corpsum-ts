@@ -33,7 +33,6 @@ const series = computed(() => {
 			}`,
 			data: categories.value
 				.map((category) => props.sourceDistributions[i]?.find(({ media }) => category === media))
-				// @ts-ignore
 				.map((a) => (a ? a[props.mode] : 0)),
 		};
 	});

@@ -51,10 +51,9 @@ const q = computed(() =>
 						date: Tbl_refs![1] ?? "",
 						source: Tbl_refs![4] ?? "",
 						region: Tbl_refs![2] ?? "",
-						// @ts-ignore wrong types in api lib
+						// @ts-expect-error wrong types in api lib
 						left: Left!.map(({ str, strc }) => str || strc).join(" "),
 						word: typeof Kwic![0] !== "undefined" ? Kwic![0].str : "",
-						// @ts-ignore wrong types in api lib
 						right: Right!.map(({ str }: { str: string }) => str).join(" "),
 						docid: Tbl_refs![0] ?? "",
 						topic: Tbl_refs![3] ?? "",

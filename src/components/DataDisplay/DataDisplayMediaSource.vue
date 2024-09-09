@@ -8,7 +8,7 @@ const t = useTranslations("Corpsum");
 const queryStore = useQueryStore();
 const { queries } = storeToRefs(queryStore);
 
-const mode = ref("relative");
+const mode: Ref<"absolute" | "relative"> = ref("relative");
 const expand = ref(false);
 
 const api = useApiClient();
@@ -105,7 +105,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 
 			<template v-if="sourceDistributions && queries">
 				<MediaStackedBarChart
-					:mode="mode as 'absolute' | 'relative'"
+					:mode="mode"
 					:queries="queries"
 					:source-distributions="sourceDistributions"
 					:stack="isStacked"

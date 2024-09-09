@@ -85,7 +85,7 @@ function pointFormatter() {
 		// @ts-expect-error todo find out how to type this function correctly
 		.map((query) => [query.userInput, this[query.userInput], query.color])
 		.sort((a, b) => b[1] - a[1]);
-	// @ts-expect-error
+	// @ts-expect-error once again highcharts interal funciton, this is okay
 	return `<b>${this.id}</b><br/>
 ${queryArray
 	.map(

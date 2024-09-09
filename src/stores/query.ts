@@ -29,7 +29,7 @@ export const useQueryStore = defineStore(
 
 			const concordance_query: Partial<ConcordanceQuery> = {};
 
-			// @ts-ignore
+			// @ts-expect-error this is okay, because we set the correct key
 			concordance_query[keyToKey[type]] = userInput;
 			concordance_query.queryselector = type;
 
@@ -90,14 +90,13 @@ export const useQueryStore = defineStore(
 		});
 
 		const getQueryWithFacetting = (query: CorpusQuery) => {
-			const result: Record<string, string> = { ...query.concordance_query };
+			const result: Record<string, string | Array<string>> = { ...query.concordance_query };
 			for (const key in query.facettingValues) {
 				const elem = query.facettingValues[key];
 				if (!elem) continue;
 				// console.log({ key, elem })
 				if (Array.isArray(elem)) {
 					if (!elem.length) continue;
-					// @ts-ignore
 					result[`sca_${key}`] = elem;
 				} else result[elem.key] = elem.value;
 			}

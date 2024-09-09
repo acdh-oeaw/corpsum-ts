@@ -16,7 +16,6 @@ const setFilters = computed(() => {
 		// @ts-expect-error just counts the set filters. if it is undefined that's falsy.
 		(key) => props.query.facettingValues[key]?.length || props.query.facettingValues[key]?.value,
 	);
-	keys;
 	return keys;
 });
 

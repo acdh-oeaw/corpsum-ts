@@ -21,13 +21,11 @@ export const useCorporaStore = defineStore(
 
 		const corporaForSearch = computed(
 			() =>
-				`corpname=${selectedCorpus.value?.corpname}${
-					selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""
-				}`,
+				`corpname=${selectedCorpus.value?.corpname ?? ""}${selectedSubCorpus.value ? `;usesubcorp=${selectedSubCorpus.value.n}` : ""}`,
 		);
 
 		const corporaForSearchWithoutSubCorpus = computed(
-			() => `corpname=${selectedCorpus.value?.corpname}`,
+			() => `corpname=${selectedCorpus.value?.corpname ?? ""}`,
 		);
 
 		const corporaForSearchKeys = computed(() => {
