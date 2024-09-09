@@ -23,7 +23,7 @@ const { data: subCorpora, isPending: subCorporaLoading } = useQuery({
 	queryKey: ["get-corp-info", selectedCorpus] as const,
 	queryFn: async () => {
 		const response = await api.search.getCorpInfo({
-			corpname: selectedCorpus.value?.name,
+			corpname: selectedCorpus.value?.name ?? "",
 			subcorpora: 1,
 		});
 		corporaStore.corpInfoResponse = response.data;

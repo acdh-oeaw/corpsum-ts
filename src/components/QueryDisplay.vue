@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-withDefaults(defineProps<{ query: CorpusQuery; loading: boolean }>(), {
+withDefaults(defineProps<{ query: CorpusQuery; loading?: boolean }>(), {
 	loading: false,
 });
 </script>

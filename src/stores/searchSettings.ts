@@ -29,7 +29,7 @@ export const useSearchSettingsStore = defineStore(
 	},
 	{
 		persist: {
-			paths: ["selectedSearches"],
+			pick: ["selectedSearches"],
 		},
 	},
 );
