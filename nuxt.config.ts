@@ -7,12 +7,15 @@ export default defineNuxtConfig({
 		"@": fileURLToPath(new URL("./src", import.meta.url)),
 		"~": fileURLToPath(new URL("./", import.meta.url)),
 	},
+
 	components: [{ path: "@/components", pathPrefix: false }],
+
 	content: {
 		defaultLocale,
 		locales: Object.keys(locales),
 		markdown: {},
 	},
+
 	css: [
 		"@fontsource-variable/inter/slnt.css",
 		"tailwindcss/tailwind.css",
@@ -20,28 +23,35 @@ export default defineNuxtConfig({
 		"vuetify/lib/styles/main.sass",
 		"@mdi/font/css/materialdesignicons.css",
 	],
+
 	devtools: {
 		enabled: true,
 	},
+
 	dir: {
 		public: "../public",
 	},
+
 	imports: {
 		dirs: ["../stores", "./stores", "types"],
 	},
+
 	experimental: {
 		componentIslands: true,
 		renderJsonPayloads: false,
 	},
+
 	pinia: {
 		// @ts-ignore
 		autoImports: ["defineStore", "acceptHMRUpdate"],
 	},
+
 	piniaPersistedstate: {
 		cookieOptions: {
 			sameSite: "strict",
 		},
 	},
+
 	i18n: {
 		baseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL,
 		defaultLocale,
@@ -53,6 +63,7 @@ export default defineNuxtConfig({
 		locales: Object.values(locales),
 		strategy: "prefix",
 	},
+
 	shadcn: {
 		/**
 		 * Prefix for all the imported component
@@ -64,17 +75,25 @@ export default defineNuxtConfig({
 		 */
 		componentDir: "./src/components/ui",
 	},
+
 	modules: [
 		"@nuxt/content",
 		"@nuxt/devtools",
+		"@nuxt/eslint",
 		"@nuxtjs/i18n",
 		"@pinia/nuxt",
 		"@pinia-plugin-persistedstate/nuxt",
 		"shadcn-nuxt",
 	],
+	eslint: {
+		config: {
+			standalone: true,
+		},
+	},
 	nitro: {
 		compressPublicAssets: true,
 	},
+
 	postcss: {
 		plugins: {
 			"tailwindcss/nesting": "postcss-nesting",
@@ -82,10 +101,12 @@ export default defineNuxtConfig({
 			autoprefixer: {},
 		},
 	},
+
 	routeRules: {
 		"/": { static: true },
 		"/imprint": { static: true },
 	},
+
 	runtimeConfig: {
 		BOTS: process.env.BOTS,
 		ENV_VALIDATION: process.env.ENV_VALIDATION,
@@ -99,10 +120,13 @@ export default defineNuxtConfig({
 			NUXT_PUBLIC_REDMINE_ID: process.env.NUXT_PUBLIC_REDMINE_ID,
 		},
 	},
+
 	build: {
 		transpile: ["vuetify"],
 	},
+
 	srcDir: "./src/",
+
 	typescript: {
 		shim: false,
 		strict: true,
@@ -116,4 +140,6 @@ export default defineNuxtConfig({
 			},
 		},
 	},
+
+	compatibilityDate: "2024-09-06",
 });
