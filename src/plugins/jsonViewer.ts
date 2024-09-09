@@ -1,7 +1,7 @@
 import "vue-json-viewer/style.css";
 
 // esilint-ignore-next-line  @typescript-eslint/ban-ts-comment
-// @ts-ignore
+// @ts-expect-error sadly has no types
 import JsonViewer from "vue-json-viewer/ssr";
 
 export default defineNuxtPlugin((nuxtApp) => {

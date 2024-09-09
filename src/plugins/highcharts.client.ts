@@ -17,6 +17,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 	// overwrites the excel download to work propperly. this part is copied and adapted from a highcharts fiddle using that library. could be adapted to use a more maintained one, but would only recomend, if issues surface
 	HighchartsExcelDownload(Highcharts);
-	// @ts-ignore
+	// @ts-expect-error this works and is like in the documentation
 	nuxtApp.vueApp.use(HighchartsVue, { tagName: "HighCharts" });
 });

@@ -16,7 +16,7 @@ const columns = computed(() => {
 		return {
 			accessorKey: key,
 			header: () => h("div", { class: "text-right" }, key),
-			// @ts-ignore this comes from tanstack-table
+			// @ts-expect-error this comes from tanstack-table
 			cell: ({ row }) => {
 				const value = row.getValue(key);
 				return h("div", { class: "text-right font-medium" }, value as string);

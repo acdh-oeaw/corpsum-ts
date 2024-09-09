@@ -139,23 +139,23 @@ function pointFormatter() {
 		this.name +
 		"</b><br/>" +
 		"Frequency: " +
-		// @ts-expect-error
+		// @ts-expect-error this is used inside the table rendering.
 		this.freq +
 		"<br/>" +
 		"Collocational Frequency: " +
-		// @ts-expect-error
+		// @ts-expect-error this is used inside the table rendering.
 		this.coll_freq +
 		"<br/>" +
 		"D: " +
-		// @ts-expect-error
+		// @ts-expect-error this is used inside the table rendering.
 		this.d +
 		"<br/>" +
 		"M: " +
-		// @ts-expect-error
+		// @ts-expect-error this is used inside the table rendering.
 		this.m +
 		"<br/>" +
 		"T: " +
-		// @ts-expect-error
+		// @ts-expect-error this is used inside the table rendering.
 		this.t
 	);
 }

@@ -3,7 +3,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const port = process.env.PORT ?? 3000;
-const baseUrl = `http://localhost:${port}`;
+const baseUrl = `http://localhost:${String(port)}`;
 
 export default defineConfig({
 	testDir: "./e2e",

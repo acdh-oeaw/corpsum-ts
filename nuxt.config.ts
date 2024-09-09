@@ -42,7 +42,7 @@ export default defineNuxtConfig({
 	},
 
 	pinia: {
-		// @ts-ignore
+		// @ts-expect-error somehow there is no types for this
 		autoImports: ["defineStore", "acceptHMRUpdate"],
 	},
 

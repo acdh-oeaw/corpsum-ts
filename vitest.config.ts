@@ -1,7 +1,6 @@
 import { defineVitestConfig } from "@nuxt/test-utils/config";
 
 export default defineVitestConfig({
-	// @ts-ignore this is exactly as in the documentation
 	test: {
 		environment: "nuxt",
 		environmentOptions: {
