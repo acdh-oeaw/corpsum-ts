@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # build
-FROM node:18-slim AS build
+FROM node:20-slim AS build
 
 RUN corepack enable
 
@@ -30,7 +30,7 @@ ENV NODE_ENV=production
 RUN pnpm run build
 
 # serve
-FROM node:18-slim AS serve
+FROM node:20-slim AS serve
 
 RUN mkdir /app && chown -R node:node /app
 WORKDIR /app
