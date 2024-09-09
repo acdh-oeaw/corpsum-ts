@@ -125,8 +125,8 @@ await changeSuggs();
 				<div class="flex flex-col items-start gap-1">
 					<Label for="search">{{ t("Mode") }}</Label>
 					<Button
-						variant="outline"
 						class="flex gap-1"
+						variant="outline"
 						@click="modeIndex = (modeIndex + 1) % modes.length"
 					>
 						<VIcon icon="mdi-swap-horizontal" />

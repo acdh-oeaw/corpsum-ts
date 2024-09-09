@@ -98,57 +98,57 @@ const expand = ref(false);
 		<VCardText class="py-0">
 			<div class="flex items-center gap-2">
 				<VBtnToggle v-model="chartMode" density="compact">
-					<VBtn variant="outlined" value="combined">
+					<VBtn value="combined" variant="outlined">
 						<VIcon icon="mdi-map" />
-						<VIcon icon="mdi-chart-pie-outline" class="ml-[-0.3rem]" />
+						<VIcon class="ml-[-0.3rem]" icon="mdi-chart-pie-outline" />
 
-						<VTooltip location="top" activator="parent">combined map chart</VTooltip>
+						<VTooltip activator="parent" location="top">combined map chart</VTooltip>
 					</VBtn>
-					<VBtn variant="outlined" value="seperate">
-						<VIcon icon="mdi-map" class="z-30 bg-white" />
-						<VIcon icon="mdi-map" class="z-20 -mt-2 ml-[-0.80rem]" />
-						<VTooltip location="top" activator="parent">seperated map charts</VTooltip>
+					<VBtn value="seperate" variant="outlined">
+						<VIcon class="z-30 bg-white" icon="mdi-map" />
+						<VIcon class="z-20 -mt-2 ml-[-0.80rem]" icon="mdi-map" />
+						<VTooltip activator="parent" location="top">seperated map charts</VTooltip>
 					</VBtn>
 				</VBtnToggle>
 				<VBtnToggle v-model="mode" density="compact">
-					<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
-					<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
+					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
+					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>
 			</div>
 			<!-- <JsonViewer boxed :value="regionalFrequencies" :expand-depth="5"></JsonViewer> -->
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div class="mt-1">
-					<QueryDisplay :query="query" :loading="regionalFrequenciesLoading[index]" />
+					<QueryDisplay :loading="regionalFrequenciesLoading[index]" :query="query" />
 					<ClientOnly v-if="!regionalFrequenciesLoading[index] && regionalFrequencies[index]">
 						<MapChart
 							v-if="!isCombined"
+							:mode="mode"
 							:query="query"
 							:resdata="regionalFrequencies[index].data"
-							:mode="mode"
 						/>
 					</ClientOnly>
 				</div>
 			</div>
 			<div v-if="isCombined && !loading && queries.length > 0">
-				<CombinedMapChart :queries="queries" :resdata="regionalFrequencies" :mode="mode" />
+				<CombinedMapChart :mode="mode" :queries="queries" :resdata="regionalFrequencies" />
 				<!-- <DemoChart /> -->
 			</div>
 		</VCardText>
 
 		<VExpandTransition v-if="expand">
 			<DataDisplaySourceTable
-				datatype="regionalFrequencies"
-				:queries="queries"
-				:loading="regionalFrequenciesLoading"
 				:data="regionalFrequencies.map((a) => a.data)"
+				datatype="regionalFrequencies"
+				:loading="regionalFrequenciesLoading"
+				:queries="queries"
 			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>
 
 		<VCardActions>
-			<VBtn variant="outlined" size="small" @click="expand = !expand">
+			<VBtn size="small" variant="outlined" @click="expand = !expand">
 				{{ !expand ? t("ShowData") : t("HideData") }}
 			</VBtn>
 		</VCardActions>

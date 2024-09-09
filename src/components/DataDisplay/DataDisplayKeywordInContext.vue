@@ -90,7 +90,7 @@ const columns = getKWICColumns(t as unknown as (s: string) => string, open);
 				<VCheckbox v-model="showViewOptionsMode" :label="t('viewOptions')"></VCheckbox>
 				<KWICAttributeSelect v-if="showViewOptionsMode" :query="query" />
 				<div>
-					<QueryDisplay :query="query" :loading="KWICresultsLoading[index]" />
+					<QueryDisplay :loading="KWICresultsLoading[index]" :query="query" />
 
 					<CorpsumDataTable
 						v-if="!KWICresultsLoading[index]"
@@ -100,8 +100,8 @@ const columns = getKWICColumns(t as unknown as (s: string) => string, open);
 
 					<KWICDetailDialog
 						v-if="selectedKWIC"
-						:query="query"
 						:kwic="selectedKWIC"
+						:query="query"
 						@close="selectedKWIC = null"
 					/>
 				</div>

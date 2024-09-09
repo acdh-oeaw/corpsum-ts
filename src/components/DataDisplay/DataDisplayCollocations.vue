@@ -171,14 +171,14 @@ function pointFormatter() {
 
 		<VCardText class="py-0">
 			<VBtnToggle v-model="mode" density="compact">
-				<VBtn variant="outlined" value="coll_freq">
+				<VBtn value="coll_freq" variant="outlined">
 					{{ t("coll_freq") }}
 				</VBtn>
-				<VBtn variant="outlined" value="freq">{{ t("freq") }}</VBtn>
+				<VBtn value="freq" variant="outlined">{{ t("freq") }}</VBtn>
 			</VBtnToggle>
 
 			<div v-for="(query, index) of queries" :key="query.id">
-				<QueryDisplay :query="query" :loading="collocationsLoading[index]" />
+				<QueryDisplay :loading="collocationsLoading[index]" :query="query" />
 				<HighCharts
 					v-if="!collocationsLoading[index]"
 					:options="{
@@ -195,17 +195,17 @@ function pointFormatter() {
 		<VExpandTransition v-if="expand">
 			<DataDisplaySourceTable
 				v-if="!loading"
-				:queries="queries"
 				:data="sortedCollocations"
-				:loading="collocationsLoading"
 				datatype="collocations"
+				:loading="collocationsLoading"
+				:queries="queries"
 			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>
 
 		<VCardActions>
-			<VBtn variant="outlined" size="small" @click="expand = !expand">
+			<VBtn size="small" variant="outlined" @click="expand = !expand">
 				{{ !expand ? t("ShowData") : t("HideData") }}
 			</VBtn>
 		</VCardActions>

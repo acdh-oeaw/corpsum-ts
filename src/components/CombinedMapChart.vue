@@ -36,7 +36,7 @@ const pieInfo: Array<PieInfo> = [
 const pieInfoWithData: ComputedRef<Array<PieInfoWithData>> = computed(() => {
 	return dataByRegion.value.map((regionData) => {
 		const [region] = regionData;
-		let [_, ...values] = regionData;
+		const [_, ...values] = regionData;
 		values.pop();
 		const queryData = props.queries.map((query) => ({
 			color: query.color,

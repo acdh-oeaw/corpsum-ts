@@ -31,7 +31,7 @@ export default defineNuxtPlugin((nuxt) => {
 							((error.error?.title as string | undefined) ?? error.statusText)
 						: error.message;
 
-				if (process.client) {
+				if (import.meta.client) {
 					addToast({
 						title: "Error",
 						description: message,
@@ -49,13 +49,13 @@ export default defineNuxtPlugin((nuxt) => {
 
 	nuxt.vueApp.use(VueQueryPlugin, options);
 
-	if (process.server) {
+	if (import.meta.server) {
 		nuxt.hooks.hook("app:rendered", () => {
 			state.value = dehydrate(queryClient);
 		});
 	}
 
-	if (process.client) {
+	if (import.meta.client) {
 		nuxt.hooks.hook("app:created", () => {
 			hydrate(queryClient, state.value);
 		});

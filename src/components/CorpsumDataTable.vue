@@ -43,8 +43,8 @@ const t = useTranslations("Corpsum");
 					<TableHead v-for="header in headerGroup.headers" :key="header.id">
 						<FlexRender
 							v-if="!header.isPlaceholder"
-							:render="header.column.columnDef.header"
 							:props="header.getContext()"
+							:render="header.column.columnDef.header"
 						/>
 					</TableHead>
 				</TableRow>
@@ -58,13 +58,13 @@ const t = useTranslations("Corpsum");
 						:data-state="row.getIsSelected() ? 'selected' : undefined"
 					>
 						<TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-							<FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+							<FlexRender :props="cell.getContext()" :render="cell.column.columnDef.cell" />
 						</TableCell>
 					</TableRow>
 				</template>
 				<template v-else>
 					<TableRow>
-						<TableCell :colspan="columns.length" class="h-24 text-center">
+						<TableCell class="h-24 text-center" :colspan="columns.length">
 							{{ t("No results.") }}
 						</TableCell>
 					</TableRow>
@@ -79,18 +79,18 @@ const t = useTranslations("Corpsum");
 			</div>
 			<div class="space-x-2">
 				<Button
-					variant="outline"
-					size="sm"
 					:disabled="!table.getCanPreviousPage()"
+					size="sm"
+					variant="outline"
 					@click="table.previousPage()"
 				>
 					{{ t("previous") }}
 				</Button>
 				<Button
-					variant="outline"
 					class="mr-2"
-					size="sm"
 					:disabled="!table.getCanNextPage()"
+					size="sm"
+					variant="outline"
 					@click="table.nextPage()"
 				>
 					{{ t("next") }}

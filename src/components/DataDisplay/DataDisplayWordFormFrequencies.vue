@@ -69,11 +69,11 @@ const expand = ref(false);
 
 		<VCardText class="py-0">
 			<VBtnToggle v-model="mode" density="compact">
-				<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
-				<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
+				<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
+				<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 			</VBtnToggle>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<QueryDisplay :query="query" :loading="wordFormFrequenciesLoading[index]" />
+				<QueryDisplay :loading="wordFormFrequenciesLoading[index]" :query="query" />
 				<HighCharts
 					:options="{
 						chart: {
@@ -109,17 +109,17 @@ const expand = ref(false);
 
 		<VExpandTransition v-if="expand">
 			<DataDisplaySourceTable
-				:queries="queries"
-				:loading="wordFormFrequenciesLoading"
 				:data="wordFormFrequencies"
 				datatype="wordFormFrequencies"
+				:loading="wordFormFrequenciesLoading"
+				:queries="queries"
 			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>
 
 		<VCardActions>
-			<VBtn variant="outlined" size="small" @click="expand = !expand">
+			<VBtn size="small" variant="outlined" @click="expand = !expand">
 				{{ !expand ? t("ShowData") : t("HideData") }}
 			</VBtn>
 		</VCardActions>

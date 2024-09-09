@@ -80,24 +80,24 @@ const isStacked = computed(() => chartMode.value === "stack");
 		<VCardText>
 			<div class="flex items-center gap-2">
 				<VBtnToggle v-model="chartMode" density="compact">
-					<VBtn variant="outlined" value="stack">
+					<VBtn value="stack" variant="outlined">
 						<VIcon icon="mdi-chart-bar-stacked" />
-						<VTooltip location="top" activator="parent">stacked bar chart</VTooltip>
+						<VTooltip activator="parent" location="top">stacked bar chart</VTooltip>
 					</VBtn>
-					<VBtn variant="outlined" value="seperate">
+					<VBtn value="seperate" variant="outlined">
 						<VIcon icon="mdi-poll" />
-						<VTooltip location="top" activator="parent">seperated bar chart</VTooltip>
+						<VTooltip activator="parent" location="top">seperated bar chart</VTooltip>
 					</VBtn>
 				</VBtnToggle>
 
 				<VBtnToggle v-model="mode" density="compact">
-					<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
-					<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
+					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
+					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div v-if="sourceDistributionsLoading[index]">
-					<QueryDisplay :query="query" :loading="sourceDistributionsLoading[index]" />
+					<QueryDisplay :loading="sourceDistributionsLoading[index]" :query="query" />
 				</div>
 			</div>
 			<!-- {{ series }} -->
@@ -105,9 +105,9 @@ const isStacked = computed(() => chartMode.value === "stack");
 
 			<template v-if="sourceDistributions && queries">
 				<MediaStackedBarChart
+					:mode="mode as 'absolute' | 'relative'"
 					:queries="queries"
 					:source-distributions="sourceDistributions"
-					:mode="mode as 'absolute' | 'relative'"
 					:stack="isStacked"
 				/>
 			</template>
@@ -115,17 +115,17 @@ const isStacked = computed(() => chartMode.value === "stack");
 
 		<VExpandTransition v-if="expand">
 			<DataDisplaySourceTable
-				:queries="queries"
-				datatype="mediaSources"
 				:data="sourceDistributions"
+				datatype="mediaSources"
 				:loading="sourceDistributionsLoading"
+				:queries="queries"
 			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>
 
 		<VCardActions>
-			<VBtn variant="outlined" size="small" @click="expand = !expand">
+			<VBtn size="small" variant="outlined" @click="expand = !expand">
 				{{ !expand ? t("ShowData") : t("HideData") }}
 			</VBtn>
 		</VCardActions>

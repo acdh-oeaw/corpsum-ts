@@ -10,12 +10,12 @@ const { selectedSearches, possibleSearchKeys } = storeToRefs(searchSettings);
 <template>
 	<VAutocomplete
 		v-model="selectedSearches"
+		chips
+		clearable
+		closable-chips
+		:items="possibleSearchKeys"
 		:label="t('SearchDimensions')"
 		multiple
-		closable-chips
-		clearable
-		chips
-		:items="possibleSearchKeys"
 	>
 		<template #chip="{ props, item }">
 			<VChip v-bind="props" :text="t(item.value)"></VChip>
@@ -25,8 +25,8 @@ const { selectedSearches, possibleSearchKeys } = storeToRefs(searchSettings);
 			<!-- @vue-ignore i18n typing doesn't seem to work for templated strings -->
 			<VListItem
 				v-bind="props"
-				:title="t(item.value)"
 				:subtitle="t(`${item.value}Desc`)"
+				:title="t(item.value)"
 			></VListItem>
 		</template>
 	</VAutocomplete>

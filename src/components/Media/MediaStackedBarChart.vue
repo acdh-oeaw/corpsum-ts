@@ -80,7 +80,7 @@ const highChartsOptions = computed(() => ({
 <template>
 	<HighCharts
 		v-if="smoothReloadForBarChart"
-		style="height: 1200px"
 		:options="highChartsOptions"
+		style="height: 1200px"
 	></HighCharts>
 </template>

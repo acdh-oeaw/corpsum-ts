@@ -32,30 +32,30 @@ function refresh() {
 
 					<JsonViewer
 						v-if="!disabled"
+						boxed
+						:expand-depth="5"
 						preview-mode
 						:value="corpora"
-						:expand-depth="5"
-						boxed
 						@click.alt="refresh()"
 					></JsonViewer>
 
 					<p>selectedCorpus:</p>
 					<JsonViewer
 						v-if="!disabled"
+						boxed
+						:expand-depth="5"
 						preview-mode
 						:value="selectedCorpus"
-						:expand-depth="5"
-						boxed
 						@click.alt="refresh()"
 					></JsonViewer>
 					<p>corpInfoResponse:</p>
 					<JsonViewer
 						v-if="!disabled"
-						:show-array-index="false"
-						preview-mode
-						:value="corpInfoResponse"
-						:expand-depth="5"
 						boxed
+						:expand-depth="5"
+						preview-mode
+						:show-array-index="false"
+						:value="corpInfoResponse"
 						@click.alt="refresh()"
 					></JsonViewer>
 				</div>
@@ -66,20 +66,20 @@ function refresh() {
 
 					<JsonViewer
 						v-if="!disabled"
+						boxed
+						:expand-depth="5"
 						preview-mode
 						:value="queries"
-						:expand-depth="5"
-						boxed
 						@click.alt="refresh()"
 					></JsonViewer>
 
 					<p>nextQueryId</p>
 					<JsonViewer
 						v-if="!disabled"
+						boxed
+						:expand-depth="5"
 						preview-mode
 						:value="nextQueryId"
-						:expand-depth="5"
-						boxed
 						@click.alt="refresh()"
 					></JsonViewer>
 				</div>
@@ -87,10 +87,10 @@ function refresh() {
 					<h2>Search Settings</h2>
 					<JsonViewer
 						v-if="!disabled"
+						boxed
+						:expand-depth="5"
 						preview-mode
 						:value="searchSettings.selectedSearches"
-						:expand-depth="5"
-						boxed
 						@click.alt="refresh()"
 					></JsonViewer>
 				</div>

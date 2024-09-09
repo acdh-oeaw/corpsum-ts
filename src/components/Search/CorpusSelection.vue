@@ -40,12 +40,12 @@ const t = useTranslations("Corpsum");
 		<div class="flex flex-col justify-start">
 			<VSelect
 				v-model="selectedCorpus"
-				:loading="corporaLoading"
-				:items="corpora!.data!"
 				item-title="name"
-				:return-object="true"
+				:items="corpora!.data!"
 				:label="t('Corpus')"
+				:loading="corporaLoading"
 				:no-data-text="t('NoData')"
+				:return-object="true"
 				style="flex-grow: 0; min-width: 15rem"
 				@update:model-value="selectedSubCorpus = null"
 			></VSelect>
@@ -62,16 +62,16 @@ const t = useTranslations("Corpsum");
 		<div class="flex h-full flex-col items-start justify-start">
 			<VAutocomplete
 				v-model="corporaStore.selectedSubCorpus"
-				:items="subCorpora?.subcorpora"
-				:loading="subCorporaLoading"
+				:clearable="true"
+				dese
 				item-title="name"
 				item-value="name"
-				dese
-				:return-object="true"
-				:clearable="true"
+				:items="subCorpora?.subcorpora"
 				:label="t('SubCorpus')"
-				:placeholder="t('SelectSubCorpus')"
+				:loading="subCorporaLoading"
 				:no-data-text="t('NoData')"
+				:placeholder="t('SelectSubCorpus')"
+				:return-object="true"
 				style="flex-grow: 0; min-width: 10rem"
 			></VAutocomplete>
 			<p v-if="corporaStore.selectedSubCorpus">

@@ -41,7 +41,7 @@ const columns = computed(() => {
 				<div v-for="(query, index) of props.queries" :key="query.id">
 					<VWindowItem :value="query.id">
 						<div>
-							<QueryDisplay :query="query" :loading="loading[index]" />
+							<QueryDisplay :loading="loading[index]" :query="query" />
 							<CorpsumDataTable v-if="!loading[index]" :columns="columns" :data="data[index]!" />
 						</div>
 					</VWindowItem>

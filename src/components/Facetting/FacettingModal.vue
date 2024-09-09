@@ -88,9 +88,9 @@ const selected: Ref<EntryLine | null> = ref(null);
 										</span>
 
 										<Button
-											variant="outline"
-											size="xs"
 											class="rounded border border-solid"
+											size="xs"
+											variant="outline"
 											@click="removeFromSelection(entry.Line[0].name, i)"
 										>
 											x
@@ -114,8 +114,8 @@ const selected: Ref<EntryLine | null> = ref(null);
 											}}
 										</Badge>
 										<Button
-											variant="outline"
 											size="xs"
+											variant="outline"
 											@click="clearRegexSearch(entry.Line[0].name)"
 										>
 											x

@@ -26,7 +26,7 @@ const expand = ref(false);
 		<VDivider></VDivider>
 
 		<VCardActions>
-			<VBtn variant="outlined" size="small" @click="expand = !expand">
+			<VBtn size="small" variant="outlined" @click="expand = !expand">
 				{{ !expand ? "Show Data" : "Hide Data" }}
 			</VBtn>
 		</VCardActions>

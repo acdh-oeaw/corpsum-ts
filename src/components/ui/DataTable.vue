@@ -34,8 +34,8 @@ const table = useVueTable({
 					<TableHead v-for="header in headerGroup.headers" :key="header.id">
 						<FlexRender
 							v-if="!header.isPlaceholder"
-							:render="header.column.columnDef.header"
 							:props="header.getContext()"
+							:render="header.column.columnDef.header"
 						/>
 					</TableHead>
 				</TableRow>
@@ -48,13 +48,13 @@ const table = useVueTable({
 						:data-state="row.getIsSelected() ? 'selected' : undefined"
 					>
 						<TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-							<FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+							<FlexRender :props="cell.getContext()" :render="cell.column.columnDef.cell" />
 						</TableCell>
 					</TableRow>
 				</template>
 				<template v-else>
 					<TableRow>
-						<TableCell :colspan="columns.length" class="h-24 text-center">No results.</TableCell>
+						<TableCell class="h-24 text-center" :colspan="columns.length">No results.</TableCell>
 					</TableRow>
 				</template>
 			</TableBody>

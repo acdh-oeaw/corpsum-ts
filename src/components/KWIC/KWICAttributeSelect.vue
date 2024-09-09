@@ -19,28 +19,28 @@ const _query = queryStore.queries.find((q) => q.id === props.query.id);
 		<div v-if="_query" class="flex w-full flex-row justify-start gap-3 p-0">
 			<VAutocomplete
 				v-model="_query.KWICAttrsStructs.attributes"
-				:label="t('Attributes')"
-				return-object
-				dese
-				closable-chips
-				placeholer="please select"
 				chips
-				multiple
+				closable-chips
+				dese
 				item-title="name"
 				:items="_query.KWICAttrsStructsOptions.attributes"
+				:label="t('Attributes')"
+				multiple
+				placeholer="please select"
+				return-object
 			/>
 
 			<VAutocomplete
 				v-model="_query.KWICAttrsStructs.structures"
-				:label="t('Structures')"
-				return-object
-				dese
-				closable-chips
-				placeholer="please select"
 				chips
-				multiple
+				closable-chips
+				dese
 				item-title="name"
 				:items="_query.KWICAttrsStructsOptions.structures"
+				:label="t('Structures')"
+				multiple
+				placeholer="please select"
+				return-object
 			/>
 		</div>
 	</div>

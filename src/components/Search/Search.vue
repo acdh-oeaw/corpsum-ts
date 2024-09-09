@@ -36,21 +36,21 @@ const _alert = (msg: string) => {
 
 					<VSelect
 						v-model="newSelectedType"
-						:items="CORPUS_QUERY_TYPES"
+						class="ml-4"
 						item-title="description"
 						item-value="value"
+						:items="CORPUS_QUERY_TYPES"
 						:label="t('querytype')"
 						style="flex-grow: 0"
-						class="ml-4"
 					></VSelect>
 					<VTextField
 						v-model="newUserInput"
+						append-inner-icon="mdi-send-circle"
+						class="flex-1"
 						:placeholder="t('SearchTerm')"
 						vafriant="outlined"
-						class="flex-1"
-						append-inner-icon="mdi-send-circle"
-						@keydown.enter="addQuery"
 						@click:append-inner="addQuery"
+						@keydown.enter="addQuery"
 					></VTextField>
 				</div>
 			</VForm>

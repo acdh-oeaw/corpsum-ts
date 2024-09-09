@@ -62,7 +62,9 @@ export const getKWICColumns = (
 			return h(
 				VIcon,
 				{
-					onClick: () => open(row.original),
+					onClick: () => {
+						open(row.original);
+					},
 					size: "small",
 					icon: "mdi-open-in-new",
 					class: "me-2 cursor-pointer font-medium",

@@ -91,11 +91,11 @@ const series = computed(() =>
 
 		<VCardText class="py-0">
 			<VBtnToggle v-model="mode" density="compact">
-				<VBtn variant="outlined" value="absolute">{{ t("absolute") }}</VBtn>
-				<VBtn variant="outlined" value="relative">{{ t("relative") }}</VBtn>
+				<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
+				<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 			</VBtnToggle>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<QueryDisplay :query="query" :loading="yearlyFrequenciesLoading[index]" />
+				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
 			</div>
 			<HighCharts
 				:options="{
@@ -115,17 +115,17 @@ const series = computed(() =>
 
 		<VExpandTransition v-if="expand">
 			<DataDisplaySourceTable
-				:queries="queries"
 				:data="yearlyFrequencies"
-				:loading="yearlyFrequenciesLoading"
 				datatype="yearlyFrequencies"
+				:loading="yearlyFrequenciesLoading"
+				:queries="queries"
 			></DataDisplaySourceTable>
 		</VExpandTransition>
 
 		<VDivider></VDivider>
 
 		<VCardActions>
-			<VBtn variant="outlined" size="small" @click="expand = !expand">
+			<VBtn size="small" variant="outlined" @click="expand = !expand">
 				{{ !expand ? t("ShowData") : t("HideData") }}
 			</VBtn>
 		</VCardActions>
