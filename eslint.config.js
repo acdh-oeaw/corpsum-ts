@@ -20,6 +20,7 @@ const config = [
 	{
 		rules: {
 			"vue/attributes-order": ["warn", { alphabetical: true }],
+			"no-undef": "off",
 		},
 	},
 ];
