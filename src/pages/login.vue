@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { cn } from '@/utils/styles'
-import { buttonVariants } from '@/components/ui/button'
 const t = useTranslations("LoginPage");
 definePageMeta({
 	title: "LoginPage.meta.title",
@@ -20,7 +19,7 @@ async function login() {
 	if (!(await auth.login(username.value, password.value))) {
 		isLoading.value = false;
 		return alert(t("WrongCredentials"))
-	};
+	}
 	return await navigateTo(localeRoute("/", locale.value));
 }
 
@@ -54,9 +53,6 @@ onMounted(async () => {
 				<form>
 					<div class="grid gap-2">
 						<div class="grid gap-1">
-							<Label class="sr-only" for="email">
-								Email
-							</Label>
 							<Input
 								id="username"
 								placeholder="username"
