@@ -29,6 +29,8 @@ const structureOptions = computed(() => {
 const attributeOptions = computed(
 	() => _query?.KWICAttrsStructsOptions.attributes.map((structure) => structure.name) ?? [],
 );
+
+const fixed = queryStore.fixedKWICStructures;
 </script>
 
 <template>
@@ -73,6 +75,7 @@ const attributeOptions = computed(
 						checkbox
 						:class="{ 'ml-4': item.raw.includes('.') }"
 						density="compact"
+						:disabled="fixed.includes(item.raw)"
 						v-bind="props"
 					></VListItem>
 				</template>

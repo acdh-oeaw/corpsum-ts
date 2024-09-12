@@ -12,18 +12,20 @@ const keyToKey = {
 	wordrow: "word",
 };
 
-const emptySelectedCorpusKWICViewInfo: KWICAttrsStructs = {
+const _fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc_name"];
+
+const newSelectedCorpusKWICViewInfo: KWICAttrsStructs = {
 	attributes: [],
-	structures: [],
+	structures: _fixedKWICStructures,
 };
 
 export const useQueryStore = defineStore(
-	"QueryStoreWithNewStructure",
+	"QueryStoreWithNewStructureadsf",
 	() => {
 		const nextQueryId = ref(0);
 		const queries = ref([]) as Ref<Array<CorpusQuery>>;
 		const corporaStore = useCorporaStore();
-
+		const fixedKWICStructures = _fixedKWICStructures;
 		function addQuery(userInput: string, type: CorpusQueryType) {
 			let finalQuery = "";
 
@@ -61,13 +63,14 @@ export const useQueryStore = defineStore(
 				concordance_query: concordance_query as ConcordanceQuery,
 				preparedQuery: `aword,${finalQuery}`, // note: this is done in the old project, so we do it here too
 				showPicker: false,
-				KWICAttrsStructs: { ...emptySelectedCorpusKWICViewInfo },
+				KWICAttrsStructs: { ...newSelectedCorpusKWICViewInfo },
 				KWICAttrsStructsOptions: {
 					attributes: (corporaStore.corpInfoResponse.attributes ??
 						([] as unknown)) as Array<KWICAttribute>,
 					structures: (corporaStore.corpInfoResponse.structures ??
 						([] as unknown)) as Array<KWICStructure>,
 				},
+				KWICAdditionalViewHeaders: [],
 				facettingValues: {},
 				loading: {
 					yearlyFrequencies: false,
@@ -104,6 +107,7 @@ export const useQueryStore = defineStore(
 		};
 		return {
 			nextQueryId,
+			fixedKWICStructures,
 			queries,
 			addQuery,
 			getKWICqueryAttrStrcs,
