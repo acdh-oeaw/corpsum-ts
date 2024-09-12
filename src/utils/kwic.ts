@@ -15,7 +15,7 @@ export const getKWICColumns = (
 	const arr = [
 		{
 			accessorKey: "docid",
-			header: () => h("div", { class: "text-right" }, t("DocID")),
+			header: () => h("div", { class: "text-right" }, t("Corpsum.DocID")),
 			cell: ({ row }: rowObj) => {
 				const docid = row.getValue("docid");
 				return h("div", { class: "text-right font-medium" }, docid);
@@ -23,7 +23,7 @@ export const getKWICColumns = (
 		},
 		{
 			accessorKey: "source",
-			header: () => h("div", { class: "text-right" }, t("source")),
+			header: () => h("div", { class: "text-right" }, t("Corpsum.source")),
 			cell: ({ row }: rowObj) => {
 				const source = row.getValue("source");
 				return h("div", { class: "text-right font-medium" }, source);
@@ -31,7 +31,7 @@ export const getKWICColumns = (
 		},
 		{
 			accessorKey: "region",
-			header: () => h("div", { class: "text-right" }, t("region")),
+			header: () => h("div", { class: "text-right" }, t("Corpsum.region")),
 			cell: ({ row }: rowObj) => {
 				const region = row.getValue("region");
 				return h("div", { class: "text-right font-medium" }, region);
@@ -39,7 +39,7 @@ export const getKWICColumns = (
 		},
 		{
 			accessorKey: "left",
-			header: () => h("div", { class: "text-right" }, t("left")),
+			header: () => h("div", { class: "text-right" }, t("Corpsum.left")),
 			cell: ({ row }: rowObj) => {
 				const left = row.getValue("left");
 				return h("div", { class: "text-right font-medium" }, left);
@@ -47,7 +47,7 @@ export const getKWICColumns = (
 		},
 		{
 			accessorKey: "word",
-			header: () => h("div", { class: "text-right" }, t("word")),
+			header: () => h("div", { class: "text-right" }, t("Corpsum.word")),
 			cell: ({ row }: rowObj) => {
 				const word = row.getValue("word");
 				return h("div", { class: "text-right font-medium" }, word);
@@ -55,7 +55,7 @@ export const getKWICColumns = (
 		},
 		{
 			accessorKey: "right",
-			header: () => h("div", { class: "text-left" }, t("right")),
+			header: () => h("div", { class: "text-left" }, t("Corpsum.right")),
 			cell: ({ row }: rowObj) => {
 				return h("div", { class: "text-right font-medium" }, row.getValue("right"));
 			},
@@ -79,7 +79,7 @@ export const getKWICColumns = (
 	// add link as lasht column
 	arr.push({
 		accessorKey: "link",
-		header: () => h("div", { class: "text-right" }, t("link")),
+		header: () => h("div", { class: "text-right" }, t("Corpsum.link")),
 		cell: ({ row }: rowObj) => {
 			// const link = row.getValue("link");
 			// <  size = "" class="me-2" icon = "mdi-open-in-new" @click="open(item)" />

@@ -60,9 +60,11 @@ function open(item: KeywordInContext) {
 
 const t = useTranslations("Corpsum");
 
+const translateWithoutNamespace = useTranslations();
+
 const columns = computed(() => {
 	return getKWICColumns(
-		t as unknown as (s: string) => string,
+		translateWithoutNamespace as unknown as (s: string) => string,
 		open,
 		props.query.KWICAttrsStructs.structures,
 		queryStore.fixedKWICStructures,
