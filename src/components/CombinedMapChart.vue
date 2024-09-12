@@ -179,6 +179,5 @@ const chartOptions = computed(() => {
 <template>
 	<div>
 		<HighCharts :constructor-type="'mapChart'" :options="chartOptions" />
-		{{ series }}
 	</div>
 </template>
