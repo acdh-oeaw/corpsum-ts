@@ -69,6 +69,12 @@ const loading = computed(() => {
 	return regionalFrequenciesLoading.value.reduce((a, b) => a || b, false);
 });
 
+const mode: Ref<"relative" | "absolute"> = ref("relative");
+
+watch(mode, (value?: string) => {
+	if (!value) mode.value = "relative";
+});
+
 // sadly this is needed to redraw the combined chart. also kills the data that is from a removed query
 watch(queries.value, () => {
 	// console.log("queries chagened", queries.value);
@@ -82,7 +88,6 @@ watch(queries.value, () => {
 	);
 });
 
-const mode = ref("relative");
 const expand = ref(false);
 </script>
 

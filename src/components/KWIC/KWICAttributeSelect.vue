@@ -11,6 +11,26 @@ const props = defineProps<{ query: CorpusQuery }>();
 const queryStore = useQueryStore();
 
 const _query = queryStore.queries.find((q) => q.id === props.query.id);
+
+const structureOptions = computed(() => {
+	const options: Array<string> = [];
+	_query?.KWICAttrsStructsOptions.structures.forEach((structure) => {
+		if (!structure.name) return;
+		options.push(structure.name);
+		if (structure.attributes && _query.KWICAttrsStructs.structures.includes(structure.name)) {
+			structure.attributes.forEach((attribute) => {
+				options.push(`${structure.name}.${attribute.name}`);
+			});
+		}
+	});
+	return options ?? [];
+});
+
+const attributeOptions = computed(
+	() => _query?.KWICAttrsStructsOptions.attributes.map((structure) => structure.name) ?? [],
+);
+
+const fixed = queryStore.fixedKWICStructures;
 </script>
 
 <template>
@@ -20,28 +40,57 @@ const _query = queryStore.queries.find((q) => q.id === props.query.id);
 			<VAutocomplete
 				v-model="_query.KWICAttrsStructs.attributes"
 				chips
+				class="flex-1"
 				closable-chips
-				dese
+				density="compact"
 				item-title="name"
-				:items="_query.KWICAttrsStructsOptions.attributes"
+				:items="attributeOptions"
 				:label="t('Attributes')"
 				multiple
 				placeholer="please select"
-				return-object
-			/>
+			>
+				<template #item="{ props, item }">
+					<VListItem
+						:class="{ 'ml-4': item.raw.includes('.') }"
+						density="compact"
+						v-bind="props"
+					></VListItem>
+				</template>
+			</VAutocomplete>
 
 			<VAutocomplete
 				v-model="_query.KWICAttrsStructs.structures"
 				chips
+				class="flex-1"
 				closable-chips
-				dese
+				density="compact"
 				item-title="name"
-				:items="_query.KWICAttrsStructsOptions.structures"
+				:items="structureOptions"
 				:label="t('Structures')"
 				multiple
 				placeholer="please select"
-				return-object
-			/>
+			>
+				<template #chip="{ item, index }">
+					<VChip
+						:closable="!fixed.includes(item.title)"
+						@click:close="_query.KWICAttrsStructs.structures.splice(index, 1)"
+					>
+						{{ item.title }}
+					</VChip>
+				</template>
+
+				<template #item="{ props, item }">
+					<VListItem
+						checkbox
+						:class="{ 'ml-4': item.raw.includes('.') }"
+						density="compact"
+						:disabled="
+							fixed.includes(item.raw) && _query.KWICAttrsStructs.structures.includes(item.raw)
+						"
+						v-bind="props"
+					></VListItem>
+				</template>
+			</VAutocomplete>
 		</div>
 	</div>
 </template>

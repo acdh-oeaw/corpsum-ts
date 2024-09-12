@@ -21,6 +21,7 @@ interface KeywordInContext {
 	docid: string;
 	topic: string;
 	toknum: number;
+	refs: Array<string>;
 }
 interface QueryData {
 	yearlyFrequencies: Array<{
@@ -62,6 +63,11 @@ interface KWICStructure {
 	size?: number | undefined;
 }
 interface KWICAttrsStructs {
+	attributes: Array<string>;
+	structures: Array<string>;
+}
+
+interface KWICAttrsStructsOptions {
 	attributes: Array<KWICAttribute>;
 	structures: Array<KWICStructure>;
 }
@@ -87,7 +93,8 @@ interface CorpusQuery {
 	subCorpus: string;
 	concordance_query: ConcordanceQuery;
 	KWICAttrsStructs: KWICAttrsStructs;
-	KWICAttrsStructsOptions: KWICAttrsStructs; // ToDo: this might be refactored to come via requesat whenever needed.
+	KWICAdditionalViewHeaders: Array<string>;
+	KWICAttrsStructsOptions: KWICAttrsStructsOptions; // ToDo: this might be refactored to come via requesat whenever needed.
 	facettingValues: FacettingValues;
 	loading: {
 		yearlyFrequencies: boolean;
