@@ -26,10 +26,11 @@ interface PieInfoWithData extends PieInfo {
 		color: string;
 	}>;
 }
+// change these values to change the position of the pies
 const pieInfo: Array<PieInfo> = [
 	{ region: "amitte", center: ["54.7%", "25%"] },
 	{ region: "aost", center: ["70%", "25%"] },
-	{ region: "asuedost", center: ["64.5%", "77.6%"] },
+	{ region: "asuedost", center: ["60.5%", "77.6%"] },
 	{ region: "awest", center: ["35%", "49%"] },
 ];
 
@@ -90,7 +91,7 @@ function pointFormatter() {
 ${queryArray
 	.map(
 		(line) =>
-			`<span style="color:${line[2]}">\u25CF</span> ${line[0]}: ${Math.round(line[1] * 100) / 100}<br/>`,
+			`<span style="color:${line[2]}">\u25CF</span> ${line[0]}: ${Math.round(line[1] * 100) / 100} <br />`,
 	)
 	.join("")}`;
 }
@@ -106,6 +107,9 @@ const pieSeries = computed(() =>
 		name: piwd.region,
 		dataLabels: {
 			enabled: false,
+		},
+		tooltip: {
+			pointFormat: `<span style="color:{point.color}">\u25CF</span> <b>{point.name}</b>: {point.y} ({point.percentage:.1f}%)`,
 		},
 	})),
 );
@@ -175,5 +179,6 @@ const chartOptions = computed(() => {
 <template>
 	<div>
 		<HighCharts :constructor-type="'mapChart'" :options="chartOptions" />
+		{{ series }}
 	</div>
 </template>
