@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { NavLinkProps } from "@/components/nav-link.vue";
-import { Button } from "@/components/ui/button";
-import { navigateTo } from "#app";
+const localeRoute = useLocaleRoute();
+const { locale } = useI18n();
 
 const t = useTranslations("AppHeader");
 
@@ -14,7 +14,7 @@ const links = {
 
 async function logout() {
 	auth.logout();
-	await navigateTo("/en/login");
+	await navigateTo(localeRoute("/login", locale.value));
 }
 </script>
 
