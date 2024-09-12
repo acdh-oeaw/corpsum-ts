@@ -1,5 +1,8 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-	// console.log("in route middleware");
+	const nuxt = useNuxtApp();
 	const auth = useAuth();
-	if (!auth.isLoggedIn() && (to.path === "/en" || to.path === "/de")) await navigateTo("/en/login");
+	const localeRoute = useLocaleRoute();
+	const i18n = nuxt.$i18n;
+	const loginPath = localeRoute("/login", i18n.locale.value)
+	if (!auth.isLoggedIn() && (to.path !== loginPath?.path)) navigateTo(localeRoute("/login", i18n.locale.value));
 });
