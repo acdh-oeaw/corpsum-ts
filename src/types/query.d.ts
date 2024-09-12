@@ -62,10 +62,14 @@ interface KWICStructure {
 	size?: number | undefined;
 }
 interface KWICAttrsStructs {
+	attributes: Array<string>;
+	structures: Array<string>;
+}
+
+interface KWICAttrsStructsOptions {
 	attributes: Array<KWICAttribute>;
 	structures: Array<KWICStructure>;
 }
-
 type ConcordanceQuery = Record<"queryselector", CorpusQueryType> &
 	Record<CorpusQueryTypeValue, string>;
 
@@ -87,7 +91,7 @@ interface CorpusQuery {
 	subCorpus: string;
 	concordance_query: ConcordanceQuery;
 	KWICAttrsStructs: KWICAttrsStructs;
-	KWICAttrsStructsOptions: KWICAttrsStructs; // ToDo: this might be refactored to come via requesat whenever needed.
+	KWICAttrsStructsOptions: KWICAttrsStructsOptions; // ToDo: this might be refactored to come via requesat whenever needed.
 	facettingValues: FacettingValues;
 	loading: {
 		yearlyFrequencies: boolean;

@@ -18,7 +18,7 @@ const emptySelectedCorpusKWICViewInfo: KWICAttrsStructs = {
 };
 
 export const useQueryStore = defineStore(
-	"newQueryStore",
+	"QueryStoreWithNewStructure",
 	() => {
 		const nextQueryId = ref(0);
 		const queries = ref([]) as Ref<Array<CorpusQuery>>;
@@ -85,8 +85,8 @@ export const useQueryStore = defineStore(
 		}
 
 		const getKWICqueryAttrStrcs = (query: CorpusQuery) => ({
-			attrs: query.KWICAttrsStructs.attributes.map((attr) => attr.name).join(","),
-			structs: query.KWICAttrsStructs.structures.map((struct) => struct.name).join(","),
+			attrs: query.KWICAttrsStructs.attributes.join(","),
+			structs: query.KWICAttrsStructs.structures.join(","),
 		});
 
 		const getQueryWithFacetting = (query: CorpusQuery) => {

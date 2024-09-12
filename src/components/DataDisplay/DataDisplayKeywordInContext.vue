@@ -75,7 +75,9 @@ function open(item: KeywordInContext) {
 
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 
-const columns = getKWICColumns(t as unknown as (s: string) => string, open);
+const columns = computed(() => {
+	return getKWICColumns(t as unknown as (s: string) => string, open);
+});
 </script>
 
 <template>
