@@ -70,12 +70,23 @@ const fixed = queryStore.fixedKWICStructures;
 				multiple
 				placeholer="please select"
 			>
+				<template #chip="{ item, index }">
+					<VChip
+						:closable="!fixed.includes(item.title)"
+						@click:close="_query.KWICAttrsStructs.structures.splice(index, 1)"
+					>
+						{{ item.title }}
+					</VChip>
+				</template>
+
 				<template #item="{ props, item }">
 					<VListItem
 						checkbox
 						:class="{ 'ml-4': item.raw.includes('.') }"
 						density="compact"
-						:disabled="fixed.includes(item.raw)"
+						:disabled="
+							fixed.includes(item.raw) && _query.KWICAttrsStructs.structures.includes(item.raw)
+						"
 						v-bind="props"
 					></VListItem>
 				</template>
