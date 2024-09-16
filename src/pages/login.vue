@@ -3,6 +3,7 @@ import { cn } from '@/utils/styles'
 const t = useTranslations("LoginPage");
 definePageMeta({
 	title: "LoginPage.meta.title",
+	layout: "full-page",
 });
 
 const localeRoute = useLocaleRoute();
@@ -14,7 +15,6 @@ const password = ref("");
 const isLoading = ref(false);
 
 async function login() {
-	console.log(username.value, password.value);
 	isLoading.value = true;
 	if (!(await auth.login(username.value, password.value))) {
 		isLoading.value = false;
@@ -29,7 +29,7 @@ onMounted(async () => {
 </script>
 
 <template>
-	<div class="container relative hidden flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+	<div class="container relative hidden flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0 h-screen">
 		<div class="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
 			<div class="absolute inset-0 bg-zinc-900" />
 			<div class="relative text-7xl font-bold">
