@@ -132,7 +132,8 @@
 		"WrongCredentials": "Username or Password wrong",
 		"username": "Username",
 		"password": "Password",
-		"login": "Login"
+		"login": "Login",
+		"splashtext": "CorpSum is a web application that enables user-friendly, dynamically generated queries in text corpora along different extralinguistic extralinguistic dimensions of variation (such as the dimensions time and space)."
 	},
 	"LocaleSwitcher": {
 		"locales": {

@@ -96,7 +96,8 @@
 		"WrongCredentials": "Username or Password wrong",
 		"username": "Username",
 		"password": "Password",
-		"login": "Login"
+		"login": "Login",
+		"splashtext": "CorpSum ist eine Webapplikation, die benutzerfreundliche, dynamisch generierte Abfragen in Textkorpora entlang verschiedener extralinguistischer Variationsdimensionen ermöglicht (wie beispielsweise die Dimensionen Zeit und Raum)."
 	},
 	"IndexPage": {
 		"meta": {
