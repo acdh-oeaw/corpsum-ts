@@ -17,7 +17,7 @@ export default defineNuxtConfig({
 	},
 
 	css: [
-		"@fontsource-variable/inter/index.css",
+		"@fontsource-variable/archivo/index.css",
 		"tailwindcss/tailwind.css",
 		"@/styles/index.css",
 		"vuetify/lib/styles/main.sass",

@@ -102,9 +102,9 @@ importers:
       '@axe-core/playwright':
         specifier: ^4.8.4
         version: 4.10.0(playwright-core@1.47.0)
-      '@fontsource-variable/inter':
+      '@fontsource-variable/archivo':
         specifier: ^5.0.16
-        version: 5.0.21
+        version: 5.1.0
       '@hey-api/openapi-ts':
         specifier: ^0.34.5
         version: 0.34.5
@@ -986,8 +986,8 @@ packages:
   '@floating-ui/vue@1.1.4':
     resolution: {integrity: sha512-ammH7T3vyCx7pmm9OF19Wc42zrGnUw0QvLoidgypWsCLJMtGXEwY7paYIHO+K+oLC3mbWpzIHzeTVienYenlNg==}
 
-  '@fontsource-variable/inter@5.0.21':
-    resolution: {integrity: sha512-1spQ5vjooBWzUSdug8njhxi0lDpIDGVV4q9Piv32X5wIati/5OvESsIxOM0kDZVWzl0uSR8kHOmsqoP8A6WqVA==}
+  '@fontsource-variable/archivo@5.1.0':
+    resolution: {integrity: sha512-q0q76Qt9qulNS/nMFhAcaWeDi/Z3Eka5qKX1P75DV06KwpCJ4Q2yeh0RnugNiyGFyxkinx9zJfyjO+agG4Yfkg==}
 
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
@@ -7305,7 +7305,7 @@ snapshots:
       - '@vue/composition-api'
       - vue
 
-  '@fontsource-variable/inter@5.0.21': {}
+  '@fontsource-variable/archivo@5.1.0': {}
 
   '@gar/promisify@1.1.3': {}
 

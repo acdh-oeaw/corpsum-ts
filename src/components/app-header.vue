@@ -9,7 +9,7 @@ const auth = useAuth();
 
 const links = {
 	home: { href: { path: "/" }, label: t("links.home") },
-	// corpsum: { href: { path: "/corpsum" }, label: t("links.corpsum") },
+	queries: { href: { path: "/queries" }, label: t("queries") },
 } satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
 
 async function logout() {
@@ -23,6 +23,13 @@ async function logout() {
 		<div class="container flex items-center justify-between gap-4 py-8">
 			<nav :aria-label="t('navigation-main')">
 				<ul class="flex items-center gap-4" role="list">
+					<li>
+						<NavLink href="/">
+							<div class="relative text-5xl font-bold mt-auto">
+								CorpSum
+							</div>
+						</NavLink>
+					</li>
 					<li v-for="(link, key) of links" :key="key">
 						<NavLink :href="link.href">
 							{{ link.label }}
@@ -30,9 +37,10 @@ async function logout() {
 					</li>
 				</ul>
 			</nav>
-
-			<LocaleSwitcher />
-			<Button v-if="auth.isLoggedIn()" size="lg" @click="logout">Logout {{ auth.username }}</Button>
+			<div class="flex items-center gap-4">
+				<LocaleSwitcher />
+				<Button v-if="auth.isLoggedIn()" size="lg" @click="logout">Logout {{ auth.username }}</Button>
+			</div>
 		</div>
 	</header>
 </template>

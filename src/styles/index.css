@@ -8,6 +8,7 @@
 
 :root {
 	overflow: hidden;
+	font-family: 'Archivo Variable', sans-serif;
 	overflow-wrap: break-word;
 	tab-size: 4;
 	block-size: 100%;
