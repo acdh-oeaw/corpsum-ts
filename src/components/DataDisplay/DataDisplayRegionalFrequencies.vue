@@ -120,7 +120,6 @@ const expand = ref(false);
 					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>
 			</div>
-			<!-- <JsonViewer boxed :value="regionalFrequencies" :expand-depth="5"></JsonViewer> -->
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div class="mt-1">

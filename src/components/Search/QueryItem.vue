@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import "vue-json-pretty/lib/styles.css";
+
+import VueJsonPretty from "vue-json-pretty";
+
 import { useQueryStore } from "../../stores/query";
 
 const props = defineProps<{ query: CorpusQuery }>();
@@ -67,9 +71,7 @@ const showFacettingInterface = ref(false);
 
 		<VCardText class="flex justify-between gap-1" :style="`color: ${props.query.color}`">
 			<div class="flex flex-col justify-between">
-				<!-- <JsonViewer preview-mode :value="query.concordance_query" boxed></JsonViewer> -->
-				<JsonViewer boxed preview-mode :value="queryWithFacetting"></JsonViewer>
-				<!-- <JsonViewer preview-mode :value="query.KWICAttrsStructs" boxed></JsonViewer> -->
+				<VueJsonPretty :data="queryWithFacetting"></VueJsonPretty>
 			</div>
 			<div class="flex flex-col gap-1">
 				<CorpusChip :query="query"></CorpusChip>
