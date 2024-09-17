@@ -25,12 +25,12 @@ async function logout() {
 				<ul class="flex items-center gap-4" role="list">
 					<li>
 						<NavLink href="/">
-							<div class="relative text-5xl font-bold mt-auto">
+							<div class="relative mt-auto font-thin text-4xl">
 								CorpSum
 							</div>
 						</NavLink>
 					</li>
-					<li v-for="(link, key) of links" :key="key">
+					<li v-for="(link, key) of links" :key="key" class="font-medium text-1xl">
 						<NavLink :href="link.href">
 							{{ link.label }}
 						</NavLink>
