@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # build
-FROM node:20-slim AS build
+FROM node:20-slim AS base
 
 RUN corepack enable
 
@@ -23,10 +23,17 @@ ARG NUXT_PUBLIC_REDMINE_ID
 ARG NUXT_PUBLIC_MATOMO_BASE_URL
 ARG NUXT_PUBLIC_MATOMO_ID
 
+FROM base as dev
+ENV NODE_ENV development
+RUN pnpm install
+
+EXPOSE 3000
+
+CMD [ "pnpm", "run", "dev", "--host" ]
+
+FROM base as build
 RUN pnpm install --frozen-lockfile --offline
-
 ENV NODE_ENV=production
-
 RUN pnpm run build
 
 # serve

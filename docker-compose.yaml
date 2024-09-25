@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+  corpsum-mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $NUXT_MONGO_ROOT_USER
+      MONGO_INITDB_ROOT_PASSWORD: $NUXT_MONGO_ROOT_PASSWORD
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodata:/data/db
+      - mongodumps:/data/dumps
+    networks:
+      - corpsumnet
+  corpsum-app:
+    build:
+      context: ./
+      target: dev
+    image: corpsum-dev
+    env_file:
+      - ./.env.local
+    networks:
+      - corpsumnet
+    ports:
+      - 3000:3000
+
+networks:
+  corpsumnet:
+
+volumes:
+  mongodata:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: $DOCKER_MONGODATA_DIR
+  mongodumps:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: $DOCKER_MONGODUMPS_DIR
