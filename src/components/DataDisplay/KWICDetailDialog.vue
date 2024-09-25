@@ -34,7 +34,6 @@ const t = useTranslations("Corpsum");
 						<VProgressCircular indeterminate></VProgressCircular>
 						<span class="ml-2">{{ t("loading-the-full-ref") }}</span>
 					</div>
-					<!-- <JsonViewer v-if="status !== 'pending'" :expand-depth="2" :value="details"></JsonViewer> -->
 					<div v-if="status !== 'pending' && details">
 						<div
 							v-for="ref of details.data.Refs"

@@ -29,13 +29,9 @@ const { queries } = storeToRefs(queryStore);
 			</VContainer>
 
 			<Search></Search>
-			<!-- <v-data-table /> -->
-			<!-- <Dev></Dev> -->
 
 			<VContainer>
 				<div class="" :class="['grid', 'gap-3', `grid-cols-1`]">
-					<!-- <DisplayCard v-for="i in 2" :key="i" :title="titles[i]"></DisplayCard> -->
-
 					<DataDisplayYearlyFrequencies
 						v-if="selectedSearches.includes('yearlyFrequencies' as unknown as SearchFunctionKey)"
 						:queries="queries"
@@ -64,7 +60,6 @@ const { queries } = storeToRefs(queryStore);
 					></DataDisplayKeywordInContext>
 				</div>
 			</VContainer>
-			<!-- <Dev /> -->
 		</ClientOnly>
 	</MainContent>
 </template>

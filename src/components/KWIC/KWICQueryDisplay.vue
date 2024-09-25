@@ -11,13 +11,15 @@ const queryStore = useQueryStore();
 
 const api = useApiClient();
 
+const facettingQuery = computed(() => queryStore.getQueryWithFacetting(props.query));
+
 const { data: KWICresults, status } = useQuery({
 	queryKey: [
 		"get-concordance",
 		props.query.corpus,
 		props.query.subCorpus,
 		props.query.KWICAttrsStructs,
-		queryStore.getQueryWithFacetting(props.query),
+		facettingQuery,
 	],
 	queryFn: async () => {
 		const response = await api.search.getConcordance({
@@ -27,7 +29,7 @@ const { data: KWICresults, status } = useQuery({
 			...queryStore.getKWICqueryAttrStrcs(props.query),
 			refs: props.query.KWICAttrsStructs.structures.map((s: string) => `=${s}`).join(","),
 			pagesize: 1000,
-			json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(props.query) }),
+			json: JSON.stringify({ concordance_query: facettingQuery.value }),
 			format: "json",
 		});
 		return response.data;
@@ -79,6 +81,7 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 		<VCheckbox v-model="showViewOptionsMode" :label="t('viewOptions')"></VCheckbox>
 		<KWICAttributeSelect v-if="showViewOptionsMode" :query="query" />
 		<div>
+			<!-- <QueryItem :query="query" /> -->
 			<QueryDisplay :loading="loading" :query="query" />
 			<CorpsumDataTable v-if="!loading" :columns="columns" :data="KWICresults!" />
 			<KWICDetailDialog

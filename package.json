@@ -57,6 +57,7 @@
 		"tailwind-merge": "^2.4.0",
 		"vue-highlight-words": "^3.0.1",
 		"vue-i18n-routing": "^1.2.0",
+		"vue-json-pretty": "^2.4.0",
 		"zipcelx": "^1.6.2"
 	},
 	"devDependencies": {
@@ -108,7 +109,6 @@
 		"typescript": "^5.5.3",
 		"vitest": "^2.0.5",
 		"vitest-environment-nuxt": "^1.0.1",
-		"vue-json-viewer": "^3.0.4",
 		"vue-tsc": "^2.0.29",
 		"vuetify": "^3.5.1"
 	},
