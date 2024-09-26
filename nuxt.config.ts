@@ -75,7 +75,8 @@ export default defineNuxtConfig({
 	},
 
 	mongoose: {
-		uri: `mongodb://${process.env.DATABASE_USER!.toString()}:${process.env.DATABASE_PASSWORD!.toString()}@${process.env.DATABASE_HOST!.toString()}/${process.env.DATABASE_NAME!.toString()}`,
+		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+		uri: `mongodb://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}/${process.env.DATABASE_NAME}`,
 		options: {},
 		modelsDir: 'models',
 		devtools: false,
