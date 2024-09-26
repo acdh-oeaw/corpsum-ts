@@ -9,7 +9,6 @@ export default defineNuxtConfig({
 	},
 
 	components: [{ path: "@/components", pathPrefix: false }],
-
 	content: {
 		defaultLocale,
 		locales: Object.keys(locales),
@@ -25,9 +24,8 @@ export default defineNuxtConfig({
 	],
 
 	devtools: {
-		enabled: true,
+		enabled: false,
 	},
-
 	dir: {
 		public: "../public",
 	},
@@ -76,6 +74,13 @@ export default defineNuxtConfig({
 		componentDir: "./src/components/ui",
 	},
 
+	mongoose: {
+		uri: `mongodb://${process.env.DATABASE_USER!.toString()}:${process.env.DATABASE_PASSWORD!.toString()}@${process.env.DATABASE_HOST!.toString()}/${process.env.DATABASE_NAME!.toString()}`,
+		options: {},
+		modelsDir: 'models',
+		devtools: false,
+	},
+
 	modules: [
 		"@nuxt/content",
 		"@nuxt/devtools",
@@ -84,6 +89,7 @@ export default defineNuxtConfig({
 		"@pinia/nuxt",
 		"@pinia-plugin-persistedstate/nuxt",
 		"shadcn-nuxt",
+		"nuxt-mongoose",
 	],
 	eslint: {
 		config: {

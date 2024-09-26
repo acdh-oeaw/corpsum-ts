@@ -3,8 +3,8 @@ services:
   corpsum-mongodb:
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: $NUXT_MONGO_ROOT_USER
-      MONGO_INITDB_ROOT_PASSWORD: $NUXT_MONGO_ROOT_PASSWORD
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USER
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
     ports:
       - 27017:27017
     volumes:
