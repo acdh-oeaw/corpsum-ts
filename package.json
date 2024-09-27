@@ -84,6 +84,8 @@
 		"@tanstack/vue-table": "^8.20.5",
 		"@types/html-to-text": "^9.0.4",
 		"@types/node": "^20.16.7",
+		"@types/jsonwebtoken": "^9.0.7",
+		"@types/bcryptjs": "^2.4.6",
 		"@vue/test-utils": "^2.4.6",
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.11.1",
@@ -111,7 +113,10 @@
 		"vitest": "^2.1.1",
 		"vitest-environment-nuxt": "^1.0.1",
 		"vue-tsc": "^2.1.6",
-		"vuetify": "^3.7.2"
+		"vuetify": "^3.7.2",
+		"bcryptjs": "^2.4.3",
+		"jsonwebtoken": "^9.0.2",
+		"jose": "^5.9.3"
 	},
 	"browserslist": {
 		"development": [
