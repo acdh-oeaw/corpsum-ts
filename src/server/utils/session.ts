@@ -2,11 +2,11 @@ import type { H3Event } from "h3";
 
 import type { AuthPayload } from "@/types/server";
 
-const { mongo } = useRuntimeConfig().auth;
+const { authSecret } = useRuntimeConfig();
 
 export async function _useSession(event: H3Event, username?: string) {
 	const session = await useSession(event, {
-		password: mongo.secret,
+		password: authSecret,
 		name: "authorization",
 	});
 	if (username) await session.update({ username });

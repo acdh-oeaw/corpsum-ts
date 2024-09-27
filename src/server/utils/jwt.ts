@@ -2,9 +2,9 @@ import { jwtVerify, SignJWT } from "jose";
 
 import type { AuthPayload } from "@/types/server";
 
-const { mongo } = useRuntimeConfig().auth;
+const { authSecret } = useRuntimeConfig();
 
-const JWT_SECRET = new TextEncoder().encode(mongo.secret);
+const JWT_SECRET = new TextEncoder().encode(authSecret);
 
 export async function createJWT(username: string) {
 	return await new SignJWT({ username })
