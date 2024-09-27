@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { NavLinkProps } from "@/components/nav-link.vue";
+
 const localeRoute = useLocaleRoute();
 const { locale } = useI18n();
 
@@ -25,12 +26,10 @@ async function logout() {
 				<ul class="flex items-center gap-4" role="list">
 					<li>
 						<NavLink href="/">
-							<div class="relative mt-auto font-thin text-4xl">
-								CorpSum
-							</div>
+							<div class="relative mt-auto text-4xl font-thin">CorpSum</div>
 						</NavLink>
 					</li>
-					<li v-for="(link, key) of links" :key="key" class="font-medium text-1xl">
+					<li v-for="(link, key) of links" :key="key" class="text-1xl font-medium">
 						<NavLink :href="link.href">
 							{{ link.label }}
 						</NavLink>
@@ -39,7 +38,9 @@ async function logout() {
 			</nav>
 			<div class="flex items-center gap-4">
 				<LocaleSwitcher />
-				<Button v-if="auth.isLoggedIn()" size="lg" @click="logout">Logout {{ auth.username }}</Button>
+				<Button v-if="auth.isLoggedIn()" size="lg" @click="logout"
+					>Logout {{ auth.username }}</Button
+				>
 			</div>
 		</div>
 	</header>

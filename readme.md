@@ -33,6 +33,7 @@ pnpm run dev
 ```
 
 To set up a database with docker-compose:
+
 ```bash
 # run the mongodb container specified in the compose file
 docker-compose --env-file ./.env.local run corpsum-mongodb
@@ -42,7 +43,9 @@ mongosh --username <NUXT_MONGO_ROOT_USER> --password <NUXT_MONGO_ROOT_PASSWORD>
 use <NUXT_DATABASE_NAME>
 db.createUser({user: "<NUXT_DATABASE_USER>", pwd: "<NUXT_DATABASE_PASSWORD>",  roles: ["readWrite"]})
 ```
+
 then shutdown the db with <kbd>Ctrl</kbd>+<kbd>C</kbd> and run the app like so
+
 ```bash
 docker-compose --env-file ./.env.local up
 ```
