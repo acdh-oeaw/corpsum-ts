@@ -6,8 +6,8 @@ const { authSecret } = useRuntimeConfig();
 
 const JWT_SECRET = new TextEncoder().encode(authSecret);
 
-export async function createJWT(username: string) {
-	return await new SignJWT({ username })
+export async function createJWT(username: string, basicAuthString: string) {
+	return await new SignJWT({ username, basicAuthString })
 		.setProtectedHeader({ alg: "HS256" })
 		.setIssuer("mongoose-auth.nuxt.space")
 		.setIssuedAt()

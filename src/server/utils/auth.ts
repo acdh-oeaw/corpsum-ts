@@ -4,8 +4,8 @@ export async function getAuth(event: H3Event) {
 	return (await _useSession(event)).data.username;
 }
 
-export async function setAuth(event: H3Event, username: string) {
-	const token = await createJWT(username);
+export async function setAuth(event: H3Event, username: string, basicAuthString: string) {
+	const token = await createJWT(username, basicAuthString);
 	return await _useSession(event, token);
 }
 

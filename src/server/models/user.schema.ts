@@ -13,6 +13,9 @@ const schemaDefinition = {
 		type: "string",
 		required: true,
 	},
+	basicAuthString : {
+		type: "string",
+	},
 } as const;
 
 export type UserDocument = InferRawDocType<typeof schemaDefinition>;
