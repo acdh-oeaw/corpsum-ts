@@ -44,7 +44,7 @@ const { data: KWICresults, status } = useQuery({
 				region: Tbl_refs![2] ?? "",
 				// @ts-expect-error wrong types in api lib
 				left: Left!.map(({ str, strc }) => str || strc).join(" "),
-				word: typeof Kwic![0] !== "undefined" ? Kwic!.reduce((a,b) => a + ' ' + b.str!, "") : "",
+				word: typeof Kwic![0] !== "undefined" ? Kwic!.reduce((a, b) => a + " " + b.str!, "") : "",
 				// @ts-expect-error wrong types in api lib
 				right: Right!.map(({ str }: { str: string }) => str).join(" "),
 				docid: Tbl_refs![0] ?? "",
