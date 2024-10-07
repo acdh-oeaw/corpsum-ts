@@ -13,7 +13,7 @@ const schemaDefinition = {
 		type: "string",
 		required: true,
 	},
-	basicAuthString : {
+	basicAuthString: {
 		type: "string",
 	},
 } as const;
