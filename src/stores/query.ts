@@ -35,20 +35,6 @@ export const useQueryStore = defineStore(
 			concordance_query[keyToKey[type]] = userInput;
 			concordance_query.queryselector = type;
 
-			// for old (regional Frequencies)
-			switch (type) {
-				case "wordrow":
-					finalQuery = `[word="${userInput}"]`;
-					break;
-				case "lemmarow":
-					finalQuery = `[lemma="${userInput}"]`;
-					break;
-				case "cqlrow":
-					finalQuery = userInput;
-					break;
-				default: // default is word search
-					finalQuery = `[word="${userInput}"]`;
-			}
 
 			const colorId = nextQueryId.value % colors.length; // so not to overshoot array
 			if (!corporaStore.corpInfoResponse) throw new Error("corpInfoResponse not loaded");
@@ -57,11 +43,9 @@ export const useQueryStore = defineStore(
 				color: colors[colorId]!,
 				type,
 				userInput,
-				finalQuery,
 				corpus: corporaStore.selectedCorpus?.corpname ?? "",
 				subCorpus: corporaStore.selectedSubCorpus?.n ?? "",
 				concordance_query: concordance_query as ConcordanceQuery,
-				preparedQuery: `aword,${finalQuery}`, // note: this is done in the old project, so we do it here too
 				showPicker: false,
 				KWICAttrsStructs: { ...newSelectedCorpusKWICViewInfo },
 				KWICAttrsStructsOptions: {
@@ -97,7 +81,6 @@ export const useQueryStore = defineStore(
 			for (const key in query.facettingValues) {
 				const elem = query.facettingValues[key];
 				if (!elem) continue;
-				// console.log({ key, elem })
 				if (Array.isArray(elem)) {
 					if (!elem.length) continue;
 					result[`sca_${key}`] = elem;

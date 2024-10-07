@@ -85,8 +85,6 @@ interface CorpusQuery {
 	id: number;
 	type: CorpusQueryType;
 	userInput: string;
-	finalQuery: string;
-	preparedQuery: string;
 	color: string;
 	showPicker: boolean;
 	corpus: string;
