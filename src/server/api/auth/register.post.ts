@@ -7,18 +7,19 @@ export default defineEventHandler(async (event) => {
 	const { username, password }: UserDocument = await readBody(event);
 
 	const hashed = bcrypt.hashSync(password, 10);
+	const basicAuthString = "Basic " + btoa(username + ":" + password);
 
 	try {
 		await mongoose.connection.db
 			?.collection<UserDocument>("users")
-			.insertOne({ username, password: hashed });
+			.insertOne({ username, password: hashed, basicAuthString });
 	} catch {
 		throw createError({
 			statusMessage: "user already registered.",
 		});
 	}
 
-	await setAuth(event, username);
+	await setAuth(event, username, basicAuthString);
 
 	return {
 		registered: true,
