@@ -27,14 +27,10 @@ export const useQueryStore = defineStore(
 		const corporaStore = useCorporaStore();
 		const fixedKWICStructures = _fixedKWICStructures;
 		function addQuery(userInput: string, type: CorpusQueryType) {
-			let finalQuery = "";
-
 			const concordance_query: Partial<ConcordanceQuery> = {};
-
 			// @ts-expect-error this is okay, because we set the correct key
 			concordance_query[keyToKey[type]] = userInput;
 			concordance_query.queryselector = type;
-
 
 			const colorId = nextQueryId.value % colors.length; // so not to overshoot array
 			if (!corporaStore.corpInfoResponse) throw new Error("corpInfoResponse not loaded");
