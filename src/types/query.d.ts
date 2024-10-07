@@ -83,17 +83,18 @@ interface FacettingRegexSearch {
 type FacettingValues = Record<string, Array<string> | FacettingRegexSearch>;
 interface CorpusQuery {
 	id: number;
-	type: CorpusQueryType;
-	userInput: string;
-	color: string;
-	showPicker: boolean;
+	noske?: string;
 	corpus: string;
 	subCorpus: string;
+	type: CorpusQueryType;
+	userInput: string;
+	facettingValues: FacettingValues;
+	color: string;
+	showPicker: boolean;
 	concordance_query: ConcordanceQuery;
 	KWICAttrsStructs: KWICAttrsStructs;
 	KWICAdditionalViewHeaders: Array<string>;
 	KWICAttrsStructsOptions: KWICAttrsStructsOptions; // ToDo: this might be refactored to come via requesat whenever needed.
-	facettingValues: FacettingValues;
 	loading: {
 		yearlyFrequencies: boolean;
 		wordFormFrequencies: boolean;
