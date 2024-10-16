@@ -67,7 +67,8 @@
 		"createSubcorpusConfirm1": "Moechten Sie ein Subkorpus erstellen mit dem Namen",
 		"createSubcorpusConfirm2": "und einem Inhalt von",
 		"createSubcorpusConfirm3": "Dokumenten aus dem Korpus",
-		"corpusCreated": "Subkorpus erfolgreich erstellt!"
+		"corpusCreated": "Subkorpus erfolgreich erstellt!",
+		"cattr": "cattr"
 	},
 	"DefaultLayout": {
 		"meta": {

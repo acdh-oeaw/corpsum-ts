@@ -97,7 +97,8 @@
 		"total-of-n-entries": "Total of {0} entries.",
 		"regexp-selection-clear-selection-to-select-values": "regexp selection. clear selection to select values.",
 		"use-search-as-modes-modeindex-for-search-this-clears-the-rest-of-the-selection": "use '{0}' as '{1}' for search (this clears the rest of the selection)",
-		"clear-selection": "Clear Selection"
+		"clear-selection": "Clear Selection",
+		"cattr": "cattr"
 	},
 	"DefaultLayout": {
 		"meta": {
