@@ -57,7 +57,7 @@ const t = useTranslations("Corpsum");
 						:key="row.id"
 						:data-state="row.getIsSelected() ? 'selected' : undefined"
 					>
-						<TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" >
+						<TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
 							<FlexRender :props="cell.getContext()" :render="cell.column.columnDef.cell" />
 						</TableCell>
 					</TableRow>
