@@ -37,7 +37,7 @@ const t = useTranslations("Corpsum");
 
 <template>
 	<div class="rounded-md border">
-		<Table>
+		<Table class="relative w-full text-nowrap">
 			<TableHeader>
 				<TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
 					<TableHead v-for="header in headerGroup.headers" :key="header.id">
@@ -57,7 +57,7 @@ const t = useTranslations("Corpsum");
 						:key="row.id"
 						:data-state="row.getIsSelected() ? 'selected' : undefined"
 					>
-						<TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+						<TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" >
 							<FlexRender :props="cell.getContext()" :render="cell.column.columnDef.cell" />
 						</TableCell>
 					</TableRow>
