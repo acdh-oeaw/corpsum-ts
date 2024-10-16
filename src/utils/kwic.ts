@@ -14,14 +14,6 @@ export const getKWICColumns = (
 ): Array<ColumnDef<KeywordInContext>> => {
 	const arr = [
 		{
-			accessorKey: "docid",
-			header: () => h("div", { class: "text-right" }, t("Corpsum.DocID")),
-			cell: ({ row }: rowObj) => {
-				const docid = row.getValue("docid");
-				return h("div", { class: "text-right font-medium" }, docid);
-			},
-		},
-		{
 			accessorKey: "source",
 			header: () => h("div", { class: "text-right" }, t("Corpsum.source")),
 			cell: ({ row }: rowObj) => {
