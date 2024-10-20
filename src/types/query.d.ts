@@ -92,6 +92,7 @@ interface CorpusQuery {
 	color: string;
 	showPicker: boolean;
 	concordance_query: ConcordanceQuery;
+	cattr?: string;
 	KWICAttrsStructs: KWICAttrsStructs;
 	KWICAdditionalViewHeaders: Array<string>;
 	KWICAttrsStructsOptions: KWICAttrsStructsOptions; // ToDo: this might be refactored to come via requesat whenever needed.

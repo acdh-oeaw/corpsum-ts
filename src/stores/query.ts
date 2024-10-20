@@ -12,7 +12,7 @@ const keyToKey = {
 	wordrow: "word",
 };
 
-const _fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc_name"];
+const _fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc"];
 
 const newSelectedCorpusKWICViewInfo: KWICAttrsStructs = {
 	attributes: [],

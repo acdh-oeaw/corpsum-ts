@@ -13,6 +13,7 @@ const api = useApiClient();
 type Mode = "coll_freq" | "freq";
 
 const mode: Ref<Mode> = ref("coll_freq");
+const cattr: Ref<string> = ref("lemma");
 
 const expand = ref(false);
 // const collocations: Ref<Array<Array<ICollocations>>> = ref([]);
@@ -41,6 +42,7 @@ const q = computed(() =>
 				query.corpus,
 				query.subCorpus,
 				query.id,
+				cattr.value,
 				cbgrfns,
 				"joooooo",
 				JSON.stringify(queryStore.getQueryWithFacetting(query)),
@@ -50,7 +52,7 @@ const q = computed(() =>
 				const response = await api.search.getCollx({
 					corpname: query.corpus,
 					usesubcorp: query.subCorpus,
-					cattr: "lemma",
+					cattr: cattr.value,
 					ctow: 3,
 					cminfreq: 9,
 					cminbgr: 9,
@@ -176,7 +178,13 @@ function pointFormatter() {
 				</VBtn>
 				<VBtn value="freq" variant="outlined">{{ t("freq") }}</VBtn>
 			</VBtnToggle>
-
+			<VSelect
+				v-model="cattr"
+				item-title="cattr"
+				:items="['lemma', 'word', 'lempos']"
+				:label="t('cattr')"
+				style="flex-grow: 0; min-width: 15rem"
+			></VSelect>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="collocationsLoading[index]" :query="query" />
 				<HighCharts

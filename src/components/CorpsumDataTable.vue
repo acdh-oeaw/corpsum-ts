@@ -37,7 +37,7 @@ const t = useTranslations("Corpsum");
 
 <template>
 	<div class="rounded-md border">
-		<Table>
+		<Table class="relative w-full text-nowrap">
 			<TableHeader>
 				<TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
 					<TableHead v-for="header in headerGroup.headers" :key="header.id">
