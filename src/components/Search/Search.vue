@@ -18,13 +18,8 @@ const CORPUS_QUERY_TYPES = [
 
 function addQuery() {
 	query.addQuery(newUserInput.value, newSelectedType.value);
-	// newSelectedType.value = "word";
 	newUserInput.value = "";
 }
-
-const _alert = (msg: string) => {
-	alert(msg);
-};
 </script>
 
 <template>
