@@ -38,7 +38,7 @@ async function logout() {
 			</nav>
 			<div class="flex items-center gap-4">
 				<LocaleSwitcher />
-				<Button v-if="auth.isLoggedIn()" size="lg" @click="logout"
+				<Button size="lg" @click="logout"
 					>Logout {{ auth.username }}</Button
 				>
 			</div>
