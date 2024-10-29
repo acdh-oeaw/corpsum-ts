@@ -35,7 +35,7 @@ RUN pnpm install
 
 EXPOSE 3000
 
-CMD [ "pnpm", "run", "dev", "--host" ]
+CMD [ "pnpm", "run", "dev"]
 
 FROM base as build
 RUN pnpm install --frozen-lockfile --offline

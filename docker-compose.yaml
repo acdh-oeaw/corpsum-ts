@@ -23,6 +23,8 @@ services:
       - corpsumnet
     ports:
       - 3000:3000
+    volumes:
+        - localsrc:/app/src
 
 networks:
   corpsumnet:
@@ -40,3 +42,9 @@ volumes:
       type: 'none'
       o: 'bind'
       device: $DOCKER_MONGODUMPS_DIR
+  localsrc:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: ./src

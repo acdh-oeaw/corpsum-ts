@@ -37,6 +37,7 @@ export default defineNuxtConfig({
 	experimental: {
 		componentIslands: true,
 		renderJsonPayloads: false,
+		inlineRouteRules: true,
 	},
 
 	pinia: {
@@ -81,7 +82,6 @@ export default defineNuxtConfig({
 		modelsDir: "models",
 		devtools: false,
 	},
-
 	modules: [
 		"@nuxt/content",
 		"@nuxt/devtools",
@@ -99,6 +99,9 @@ export default defineNuxtConfig({
 	},
 	nitro: {
 		compressPublicAssets: true,
+		experimental: {
+			openAPI: true,
+		},
 	},
 
 	postcss: {
