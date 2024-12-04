@@ -4,9 +4,9 @@ import { type  InferRawDocType, Schema } from "mongoose";
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
-	owner: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
 	id: { type: "string", required: true },
-	noske: { type: "string", required: true },
+	owner: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
+	noske: { type: Schema.Types.ObjectId, ref: "Noske", required: true },
 	corpus: { type: "string", required: true },
 	subCorpus: { type: "string", required: true },
 	type: { type: "string", enum: ["charrow" , "cqlrow" , "iqueryrow" , "lemmarow" , "phraserow" , "wordrow"], required: true },

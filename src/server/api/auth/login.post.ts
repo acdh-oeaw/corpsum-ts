@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
 
 	let user = await mongoose.connection.db?.collection<UserDocument>("users").findOne({ username });
 
+	//if the user is not registered, check if user is registered for AMC and register the user
 	if (!user) {
-		//check if user is registered for AMC
 		const env = useRuntimeConfig();
 
 		const basicAuthString = "Basic " + btoa(username + ":" + password);
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
 			try {
 				await mongoose.connection.db
 					?.collection<UserDocument>("users")
-					.insertOne({ username, password: hashed, basicAuthString });
+					.insertOne({ username, password: hashed, basicAuthString, accounttype: "user",  });
 				user = await mongoose.connection.db
 					?.collection<UserDocument>("users")
 					.findOne({ username });
@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
 		});
 	}
 
-	await setAuth(event, user!.username, user!.basicAuthString ?? "");
+	await setAuth(event, user!.username);
 
 	return {
 		loggedIn: true,

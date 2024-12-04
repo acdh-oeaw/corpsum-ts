@@ -4,6 +4,10 @@ import type { InferRawDocType } from "mongoose";
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
+	email: {
+		type: "string",
+		unique: true,
+	},
 	username: {
 		type: "string",
 		unique: true,
@@ -15,6 +19,9 @@ const schemaDefinition = {
 	},
 	basicAuthString: {
 		type: "string",
+	},
+	accounttype: {
+		type: "string", enum: ["admin", "user"], required: true
 	},
 } as const;
 
