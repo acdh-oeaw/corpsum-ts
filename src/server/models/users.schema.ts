@@ -28,6 +28,8 @@ const schemaDefinition = {
 		type: Schema.Types.String, enum: ["admin", "user"], required: true
 	},
 	credentials: [credentialsSchema],
+	created: { type: Schema.Types.Date, required: true },
+	modified: { type: Schema.Types.Date, required: true },
 } as const;
 
 

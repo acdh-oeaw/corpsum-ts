@@ -5,7 +5,7 @@ import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
 	_id: { type: Schema.Types.ObjectId },
-	id: { type: "string", required: true },
+	name: { type: "string", required: true },
 	owner: [{ type: Schema.Types.ObjectId, ref: "users", required: true }],
 	noske: { type: Schema.Types.ObjectId, ref: "noskeinstances", required: true },
 	corpus: { type: "string", required: true },
@@ -13,6 +13,8 @@ const schemaDefinition = {
 	type: { type: "string", enum: ["charrow" , "cqlrow" , "iqueryrow" , "lemmarow" , "phraserow" , "wordrow"], required: true },
 	userInput: { type: "string", required: true },
 	facettingValues: { type: Schema.Types.Mixed, required: true },
+	created: { type: Schema.Types.Date, required: true },
+	modified: { type: Schema.Types.Date, required: true },
 } as const;
 
 export type QueryDocument = InferRawDocType<typeof schemaDefinition>;
