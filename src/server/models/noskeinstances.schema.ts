@@ -4,8 +4,9 @@ import { type  InferRawDocType, Schema } from "mongoose";
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
-	owner: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
-	id: { type: "string", required: true },
+	_id: { type: Schema.Types.ObjectId },
+	owner: { type: Schema.Types.ObjectId, ref: "users", required: true },
+	name: { type: "string", required: true },
 	base: { type: "string", required: true },
 	version: {
 		type: "string", enum: ["openapi", "bonito"], required: true
@@ -13,11 +14,12 @@ const schemaDefinition = {
 	authentication: {
 		type: "string", enum: ["none", "basic"], required: true
 	},
+	public: { type: Schema.Types.Boolean, required: true },
 } as const;
 
 export type NoskeDocument = InferRawDocType<typeof schemaDefinition>;
 
 export const NoskeModel = defineMongooseModel({
-	name: "Noske",
+	name: "noskeinstances",
 	schema: schemaDefinition,
 });

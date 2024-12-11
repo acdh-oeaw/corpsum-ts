@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
-import type { UserDocument } from "@/server/models/user.schema";
+import type { UserDocument } from "@/server/models/users.schema.ts";
 import type { HttpResponse, Type03CorporaList } from "~/lib/api-client";
 
 const errorMessage = "username or password is wrong! please try again";
@@ -21,9 +21,9 @@ export default defineEventHandler(async (event) => {
 	if (!user) {
 		const env = useRuntimeConfig();
 
-		const basicAuthString = "Basic " + btoa(username + ":" + password);
+		const basicAuthString = `Basic ${  btoa(`${username  }:${  password}`)}`;
 		const corpora = (await (
-			await fetch(env.public.apiBaseUrl + "/ca/api/corpora", {
+			await fetch(`${env.public.apiBaseUrl}/ca/api/corpora`, {
 				headers: {
 					Authorization: basicAuthString,
 				},
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
 			try {
 				await mongoose.connection.db
 					?.collection<UserDocument>("users")
-					.insertOne({ username, password: hashed, basicAuthString, accounttype: "user",  });
+					.insertOne({ username, password: hashed, accounttype: "user", email: 'christoph.hoffmann@oeaw.ac.at', credentials:  [{noskeinstance: new mongoose.Types.ObjectId('5c90a00f9ca403074db60bc7'), username, password }]  });
 				user = await mongoose.connection.db
 					?.collection<UserDocument>("users")
 					.findOne({ username });
