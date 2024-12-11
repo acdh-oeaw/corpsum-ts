@@ -2,16 +2,16 @@ import { jwtVerify, SignJWT } from "jose";
 
 import type { AuthPayload } from "@/types/server";
 
-const { authSecret } = useRuntimeConfig();
+const { authSecret, jwtExpiration } = useRuntimeConfig();
 
 const JWT_SECRET = new TextEncoder().encode(authSecret);
 
 export async function createJWT(username: string) {
 	return await new SignJWT({ username })
 		.setProtectedHeader({ alg: "HS256" })
-		.setIssuer("mongoose-auth.nuxt.space")
+		.setIssuer("acdh-ch.corpsum")
 		.setIssuedAt()
-		.setExpirationTime("2h")
+		.setExpirationTime(jwtExpiration)
 		.sign(JWT_SECRET);
 }
 

@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import type { UserDocument } from "@/server/models/users.schema.ts";
 import type { HttpResponse, Type03CorporaList } from "~/lib/api-client";
 
+const { jwtExpiration } = useRuntimeConfig();
+
 const errorMessage = "username or password is wrong! please try again";
 
 export default defineEventHandler(async (event) => {
@@ -63,5 +65,6 @@ export default defineEventHandler(async (event) => {
 	return {
 		loggedIn: true,
 		user: user!.username,
+		expires: Date.now() + parseInt(jwtExpiration),
 	};
 });

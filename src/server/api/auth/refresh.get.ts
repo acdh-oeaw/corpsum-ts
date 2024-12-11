@@ -1,7 +1,11 @@
 export default defineEventHandler(async (event) => {
-	const payload = await requireAuth(event);
+	const {username} = await requireAuth(event);
+	const { jwtExpiration } = useRuntimeConfig();
+
+	await setAuth(event, username);
 
 	return {
-		...payload,
+		username,
+		expires: Date.now() + parseInt(jwtExpiration),
 	};
 });
