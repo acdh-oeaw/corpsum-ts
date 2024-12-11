@@ -4,6 +4,7 @@ export const useAuth = defineStore(
 	"newAuth",
 	() => {
 		const username = ref("");
+		let expiry= 0;
 
 		async function login(_username: string, _password: string) {
 			if (_username && _password) {
@@ -20,6 +21,7 @@ export const useAuth = defineStore(
 				if (res.ok) {
 					const data: LoginResponse = await res.json() as LoginResponse;
 					username.value = data.user;
+					expiry = data.expires;
 					return true;
 				}
 			}
@@ -33,12 +35,22 @@ export const useAuth = defineStore(
 			username.value = "";
 		}
 
+		async function refresh() {
+			const res = await fetch("/api/auth/refresh");
+			if(res.ok) {
+		    const data: RefreshResponse = await res.json() as RefreshResponse;
+				expiry = data.expires;
+				return true;
+			}
+			return false;
+		}
+
 		function isLoggedIn(): boolean {
 			if (username.value !== "") return true;
 			return false;
 		}
 
-		return { login, logout, isLoggedIn, username };
+		return { login, logout, isLoggedIn, refresh, username, expiry };
 	},
 	{
 		persist: {
