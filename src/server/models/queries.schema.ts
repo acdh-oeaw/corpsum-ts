@@ -13,8 +13,6 @@ const schemaDefinition = {
 	type: { type: "string", enum: ["charrow" , "cqlrow" , "iqueryrow" , "lemmarow" , "phraserow" , "wordrow"], required: true },
 	userInput: { type: "string", required: true },
 	facettingValues: { type: Schema.Types.Mixed, required: true },
-	created: { type: Schema.Types.Date, required: true },
-	modified: { type: Schema.Types.Date, required: true },
 } as const;
 
 export type QueryDocument = InferRawDocType<typeof schemaDefinition>;
@@ -22,4 +20,5 @@ export type QueryDocument = InferRawDocType<typeof schemaDefinition>;
 export const QueryModel = defineMongooseModel({
 	name: "queries",
 	schema: schemaDefinition,
+	options: { timestamps: true },
 });

@@ -28,8 +28,6 @@ const schemaDefinition = {
 		type: Schema.Types.String, enum: ["admin", "user"], required: true
 	},
 	credentials: [credentialsSchema],
-	created: { type: Schema.Types.Date, required: true },
-	modified: { type: Schema.Types.Date, required: true },
 } as const;
 
 
@@ -39,6 +37,7 @@ export type UserDocument = InferRawDocType<typeof schemaDefinition>;
 export const UserModel = defineMongooseModel({
 	name: "users",
 	schema: schemaDefinition,
+	options: { timestamps: true },
 	hooks(schema) {
 		schema.pre("save", function (this, next) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

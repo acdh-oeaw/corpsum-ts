@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 			try {
 				await mongoose.connection.db
 					?.collection<UserDocument>("users")
-					.insertOne({ username, password: hashed, accounttype: "user", email: 'christoph.hoffmann@oeaw.ac.at', credentials:  [{noskeinstance: new mongoose.Types.ObjectId('5c90a00f9ca403074db60bc7'), username, password }]  });
+					.insertOne({ username, password: hashed, accounttype: "user", credentials:  [{noskeinstance: new mongoose.Types.ObjectId('5c90a00f9ca403074db60bc7'), username, password }] });
 				user = await mongoose.connection.db
 					?.collection<UserDocument>("users")
 					.findOne({ username });

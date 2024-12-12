@@ -15,8 +15,6 @@ const schemaDefinition = {
 		type: "string", enum: ["none", "basic"], required: true
 	},
 	public: { type: Schema.Types.Boolean, required: true },
-	created: { type: Schema.Types.Date, required: true },
-	modified: { type: Schema.Types.Date, required: true },
 } as const;
 
 export type NoskeDocument = InferRawDocType<typeof schemaDefinition>;
@@ -24,4 +22,5 @@ export type NoskeDocument = InferRawDocType<typeof schemaDefinition>;
 export const NoskeModel = defineMongooseModel({
 	name: "noskeinstances",
 	schema: schemaDefinition,
+	options: { timestamps: true },
 });
