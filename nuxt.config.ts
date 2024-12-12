@@ -121,8 +121,8 @@ export default defineNuxtConfig({
 		BOTS: process.env.BOTS,
 		ENV_VALIDATION: process.env.ENV_VALIDATION,
 		NODE_ENV: process.env.NODE_ENV,
-		authSecret: process.env.AUTH_SECRET,
-		jwtExpiration: process.env.JWT_EXPIRATION,
+		authSecret: process.env.NUXT_AUTH_SECRET,
+		jwtExpiration: process.env.NUXT_JWT_EXPIRATION,
 		public: {
 			apiBaseUrl: "",
 			redmineId: "",
