@@ -32,6 +32,7 @@ export default defineEventHandler(async (event) => {
 			})
 		).json()) as HttpResponse<Array<Type03CorporaList>>;
 		if (Array.isArray(corpora.data)) {
+			// eslint-disable-next-line import-x/no-named-as-default-member
 			const hashed = bcrypt.hashSync(password, 10);
 			try {
 				await mongoose.connection.db
@@ -52,6 +53,7 @@ export default defineEventHandler(async (event) => {
 		}
 	}
 
+	// eslint-disable-next-line import-x/no-named-as-default-member
 	const matches = bcrypt.compareSync(password, user!.password);
 
 	if (!matches) {

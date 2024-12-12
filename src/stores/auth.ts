@@ -46,8 +46,7 @@ export const useAuth = defineStore(
 		}
 
 		function isLoggedIn(): boolean {
-			if (username.value !== "") return true;
-			return false;
+			return username.value !== "";
 		}
 
 		return { login, logout, isLoggedIn, refresh, username, expiry };

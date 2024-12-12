@@ -7,7 +7,6 @@ const { authSecret, jwtExpiration } = useRuntimeConfig();
 const JWT_SECRET = new TextEncoder().encode(authSecret);
 
 export async function createJWT(username: string) {
-	console.log(Date.now(),jwtExpiration, authSecret);
 	return await new SignJWT({ username })
 		.setProtectedHeader({ alg: "HS256" })
 		.setIssuer("acdh-ch.corpsum")

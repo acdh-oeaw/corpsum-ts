@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 
-import { defaultLocale, locales } from "./src/config/i18n.config";
+import { defaultLocale, locales } from "@/config/i18n.config.ts";
 
 export default defineNuxtConfig({
 	alias: {
