@@ -10,7 +10,7 @@ const auth = useAuth();
 
 const links = {
 	home: { href: { path: "/" }, label: t("links.home") },
-	queries: { href: { path: "/queries" }, label: t("queries") },
+	queries: { href: { path: "/query" }, label: t("queries") },
 } satisfies Record<string, { href: NavLinkProps["href"]; label: string }>;
 
 async function logout() {
