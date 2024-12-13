@@ -1,25 +1,23 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
-import type { UserDocument } from "@/server/models/user.schema";
+import type { UserDocument } from "@/server/models/users.schema.ts";
 
 export default defineEventHandler(async (event) => {
 	const { username, password }: UserDocument = await readBody(event);
 
 	const hashed = bcrypt.hashSync(password, 10);
-	const basicAuthString = "Basic " + btoa(username + ":" + password);
 
 	try {
 		await mongoose.connection.db
 			?.collection<UserDocument>("users")
-			.insertOne({ username, password: hashed, basicAuthString });
-	} catch {
-		throw createError({
-			statusMessage: "user already registered.",
-		});
+			.insertOne({ username, password: hashed, accounttype: "user" });
+	} catch (error) {
+		setResponseStatus(event, 500, "database error");
+		return `ERROR: ${error as string}`;
 	}
 
-	await setAuth(event, username, basicAuthString);
+	await setAuth(event, username);
 
 	return {
 		registered: true,

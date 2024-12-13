@@ -12,9 +12,8 @@ export default defineEventHandler(async (event) => {
 	const { username, password }: UserDocument = await readBody(event);
 
 	if (!username || !password) {
-		throw createError({
-			statusMessage: "required field missing",
-		});
+		setResponseStatus(event, 400, "required field missing");
+		return;
 	}
 
 	let user = await mongoose.connection.db?.collection<UserDocument>("users").findOne({ username });
@@ -41,16 +40,15 @@ export default defineEventHandler(async (event) => {
 				user = await mongoose.connection.db
 					?.collection<UserDocument>("users")
 					.findOne({ username });
-			} catch {
-				throw createError({
-					statusMessage: errorMessage,
-				});
+			} catch (error) {
+				setResponseStatus(event, 500, "database error");
+				return `ERROR: ${error as string}`;
+			}
 			}
 		} else {
 			throw createError({
 				statusMessage: errorMessage,
 			});
-		}
 	}
 
 	// eslint-disable-next-line import-x/no-named-as-default-member

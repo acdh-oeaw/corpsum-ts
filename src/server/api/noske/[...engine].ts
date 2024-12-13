@@ -12,24 +12,18 @@ export default defineEventHandler(async (event) => {
 		user = await UserModel
 			.findOne({ username });
 	} catch {
-		throw createError({
-			status: 401,
-			statusMessage: "user not found - faulty token",
-			message: `the user ${username} was not found in the database`,
-		});
+		setResponseStatus(event, 401, "user not found - faulty token");
+		return `the user ${username} was not found in the database`;
 	}
-
 
 	try {
 		noske = await NoskeModel
 			.findOne({ name: requestedEngine });
 	} catch {
-		throw createError({
-			status: 404,
-			statusMessage: "engine not found - faulty request",
-			message: event.context.params?.engine ? `the engine ${event.context.params.engine} was not found in the database`: "no engine was specified",
-		});
+		setResponseStatus(event, 404, "engine not found - faulty request");
+		return event.context.params?.engine ? `the engine ${event.context.params.engine} was not found in the database`: "no engine was specified";
 	}
+
 
 	const method = event.method;
 	const params = getQuery(event);
@@ -44,11 +38,8 @@ export default defineEventHandler(async (event) => {
 	if(noske!.authentication === "basic" && user) {
 		const credentials = user.credentials?.find(cred => cred.noskeinstance.toString() === noske!._id?.toString());
 		if(!credentials) {
-			throw createError({
-				status: 401,
-				statusMessage: "user not authorized for this engine",
-				message: `the user ${username} has no credentials set up for engine ${noske!.name}`,
-			});
+			setResponseStatus(event, 401, "user not authorized for this engine");
+			return `the user ${username} has no credentials set up for engine ${noske!.name}`;
 		}
 		authheader = `Basic ${btoa(`${credentials.username}:${credentials.password}`)}`;
 	}
