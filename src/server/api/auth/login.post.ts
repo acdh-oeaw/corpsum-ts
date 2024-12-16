@@ -17,12 +17,12 @@ export default defineEventHandler(async (event) => {
 	}
 
 	let user = await mongoose.connection.db?.collection<UserDocument>("users").findOne({ username });
-
+	console.log(user);
 	//if the user is not registered, check if user is registered for AMC and register the user
 	if (!user) {
 		const env = useRuntimeConfig();
 
-		const basicAuthString = `Basic ${  btoa(`${username  }:${  password}`)}`;
+		const basicAuthString = `Basic ${btoa(`${username}:${password}`)}`;
 		const corpora = (await (
 			await fetch(`${env.public.apiBaseUrl}/ca/api/corpora`, {
 				headers: {
@@ -36,19 +36,28 @@ export default defineEventHandler(async (event) => {
 			try {
 				await mongoose.connection.db
 					?.collection<UserDocument>("users")
-					.insertOne({ username, password: hashed, accounttype: "user", credentials:  [{noskeinstance: new mongoose.Types.ObjectId('5c90a00f9ca403074db60bc7'), username, password }] });
+					.insertOne({
+						username,
+						password: hashed,
+						accounttype: "user",
+						credentials: [{
+							noskeinstance: new mongoose.Types.ObjectId('5c90a00f9ca403074db60bc7'),
+							username,
+							password
+						}]
+					});
 				user = await mongoose.connection.db
 					?.collection<UserDocument>("users")
-					.findOne({ username });
+					.findOne({username});
 			} catch (error) {
 				setResponseStatus(event, 500, "database error");
 				return `ERROR: ${error as string}`;
-			}
 			}
 		} else {
 			throw createError({
 				statusMessage: errorMessage,
 			});
+		}
 	}
 
 	// eslint-disable-next-line import-x/no-named-as-default-member
