@@ -34,7 +34,8 @@
 		"full-validate": "run-p format:check lint:check types:check test test:e2e",
 		"validate-without-tests": "run-p format:fix lint:check types:check",
 		"playwright:install": "npx playwright install",
-		"generate:api-client": "swagger-typescript-api --path ./public/noske.json --clean-output --name index.ts --output ./lib/api-client/"
+		"generate:api-client": "swagger-typescript-api --path ./public/noske.json --clean-output --name index.ts --output ./lib/api-client/",
+		"generate:api-types": "npx openapi-typescript ./public/noske.json  -o ./src/types/noske.schema.d.ts"
 	},
 	"dependencies": {
 		"@acdh-oeaw/lib": "^0.1.12",
@@ -59,7 +60,8 @@
 		"vue-highlight-words": "^3.0.1",
 		"vue-i18n-routing": "^1.2.0",
 		"vue-json-pretty": "^2.4.0",
-		"zipcelx": "^1.6.2"
+		"zipcelx": "^1.6.2",
+		"openapi-fetch": "^0.13.3"
 	},
 	"devDependencies": {
 		"@acdh-oeaw/eslint-config": "^2.0.1",
@@ -117,7 +119,8 @@
 		"vitest": "^2.1.1",
 		"vitest-environment-nuxt": "^1.0.1",
 		"vue-tsc": "^2.1.6",
-		"vuetify": "^3.7.2"
+		"vuetify": "^3.7.2",
+		"openapi-typescript": "^7.4.4"
 	},
 	"browserslist": {
 		"development": [
