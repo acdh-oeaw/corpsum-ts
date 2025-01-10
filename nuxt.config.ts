@@ -9,11 +9,6 @@ export default defineNuxtConfig({
 	},
 
 	components: [{ path: "@/components", pathPrefix: false }],
-	content: {
-		defaultLocale,
-		locales: Object.keys(locales),
-		markdown: {},
-	},
 
 	css: [
 		"@fontsource-variable/archivo/index.css",
@@ -26,6 +21,7 @@ export default defineNuxtConfig({
 	devtools: {
 		enabled: false,
 	},
+
 	dir: {
 		public: "../public",
 	},
@@ -83,7 +79,6 @@ export default defineNuxtConfig({
 		devtools: false,
 	},
 	modules: [
-		"@nuxt/content",
 		"@nuxt/devtools",
 		"@nuxt/eslint",
 		"@nuxtjs/i18n",
@@ -152,6 +147,5 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-
 	compatibilityDate: "2024-09-06",
 });
