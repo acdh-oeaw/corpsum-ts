@@ -1,0 +1,67 @@
+{
+	"AppFooter": {
+		"links": {
+			"imprint": "Impressum"
+		},
+		"navigation-secondary": "Sekundärnavigation"
+	},
+	"AppHeader": {
+		"links": {
+			"home": "Startseite"
+		},
+		"navigation-main": "Hauptnavigation"
+	},
+	"ColorSchemeToggle": {
+		"change-color-scheme": "Farbschema ändern",
+		"color-schemes": {
+			"dark": "Dunkel",
+			"light": "Hell",
+			"system": "System"
+		}
+	},
+	"DefaultLayout": {
+		"meta": {
+			"description": "ACDH-CH App",
+			"title": "ACDH-CH App",
+			"twitter": "{'@acdh_oeaw'}"
+		},
+		"skip-to-main-content": "Zum Hauptinhalt springen"
+	},
+	"ErrorBoundary": {
+		"error": "Fehler"
+	},
+	"ErrorPage": {
+		"meta": {
+			"title": "Fehler"
+		},
+		"title": "Etwas ist schief gelaufen!",
+		"try-again": "Erneut versuchen"
+	},
+	"ImprintPage": {
+		"meta": {
+			"title": "Impressum"
+		},
+		"title": "Impressum"
+	},
+	"IndexPage": {
+		"meta": {
+			"title": "Startseite"
+		},
+		"title": "Startseite"
+	},
+	"LocaleSwitcher": {
+		"current-locale": "Aktuelle Sprache: {locale}",
+		"switch-locale": "Zu {locale} wechseln"
+	},
+	"Manifest": {
+		"name": "ACDH-CH App",
+		"short-name": "ACDH-CH App",
+		"description": "ACDH-CH App"
+	},
+	"NotFoundPage": {
+		"meta": {
+			"title": "Seite nicht gefunden"
+		},
+		"title": "Seite nicht gefunden"
+	}
+}

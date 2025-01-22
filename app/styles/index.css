@@ -1,0 +1,8 @@
+:root {
+	--font-body: "Inter Variable";
+}
+
+#__nuxt {
+	block-size: 100%;
+	isolation: isolate;
+}
