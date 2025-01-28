@@ -31,6 +31,7 @@ export default defineNuxtConfig({
 		"@fontsource-variable/inter/standard.css",
 		"@fontsource-variable/inter/standard-italic.css",
 		"tailwindcss/tailwind.css",
+		"@/styles/shadcn.css",
 		"@/styles/index.css",
 	],
 
@@ -93,7 +94,14 @@ export default defineNuxtConfig({
 		"@nuxtjs/color-mode",
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
+		"@nuxtjs/tailwindcss",
+		"shadcn-nuxt",
 	],
+
+	shadcn: {
+		prefix: "",
+		componentDir: "./app/components/ui",
+	},
 
 	nitro: {
 		compressPublicAssets: true,
