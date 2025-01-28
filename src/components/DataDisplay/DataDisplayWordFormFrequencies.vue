@@ -28,8 +28,8 @@ const q = computed(() =>
 				const response = await api.search.getFreqMl({
 					corpname: query.corpus,
 					usesubcorp: query.subCorpus,
-					ml1attr: "",
-					ml1ctx: "",
+					ml1attr: "word",
+					ml1ctx: "0<0~0>0",
 					json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
 				});
 				return response.data;
