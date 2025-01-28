@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/switch-exhaustiveness-check */
 type JsonValue = Array<JsonValue> | boolean | number | string | { [key: string]: JsonValue } | null;
 
 const entities = Object.freeze({
