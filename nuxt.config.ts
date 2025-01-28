@@ -9,34 +9,42 @@ export default defineNuxtConfig({
 		"@": fileURLToPath(new URL("./app/", import.meta.url)),
 		"~": fileURLToPath(new URL("./", import.meta.url)),
 	},
+
 	app: {
 		layoutTransition: false,
 		pageTransition: false,
 	},
+
 	colorMode: {
 		classSuffix: "",
 		dataValue: "ui-color-scheme",
 	},
+
 	components: [{ extensions: [".vue"], path: "@/components", pathPrefix: false }],
+
 	content: {
 		defaultLocale,
 		locales: Object.keys(localesMap),
 	},
+
 	css: [
 		"@fontsource-variable/inter/standard.css",
 		"@fontsource-variable/inter/standard-italic.css",
 		"tailwindcss/tailwind.css",
 		"@/styles/index.css",
 	],
+
 	devtools: {
 		enabled: true,
 	},
+
 	eslint: {
 		config: {
 			autoInit: false,
 			standalone: true,
 		},
 	},
+
 	experimental: {
 		componentIslands: {
 			selectiveClient: true,
@@ -51,13 +59,16 @@ export default defineNuxtConfig({
 		},
 		inlineRouteRules: true,
 	},
+
 	features: {
 		/** @see https://github.com/nuxt/nuxt/issues/21821 */
 		inlineStyles: false,
 	},
+
 	future: {
 		compatibilityVersion: 4,
 	},
+
 	i18n: {
 		baseUrl,
 		defaultLocale,
@@ -70,9 +81,11 @@ export default defineNuxtConfig({
 		strategy: "prefix",
 		vueI18n: "./i18n/i18n.config.ts",
 	},
+
 	imports: {
 		dirs: ["./config/"],
 	},
+
 	modules: [
 		"@nuxt/content",
 		"@nuxt/eslint",
@@ -81,17 +94,20 @@ export default defineNuxtConfig({
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
 	],
+
 	nitro: {
 		compressPublicAssets: true,
 		prerender: {
 			routes: ["/manifest.webmanifest", "/robots.txt", "/sitemap.xml"],
 		},
 	},
+
 	postcss: {
 		plugins: {
 			tailwindcss: {},
 		},
 	},
+
 	runtimeConfig: {
 		public: {
 			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL,
@@ -102,6 +118,7 @@ export default defineNuxtConfig({
 			redmineId: process.env.NUXT_PUBLIC_REDMINE_ID,
 		},
 	},
+
 	typescript: {
 		shim: false,
 		strict: true,
@@ -116,4 +133,6 @@ export default defineNuxtConfig({
 			},
 		},
 	},
+
+	compatibilityDate: "2025-01-28",
 });
