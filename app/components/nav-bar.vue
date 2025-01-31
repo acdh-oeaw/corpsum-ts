@@ -19,7 +19,7 @@ const NavItems = [
 </script>
 
 <template>
-	<aside class="inset-y fixed left-0 z-20 flex h-full flex-col border-r">
+	<aside class="fixed left-0 z-20 flex h-full flex-col border-r">
 		<NuxtLinkLocale :href="{ path: '/' }">
 			<div class="border-b p-2">
 				<Button aria-label="Home" size="icon" variant="outline"> CS </Button>
@@ -30,13 +30,8 @@ const NavItems = [
 				<Tooltip>
 					<TooltipTrigger as-child>
 						<NuxtLinkLocale :href="{ path: item.href }">
-							<Button
-								:aria-label="item.tooltip"
-								class="rounded-lg bg-muted"
-								size="icon"
-								variant="ghost"
-							>
-								<LucideIcon :name="item.icon" stroke-width="2" />
+							<Button :aria-label="item.tooltip" class="rounded-md" size="icon" variant="ghost">
+								<LucideIcon :name="item.icon" :stroke-width="2" />
 							</Button>
 						</NuxtLinkLocale>
 					</TooltipTrigger>
@@ -51,8 +46,8 @@ const NavItems = [
 				<Tooltip>
 					<TooltipTrigger as-child>
 						<NuxtLinkLocale :href="{ path: '/imprint' }">
-							<Button aria-label="Imprint" class="rounded-lg bg-muted" size="icon" variant="ghost">
-								<LucideIcon name="Scale" stroke-width="2" />
+							<Button aria-label="Imprint" class="rounded-lg" size="icon" variant="ghost">
+								<LucideIcon name="Scale" :stroke-width="2" />
 							</Button>
 						</NuxtLinkLocale>
 					</TooltipTrigger>
