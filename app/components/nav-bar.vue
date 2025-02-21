@@ -22,7 +22,7 @@ const NavItems = [
 	<aside class="fixed left-0 z-20 flex h-full flex-col border-r">
 		<NuxtLinkLocale :href="{ path: '/' }">
 			<div class="border-b p-2">
-				<Button aria-label="Home" size="icon" variant="outline"> CS </Button>
+				<Button aria-label="Home" size="icon" variant="ghost"> CS </Button>
 			</div>
 		</NuxtLinkLocale>
 		<nav class="grid gap-1 p-2">
@@ -42,6 +42,7 @@ const NavItems = [
 			</TooltipProvider>
 		</nav>
 		<nav class="mt-auto grid gap-1 p-2">
+			<LocaleSwitcher></LocaleSwitcher>
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger as-child>
