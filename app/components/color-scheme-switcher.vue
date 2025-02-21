@@ -1,20 +1,30 @@
 <script lang="ts" setup>
-const t = useTranslations();
-
 const colorMode = useColorMode();
 
-const colorSchemes = ["system", "light", "dark"] as const;
+const colorSchemes = [
+	{ name: "system", icon: "MonitorCog" },
+	{ name: "light", icon: "Sun" },
+	{ name: "dark", icon: "Moon" },
+] as const;
 </script>
 
 <template>
 	<ClientOnly>
-		<label>
-			<span class="sr-only">{{ t("ColorSchemeToggle.change-color-scheme") }}</span>
-			<select v-model="colorMode.preference">
-				<option v-for="colorScheme of colorSchemes" :key="colorScheme" :value="colorScheme">
-					{{ t(`ColorSchemeToggle.color-schemes.${colorScheme}`) }}
-				</option>
-			</select>
-		</label>
+		<Select v-model="colorMode.preference" aria-label="Select Color Scheme">
+			<SelectTrigger>
+				<SelectValue placeholder="Select Color Scheme" />
+			</SelectTrigger>
+			<SelectContent>
+				<SelectGroup>
+					<SelectItem
+						v-for="colorScheme of colorSchemes"
+						:key="colorScheme.name"
+						:value="colorScheme.name"
+					>
+						<LucideIcon :name="colorScheme.icon" size="20" :stroke-width="2" />
+					</SelectItem>
+				</SelectGroup>
+			</SelectContent>
+		</Select>
 	</ClientOnly>
 </template>
