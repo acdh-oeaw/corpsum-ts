@@ -96,7 +96,7 @@ router.afterEach((to, from) => {
 </script>
 
 <template>
-	<div class="grid h-screen w-full pl-[56px]">
+	<div class="grid h-screen w-full pl-[78px]">
 		<SkipLink target-id="main-content">
 			{{ t("DefaultLayout.skip-to-main-content") }}
 		</SkipLink>
