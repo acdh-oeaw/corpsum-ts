@@ -28,9 +28,9 @@ export default defineNuxtConfig({
 	},
 
 	css: [
+		"tailwindcss/tailwind.css",
 		"@fontsource-variable/inter/standard.css",
 		"@fontsource-variable/inter/standard-italic.css",
-		"tailwindcss/tailwind.css",
 		"@/styles/shadcn.css",
 		"@/styles/index.css",
 	],

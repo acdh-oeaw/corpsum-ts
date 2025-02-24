@@ -1,11 +1,17 @@
-import * as animate from "tailwindcss/plugin";
+import typographyPlugin from "@tailwindcss/typography";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+	content: [
+		"./app/app.vue",
+		"./app/error.vue",
+		"./app/components/**/*.@(css|ts|vue)",
+		"./app/layouts/**/*.@(css|ts|vue)",
+		"./app/pages/**/*.@(css|ts|vue)",
+		"./app/styles/**/*.css",
+	],
 	darkMode: ["class"],
 	safelist: ["dark"],
-	prefix: "",
-
 	theme: {
 		container: {
 			center: true,
@@ -82,5 +88,5 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [animate],
+	plugins: [typographyPlugin],
 };
