@@ -34,3 +34,4 @@ dist
 /playwright/.cache/
 /playwright-report/
 /test-results/
+/lib/api-client/
