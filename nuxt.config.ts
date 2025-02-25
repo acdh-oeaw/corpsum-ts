@@ -23,11 +23,6 @@ export default defineNuxtConfig({
 
 	components: [{ extensions: [".vue"], path: "@/components", pathPrefix: false }],
 
-	content: {
-		defaultLocale,
-		locales: Object.keys(localesMap),
-	},
-
 	css: [
 		"tailwindcss/tailwind.css",
 		"@fontsource-variable/inter/standard.css",
@@ -89,7 +84,6 @@ export default defineNuxtConfig({
 	},
 
 	modules: [
-		"@nuxt/content",
 		"@nuxt/eslint",
 		"@nuxt/image",
 		"@nuxtjs/color-mode",
@@ -98,6 +92,8 @@ export default defineNuxtConfig({
 		"@nuxtjs/tailwindcss",
 		"shadcn-nuxt",
 		"nuxt-mongoose",
+		"@pinia/nuxt",
+		"pinia-plugin-persistedstate/nuxt",
 	],
 
 	mongoose: {
@@ -106,6 +102,16 @@ export default defineNuxtConfig({
 		options: {},
 		modelsDir: "models",
 		devtools: false,
+	},
+
+	pinia: {
+		storesDirs: ["./app/stores/**"],
+	},
+
+	piniaPluginPersistedstate: {
+		cookieOptions: {
+			sameSite: "strict",
+		},
 	},
 
 	shadcn: {
