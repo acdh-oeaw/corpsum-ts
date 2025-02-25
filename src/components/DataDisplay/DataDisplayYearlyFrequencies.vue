@@ -58,6 +58,16 @@ const q = computed(() =>
 								};
 							}) ?? [],
 					)[0] ?? [];
+				const years = Array.from({ length: 2024 - 1988 + 1 }, (_, i) => 1988 + i);
+				years.forEach((year) => {
+					if (yearlyFrequencies.value[index]?.filter((item) => item.year === year).length === 0) {
+						yearlyFrequencies.value[index].push({
+							year,
+							absolute: 0,
+							relative: 0,
+						});
+					}
+				});
 				yearlyFrequenciesLoading.value[index] = false;
 			},
 		};
