@@ -11,7 +11,7 @@ const colorSchemes = [
 <template>
 	<ClientOnly>
 		<Select v-model="colorMode.preference" aria-label="Select Color Scheme">
-			<SelectTrigger>
+			<SelectTrigger class="w-15">
 				<SelectValue placeholder="Select Color Scheme" />
 			</SelectTrigger>
 			<SelectContent>

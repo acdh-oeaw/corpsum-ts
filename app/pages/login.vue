@@ -46,6 +46,7 @@ onMounted(async () => {
 		<div class="h-full lg:p-4">
 			<div class="flex justify-end">
 				<LocaleSwitcher />
+				<ColorSchemeSwitcher />
 			</div>
 			<div :class="cn('mx-auto grid h-full max-w-96 gap-6', $attrs.class ?? '')">
 				<form class="my-auto">
