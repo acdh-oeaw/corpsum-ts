@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
 
 		const basicAuthString = `Basic ${btoa(`${username}:${password}`)}`;
 		const corpora =
-			(await // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-			(
+			(await
+			(// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 				await fetch(`${env.public.apiBaseUrl}/ca/api/corpora`, {
 					headers: {
 						Authorization: basicAuthString,
@@ -74,6 +74,6 @@ export default defineEventHandler(async (event) => {
 	return {
 		loggedIn: true,
 		user: user!.username,
-		expires: Date.now() + parseInt(jwtExpiration as string),
+		expires: Date.now() + parseInt(jwtExpiration),
 	};
 });
