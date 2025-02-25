@@ -16,6 +16,15 @@ const NavItems = [
 		href: "/visualizations",
 	},
 ];
+const localeRoute = useLocaleRoute();
+const { locale } = useI18n();
+
+const auth = useAuth();
+
+const logout = async () => {
+	await auth.logout();
+	return await navigateTo(localeRoute("/login", locale.value));
+};
 </script>
 
 <template>
@@ -47,6 +56,24 @@ const NavItems = [
 			<ColorSchemeSwitcher></ColorSchemeSwitcher>
 			<div class="flex justify-center">
 				<LocaleSwitcher></LocaleSwitcher>
+			</div>
+			<div class="flex justify-center">
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger as-child>
+							<Button
+								aria-label="Logout"
+								class="rounded-lg"
+								size="icon"
+								variant="ghost"
+								@click="logout"
+							>
+								<LucideIcon name="LogOut" :stroke-width="2" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent side="right" :side-offset="5"> Logout </TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
 			</div>
 			<div class="flex justify-center">
 				<TooltipProvider>
