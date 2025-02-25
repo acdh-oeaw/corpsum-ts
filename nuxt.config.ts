@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 
+// noinspection ES6PreferShortImport
 import { defaultLocale, localesMap } from "./app/config/i18n.config";
 
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
@@ -126,6 +127,8 @@ export default defineNuxtConfig({
 	},
 
 	runtimeConfig: {
+		authSecret: process.env.NUXT_AUTH_SECRET,
+		jwtExpiration: process.env.NUXT_JWT_EXPIRATION,
 		public: {
 			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL,
 			bots: process.env.NUXT_PUBLIC_BOTS,
