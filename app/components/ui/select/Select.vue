@@ -4,7 +4,7 @@ import {
 	type SelectRootEmits,
 	type SelectRootProps,
 	useForwardPropsEmits,
-} from "radix-vue";
+} from "reka-ui";
 
 const props = defineProps<SelectRootProps>();
 const emits = defineEmits<SelectRootEmits>();
