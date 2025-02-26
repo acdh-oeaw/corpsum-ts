@@ -89,20 +89,25 @@ useHead({
 		return scripts;
 	}),
 });
-
 router.afterEach((to, from) => {
 	trackPageView(to, from);
 });
 </script>
 
 <template>
-	<div class="grid h-screen w-full pl-[78px]">
+	<div>
 		<SkipLink target-id="main-content">
 			{{ t("DefaultLayout.skip-to-main-content") }}
 		</SkipLink>
-		<NavBar />
-		<ErrorBoundary>
-			<slot />
-		</ErrorBoundary>
+		<SidebarProvider :default-open="false">
+			<AppSidebar />
+			<SidebarInset>
+				<div class="flex items-center gap-2 px-4">
+					<ErrorBoundary>
+						<slot />
+					</ErrorBoundary>
+				</div>
+			</SidebarInset>
+		</SidebarProvider>
 	</div>
 </template>
