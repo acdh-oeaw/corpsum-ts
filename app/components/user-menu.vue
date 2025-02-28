@@ -52,6 +52,12 @@ const logout = async () => {
 					</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
+						<NuxtLinkLocale :href="{ path: '/' }">
+							<DropdownMenuItem>
+								<LucideIcon name="Star" />
+								Start
+							</DropdownMenuItem>
+						</NuxtLinkLocale>
 						<DropdownMenuItem>
 							<LucideIcon name="BadgeCheck" />
 							Account Settings
