@@ -13,6 +13,7 @@ const props = defineProps({
 	defaultClass: String,
 });
 
+// @ts-expect-error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type.
 const icon = computed(() => icons[props.name]);
 </script>
 
