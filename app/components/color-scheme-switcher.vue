@@ -1,11 +1,7 @@
 <script lang="ts" setup>
-const colorMode = useColorMode();
+import { colorSchemes } from "@/config/colorSchemes.config";
 
-const colorSchemes = [
-	{ name: "system", icon: "MonitorCog" },
-	{ name: "light", icon: "Sun" },
-	{ name: "dark", icon: "Moon" },
-] as const;
+const colorMode = useColorMode();
 </script>
 
 <template>
@@ -21,7 +17,7 @@ const colorSchemes = [
 						:key="colorScheme.name"
 						:value="colorScheme.name"
 					>
-						<LucideIcon :name="colorScheme.icon" size="20" :stroke-width="2" />
+						<LucideIcon :name="colorScheme.icon" :size="20" :stroke-width="2" />
 					</SelectItem>
 				</SelectGroup>
 			</SelectContent>

@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { useSidebar } from "@/components/ui/sidebar";
+import { colorSchemes } from "@/config/colorSchemes.config";
+import { locales } from "@/config/i18n.config";
+
 const NavItems = [
+	{
+		icon: "Database",
+		tooltip: "NoSketch Engines",
+		href: "/noskeinstances",
+	},
 	{
 		icon: "Book",
 		tooltip: "Corpora",
@@ -15,81 +24,118 @@ const NavItems = [
 		tooltip: "Visualizations",
 		href: "/visualizations",
 	},
+	{
+		icon: "LayoutPanelTop",
+		tooltip: "Published Panels",
+		href: "/publishedpanels",
+	},
 ];
-const localeRoute = useLocaleRoute();
-const { locale } = useI18n();
 
-const auth = useAuth();
+const colorMode = useColorMode();
 
-const logout = async () => {
-	await auth.logout();
-	return await navigateTo(localeRoute("/login", locale.value));
-};
+const currentLocale = useLocale();
+
+const availableLocales = computed(() => {
+	return locales.filter((locale) => locale !== currentLocale.value);
+});
+
+const switchLocalePath = useSwitchLocalePath();
+const route = useRoute();
+
+const { isMobile } = useSidebar();
 </script>
 
 <template>
 	<Sidebar collapsible="icon">
 		<SidebarHeader>
-			<NuxtLinkLocale :href="{ path: '/' }">
-				<div class="flex justify-center border-b p-2">
-					<Button aria-label="Home" size="icon" variant="ghost"> CS</Button>
-				</div>
-			</NuxtLinkLocale>
+			<UserMenu />
 		</SidebarHeader>
 		<SidebarContent>
-			<SidebarGroupLabel>Query Functions</SidebarGroupLabel>
-			<SidebarGroupContent>
-				<SidebarMenu>
-					<SidebarMenuItem v-for="(item, index) in NavItems" :key="index">
-						<SidebarMenuButton as-child :tooltip="item.tooltip">
-							<NuxtLinkLocale :href="{ path: item.href }">
-								<LucideIcon :name="item.icon" :stroke-width="2" />
-								<span>{{ item.tooltip }}</span>
-							</NuxtLinkLocale>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
-				</SidebarMenu>
-			</SidebarGroupContent>
-			<nav class="mt-auto grid gap-1 p-2">
-				<ColorSchemeSwitcher></ColorSchemeSwitcher>
-				<div class="flex justify-center">
-					<LocaleSwitcher></LocaleSwitcher>
-				</div>
-				<div class="flex justify-center">
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger as-child>
-								<Button
-									aria-label="Logout"
-									class="rounded-lg"
-									size="icon"
-									variant="ghost"
-									@click="logout"
-								>
-									<LucideIcon name="LogOut" :stroke-width="2" />
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent side="right" :side-offset="5"> Logout</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-				</div>
-				<div class="flex justify-center">
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger as-child>
-								<NuxtLinkLocale :href="{ path: '/imprint' }">
-									<Button aria-label="Imprint" class="rounded-lg" size="icon" variant="ghost">
-										<LucideIcon name="Scale" :stroke-width="2" />
-									</Button>
+			<SidebarGroup>
+				<SidebarGroupLabel>Platform Functions</SidebarGroupLabel>
+				<SidebarGroupContent>
+					<SidebarMenu>
+						<SidebarMenuItem v-for="(item, index) in NavItems" :key="index">
+							<SidebarMenuButton as-child :tooltip="item.tooltip">
+								<NuxtLinkLocale :href="{ path: item.href }">
+									<LucideIcon :name="item.icon" :stroke-width="2" />
+									<span>{{ item.tooltip }}</span>
 								</NuxtLinkLocale>
-							</TooltipTrigger>
-							<TooltipContent side="right" :side-offset="5"> Imprint</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-				</div>
-			</nav>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+					</SidebarMenu>
+				</SidebarGroupContent>
+			</SidebarGroup>
+			<SidebarGroup class="mt-auto">
+				<SidebarGroupLabel>Settings</SidebarGroupLabel>
+				<SidebarGroupContent>
+					<SidebarMenu>
+						<SidebarMenuItem>
+							<DropdownMenu>
+								<DropdownMenuTrigger>
+									<SidebarMenuButton tooltip="Color Scheme">
+										<LucideIcon name="Eclipse" :stroke-width="2" />
+										<span>Color Scheme</span>
+									</SidebarMenuButton>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									:align="isMobile ? 'end' : 'start'"
+									class="w-48 rounded-lg"
+									:side="isMobile ? 'bottom' : 'right'"
+								>
+									<DropdownMenuItem
+										v-for="colorScheme of colorSchemes"
+										:key="colorScheme.name"
+										@click="colorMode.preference = colorScheme.name"
+									>
+										<LucideIcon
+											class="text-muted-foreground"
+											:name="colorScheme.icon"
+											:stroke-width="2"
+										/>
+										<span>{{ colorScheme.name }}</span>
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</SidebarMenuItem>
+						<SidebarMenuItem>
+							<DropdownMenu>
+								<DropdownMenuTrigger>
+									<SidebarMenuButton tooltip="Language">
+										<LucideIcon name="Globe" :stroke-width="2" />
+										<span>Language</span>
+									</SidebarMenuButton>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									:align="isMobile ? 'end' : 'start'"
+									class="w-48 rounded-lg"
+									:side="isMobile ? 'bottom' : 'right'"
+								>
+									<div v-for="locale of availableLocales" :key="locale">
+										<NuxtLinkLocale :href="{ path: switchLocalePath(locale), query: route.query }">
+											<DropdownMenuItem>
+												<span>{{ `Switch to ${locale.toUpperCase()}` }}</span>
+											</DropdownMenuItem>
+										</NuxtLinkLocale>
+									</div>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</SidebarMenuItem>
+					</SidebarMenu>
+					<SidebarMenu>
+						<SidebarMenuItem>
+							<SidebarMenuButton as-child tooltip="Imprint">
+								<NuxtLinkLocale :href="{ path: '/imprint' }">
+									<LucideIcon name="Scale" :stroke-width="2" />
+									<span>Imprint</span>
+								</NuxtLinkLocale>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+					</SidebarMenu>
+				</SidebarGroupContent>
+			</SidebarGroup>
 		</SidebarContent>
-		<SidebarFooter> </SidebarFooter>
+		<SidebarFooter></SidebarFooter>
 		<SidebarRail />
 	</Sidebar>
 </template>
