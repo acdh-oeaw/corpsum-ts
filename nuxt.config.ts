@@ -124,6 +124,9 @@ export default defineNuxtConfig({
 		prerender: {
 			routes: ["/manifest.webmanifest", "/robots.txt", "/sitemap.xml"],
 		},
+		experimental: {
+			openAPI: true,
+		},
 	},
 
 	postcss: {
