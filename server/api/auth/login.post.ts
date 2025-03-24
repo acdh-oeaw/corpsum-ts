@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
-import type { HttpResponse, Type03CorporaList } from "~/lib/api-client";
+import type { components } from "~/lib/noske-types";
 import type { UserDocument } from "~/server/models/users.schema";
 import { setAuth } from "~/server/utils/auth";
 
@@ -24,15 +24,15 @@ export default defineEventHandler(async (event) => {
 
 		const basicAuthString = `Basic ${btoa(`${username}:${password}`)}`;
 		const corpora =
-			(await
-			(// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+			(await // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+			(
 				await fetch(`${env.public.apiBaseUrl}/ca/api/corpora`, {
 					headers: {
 						Authorization: basicAuthString,
 					},
 				})
-			).json()) as HttpResponse<Array<Type03CorporaList>>;
-		if (Array.isArray(corpora.data)) {
+			).json()) as Array<components["schemas"]["03_corpora_list"]>;
+		if (Array.isArray(corpora)) {
 			const hashed = bcrypt.hashSync(password, 10);
 			try {
 				await mongoose.connection.db?.collection<UserDocument>("users").insertOne({
