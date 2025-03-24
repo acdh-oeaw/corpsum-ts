@@ -8,6 +8,6 @@ export default defineEventHandler(async (event) => {
 
 	return {
 		username,
-		expires: Date.now() + parseInt(jwtExpiration as string),
+		expires: Date.now() + parseInt(jwtExpiration),
 	};
 });
