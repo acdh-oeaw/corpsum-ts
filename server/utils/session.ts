@@ -6,7 +6,7 @@ const { authSecret } = useRuntimeConfig();
 
 export async function _useSession(event: H3Event, username?: string) {
 	const session = await useSession(event, {
-		password: authSecret as string,
+		password: authSecret,
 		name: "authorization",
 	});
 	if (username) await session.update({ username });
