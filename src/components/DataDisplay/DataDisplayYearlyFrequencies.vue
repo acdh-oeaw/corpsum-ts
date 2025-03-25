@@ -17,6 +17,7 @@ interface IyearlyFrequency {
 }
 
 const mode = ref("relative");
+const interval = ref(1);
 const expand = ref(false);
 const yearlyFrequencies: Ref<Array<Array<IyearlyFrequency>>> = ref([]);
 const yearlyFrequenciesLoading: Ref<Array<boolean>> = ref([]);
@@ -76,8 +77,26 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const series = computed(() =>
-	queries.value
+const sumInIntervals = function (numbers: Array<unknown>, intervalSize: number) {
+	const results = [];
+	const fullIntervals = Math.floor(numbers.length / intervalSize);
+
+	for (let i = 0; i < fullIntervals; i++) {
+		let sum = 0;
+		let start, finish;
+		for (let j = 0; j < intervalSize; j++) {
+			if (j === 0) start = numbers[i * intervalSize + j][0];
+			if (j === intervalSize-1) finish = numbers[i * intervalSize + j][0];
+			sum += numbers[i * intervalSize + j][1];
+		}
+		results.push([`${start}-${finish}`, sum]);
+	}
+
+	return results;
+};
+
+const series = computed(() => {
+	const q = queries.value
 		.filter((q, i) => yearlyFrequencies.value[i])
 		.map((query, index) => ({
 			name: `${query.type}: ${query.userInput} (${query.corpus}${
@@ -87,8 +106,13 @@ const series = computed(() =>
 				.sort((a, b) => b.year - a.year)
 				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
 			color: query.color,
-		})),
-);
+		}));
+	q.forEach((tq, i) => {
+		//@ts-expect-error used only for chart rendering
+		if(tq.data) q[i]!.data = sumInIntervals(tq.data.reverse(), interval.value);
+	})
+	return q;
+});
 </script>
 
 <template>
@@ -104,6 +128,15 @@ const series = computed(() =>
 				<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 				<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 			</VBtnToggle>
+			<VSelect
+				v-model="interval"
+				class="ml-4"
+				item-title="description"
+				item-value="value"
+				:items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+				label="Interval"
+				style="flex-grow: 0"
+			></VSelect>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
 			</div>
