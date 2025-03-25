@@ -86,7 +86,7 @@ const sumInIntervals = function (numbers: Array<unknown>, intervalSize: number) 
 		let start, finish;
 		for (let j = 0; j < intervalSize; j++) {
 			if (j === 0) start = numbers[i * intervalSize + j][0];
-			if (j === intervalSize-1) finish = numbers[i * intervalSize + j][0];
+			if (j === intervalSize - 1) finish = numbers[i * intervalSize + j][0];
 			sum += numbers[i * intervalSize + j][1];
 		}
 		results.push([`${start}-${finish}`, sum]);
@@ -109,8 +109,8 @@ const series = computed(() => {
 		}));
 	q.forEach((tq, i) => {
 		//@ts-expect-error used only for chart rendering
-		if(tq.data) q[i]!.data = sumInIntervals(tq.data.reverse(), interval.value);
-	})
+		if (tq.data) q[i]!.data = sumInIntervals(tq.data.reverse(), interval.value);
+	});
 	return q;
 });
 </script>
