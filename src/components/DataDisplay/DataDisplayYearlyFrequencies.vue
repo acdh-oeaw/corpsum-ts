@@ -139,10 +139,10 @@ const intervalseries = computed(() => {
 
 		<VCardText class="py-0">
 			<div class="max-w-7xl">
-			<VBtnToggle v-model="mode" density="compact">
-				<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
-				<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
-			</VBtnToggle>
+				<VBtnToggle v-model="mode" density="compact">
+					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
+					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
+				</VBtnToggle>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
@@ -172,15 +172,16 @@ const intervalseries = computed(() => {
 				item-title="title"
 				item-value="value"
 				:items="[
-					{title: '2 years', value: 2},
-					{title: '3 years', value: 3},
-					{title: '4 years', value: 4},
-					{title: '5 years', value: 5},
-					{title: '6 years', value: 6},
-					{title: '7 years', value: 7},
-					{title: '8 years', value: 8},
-					{title: '9 years', value: 9},
-					{title: '10 years', value: 10}]"
+					{ title: '2 years', value: 2 },
+					{ title: '3 years', value: 3 },
+					{ title: '4 years', value: 4 },
+					{ title: '5 years', value: 5 },
+					{ title: '6 years', value: 6 },
+					{ title: '7 years', value: 7 },
+					{ title: '8 years', value: 8 },
+					{ title: '9 years', value: 9 },
+					{ title: '10 years', value: 10 },
+				]"
 				label="Interval"
 				style="flex-grow: 0"
 			></VSelect>
