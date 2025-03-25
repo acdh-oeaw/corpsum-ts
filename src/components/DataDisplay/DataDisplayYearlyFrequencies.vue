@@ -89,7 +89,7 @@ const sumInIntervals = function (numbers: Array<unknown>, intervalSize: number) 
 			if (j === intervalSize - 1) finish = numbers[i * intervalSize + j][0];
 			sum += numbers[i * intervalSize + j][1];
 		}
-		results.push([`${start}-${finish}`, sum]);
+		results.push([start, sum]);
 	}
 
 	return results;
