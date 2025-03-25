@@ -17,7 +17,7 @@ interface IyearlyFrequency {
 }
 
 const mode = ref("relative");
-const interval = ref(1);
+const interval = ref(2);
 const expand = ref(false);
 const yearlyFrequencies: Ref<Array<Array<IyearlyFrequency>>> = ref([]);
 const yearlyFrequenciesLoading: Ref<Array<boolean>> = ref([]);
@@ -91,11 +91,25 @@ const sumInIntervals = function (numbers: Array<Array<number>>, intervalSize: nu
 		}
 		results.push([`${start}-${finish}`, sum]);
 	}
-
 	return results;
 };
 
 const series = computed(() => {
+	const q = queries.value
+		.filter((q, i) => yearlyFrequencies.value[i])
+		.map((query, index) => ({
+			name: `${query.type}: ${query.userInput} (${query.corpus}${
+				query.subCorpus ? ` / ${query.subCorpus})` : ")"
+			}`,
+			data: (yearlyFrequencies.value[index] ?? [])
+				.sort((a, b) => b.year - a.year)
+				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
+			color: query.color,
+		}));
+	return q;
+});
+
+const intervalseries = computed(() => {
 	const q = queries.value
 		.filter((q, i) => yearlyFrequencies.value[i])
 		.map((query, index) => ({
@@ -124,19 +138,12 @@ const series = computed(() => {
 		</VCardItem>
 
 		<VCardText class="py-0">
+			<div class="max-w-7xl">
 			<VBtnToggle v-model="mode" density="compact">
 				<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 				<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 			</VBtnToggle>
-			<VSelect
-				v-model="interval"
-				class="ml-4"
-				item-title="description"
-				item-value="value"
-				:items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-				label="Interval"
-				style="flex-grow: 0"
-			></VSelect>
+			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
 			</div>
@@ -151,6 +158,49 @@ const series = computed(() => {
 						title: {
 							text: t('sources'),
 						},
+					},
+				}"
+			></HighCharts>
+			<VCardItem :title="t('yearlyFrequenciesPer') + interval + ' years'">
+				<template #subtitle>
+					{{ t("yearlyFrequenciesDesc") }}
+				</template>
+			</VCardItem>
+			<VSelect
+				v-model="interval"
+				class="ml-4"
+				item-title="title"
+				item-value="value"
+				:items="[
+					{title: '2 years', value: 2},
+					{title: '3 years', value: 3},
+					{title: '4 years', value: 4},
+					{title: '5 years', value: 5},
+					{title: '6 years', value: 6},
+					{title: '7 years', value: 7},
+					{title: '8 years', value: 8},
+					{title: '9 years', value: 9},
+					{title: '10 years', value: 10}]"
+				label="Interval"
+				style="flex-grow: 0"
+			></VSelect>
+			<HighCharts
+				:options="{
+					chart: {
+						type: 'column',
+					},
+					series: intervalseries,
+					title: {
+						text: `${intervalseries.length} ${t('queries')}`,
+						align: 'center',
+					},
+					yAxis: {
+						title: {
+							text: t('sources'),
+						},
+					},
+					xAxis: {
+						categories: intervalseries[0]?.data?.map(([year]) => year),
 					},
 				}"
 			></HighCharts>
