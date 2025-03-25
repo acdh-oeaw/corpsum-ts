@@ -37,6 +37,7 @@
 		"SearchTerm": "Your search term",
 		"SearchDimensions": "Search Dimensions",
 		"yearlyFrequencies": "Yearly Frequencies (per years)",
+		"yearlyFrequenciesPer": "Yearly Frequencies per ",
 		"yearlyFrequenciesDesc": "Shows absolute and relative (hits per million token) Values.",
 		"wordFormFrequencies": "Word Form Frequencies",
 		"wordFormFrequenciesDesc": "Shows absolute and relative (hits per million token) Values.",
