@@ -77,7 +77,7 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const sumInIntervals = function (numbers: Array<unknown>, intervalSize: number) {
+const sumInIntervals = function (numbers: Array<Array<number>>, intervalSize: number) {
 	const results = [];
 	const fullIntervals = Math.floor(numbers.length / intervalSize);
 
@@ -85,9 +85,9 @@ const sumInIntervals = function (numbers: Array<unknown>, intervalSize: number) 
 		let sum = 0;
 		let start, finish;
 		for (let j = 0; j < intervalSize; j++) {
-			if (j === 0) start = numbers[i * intervalSize + j][0];
-			if (j === intervalSize - 1) finish = numbers[i * intervalSize + j][0];
-			sum += numbers[i * intervalSize + j][1];
+			if (j === 0) start = numbers[i * intervalSize + j]![0];
+			if (j === intervalSize - 1) finish = numbers[i * intervalSize + j]![0];
+			sum += numbers[i * intervalSize + j]![1]!;
 		}
 		results.push([`${start}-${finish}`, sum]);
 	}
