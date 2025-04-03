@@ -4,7 +4,7 @@
 # @see https://sharp.pixelplumbing.com/install#linux-memory-allocator
 
 # build
-FROM node:22 AS base
+FROM node:22-slim AS base
 
 RUN corepack enable
 
