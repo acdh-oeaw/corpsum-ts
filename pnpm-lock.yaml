@@ -219,6 +219,9 @@ importers:
       npm-run-all2:
         specifier: ^7.0.2
         version: 7.0.2
+      openapi-typescript:
+        specifier: ^7.6.1
+        version: 7.6.1(typescript@5.8.2)
       postcss:
         specifier: ^8.5.3
         version: 8.5.3

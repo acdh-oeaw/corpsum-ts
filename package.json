@@ -117,7 +117,8 @@
 		"tailwindcss": "^3.4.17",
 		"typescript": "^5.8.2",
 		"vite": "^6.2.2",
-		"vue-tsc": "^2.2.8"
+		"vue-tsc": "^2.2.8",
+		"openapi-typescript": "^7.6.1"
 	},
 	"browserslist": {
 		"development": [
