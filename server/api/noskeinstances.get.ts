@@ -8,7 +8,7 @@ interface Owner {
 	username: string;
 }
 
-type PopulatedNoskeDocument = NoskeDocumentSlim & { owner: Owner };
+export type PopulatedNoskeDocument = NoskeDocumentSlim & { owner: Owner };
 
 export default defineEventHandler(
 	async (event): Promise<Array<PopulatedNoskeDocument> | undefined> => {
