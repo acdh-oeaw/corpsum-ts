@@ -1,6 +1,6 @@
 import { defineEventHandler } from "h3";
 
-import { NoskeModel } from "~/server/models/noskeinstances.schema";
+import { type NoskeDocumentSlim, NoskeModel } from "~/server/models/noskeinstances.schema";
 import { requireAuth } from "~/server/utils/auth";
 
 interface Owner {
@@ -8,7 +8,7 @@ interface Owner {
 	username: string;
 }
 
-type PopulatedNoskeDocument = NoskeDocument & { owner: Owner };
+type PopulatedNoskeDocument = NoskeDocumentSlim & { owner: Owner };
 
 export default defineEventHandler(
 	async (event): Promise<Array<PopulatedNoskeDocument> | undefined> => {
@@ -20,8 +20,17 @@ export default defineEventHandler(
 			return;
 		}
 
-		return await NoskeModel.find({
+		const res = await NoskeModel.find<NoskeDocument>({
 			$or: [{ public: true }, { owner: user._id }],
 		}).populate<{ owner: Owner }>("owner", "username");
+
+		return res.map((noskeinstance) => ({
+			...noskeinstance,
+			_id: noskeinstance._id?.toString(),
+			owner: {
+				_id: noskeinstance.owner._id.toString(),
+				username: noskeinstance.owner.username,
+			},
+		}));
 	},
 );
