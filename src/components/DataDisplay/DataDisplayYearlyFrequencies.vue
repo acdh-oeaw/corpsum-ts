@@ -19,6 +19,7 @@ interface IyearlyFrequency {
 const mode = ref("relative");
 const interval = ref(2);
 const reverse = ref(false);
+const sample = ref(100);
 const expand = ref(false);
 const yearlyFrequencies: Ref<Array<Array<IyearlyFrequency>>> = ref([]);
 const yearlyFrequenciesLoading: Ref<Array<boolean>> = ref([]);
@@ -78,7 +79,11 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const sumInIntervals = function (numbers: Array<Array<number>>, intervalSize: number, reverse: boolean) {
+const sumInIntervals = function (
+	numbers: Array<Array<number>>,
+	intervalSize: number,
+	reverse: boolean,
+) {
 	const results = [];
 	const fullIntervals = Math.floor(numbers.length / intervalSize);
 
@@ -88,7 +93,8 @@ const sumInIntervals = function (numbers: Array<Array<number>>, intervalSize: nu
 			let start, finish;
 			for (let j = 0; j < intervalSize; j++) {
 				if (j === 0) finish = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
-				if (j === intervalSize - 1) start = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
+				if (j === intervalSize - 1)
+					start = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
 				sum += numbers[numbers.length - 1 - (i * intervalSize + j)]![1]!;
 			}
 			results.push([`${start}-${finish}`, sum]);
@@ -109,6 +115,16 @@ const sumInIntervals = function (numbers: Array<Array<number>>, intervalSize: nu
 	return results;
 };
 
+const applySampleSize = function (numbers: Array<Array<number>>, sampleSize: number) {
+	const results = [...numbers];
+	// eslint-disable-next-line @typescript-eslint/prefer-for-of
+	for (let i = 0; i < results.length; i++) {
+		if (results[i] && Array.isArray(results[i]))
+			results[i]![1] = results[i]![1]! * (sampleSize / 100);
+	}
+	return results;
+};
+
 const series = computed(() => {
 	const q = queries.value
 		.filter((q, i) => yearlyFrequencies.value[i])
@@ -121,6 +137,9 @@ const series = computed(() => {
 				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
 			color: query.color,
 		}));
+	q.forEach((tq, i) => {
+		if (tq.data) q[i]!.data = applySampleSize(tq.data.reverse(), sample.value);
+	});
 	return q;
 });
 
@@ -137,8 +156,12 @@ const intervalseries = computed(() => {
 			color: query.color,
 		}));
 	q.forEach((tq, i) => {
-		//@ts-expect-error used only for chart rendering
-		if (tq.data) q[i]!.data = sumInIntervals(tq.data.reverse() , interval.value, reverse.value);
+
+		if (tq.data) {
+			//@ts-expect-error used only for chart rendering
+			q[i]!.data = sumInIntervals(tq.data.reverse(), interval.value, reverse.value);
+			q[i]!.data = applySampleSize(tq.data, sample.value);
+		}
 	});
 	return q;
 });
@@ -153,11 +176,32 @@ const intervalseries = computed(() => {
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<div class="max-w-7xl">
-				<VBtnToggle v-model="mode" density="compact">
+			<div class="max-w-7xl mt-2 flex">
+				<VBtnToggle v-model="mode" density="compact" class="flex w-full">
 					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>
+				<VSelect
+					v-model="sample"
+					class="ml-4 flex-auto w-full"
+					item-title="title"
+					item-value="value"
+					:items="[
+						{ title: '10%', value: 10 },
+						{ title: '15%', value: 15 },
+						{ title: '20%', value: 20 },
+						{ title: '30%', value: 30 },
+						{ title: '40%', value: 40 },
+						{ title: '50%', value: 50 },
+						{ title: '60%', value: 60 },
+						{ title: '70%', value: 70 },
+						{ title: '80%', value: 80 },
+						{ title: '90%', value: 90 },
+						{ title: '100%', value: 100 },
+					]"
+					label="Sample size"
+					style="flex-grow: 0"
+				></VSelect>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
@@ -188,24 +232,20 @@ const intervalseries = computed(() => {
 					item-title="title"
 					item-value="value"
 					:items="[
-					{ title: '2 years', value: 2 },
-					{ title: '3 years', value: 3 },
-					{ title: '4 years', value: 4 },
-					{ title: '5 years', value: 5 },
-					{ title: '6 years', value: 6 },
-					{ title: '7 years', value: 7 },
-					{ title: '8 years', value: 8 },
-					{ title: '9 years', value: 9 },
-					{ title: '10 years', value: 10 },
-				]"
+						{ title: '2 years', value: 2 },
+						{ title: '3 years', value: 3 },
+						{ title: '4 years', value: 4 },
+						{ title: '5 years', value: 5 },
+						{ title: '6 years', value: 6 },
+						{ title: '7 years', value: 7 },
+						{ title: '8 years', value: 8 },
+						{ title: '9 years', value: 9 },
+						{ title: '10 years', value: 10 },
+					]"
 					label="Interval"
 					style="flex-grow: 0"
 				></VSelect>
-				<VCheckbox
-					v-model="reverse"
-					class="w-32 flex-none"
-					label="Reverse"
-				></VCheckbox>
+				<VCheckbox v-model="reverse" class="w-32 flex-none" label="Reverse"></VCheckbox>
 			</div>
 			<HighCharts
 				:options="{
