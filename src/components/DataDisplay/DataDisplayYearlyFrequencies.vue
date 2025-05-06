@@ -156,7 +156,6 @@ const intervalseries = computed(() => {
 			color: query.color,
 		}));
 	q.forEach((tq, i) => {
-
 		if (tq.data) {
 			//@ts-expect-error used only for chart rendering
 			q[i]!.data = sumInIntervals(tq.data.reverse(), interval.value, reverse.value);
@@ -176,14 +175,14 @@ const intervalseries = computed(() => {
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<div class="max-w-7xl mt-2 flex">
-				<VBtnToggle v-model="mode" density="compact" class="flex w-full">
+			<div class="mt-2 flex max-w-7xl">
+				<VBtnToggle v-model="mode" class="flex w-full" density="compact">
 					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>
 				<VSelect
 					v-model="sample"
-					class="ml-4 flex-auto w-full"
+					class="ml-4 w-full flex-auto"
 					item-title="title"
 					item-value="value"
 					:items="[
@@ -228,7 +227,7 @@ const intervalseries = computed(() => {
 			<div class="mt-2 flex">
 				<VSelect
 					v-model="interval"
-					class="ml-4 flex-auto w-full"
+					class="ml-4 w-full flex-auto"
 					item-title="title"
 					item-value="value"
 					:items="[
