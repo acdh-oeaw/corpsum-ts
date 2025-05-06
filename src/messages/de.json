@@ -37,7 +37,7 @@
 		"SearchTerm": "Ihr Suchterm",
 		"SearchDimensions": "Ergebnistypen",
 		"yearlyFrequencies": "Zeitliche Verteilung (nach Jahren)",
-		"yearlyFrequenciesPer": "Zeitliche Verteilung pro ",
+		"yearlyFrequenciesPer": "Zeitliche Verteilung ^pro ",
 		"yearlyFrequenciesDesc": "Zeigt absolute und relative (Treffer pro Millionen Token) Werte.",
 		"wordFormFrequencies": "Wortformen",
 		"wordFormFrequenciesDesc": "Zeigt absolute und relative (Treffer pro Millionen Token) Werte.",

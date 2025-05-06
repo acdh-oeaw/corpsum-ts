@@ -18,6 +18,7 @@ interface IyearlyFrequency {
 
 const mode = ref("relative");
 const interval = ref(2);
+const reverse = ref(false);
 const expand = ref(false);
 const yearlyFrequencies: Ref<Array<Array<IyearlyFrequency>>> = ref([]);
 const yearlyFrequenciesLoading: Ref<Array<boolean>> = ref([]);
@@ -77,19 +78,33 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const sumInIntervals = function (numbers: Array<Array<number>>, intervalSize: number) {
+const sumInIntervals = function (numbers: Array<Array<number>>, intervalSize: number, reverse: boolean) {
 	const results = [];
 	const fullIntervals = Math.floor(numbers.length / intervalSize);
 
-	for (let i = 0; i < fullIntervals; i++) {
-		let sum = 0;
-		let start, finish;
-		for (let j = 0; j < intervalSize; j++) {
-			if (j === 0) start = numbers[i * intervalSize + j]![0];
-			if (j === intervalSize - 1) finish = numbers[i * intervalSize + j]![0];
-			sum += numbers[i * intervalSize + j]![1]!;
+	if (reverse) {
+		for (let i = 0; i < fullIntervals; i++) {
+			let sum = 0;
+			let start, finish;
+			for (let j = 0; j < intervalSize; j++) {
+				if (j === 0) finish = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
+				if (j === intervalSize - 1) start = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
+				sum += numbers[numbers.length - 1 - (i * intervalSize + j)]![1]!;
+			}
+			results.push([`${start}-${finish}`, sum]);
 		}
-		results.push([`${start}-${finish}`, sum]);
+		results.reverse();
+	} else {
+		for (let i = 0; i < fullIntervals; i++) {
+			let sum = 0;
+			let start, finish;
+			for (let j = 0; j < intervalSize; j++) {
+				if (j === 0) start = numbers[i * intervalSize + j]![0];
+				if (j === intervalSize - 1) finish = numbers[i * intervalSize + j]![0];
+				sum += numbers[i * intervalSize + j]![1]!;
+			}
+			results.push([`${start}-${finish}`, sum]);
+		}
 	}
 	return results;
 };
@@ -123,7 +138,7 @@ const intervalseries = computed(() => {
 		}));
 	q.forEach((tq, i) => {
 		//@ts-expect-error used only for chart rendering
-		if (tq.data) q[i]!.data = sumInIntervals(tq.data.reverse(), interval.value);
+		if (tq.data) q[i]!.data = sumInIntervals(tq.data.reverse() , interval.value, reverse.value);
 	});
 	return q;
 });
@@ -166,12 +181,13 @@ const intervalseries = computed(() => {
 					{{ t("yearlyFrequenciesDesc") }}
 				</template>
 			</VCardItem>
-			<VSelect
-				v-model="interval"
-				class="ml-4"
-				item-title="title"
-				item-value="value"
-				:items="[
+			<div class="mt-2 flex">
+				<VSelect
+					v-model="interval"
+					class="ml-4 flex-auto w-full"
+					item-title="title"
+					item-value="value"
+					:items="[
 					{ title: '2 years', value: 2 },
 					{ title: '3 years', value: 3 },
 					{ title: '4 years', value: 4 },
@@ -182,9 +198,15 @@ const intervalseries = computed(() => {
 					{ title: '9 years', value: 9 },
 					{ title: '10 years', value: 10 },
 				]"
-				label="Interval"
-				style="flex-grow: 0"
-			></VSelect>
+					label="Interval"
+					style="flex-grow: 0"
+				></VSelect>
+				<VCheckbox
+					v-model="reverse"
+					class="w-32 flex-none"
+					label="Reverse"
+				></VCheckbox>
+			</div>
 			<HighCharts
 				:options="{
 					chart: {
