@@ -166,7 +166,8 @@ const chartOptions = computed(() => {
 		},
 		colorAxis: colorAxis.value,
 		exporting: {
-			scale: 2,
+			scale: 1,
+			sourceWidth: 1200,
 			width: 1200,
 		},
 		type: "logarithmic",
