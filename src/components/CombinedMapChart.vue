@@ -166,8 +166,8 @@ const chartOptions = computed(() => {
 		},
 		colorAxis: colorAxis.value,
 		exporting: {
-			scale: 1,
-			printMaxWidth: 700,
+			scale: 2,
+			width: 1200,
 		},
 		type: "logarithmic",
 		minColor: "#eee",
