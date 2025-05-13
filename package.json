@@ -110,7 +110,7 @@
 		"vitest": "^2.0.5",
 		"vitest-environment-nuxt": "^1.0.1",
 		"vue-tsc": "^2.0.29",
-		"vuetify": "^3.5.1"
+		"vuetify": "^3.8.0"
 	},
 	"browserslist": {
 		"development": [

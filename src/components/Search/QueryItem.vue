@@ -54,6 +54,14 @@ const showFacettingInterface = ref(false);
 						icon="mdi-filter"
 						@click="showFacettingInterface = true"
 					></VBtn>
+					<VNumberInput
+						v-model="props.query.SampleRatio"
+						control-variant="split"
+						:hide-input="false"
+						:inset="false"
+						label="Sample Ratio"
+						:reverse="false"
+					></VNumberInput>
 				</div>
 
 				<span class="text-xl" :style="`color: ${props.query.color}`">

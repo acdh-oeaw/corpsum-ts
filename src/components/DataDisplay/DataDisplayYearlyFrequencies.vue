@@ -19,7 +19,6 @@ interface IyearlyFrequency {
 const mode = ref("relative");
 const interval = ref(2);
 const reverse = ref(false);
-const sample = ref(100);
 const expand = ref(false);
 const yearlyFrequencies: Ref<Array<Array<IyearlyFrequency>>> = ref([]);
 const yearlyFrequenciesLoading: Ref<Array<boolean>> = ref([]);
@@ -138,7 +137,7 @@ const series = computed(() => {
 			color: query.color,
 		}));
 	q.forEach((tq, i) => {
-		if (tq.data) q[i]!.data = applySampleSize(tq.data.reverse(), sample.value);
+		if (tq.data) q[i]!.data = applySampleSize(tq.data.reverse(), queries.value[i]!.SampleRatio);
 	});
 	return q;
 });
@@ -159,7 +158,7 @@ const intervalseries = computed(() => {
 		if (tq.data) {
 			//@ts-expect-error used only for chart rendering
 			q[i]!.data = sumInIntervals(tq.data.reverse(), interval.value, reverse.value);
-			q[i]!.data = applySampleSize(tq.data, sample.value);
+			q[i]!.data = applySampleSize(tq.data, queries.value[i]!.SampleRatio);
 		}
 	});
 	return q;
@@ -180,27 +179,6 @@ const intervalseries = computed(() => {
 					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>
-				<VSelect
-					v-model="sample"
-					class="ml-4 w-full flex-auto"
-					item-title="title"
-					item-value="value"
-					:items="[
-						{ title: '10%', value: 10 },
-						{ title: '15%', value: 15 },
-						{ title: '20%', value: 20 },
-						{ title: '30%', value: 30 },
-						{ title: '40%', value: 40 },
-						{ title: '50%', value: 50 },
-						{ title: '60%', value: 60 },
-						{ title: '70%', value: 70 },
-						{ title: '80%', value: 80 },
-						{ title: '90%', value: 90 },
-						{ title: '100%', value: 100 },
-					]"
-					label="Sample size"
-					style="flex-grow: 0"
-				></VSelect>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />

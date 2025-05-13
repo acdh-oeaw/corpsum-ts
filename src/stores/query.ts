@@ -72,6 +72,7 @@ export const useQueryStore = defineStore(
 				},
 				KWICAdditionalViewHeaders: [],
 				facettingValues: {},
+				SampleRatio: 100,
 				loading: {
 					yearlyFrequencies: false,
 					wordFormFrequencies: false,

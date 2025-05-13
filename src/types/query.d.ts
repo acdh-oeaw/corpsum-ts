@@ -97,6 +97,7 @@ interface CorpusQuery {
 	KWICAdditionalViewHeaders: Array<string>;
 	KWICAttrsStructsOptions: KWICAttrsStructsOptions; // ToDo: this might be refactored to come via requesat whenever needed.
 	facettingValues: FacettingValues;
+	SampleRatio: number;
 	loading: {
 		yearlyFrequencies: boolean;
 		wordFormFrequencies: boolean;
