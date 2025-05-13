@@ -1,3 +1,4 @@
+/* eslint-disable vue/no-mutating-props */
 <script setup lang="ts">
 import "vue-json-pretty/lib/styles.css";
 
@@ -54,6 +55,7 @@ const showFacettingInterface = ref(false);
 						icon="mdi-filter"
 						@click="showFacettingInterface = true"
 					></VBtn>
+					<!-- eslint-disable -->
 					<VNumberInput
 						v-model="props.query.SampleRatio"
 						control-variant="split"
