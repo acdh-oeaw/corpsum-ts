@@ -165,7 +165,7 @@ const chartOptions = computed(() => {
 			description: t("map-showing-the-different-query-frequencies-relating-to-the-region"),
 		},
 		colorAxis: colorAxis.value,
-
+		printMaxWidth: 700,
 		type: "logarithmic",
 		minColor: "#eee",
 		title: {
