@@ -4,7 +4,7 @@ import en from "~/i18n/messages/en.json";
 
 const locale = "en";
 
-const { t } = createI18n({ legacy: false, locale, messages: { [locale]: en } }).global;
+const { t } = createI18n({ legacy: false, locale, messages: { "en-US": en } }).global;
 
 const manifest = {
 	name: t("Manifest.name"),

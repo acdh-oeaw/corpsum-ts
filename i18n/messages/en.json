@@ -49,6 +49,9 @@
 		},
 		"title": "Home"
 	},
+	"LoginPage": {
+
+	},
 	"LocaleSwitcher": {
 		"current-locale": "Current language: {locale}",
 		"switch-locale": "Switch to {locale}"

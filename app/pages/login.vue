@@ -6,7 +6,7 @@ definePageMeta({
 	layout: "full-page",
 });
 
-const t = useTranslations("LoginPage");
+const t = useTranslations();
 
 const localeRoute = useLocaleRoute();
 const { locale } = useI18n();
