@@ -35,3 +35,6 @@ dist
 /playwright-report/
 /test-results/
 /lib/api-client/
+
+#generated
+lib
