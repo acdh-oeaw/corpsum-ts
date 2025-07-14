@@ -58,7 +58,7 @@
 		"jose": "^6.0.10",
 		"lucide-vue-next": "^0.453.0",
 		"mongoose": "^8.12.1",
-		"nuxt": "^3.16.2",
+		"nuxt": "^3.17.7",
 		"nuxt-mongoose": "^1.0.6",
 		"pinia": "^3.0.1",
 		"pinia-plugin-persistedstate": "^4.2.0",
