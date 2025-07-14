@@ -1,10 +1,6 @@
 import { defineEventHandler } from "h3";
 
-import {
-	type NoskeDocument,
-	type NoskeDocumentSlim,
-	NoskeModel,
-} from "~/server/models/noskeinstances.schema";
+import { type NoskeDocumentSlim, NoskeModel } from "~/server/models/noskeinstances.schema";
 import { requireAuth } from "~/server/utils/auth";
 
 interface Owner {

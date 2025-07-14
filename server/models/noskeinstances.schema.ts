@@ -22,6 +22,7 @@ const schemaDefinition = {
 } as const;
 
 export type NoskeDocument = InferRawDocType<typeof schemaDefinition>;
+export type NoskeDocumentSlim = Omit<NoskeDocument, "_id" | "owner">;
 
 export const NoskeModel = defineMongooseModel({
 	name: "noskeinstances",
