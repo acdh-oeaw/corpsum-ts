@@ -23,7 +23,7 @@ export default defineEventHandler(
 		const res = await NoskeModel.find<NoskeDocument>({
 			$or: [{ public: true }, { owner: user._id }],
 		}).populate<{ owner: Owner }>("owner", "username");
-		console.log("res", res);
+
 		return res.map((noskeinstance) => ({
 			_id: noskeinstance._id?.toString(),
 			name: noskeinstance.name,
