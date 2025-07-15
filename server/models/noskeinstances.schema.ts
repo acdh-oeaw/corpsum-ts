@@ -19,6 +19,7 @@ const schemaDefinition = {
 		required: true,
 	},
 	public: { type: Schema.Types.Boolean, required: true },
+	host: { type: "string", required: true },
 } as const;
 
 export type NoskeDocument = InferRawDocType<typeof schemaDefinition>;
