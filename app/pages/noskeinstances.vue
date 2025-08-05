@@ -1,9 +1,15 @@
 <script lang="ts" setup>
-const { data: message } = await useFetch("/api/noskeinstances", {});
+import NoskeInstanceCard from "@/components/noskeinstance/noske-instance-card.vue";
+
+const t = useTranslations();
+const { data: instances } = await useFetch("/api/noskeinstances", {});
 </script>
 
 <template>
-	<MainContent class="container grid content-start gap-y-8 py-8">
-		<PageTitle>{{ message }}</PageTitle>
+	<MainContent class="">
+		<PageTitle>{{ t("NoskeInstancesPage.title") }}</PageTitle>
+		<div class="flex flex-wrap gap-3">
+			<NoskeInstanceCard v-for="(instance, index) in instances" :key="index" :noske-instance="instance" />
+		</div>
 	</MainContent>
 </template>

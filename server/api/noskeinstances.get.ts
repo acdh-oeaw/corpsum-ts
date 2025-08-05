@@ -8,7 +8,7 @@ interface Owner {
 	username: string;
 }
 
-export type PopulatedNoskeDocument = NoskeDocumentSlim & { owner: Owner };
+export type PopulatedNoskeDocument = NoskeDocumentSlim & { owner: Owner; _id: string };
 
 export default defineEventHandler(
 	async (event): Promise<Array<PopulatedNoskeDocument> | undefined> => {
@@ -25,7 +25,7 @@ export default defineEventHandler(
 		}).populate<{ owner: Owner }>("owner", "username");
 
 		return res.map((noskeinstance) => ({
-			_id: noskeinstance._id?.toString(),
+			_id: noskeinstance._id!.toString(),
 			name: noskeinstance.name,
 			public: noskeinstance.public,
 			base: noskeinstance.base,

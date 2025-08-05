@@ -10,7 +10,8 @@ interface Owner {
 
 type PopulatedNoskeDocument = NoskeDocumentSlim & { owner: Owner; _id: string };
 
-export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument | undefined> => {
+export default defineEventHandler(
+	async (event): Promise<PopulatedNoskeDocument | undefined> => {
 	const { username } = await requireAuth(event);
 
 	const user = await UserModel.findOne({ username });
@@ -29,8 +30,13 @@ export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument 
 	}
 
 	return {
-		...noskeinstance,
 		_id: noskeinstance._id!.toString(),
+		name: noskeinstance.name,
+		public: noskeinstance.public,
+		base: noskeinstance.base,
+		version: noskeinstance.version,
+		host: noskeinstance.host,
+		authentication: noskeinstance.authentication,
 		owner: {
 			_id: noskeinstance.owner._id.toString(),
 			username: noskeinstance.owner.username,
