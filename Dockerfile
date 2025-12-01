@@ -4,7 +4,7 @@
 # @see https://sharp.pixelplumbing.com/install#linux-memory-allocator
 
 # build
-FROM node:22-slim AS base
+FROM node:24-slim AS base
 
 RUN corepack enable
 
@@ -50,7 +50,7 @@ ENV NODE_ENV=production
 RUN pnpm run build
 
 # serve
-FROM node:22-alpine AS serve
+FROM node:24-alpine AS serve
 
 RUN mkdir /app && chown -R node:node /app
 WORKDIR /app

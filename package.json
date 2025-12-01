@@ -1,13 +1,12 @@
 {
-	"name": "@acdh-oeaw/app",
+	"name": "@acdh-oeaw/corpsum-ts",
 	"private": true,
 	"license": "MIT",
 	"type": "module",
 	"engines": {
-		"node": "22.x",
-		"pnpm": "9.x"
+		"node": "24.x"
 	},
-	"packageManager": "pnpm@9.12.2",
+	"packageManager": "pnpm@10.23.0",
 	"scripts": {
 		"analyze": "nuxt analyze",
 		"build": "nuxt build --dotenv ./.env.local",
