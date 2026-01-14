@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+/* eslint-disable vue/no-v-html */
 import { createImprintUrl } from "@/config/imprint.config";
 
 const env = useRuntimeConfig();

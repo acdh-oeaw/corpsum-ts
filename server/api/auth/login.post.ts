@@ -22,16 +22,15 @@ export default defineEventHandler(async (event) => {
 	if (!user) {
 		const env = useRuntimeConfig();
 
-		const basicAuthString = `Basic ${btoa(`${username}:${password}`)}`;
-		const corpora =
-			(await // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-			(
-				await fetch(`${env.public.apiBaseUrl}/ca/api/corpora`, {
-					headers: {
-						Authorization: basicAuthString,
-					},
-				})
-			).json()) as Array<components["schemas"]["03_corpora_list"]>;
+		const apiBaseUrl = typeof env.public.apiBaseUrl === "string" ? env.public.apiBaseUrl : "";
+		const basicAuthString = `Basic ${btoa(`${String(username)}:${String(password)}`)}`;
+		const corpora = (await (
+			await fetch(`${apiBaseUrl}/ca/api/corpora`, {
+				headers: {
+					Authorization: basicAuthString,
+				},
+			})
+		).json()) as Array<components["schemas"]["03_corpora_list"]>;
 		if (Array.isArray(corpora)) {
 			const hashed = bcrypt.hashSync(password, 10);
 			try {
@@ -52,7 +51,7 @@ export default defineEventHandler(async (event) => {
 					.findOne({ username });
 			} catch (error) {
 				setResponseStatus(event, 500, "database error");
-				return `ERROR: ${error as string}`;
+				return `ERROR: ${String(error)}`;
 			}
 		} else {
 			throw createError({

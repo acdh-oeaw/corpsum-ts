@@ -7,7 +7,7 @@ const colorMode = useColorMode();
 <template>
 	<ClientOnly>
 		<Select v-model="colorMode.preference" aria-label="Select Color Scheme">
-			<SelectTrigger class="w-15">
+			<SelectTrigger class="w-16">
 				<SelectValue placeholder="Select Color Scheme" />
 			</SelectTrigger>
 			<SelectContent>

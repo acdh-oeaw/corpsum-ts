@@ -8,7 +8,7 @@ export default defineNuxtRouteMiddleware(async () => {
 			method: "GET",
 		});
 		if (!res.ok) {
-			console.log("token invalid, logging out");
+			console.warn("token invalid, logging out");
 			await auth.logout();
 		}
 	}
