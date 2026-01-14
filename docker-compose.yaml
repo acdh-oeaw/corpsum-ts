@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 services:
   corpsum-mongodb:
     image: mongo:latest
@@ -18,15 +18,15 @@ services:
       target: dev
     image: corpsum-refactor
     env_file:
-      - ./.env.local
+      - local.env
     networks:
       - corpsumnet
     ports:
       - 3000:3000
       - 4000:4000
     volumes:
-        - localapp:/app/app
-        - localserver:/app/server
+      - localapp:/app/app
+      - localserver:/app/server
 
 networks:
   corpsumnet:
@@ -35,24 +35,24 @@ volumes:
   mongodata:
     driver: local
     driver_opts:
-      type: 'none'
-      o: 'bind'
+      type: "none"
+      o: "bind"
       device: $DOCKER_MONGODATA_DIR
   mongodumps:
     driver: local
     driver_opts:
-      type: 'none'
-      o: 'bind'
+      type: "none"
+      o: "bind"
       device: $DOCKER_MONGODUMPS_DIR
   localapp:
     driver: local
     driver_opts:
-      type: 'none'
-      o: 'bind'
+      type: "none"
+      o: "bind"
       device: ./app
   localserver:
     driver: local
     driver_opts:
-      type: 'none'
-      o: 'bind'
+      type: "none"
+      o: "bind"
       device: ./server

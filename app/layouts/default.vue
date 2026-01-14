@@ -95,13 +95,13 @@ router.afterEach((to, from) => {
 </script>
 
 <template>
-	<div>
+	<div class="relative w-full">
 		<SkipLink target-id="main-content">
 			{{ t("DefaultLayout.skip-to-main-content") }}
 		</SkipLink>
 		<SidebarProvider :default-open="false">
 			<AppSidebar />
-			<SidebarInset>
+			<SidebarInset class="w-full max-w-full overflow-x-hidden">
 				<div class="flex items-center gap-2 px-4">
 					<ErrorBoundary>
 						<slot />

@@ -50,7 +50,9 @@
 		"title": "Home"
 	},
 	"LoginPage": {
-
+		"meta": {
+			"title": "Login"
+		}
 	},
 	"LocaleSwitcher": {
 		"current-locale": "Current language: {locale}",
@@ -61,10 +63,121 @@
 		"short-name": "ACDH-CH App",
 		"description": "ACDH-CH App"
 	},
+	"FacettingModal": {
+		"actions": {
+			"clear": "Clear",
+			"close": "Close",
+			"remove": "Remove"
+		},
+		"messages": {
+			"noTextTypes": "No text type data available.",
+			"selectAttribute": "Select an attribute to configure its filters."
+		},
+		"title": "Facetting filters for"
+	},
+	"FacettingSelection": {
+		"actions": {
+			"clearSelection": "Clear selection",
+			"loadMore": "Load more",
+			"search": "Search",
+			"useSearchAsRegex": "Use \"{search}\" as {mode} regex (clears current selection)"
+		},
+		"labels": {
+			"mode": "Mode",
+			"search": "Search"
+		},
+		"messages": {
+			"regexSelection": "Regex selection active. Clear it to select individual values."
+		},
+		"modes": {
+			"contains": "containing",
+			"endsWith": "ends with",
+			"regex": "regex",
+			"startsWith": "starts with"
+		}
+	},
+	"NoskeInstanceComboBox": {
+		"empty": "No instances found.",
+		"placeholder": "Select a NoSketch instance...",
+		"searchPlaceholder": "Search instances..."
+	},
+	"CorpusComboBox": {
+		"empty": "No corpora found.",
+		"placeholder": "Select a corpus...",
+		"searchPlaceholder": "Search corpora..."
+	},
+	"SubCorpusComboBox": {
+		"empty": "No sub corpora found.",
+		"placeholder": "Select a sub corpus...",
+		"searchPlaceholder": "Search sub corpora..."
+	},
 	"NotFoundPage": {
 		"meta": {
 			"title": "Page not found"
 		},
 		"title": "Page not found"
-	}
+	},
+	"NoskeInstancesPage": {
+		"title": "NoSketch Instances"
+	},
+	"QueriesPage": {
+		"title": "Queries"
+	},
+	"QueryForm": {
+		"actions": {
+			"cancel": "Cancel",
+			"editFacetting": "Edit"
+		},
+		"labels": {
+			"corpus": "Corpus",
+			"facettingValues": "Facetting values (JSON)",
+			"name": "Name",
+			"noske": "NoSketch Instance",
+			"subCorpus": "Sub corpus",
+			"type": "Type",
+			"userInput": "Input"
+		},
+		"messages": {
+			"corporaAvailable": "{count} corpora available.",
+			"corporaLoading": "Loading corpora...",
+			"noFacettingValues": "No facetting values configured yet.",
+			"selectNoskeForCorpora": "Select a NoSketch instance to load corpora.",
+			"selectCorpusForSubcorpora": "Select a corpus to load sub corpora.",
+			"subcorporaAvailable": "{count} sub corpora available.",
+			"subcorporaLoading": "Loading sub corpora..."
+		},
+		"table": {
+			"attribute": "Attribute",
+			"value": "Value"
+		},
+		"validation": {
+			"facettingInvalidJson": "Facetting values must be valid JSON.",
+			"facettingRequired": "Facetting values are required.",
+			"invalidValue": "Invalid value.",
+			"required": "{label} is required."
+		}
+	},
+	"WrongCredentials": "Wrong credentials.",
+	"NoskeForm": {
+		"actions": {
+			"cancel": "Cancel"
+		},
+		"labels": {
+			"authentication": "Authentication",
+			"base": "Base URL",
+			"host": "Host",
+			"name": "Name",
+			"public": "Public",
+			"version": "Version"
+		},
+		"validation": {
+			"invalidValue": "Invalid value.",
+			"required": "{label} is required."
+		}
+	},
+	"login": "Log in",
+	"password": "Password",
+	"skip-to-main-content": "Skip to main content",
+	"splashtext": "Summaries at scale for your corpora.",
+	"username": "Username"
 }

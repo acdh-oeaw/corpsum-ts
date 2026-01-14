@@ -1,6 +1,11 @@
 import { defineEventHandler } from "h3";
 
-import { type NoskeDocumentSlim, NoskeModel } from "~/server/models/noskeinstances.schema";
+import {
+	type NoskeDocument,
+	type NoskeDocumentSlim,
+	NoskeModel,
+} from "~/server/models/noskeinstances.schema";
+import { UserModel } from "~/server/models/users.schema";
 import { requireAuth } from "~/server/utils/auth";
 
 interface Owner {
@@ -25,7 +30,7 @@ export default defineEventHandler(
 		}).populate<{ owner: Owner }>("owner", "username");
 
 		return res.map((noskeinstance) => ({
-			_id: noskeinstance._id!.toString(),
+			_id: noskeinstance._id.toString(),
 			name: noskeinstance.name,
 			public: noskeinstance.public,
 			base: noskeinstance.base,

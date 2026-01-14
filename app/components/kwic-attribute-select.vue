@@ -1,0 +1,97 @@
+<script lang="ts" setup>
+import { storeToRefs } from "pinia";
+
+const corporaStore = useCorporaStore();
+const { corpInfoResponse, corporaLoading } = storeToRefs(corporaStore);
+const t = useTranslations();
+
+const props = defineProps<{ query: CorpusQuery }>();
+
+const queryStore = useQueryStore();
+
+const currentQuery = computed(() => queryStore.queries.find((q) => q.id === props.query.id));
+
+const structureOptions = computed(() => {
+	const options: Array<string> = [];
+	currentQuery.value?.KWICAttrsStructsOptions.structures.forEach((structure) => {
+		if (!structure.name) return;
+		options.push(structure.name);
+		if (
+			structure.attributes &&
+			currentQuery.value?.KWICAttrsStructs.structures.includes(structure.name)
+		) {
+			structure.attributes.forEach((attribute) => {
+				options.push(`${structure.name}.${attribute.name}`);
+			});
+		}
+	});
+	return options ?? [];
+});
+
+const attributeOptions = computed(
+	() =>
+		currentQuery.value?.KWICAttrsStructsOptions.attributes.map((structure) => structure.name) ?? [],
+);
+
+const fixed = queryStore.fixedKWICStructures;
+
+const toggleSelection = (
+	list: Array<string>,
+	value: string,
+	checked: boolean | "indeterminate",
+) => {
+	if (checked) {
+		if (!list.includes(value)) list.push(value);
+		return;
+	}
+	const index = list.indexOf(value);
+	if (index >= 0) list.splice(index, 1);
+};
+</script>
+
+<template>
+	<div v-if="!corporaLoading && corpInfoResponse">
+		<h2 class="text-lg font-semibold">{{ t("Attributes and Structures") }}</h2>
+		<div v-if="currentQuery" class="mt-4 grid gap-6 md:grid-cols-2">
+			<div class="space-y-3">
+				<h3 class="text-sm font-medium text-muted-foreground">{{ t("Attributes") }}</h3>
+				<div class="space-y-2 rounded-md border p-3">
+					<div
+						v-for="attribute in attributeOptions"
+						:key="attribute"
+						class="flex items-center gap-2"
+					>
+						<Checkbox
+							:checked="currentQuery.KWICAttrsStructs.attributes.includes(attribute)"
+							@update:checked="
+								toggleSelection(currentQuery.KWICAttrsStructs.attributes, attribute, $event)
+							"
+						/>
+						<span class="text-sm">{{ attribute }}</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="space-y-3">
+				<h3 class="text-sm font-medium text-muted-foreground">{{ t("Structures") }}</h3>
+				<div class="space-y-2 rounded-md border p-3">
+					<div
+						v-for="structure in structureOptions"
+						:key="structure"
+						class="flex items-center gap-2"
+						:class="{ 'pl-4': structure.includes('.') }"
+					>
+						<Checkbox
+							:checked="currentQuery.KWICAttrsStructs.structures.includes(structure)"
+							:disabled="fixed.includes(structure)"
+							@update:checked="
+								toggleSelection(currentQuery.KWICAttrsStructs.structures, structure, $event)
+							"
+						/>
+						<span class="text-sm">{{ structure }}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

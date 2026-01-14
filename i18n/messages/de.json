@@ -50,7 +50,9 @@
 		"title": "Startseite"
 	},
 	"LoginPage": {
-
+		"meta": {
+			"title": "Anmeldung"
+		}
 	},
 	"LocaleSwitcher": {
 		"current-locale": "Aktuelle Sprache: {locale}",
@@ -61,10 +63,121 @@
 		"short-name": "ACDH-CH App",
 		"description": "ACDH-CH App"
 	},
+	"FacettingModal": {
+		"actions": {
+			"clear": "Leeren",
+			"close": "Schließen",
+			"remove": "Entfernen"
+		},
+		"messages": {
+			"noTextTypes": "Keine Texttyp-Daten verfügbar.",
+			"selectAttribute": "Wählen Sie ein Attribut, um die Filter zu konfigurieren."
+		},
+		"title": "Facettierungsfilter für"
+	},
+	"FacettingSelection": {
+		"actions": {
+			"clearSelection": "Auswahl löschen",
+			"loadMore": "Mehr laden",
+			"search": "Suchen",
+			"useSearchAsRegex": "\"{search}\" als {mode}-Regex verwenden (setzt die Auswahl zurück)"
+		},
+		"labels": {
+			"mode": "Modus",
+			"search": "Suche"
+		},
+		"messages": {
+			"regexSelection": "Regex-Auswahl aktiv. Löschen Sie sie, um einzelne Werte auszuwählen."
+		},
+		"modes": {
+			"contains": "enthält",
+			"endsWith": "endet mit",
+			"regex": "Regex",
+			"startsWith": "beginnt mit"
+		}
+	},
+	"NoskeInstanceComboBox": {
+		"empty": "Keine Instanzen gefunden.",
+		"placeholder": "NoSketch-Instanz auswählen...",
+		"searchPlaceholder": "Instanzen durchsuchen..."
+	},
+	"CorpusComboBox": {
+		"empty": "Keine Korpora gefunden.",
+		"placeholder": "Korpus auswählen...",
+		"searchPlaceholder": "Korpora durchsuchen..."
+	},
+	"SubCorpusComboBox": {
+		"empty": "Keine Subkorpora gefunden.",
+		"placeholder": "Subkorpus auswählen...",
+		"searchPlaceholder": "Subkorpora durchsuchen..."
+	},
 	"NotFoundPage": {
 		"meta": {
 			"title": "Seite nicht gefunden"
 		},
 		"title": "Seite nicht gefunden"
-	}
+	},
+	"NoskeInstancesPage": {
+		"title": "NoSketch-Instanzen"
+	},
+	"QueriesPage": {
+		"title": "Abfragen"
+	},
+	"QueryForm": {
+		"actions": {
+			"cancel": "Abbrechen",
+			"editFacetting": "Bearbeiten"
+		},
+		"labels": {
+			"corpus": "Korpus",
+			"facettingValues": "Facettierungswerte (JSON)",
+			"name": "Name",
+			"noske": "NoSketch-Instanz",
+			"subCorpus": "Subkorpus",
+			"type": "Typ",
+			"userInput": "Eingabe"
+		},
+		"messages": {
+			"corporaAvailable": "{count} Korpora verfügbar.",
+			"corporaLoading": "Korpora werden geladen...",
+			"noFacettingValues": "Noch keine Facettierungswerte konfiguriert.",
+			"selectNoskeForCorpora": "Wählen Sie eine NoSketch-Instanz, um Korpora zu laden.",
+			"selectCorpusForSubcorpora": "Wählen Sie ein Korpus, um Subkorpora zu laden.",
+			"subcorporaAvailable": "{count} Subkorpora verfügbar.",
+			"subcorporaLoading": "Subkorpora werden geladen..."
+		},
+		"table": {
+			"attribute": "Attribut",
+			"value": "Wert"
+		},
+		"validation": {
+			"facettingInvalidJson": "Facettierungswerte müssen gültiges JSON sein.",
+			"facettingRequired": "Facettierungswerte sind erforderlich.",
+			"invalidValue": "Ungültiger Wert.",
+			"required": "{label} ist erforderlich."
+		}
+	},
+	"WrongCredentials": "Falsche Zugangsdaten.",
+	"NoskeForm": {
+		"actions": {
+			"cancel": "Abbrechen"
+		},
+		"labels": {
+			"authentication": "Authentifizierung",
+			"base": "Basis-URL",
+			"host": "Host",
+			"name": "Name",
+			"public": "Öffentlich",
+			"version": "Version"
+		},
+		"validation": {
+			"invalidValue": "Ungültiger Wert.",
+			"required": "{label} ist erforderlich."
+		}
+	},
+	"login": "Anmelden",
+	"password": "Passwort",
+	"skip-to-main-content": "Zum Hauptinhalt springen",
+	"splashtext": "Zusammenfassungen im Großen fuer Ihre Korpora.",
+	"username": "Benutzername"
 }

@@ -4,18 +4,17 @@ import { type InferRawDocType, Schema } from "mongoose";
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
-	_id: { type: Schema.Types.ObjectId },
-	name: { type: "string", required: true },
+	name: { type: Schema.Types.String, required: true },
 	owner: [{ type: Schema.Types.ObjectId, ref: "users", required: true }],
 	noske: { type: Schema.Types.ObjectId, ref: "noskeinstances", required: true },
-	corpus: { type: "string", required: true },
-	subCorpus: { type: "string", required: true },
+	corpus: { type: Schema.Types.String, required: true },
+	subCorpus: { type: Schema.Types.String, required: false },
 	type: {
-		type: "string",
+		type: Schema.Types.String,
 		enum: ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"],
 		required: true,
 	},
-	userInput: { type: "string", required: true },
+	userInput: { type: Schema.Types.String, required: true },
 	facettingValues: { type: Schema.Types.Mixed, required: true },
 } as const;
 

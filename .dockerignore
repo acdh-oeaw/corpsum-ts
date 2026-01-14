@@ -8,7 +8,7 @@ node_modules/
 *.log
 
 # non-public environment variables
-.env.local
+local.env
 .env.*.local
 
 # caches

@@ -1,12 +1,17 @@
-import { useQuery } from "@tanstack/vue-query";
+import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 
 export function useGetNoskeinstances(id: MaybeRef<string | null>) {
-	return useQuery({
-		queryKey: ["noskeinstances", id] as const,
-		async queryFn({ queryKey }) {
-			const [, id] = queryKey;
-			if (id !== null) return useFetch(`/api/noskeinstances/${id}`, {});
-			return useFetch(`/api/noskeinstances/`, {});
+	const resolvedId = computed(() => unref(id));
+	const hasId = computed(() => Boolean(resolvedId.value?.length));
+
+	return useAsyncData<Array<PopulatedNoskeDocument> | PopulatedNoskeDocument | null>(
+		() => `noskeinstances:${resolvedId.value ?? "all"}`,
+		async () => {
+			if (hasId.value && resolvedId.value) {
+				return await $fetch<PopulatedNoskeDocument>(`/api/noskeinstances/${resolvedId.value}`);
+			}
+			return await $fetch<Array<PopulatedNoskeDocument>>("/api/noskeinstances");
 		},
-	});
+		{ watch: [resolvedId] },
+	);
 }

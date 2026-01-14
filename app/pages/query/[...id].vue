@@ -1,0 +1,90 @@
+<script setup lang="ts">
+import type { QueryResponse } from "~/server/api/query/[id].get.ts";
+
+const route = useRoute();
+const t = useTranslations();
+const auth = useAuth();
+
+interface FacettingRegexSearch {
+	key: string;
+	value: string;
+}
+type FacettingValues = Record<string, Array<string> | FacettingRegexSearch>;
+
+const queryId = computed(() => {
+	const idParam = route.params.id;
+	return Array.isArray(idParam) ? idParam[0] : idParam;
+});
+
+const { data: query } = await useFetch<QueryResponse>(() => `/api/query/${queryId.value}`);
+
+const ownerNames = computed(
+	() =>
+		query.value?.owner
+			.map((owner) => owner.username || owner._id)
+			.filter((ownerName) => ownerName.length > 0) ?? [],
+);
+const isOwner = computed(() =>
+	query.value?.owner.some((owner) => owner.username === auth.username),
+);
+
+const facettingEntries = computed(() => {
+	const values = (query.value?.facettingValues ?? {}) as FacettingValues;
+	return Object.entries(values) as Array<[string, FacettingValues[string]]>;
+});
+</script>
+
+<template>
+	<MainContent v-if="query" class="">
+		<PageTitle>{{ query.name }}</PageTitle>
+		<div class="flex flex-col gap-3">
+			<p><span class="text-xs">Type:</span> {{ query.type }}</p>
+			<p><span class="text-xs">Corpus:</span> {{ query.corpus }}</p>
+			<p><span class="text-xs">Sub corpus:</span> {{ query.subCorpus }}</p>
+			<p><span class="text-xs">NoSketch Engine:</span> {{ query.noske }}</p>
+			<p><span class="text-xs">Owners:</span> {{ ownerNames.join(", ") }}</p>
+			<p><span class="text-xs">Input:</span> {{ query.userInput }}</p>
+			<div class="grid gap-2">
+				<p class="text-xs">{{ t("QueryForm.labels.facettingValues") }}</p>
+				<div class="overflow-hidden rounded-md border">
+					<table class="min-w-full text-sm">
+						<thead class="bg-muted/40 text-left">
+							<tr>
+								<th class="px-3 py-2 font-medium">
+									{{ t("QueryForm.table.attribute") }}
+								</th>
+								<th class="px-3 py-2 font-medium">
+									{{ t("QueryForm.table.value") }}
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="[key, value] in facettingEntries" :key="key">
+								<td class="px-3 py-2 font-medium">{{ key }}</td>
+								<td class="px-3 py-2">
+									<span v-if="Array.isArray(value)">
+										{{ value.join(", ") || "—" }}
+									</span>
+									<span v-else>
+										{{ value.value || "—" }}
+									</span>
+								</td>
+							</tr>
+							<tr v-if="facettingEntries.length === 0">
+								<td class="px-3 py-2 text-sm text-muted-foreground" colspan="2">
+									{{ t("QueryForm.messages.noFacettingValues") }}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="mt-4">
+			<NuxtLinkLocale v-if="isOwner" :href="{ path: `/query/edit/${query._id}` }">
+				<Button> Edit </Button>
+			</NuxtLinkLocale>
+			<Button v-else disabled> Edit </Button>
+		</div>
+	</MainContent>
+</template>

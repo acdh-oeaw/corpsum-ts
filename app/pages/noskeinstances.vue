@@ -1,15 +1,33 @@
 <script lang="ts" setup>
-import NoskeInstanceCard from "@/components/noskeinstance/noske-instance-card.vue";
+import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 
 const t = useTranslations();
-const { data: instances } = await useFetch("/api/noskeinstances", {});
+const { data: instancesData, refresh } = useGetNoskeinstances(null);
+const instances = computed<Array<PopulatedNoskeDocument>>(() => {
+	if (!instancesData.value) return [];
+	return Array.isArray(instancesData.value) ? instancesData.value : [instancesData.value];
+});
+
+function handleDeleted() {
+	void refresh();
+}
 </script>
 
 <template>
 	<MainContent class="">
-		<PageTitle>{{ t("NoskeInstancesPage.title") }}</PageTitle>
-		<div class="flex flex-wrap gap-3">
-			<NoskeInstanceCard v-for="(instance, index) in instances" :key="index" :noske-instance="instance" />
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<PageTitle>{{ t("NoskeInstancesPage.title") }}</PageTitle>
+			<Button as-child>
+				<NuxtLinkLocale :href="{ path: '/noskeinstance/edit/new' }">New instance</NuxtLinkLocale>
+			</Button>
+		</div>
+		<div class="mt-4 flex flex-wrap gap-3">
+			<NoskeInstanceCard
+				v-for="instance in instances"
+				:key="instance._id"
+				:noske-instance="instance"
+				@deleted="handleDeleted"
+			/>
 		</div>
 	</MainContent>
 </template>

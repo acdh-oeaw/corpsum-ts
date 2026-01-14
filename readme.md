@@ -16,5 +16,5 @@ prerequisites:
 set required environment variables in `.env.local`:
 
 ```bash
-cp .env.local.example .env.local
+cp local.env.example local.env
 ```
