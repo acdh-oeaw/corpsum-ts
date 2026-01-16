@@ -96,8 +96,7 @@ export default defineNuxtConfig({
 	],
 
 	mongoose: {
-		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-		uri: `${process.env.DATABASE_URL}`,
+		uri: process.env.DATABASE_URL,
 		options: {},
 		modelsDir: "models",
 		devtools: false,
