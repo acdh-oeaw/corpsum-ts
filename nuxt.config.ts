@@ -5,6 +5,8 @@ import { defaultLocale, localesMap } from "./app/config/i18n.config";
 
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
 
+console.log(process.env.DATABASE_URL);
+
 export default defineNuxtConfig({
 	alias: {
 		"@": fileURLToPath(new URL("./app/", import.meta.url)),
