@@ -15,8 +15,6 @@ jobs:
             echo "environment=production" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.ref }}" = "refs/heads/development" ]; then
             echo "environment=development" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.ref }}" = "refs/heads/shadcn" ]; then
-            echo "environment=shadcn" >> "$GITHUB_OUTPUT"          
           else
             echo "environment=review/${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
