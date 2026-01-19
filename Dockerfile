@@ -24,9 +24,6 @@ ARG NUXT_PUBLIC_REDMINE_ID
 ARG NUXT_PUBLIC_MATOMO_BASE_URL
 ARG NUXT_PUBLIC_MATOMO_ID
 
-RUN --mount=type=secret,id=DATABASE_URL,uid=1000 \
-	DATABASE_URL=$(cat /run/secrets/DATABASE_URL)
-
 FROM base AS dev
 ENV NODE_ENV development
 RUN pnpm install
@@ -43,7 +40,9 @@ ENV NODE_ENV=production
 
 # to mount secrets which need to be available at build time
 # @see https://docs.docker.com/build/building/secrets/
-RUN pnpm run build
+RUN --mount=type=secret,id=DATABASE_URL,uid=1000 \
+  	DATABASE_URL=$(cat /run/secrets/DATABASE_URL) \
+    pnpm run build
 
 # serve
 FROM node:24-alpine AS serve
