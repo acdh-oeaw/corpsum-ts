@@ -4,8 +4,7 @@ import { fileURLToPath } from "node:url";
 import { defaultLocale, localesMap } from "./app/config/i18n.config";
 
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
-
-console.log(process.env.DATABASE_URL);
+const databaseUrl = process.env.DATABASE_URL!;
 
 export default defineNuxtConfig({
 	alias: {
@@ -98,7 +97,7 @@ export default defineNuxtConfig({
 	],
 
 	mongoose: {
-		uri: process.env.DATABASE_URL,
+		uri: databaseUrl,
 		options: {},
 		modelsDir: "models",
 		devtools: false,
