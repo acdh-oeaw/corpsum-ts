@@ -139,6 +139,7 @@ export default defineNuxtConfig({
 		jwtExpiration: process.env.NUXT_JWT_EXPIRATION,
 		public: {
 			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL,
+			apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
 			bots: process.env.NUXT_PUBLIC_BOTS,
 			googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
 			matomoBaseUrl: process.env.NUXT_PUBLIC_MATOMO_BASE_URL,
