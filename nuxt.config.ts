@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 // noinspection ES6PreferShortImport
 import { defaultLocale, localesMap } from "./app/config/i18n.config";
 
-const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
+const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL ?? "https://shadcn.acdh-ch-dev.oeaw.ac.at";
 const databaseUrl = process.env.DATABASE_URL!;
 
 export default defineNuxtConfig({
