@@ -68,7 +68,8 @@ export default defineNuxtConfig({
 	},
 
 	i18n: {
-		baseUrl,
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		baseUrl: baseUrl ?? "https://shadcn.acdh-ch-dev.oeaw.ac.at",
 		defaultLocale,
 		detectBrowserLanguage: {
 			redirectOn: "root",
@@ -138,7 +139,7 @@ export default defineNuxtConfig({
 		authSecret: process.env.NUXT_AUTH_SECRET,
 		jwtExpiration: process.env.NUXT_JWT_EXPIRATION,
 		public: {
-			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL,
+			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL ?? "https://shadcn.acdh-ch-dev.oeaw.ac.at",
 			apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
 			bots: process.env.NUXT_PUBLIC_BOTS,
 			googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
