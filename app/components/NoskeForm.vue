@@ -127,173 +127,179 @@ const handleReset = () => {
 </script>
 
 <template>
-	<form class="mt-4 flex max-w-2xl flex-col gap-4" @submit.prevent="form.handleSubmit">
-		<component
-			:is="form.Field"
-			v-slot="{ field, state }"
-			name="name"
-			:validators="{ onChange: requiredText(t('NoskeForm.labels.name')) }"
-		>
-			<div class="grid gap-2">
-				<label class="text-sm font-medium" for="name">{{ t("NoskeForm.labels.name") }}</label>
-				<Input
-					id="name"
-					:aria-describedby="hasError(state) ? 'name-error' : undefined"
-					:aria-invalid="hasError(state)"
-					:class="errorClass(state)"
-					:disabled="props.isSaving"
-					:model-value="field.state.value"
-					type="text"
-					@blur="field.handleBlur"
-					@update:model-value="(value) => field.handleChange(String(value))"
-				/>
-				<p v-if="hasError(state)" id="name-error" class="text-xs text-destructive" role="alert">
-					{{ firstError(state) }}
-				</p>
-			</div>
-		</component>
-
-		<component
-			:is="form.Field"
-			v-slot="{ field, state }"
-			name="base"
-			:validators="{ onChange: requiredText(t('NoskeForm.labels.base')) }"
-		>
-			<div class="grid gap-2">
-				<label class="text-sm font-medium" for="base">{{ t("NoskeForm.labels.base") }}</label>
-				<Input
-					id="base"
-					:aria-describedby="hasError(state) ? 'base-error' : undefined"
-					:aria-invalid="hasError(state)"
-					:class="errorClass(state)"
-					:disabled="props.isSaving"
-					:model-value="field.state.value"
-					type="text"
-					@blur="field.handleBlur"
-					@update:model-value="(value) => field.handleChange(String(value))"
-				/>
-				<p v-if="hasError(state)" id="base-error" class="text-xs text-destructive" role="alert">
-					{{ firstError(state) }}
-				</p>
-			</div>
-		</component>
-
-		<component
-			:is="form.Field"
-			v-slot="{ field, state }"
-			name="host"
-			:validators="{ onChange: requiredText(t('NoskeForm.labels.host')) }"
-		>
-			<div class="grid gap-2">
-				<label class="text-sm font-medium" for="host">{{ t("NoskeForm.labels.host") }}</label>
-				<Input
-					id="host"
-					:aria-describedby="hasError(state) ? 'host-error' : undefined"
-					:aria-invalid="hasError(state)"
-					:class="errorClass(state)"
-					:disabled="props.isSaving"
-					:model-value="field.state.value"
-					type="text"
-					@blur="field.handleBlur"
-					@update:model-value="(value) => field.handleChange(String(value))"
-				/>
-				<p v-if="hasError(state)" id="host-error" class="text-xs text-destructive" role="alert">
-					{{ firstError(state) }}
-				</p>
-			</div>
-		</component>
-
-		<component
-			:is="form.Field"
-			v-slot="{ field, state }"
-			name="version"
-			:validators="{ onChange: optionValidator(versionOptions, t('NoskeForm.labels.version')) }"
-		>
-			<div class="grid gap-2">
-				<label class="text-sm font-medium" for="version">
-					{{ t("NoskeForm.labels.version") }}
-				</label>
-				<select
-					id="version"
-					:aria-describedby="hasError(state) ? 'version-error' : undefined"
-					:aria-invalid="hasError(state)"
-					class="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-					:class="errorClass(state)"
-					:disabled="props.isSaving"
-					:value="field.state.value"
-					@blur="field.handleBlur"
-					@change="
-						field.handleChange(
-							($event.target as HTMLSelectElement).value as NoskeFormValues['version'],
-						)
-					"
+	<form class="mt-4 flex w-full flex-col gap-4" @submit.prevent="form.handleSubmit">
+		<div class="grid gap-6 lg:grid-cols-2">
+			<div class="flex flex-col gap-4">
+				<component
+					:is="form.Field"
+					v-slot="{ field, state }"
+					name="name"
+					:validators="{ onChange: requiredText(t('NoskeForm.labels.name')) }"
 				>
-					<option v-for="option in versionOptions" :key="option" :value="option">
-						{{ option }}
-					</option>
-				</select>
-				<p v-if="hasError(state)" id="version-error" class="text-xs text-destructive" role="alert">
-					{{ firstError(state) }}
-				</p>
-			</div>
-		</component>
+					<div class="grid gap-2">
+						<label class="text-sm font-medium" for="name">{{ t("NoskeForm.labels.name") }}</label>
+						<Input
+							id="name"
+							:aria-describedby="hasError(state) ? 'name-error' : undefined"
+							:aria-invalid="hasError(state)"
+							:class="errorClass(state)"
+							:disabled="props.isSaving"
+							:model-value="field.state.value"
+							type="text"
+							@blur="field.handleBlur"
+							@update:model-value="(value) => field.handleChange(String(value))"
+						/>
+						<p v-if="hasError(state)" id="name-error" class="text-xs text-destructive" role="alert">
+							{{ firstError(state) }}
+						</p>
+					</div>
+				</component>
 
-		<component
-			:is="form.Field"
-			v-slot="{ field, state }"
-			name="authentication"
-			:validators="{ onChange: optionValidator(authOptions, t('NoskeForm.labels.authentication')) }"
-		>
-			<div class="grid gap-2">
-				<label class="text-sm font-medium" for="authentication">
-					{{ t("NoskeForm.labels.authentication") }}
-				</label>
-				<select
-					id="authentication"
-					:aria-describedby="hasError(state) ? 'authentication-error' : undefined"
-					:aria-invalid="hasError(state)"
-					class="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-					:class="errorClass(state)"
-					:disabled="props.isSaving"
-					:value="field.state.value"
-					@blur="field.handleBlur"
-					@change="
-						field.handleChange(
-							($event.target as HTMLSelectElement).value as NoskeFormValues['authentication'],
-						)
-					"
+				<component
+					:is="form.Field"
+					v-slot="{ field, state }"
+					name="base"
+					:validators="{ onChange: requiredText(t('NoskeForm.labels.base')) }"
 				>
-					<option v-for="option in authOptions" :key="option" :value="option">
-						{{ option }}
-					</option>
-				</select>
-				<p
-					v-if="hasError(state)"
-					id="authentication-error"
-					class="text-xs text-destructive"
-					role="alert"
-				>
-					{{ firstError(state) }}
-				</p>
-			</div>
-		</component>
+					<div class="grid gap-2">
+						<label class="text-sm font-medium" for="base">{{ t("NoskeForm.labels.base") }}</label>
+						<Input
+							id="base"
+							:aria-describedby="hasError(state) ? 'base-error' : undefined"
+							:aria-invalid="hasError(state)"
+							:class="errorClass(state)"
+							:disabled="props.isSaving"
+							:model-value="field.state.value"
+							type="text"
+							@blur="field.handleBlur"
+							@update:model-value="(value) => field.handleChange(String(value))"
+						/>
+						<p v-if="hasError(state)" id="base-error" class="text-xs text-destructive" role="alert">
+							{{ firstError(state) }}
+						</p>
+					</div>
+				</component>
 
-		<component :is="form.Field" v-slot="{ field }" name="public">
-			<div class="flex items-center gap-2">
-				<input
-					id="public"
-					:checked="field.state.value"
-					class="size-4 rounded border border-input"
-					:disabled="props.isSaving"
-					type="checkbox"
-					@blur="field.handleBlur"
-					@change="field.handleChange(($event.target as HTMLInputElement).checked)"
-				/>
-				<label class="text-sm font-medium" for="public">
-					{{ t("NoskeForm.labels.public") }}
-				</label>
+				<component
+					:is="form.Field"
+					v-slot="{ field, state }"
+					name="host"
+					:validators="{ onChange: requiredText(t('NoskeForm.labels.host')) }"
+				>
+					<div class="grid gap-2">
+						<label class="text-sm font-medium" for="host">{{ t("NoskeForm.labels.host") }}</label>
+						<Input
+							id="host"
+							:aria-describedby="hasError(state) ? 'host-error' : undefined"
+							:aria-invalid="hasError(state)"
+							:class="errorClass(state)"
+							:disabled="props.isSaving"
+							:model-value="field.state.value"
+							type="text"
+							@blur="field.handleBlur"
+							@update:model-value="(value) => field.handleChange(String(value))"
+						/>
+						<p v-if="hasError(state)" id="host-error" class="text-xs text-destructive" role="alert">
+							{{ firstError(state) }}
+						</p>
+					</div>
+				</component>
 			</div>
-		</component>
+
+			<div class="flex flex-col gap-4">
+				<component
+					:is="form.Field"
+					v-slot="{ field, state }"
+					name="version"
+					:validators="{ onChange: optionValidator(versionOptions, t('NoskeForm.labels.version')) }"
+				>
+					<div class="grid gap-2">
+						<label class="text-sm font-medium" for="version">
+							{{ t("NoskeForm.labels.version") }}
+						</label>
+						<select
+							id="version"
+							:aria-describedby="hasError(state) ? 'version-error' : undefined"
+							:aria-invalid="hasError(state)"
+							class="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+							:class="errorClass(state)"
+							:disabled="props.isSaving"
+							:value="field.state.value"
+							@blur="field.handleBlur"
+							@change="
+								field.handleChange(
+									($event.target as HTMLSelectElement).value as NoskeFormValues['version'],
+								)
+							"
+						>
+							<option v-for="option in versionOptions" :key="option" :value="option">
+								{{ option }}
+							</option>
+						</select>
+						<p v-if="hasError(state)" id="version-error" class="text-xs text-destructive" role="alert">
+							{{ firstError(state) }}
+						</p>
+					</div>
+				</component>
+
+				<component
+					:is="form.Field"
+					v-slot="{ field, state }"
+					name="authentication"
+					:validators="{ onChange: optionValidator(authOptions, t('NoskeForm.labels.authentication')) }"
+				>
+					<div class="grid gap-2">
+						<label class="text-sm font-medium" for="authentication">
+							{{ t("NoskeForm.labels.authentication") }}
+						</label>
+						<select
+							id="authentication"
+							:aria-describedby="hasError(state) ? 'authentication-error' : undefined"
+							:aria-invalid="hasError(state)"
+							class="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+							:class="errorClass(state)"
+							:disabled="props.isSaving"
+							:value="field.state.value"
+							@blur="field.handleBlur"
+							@change="
+								field.handleChange(
+									($event.target as HTMLSelectElement).value as NoskeFormValues['authentication'],
+								)
+							"
+						>
+							<option v-for="option in authOptions" :key="option" :value="option">
+								{{ option }}
+							</option>
+						</select>
+						<p
+							v-if="hasError(state)"
+							id="authentication-error"
+							class="text-xs text-destructive"
+							role="alert"
+						>
+							{{ firstError(state) }}
+						</p>
+					</div>
+				</component>
+
+				<component :is="form.Field" v-slot="{ field }" name="public">
+					<div class="flex items-center gap-2">
+						<input
+							id="public"
+							:checked="field.state.value"
+							class="size-4 rounded border border-input"
+							:disabled="props.isSaving"
+							type="checkbox"
+							@blur="field.handleBlur"
+							@change="field.handleChange(($event.target as HTMLInputElement).checked)"
+						/>
+						<label class="text-sm font-medium" for="public">
+							{{ t("NoskeForm.labels.public") }}
+						</label>
+					</div>
+				</component>
+			</div>
+		</div>
 
 		<div class="flex flex-wrap gap-2">
 			<Button :disabled="props.isSaving" type="submit">{{ props.submitLabel }}</Button>
