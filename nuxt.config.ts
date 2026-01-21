@@ -132,9 +132,10 @@ export default defineNuxtConfig({
 	postcss: {
 		plugins: {
 			tailwindcss: {},
-			highcharts: { src: "@/plugins/highcharts.client.js", mode: "client" },
 		},
 	},
+
+	plugins: [{ src: "@/plugins/highcharts.client.js", mode: "client" }],
 
 	runtimeConfig: {
 		authSecret: process.env.NUXT_AUTH_SECRET,
