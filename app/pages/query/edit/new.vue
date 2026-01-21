@@ -3,6 +3,7 @@ import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts"
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 
 const localeRoute = useLocaleRoute();
+const route = useRoute();
 
 const { data: instancesData } = useGetNoskeinstances(null);
 const noskeInstances = computed<Array<PopulatedNoskeDocument>>(() => {
@@ -14,6 +15,21 @@ const isSaving = ref(false);
 const setSaving = (value: boolean) => {
 	isSaving.value = value;
 };
+
+const getQueryString = (key: string) => {
+	const raw = route.query[key];
+	if (Array.isArray(raw)) {
+		return typeof raw[0] === "string" ? raw[0] : undefined;
+	}
+	return typeof raw === "string" ? raw : undefined;
+};
+
+const initialValues = computed(() => ({
+	name: getQueryString("name"),
+	noske: getQueryString("noske"),
+	corpus: getQueryString("corpus"),
+	subCorpus: getQueryString("subCorpus"),
+}));
 
 async function save(payload: {
 	name: string;
@@ -56,6 +72,7 @@ function cancel() {
 			<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
 		</div>
 		<QueryForm
+			:initial-values="initialValues"
 			:is-saving="isSaving"
 			:noske-instances="noskeInstances"
 			submit-label="Create"

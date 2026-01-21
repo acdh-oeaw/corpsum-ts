@@ -28,6 +28,11 @@ function formatCount(value?: number) {
 	return typeof value === "number" ? value.toLocaleString() : "—";
 }
 
+function getCorpusQueryValue(corpus: CorporaListItem) {
+	if (corpus.corpname) return corpus.corpname;
+	return corpus.id != null ? String(corpus.id) : "";
+}
+
 const isDeleting = ref(false);
 const setDeleting = (value: boolean) => {
 	isDeleting.value = value;
@@ -95,6 +100,7 @@ async function deleteInstance() {
 							<th class="px-3 py-2 font-medium">Language</th>
 							<th class="px-3 py-2 text-right font-medium">Words</th>
 							<th class="px-3 py-2 text-right font-medium">Documents</th>
+							<th class="px-3 py-2 text-right font-medium">Create query</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -109,9 +115,24 @@ async function deleteInstance() {
 							</td>
 							<td class="px-3 py-2 text-right">{{ formatCount(corpus.sizes?.wordcount) }}</td>
 							<td class="px-3 py-2 text-right">{{ formatCount(corpus.sizes?.doccount) }}</td>
+							<td class="px-3 py-2 text-right">
+								<Button v-if="getCorpusQueryValue(corpus)" as-child size="sm" variant="outline">
+									<NuxtLinkLocale
+										:href="{
+											path: '/query/edit/new',
+											query: {
+												noske: noskeInstance._id,
+												corpus: getCorpusQueryValue(corpus),
+											},
+										}"
+									>
+										New query
+									</NuxtLinkLocale>
+								</Button>
+							</td>
 						</tr>
 						<tr v-if="corpora.length === 0">
-							<td class="p-3 text-sm text-muted-foreground" colspan="4">
+							<td class="p-3 text-sm text-muted-foreground" colspan="5">
 								No corpora found for this instance.
 							</td>
 						</tr>
