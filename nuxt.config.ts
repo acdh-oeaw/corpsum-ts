@@ -135,7 +135,7 @@ export default defineNuxtConfig({
 		},
 	},
 
-	plugins: [{ src: "@/plugins/highcharts.client.js", mode: "client" }],
+	plugins: [{ src: "@/plugins/highcharts.client.ts", mode: "client" }],
 
 	runtimeConfig: {
 		authSecret: process.env.NUXT_AUTH_SECRET,
