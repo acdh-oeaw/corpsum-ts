@@ -22,7 +22,10 @@ export default defineEventHandler(async (event) => {
 	if (!user) {
 		const env = useRuntimeConfig();
 
-		const apiBaseUrl = typeof env.public.apiBaseUrl === "string" ? env.public.apiBaseUrl : "";
+		const apiBaseUrl =
+			typeof env.public.apiBaseUrl === "string"
+				? env.public.apiBaseUrl
+				: "https://noskecrystal5corpsum.acdh-dev.oeaw.ac.at";
 		const basicAuthString = `Basic ${btoa(`${String(username)}:${String(password)}`)}`;
 		const corpora = (await (
 			await fetch(`${apiBaseUrl}/ca/api/corpora`, {
