@@ -132,6 +132,7 @@ export default defineNuxtConfig({
 	postcss: {
 		plugins: {
 			tailwindcss: {},
+			highcharts: { src: "@/plugins/highcharts.client.js", mode: "client" },
 		},
 	},
 
