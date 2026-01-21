@@ -35,48 +35,63 @@ const facettingEntries = computed(() => {
 </script>
 
 <template>
-	<MainContent v-if="query" class="">
-		<PageTitle>{{ query.name }}</PageTitle>
-		<div class="flex flex-col gap-3">
-			<p><span class="text-xs">Type:</span> {{ query.type }}</p>
-			<p><span class="text-xs">Corpus:</span> {{ query.corpus }}</p>
-			<p><span class="text-xs">Sub corpus:</span> {{ query.subCorpus }}</p>
-			<p><span class="text-xs">NoSketch Engine:</span> {{ query.noske }}</p>
-			<p><span class="text-xs">Owners:</span> {{ ownerNames.join(", ") }}</p>
-			<p><span class="text-xs">Input:</span> {{ query.userInput }}</p>
-			<div class="grid gap-2">
-				<p class="text-xs">{{ t("QueryForm.labels.facettingValues") }}</p>
-				<div class="overflow-hidden rounded-md border">
-					<table class="min-w-full text-sm">
-						<thead class="bg-muted/40 text-left">
-							<tr>
-								<th class="px-3 py-2 font-medium">
-									{{ t("QueryForm.table.attribute") }}
-								</th>
-								<th class="px-3 py-2 font-medium">
-									{{ t("QueryForm.table.value") }}
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr v-for="[key, value] in facettingEntries" :key="key">
-								<td class="px-3 py-2 font-medium">{{ key }}</td>
-								<td class="px-3 py-2">
-									<span v-if="Array.isArray(value)">
-										{{ value.join(", ") || "—" }}
-									</span>
-									<span v-else>
-										{{ value.value || "—" }}
-									</span>
-								</td>
-							</tr>
-							<tr v-if="facettingEntries.length === 0">
-								<td class="px-3 py-2 text-sm text-muted-foreground" colspan="2">
-									{{ t("QueryForm.messages.noFacettingValues") }}
-								</td>
-							</tr>
-						</tbody>
-					</table>
+	<MainContent v-if="query" class="mx-auto w-full max-w-5xl">
+		<div class="my-10 flex items-center gap-3">
+			<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+				<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
+			</div>
+			<PageTitle>{{ query.name }}</PageTitle>
+		</div>
+		<div class="grid gap-6 lg:grid-cols-2">
+			<div class="flex flex-col gap-3">
+				<p><span class="text-xs">Type:</span> {{ query.type }}</p>
+				<p><span class="text-xs">Corpus:</span> {{ query.corpus }}</p>
+				<p><span class="text-xs">Sub corpus:</span> {{ query.subCorpus }}</p>
+				<p><span class="text-xs">NoSketch Engine:</span> {{ query.noske }}</p>
+				<p><span class="text-xs">Owners:</span> {{ ownerNames.join(", ") }}</p>
+			</div>
+			<div class="flex flex-col gap-4">
+				<p v-if="query.type !== 'cqlrow'">
+					<span class="text-xs">Input:</span> {{ query.userInput }}
+				</p>
+				<div v-else class="grid gap-2">
+					<p class="text-xs">Input:</p>
+					<CqlPrettyPrint :query="query.userInput" />
+				</div>
+				<div class="grid gap-2">
+					<p class="text-xs">{{ t("QueryForm.labels.facettingValues") }}</p>
+					<div class="w-full overflow-hidden rounded-md border">
+						<table class="min-w-full text-sm">
+							<thead class="bg-muted/40 text-left">
+								<tr>
+									<th class="px-3 py-2 font-medium">
+										{{ t("QueryForm.table.attribute") }}
+									</th>
+									<th class="px-3 py-2 font-medium">
+										{{ t("QueryForm.table.value") }}
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="[key, value] in facettingEntries" :key="key">
+									<td class="px-3 py-2 font-medium">{{ key }}</td>
+									<td class="px-3 py-2">
+										<span v-if="Array.isArray(value)">
+											{{ value.join(", ") || "—" }}
+										</span>
+										<span v-else>
+											{{ value.value || "—" }}
+										</span>
+									</td>
+								</tr>
+								<tr v-if="facettingEntries.length === 0">
+									<td class="px-3 py-2 text-sm text-muted-foreground" colspan="2">
+										{{ t("QueryForm.messages.noFacettingValues") }}
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>

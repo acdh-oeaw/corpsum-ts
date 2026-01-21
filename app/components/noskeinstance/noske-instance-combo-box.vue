@@ -75,10 +75,11 @@ watch(selectedValue, () => {
 	<ComboboxRoot
 		v-model="selectedValue"
 		v-model:open="open"
+		class="w-full min-w-0"
 		:ignore-filter="true"
 		:reset-search-term-on-select="true"
 	>
-		<ComboboxAnchor class="w-full">
+		<ComboboxAnchor class="w-full min-w-0">
 			<ComboboxTrigger as-child>
 				<Button class="w-full justify-between" :disabled="props.disabled" variant="outline">
 					<span v-if="selectedItem" class="truncate">

@@ -67,9 +67,12 @@ function cancel() {
 </script>
 
 <template>
-	<MainContent class="mx-auto my-4 flex w-full max-w-2xl flex-col items-center gap-4">
-		<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
-			<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
+	<MainContent class="mx-auto my-4 flex w-full max-w-5xl flex-col gap-4">
+		<div class="flex items-center gap-3">
+			<div class="flex size-10 items-center justify-center rounded-full border bg-muted/40">
+				<LucideIcon class="size-5 text-foreground" name="Terminal" :stroke-width="2" />
+			</div>
+			<PageTitle>New query</PageTitle>
 		</div>
 		<QueryForm
 			:initial-values="initialValues"
