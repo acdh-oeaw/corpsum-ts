@@ -4,12 +4,11 @@ import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 
 const localeRoute = useLocaleRoute();
 
-const noskeFetcher = $fetch as (input: string) => Promise<Array<PopulatedNoskeDocument>>;
-const { data: noskeInstances } = await useAsyncData<Array<PopulatedNoskeDocument>>(
-	"noskeinstances",
-	() => noskeFetcher("/api/noskeinstances"),
-	{ default: () => [] },
-);
+const { data: instancesData } = useGetNoskeinstances(null);
+const noskeInstances = computed<Array<PopulatedNoskeDocument>>(() => {
+	if (!instancesData.value) return [];
+	return Array.isArray(instancesData.value) ? instancesData.value : [instancesData.value];
+});
 
 const isSaving = ref(false);
 const setSaving = (value: boolean) => {
