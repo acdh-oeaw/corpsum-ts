@@ -39,18 +39,39 @@ async function save(payload: {
 function cancel() {
 	navigateTo(localeRoute("/noskeinstances"));
 }
+
+const formId = "noske-form";
 </script>
 
 <template>
 	<MainContent class="mx-auto my-4 flex w-full max-w-5xl flex-col gap-4">
-		<div class="my-10 flex items-center gap-3">
-			<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
-				<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
+				</div>
+				<PageTitle>New instance</PageTitle>
 			</div>
-			<PageTitle>New instance</PageTitle>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button :disabled="isSaving" :form="formId" size="sm" type="submit" variant="ghost">
+					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
+					Create
+				</Button>
+				<Button :disabled="isSaving" size="sm" type="button" variant="ghost" @click="cancel">
+					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
+					Cancel
+				</Button>
+			</div>
 		</div>
 		<div class="w-full">
-			<NoskeForm :is-saving="isSaving" submit-label="Create" @cancel="cancel" @submit="save" />
+			<NoskeForm
+				:form-id="formId"
+				:is-saving="isSaving"
+				:show-actions="false"
+				submit-label="Create"
+				@cancel="cancel"
+				@submit="save"
+			/>
 		</div>
 	</MainContent>
 </template>

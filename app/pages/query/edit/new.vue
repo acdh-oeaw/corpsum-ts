@@ -30,6 +30,7 @@ const initialValues = computed(() => ({
 	corpus: getQueryString("corpus"),
 	subCorpus: getQueryString("subCorpus"),
 }));
+const formId = "query-form";
 
 async function save(payload: {
 	name: string;
@@ -68,16 +69,30 @@ function cancel() {
 
 <template>
 	<MainContent class="mx-auto my-4 flex w-full max-w-5xl flex-col gap-4">
-		<div class="flex items-center gap-3">
-			<div class="flex size-10 items-center justify-center rounded-full border bg-muted/40">
-				<LucideIcon class="size-5 text-foreground" name="Terminal" :stroke-width="2" />
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
+				</div>
+				<PageTitle>New query</PageTitle>
 			</div>
-			<PageTitle>New query</PageTitle>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button :disabled="isSaving" :form="formId" size="sm" type="submit" variant="ghost">
+					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
+					Create
+				</Button>
+				<Button :disabled="isSaving" size="sm" type="button" variant="ghost" @click="cancel">
+					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
+					Cancel
+				</Button>
+			</div>
 		</div>
 		<QueryForm
+			:form-id="formId"
 			:initial-values="initialValues"
 			:is-saving="isSaving"
 			:noske-instances="noskeInstances"
+			:show-actions="false"
 			submit-label="Create"
 			@cancel="cancel"
 			@submit="save"

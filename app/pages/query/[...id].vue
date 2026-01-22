@@ -36,11 +36,25 @@ const facettingEntries = computed(() => {
 
 <template>
 	<MainContent v-if="query" class="mx-auto w-full max-w-5xl">
-		<div class="my-10 flex items-center gap-3">
-			<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
-				<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
+				</div>
+				<PageTitle>{{ query.name }}</PageTitle>
 			</div>
-			<PageTitle>{{ query.name }}</PageTitle>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button v-if="isOwner" as-child size="sm" type="button" variant="ghost">
+					<NuxtLinkLocale :href="{ path: `/query/edit/${query._id}` }">
+						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+						Edit
+					</NuxtLinkLocale>
+				</Button>
+				<Button v-else disabled size="sm" type="button" variant="ghost">
+					<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+					Edit
+				</Button>
+			</div>
 		</div>
 		<div class="grid gap-6 lg:grid-cols-2">
 			<div class="flex flex-col gap-3">
@@ -94,12 +108,6 @@ const facettingEntries = computed(() => {
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="mt-4">
-			<NuxtLinkLocale v-if="isOwner" :href="{ path: `/query/edit/${query._id}` }">
-				<Button> Edit </Button>
-			</NuxtLinkLocale>
-			<Button v-else disabled> Edit </Button>
 		</div>
 	</MainContent>
 </template>

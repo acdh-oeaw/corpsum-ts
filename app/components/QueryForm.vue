@@ -40,11 +40,15 @@ const props = withDefaults(
 		isSaving?: boolean;
 		submitLabel?: string;
 		initialValues?: Partial<QueryFormValues>;
+		showActions?: boolean;
+		formId?: string;
 	}>(),
 	{
 		isSaving: false,
 		submitLabel: "Create",
 		initialValues: () => ({}),
+		showActions: true,
+		formId: undefined,
 	},
 );
 
@@ -257,7 +261,11 @@ watch(corpusId, (value, previous) => {
 </script>
 
 <template>
-	<form class="mt-4 flex w-full flex-col gap-4" @submit.prevent="form.handleSubmit">
+	<form
+		:id="props.formId"
+		class="mt-4 flex w-full flex-col gap-4"
+		@submit.prevent="form.handleSubmit"
+	>
 		<div class="grid gap-6 lg:grid-cols-2">
 			<div class="flex flex-col gap-4">
 				<component
@@ -549,7 +557,7 @@ watch(corpusId, (value, previous) => {
 			</div>
 		</div>
 
-		<div class="flex flex-wrap gap-2">
+		<div v-if="props.showActions" class="flex flex-wrap gap-2">
 			<Button :disabled="props.isSaving" type="submit">{{ props.submitLabel }}</Button>
 			<Button :disabled="props.isSaving" type="button" variant="outline" @click="emit('cancel')">
 				{{ t("QueryForm.actions.cancel") }}

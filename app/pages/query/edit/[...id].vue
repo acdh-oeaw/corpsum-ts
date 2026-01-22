@@ -40,6 +40,7 @@ const initialValues = computed(() => {
 		facettingValuesText: JSON.stringify(query.value.facettingValues, null, 2),
 	};
 });
+const formId = "query-form";
 
 async function save(payload: {
 	name: string;
@@ -80,20 +81,41 @@ function cancel() {
 
 <template>
 	<MainContent v-if="query" class="mx-auto my-4 flex w-full max-w-5xl flex-col gap-4">
-		<div class="flex items-center gap-3">
-			<div class="flex size-10 items-center justify-center rounded-full border bg-muted/40">
-				<LucideIcon class="size-5 text-foreground" name="Terminal" :stroke-width="2" />
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
+				</div>
+				<PageTitle>{{ query.name }}</PageTitle>
 			</div>
-			<PageTitle>{{ query.name }}</PageTitle>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button
+					v-if="isOwner"
+					:disabled="isSaving"
+					:form="formId"
+					size="sm"
+					type="submit"
+					variant="ghost"
+				>
+					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
+					Save
+				</Button>
+				<Button size="sm" type="button" variant="ghost" @click="cancel">
+					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
+					Cancel
+				</Button>
+			</div>
 		</div>
 		<p v-if="!isOwner" class="text-sm text-muted-foreground">
 			You do not own this query. Editing is disabled.
 		</p>
 		<QueryForm
 			v-if="isOwner"
+			:form-id="formId"
 			:initial-values="initialValues"
 			:is-saving="isSaving"
 			:noske-instances="noskeInstances"
+			:show-actions="false"
 			submit-label="Save"
 			@cancel="cancel"
 			@submit="save"

@@ -36,6 +36,7 @@ const initialValues = computed(() =>
 			}
 		: null,
 );
+const formId = "noske-form";
 
 async function save(payload: {
 	name: string;
@@ -67,20 +68,41 @@ function cancel() {
 
 <template>
 	<MainContent v-if="noskeInstance" class="mx-auto my-4 flex w-full max-w-5xl flex-col gap-4">
-		<div class="my-10 flex items-center gap-3">
-			<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
-				<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
+				</div>
+				<PageTitle>{{ noskeInstance.name }}</PageTitle>
 			</div>
-			<PageTitle>{{ noskeInstance.name }}</PageTitle>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button
+					v-if="isOwner"
+					:disabled="isSaving"
+					:form="formId"
+					size="sm"
+					type="submit"
+					variant="ghost"
+				>
+					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
+					Save
+				</Button>
+				<Button size="sm" type="button" variant="ghost" @click="cancel">
+					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
+					Cancel
+				</Button>
+			</div>
 		</div>
 		<p v-if="!isOwner" class="text-sm text-muted-foreground">
 			You do not own this instance. Editing is disabled.
 		</p>
 		<div class="w-full">
 			<NoskeForm
+				:form-id="formId"
 				:initial-values="initialValues ?? undefined"
 				:is-saving="isSaving || !isOwner"
 				reset-label="Reset"
+				:show-actions="false"
 				:show-reset="isOwner"
 				submit-label="Save"
 				@cancel="cancel"

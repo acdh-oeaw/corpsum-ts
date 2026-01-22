@@ -52,49 +52,58 @@ async function deleteInstance() {
 
 <template>
 	<MainContent v-if="noskeInstance" class="mx-auto w-full max-w-5xl">
-		<div class="my-10 flex items-center gap-3">
-			<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
-				<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
+				</div>
+				<PageTitle>{{ noskeInstance.name }}</PageTitle>
 			</div>
-			<PageTitle>{{ noskeInstance.name }}</PageTitle>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button v-if="isOwner" as-child size="sm" variant="ghost">
+					<NuxtLinkLocale :href="{ path: `/noskeinstance/edit/${noskeInstance._id}` }">
+						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+						Edit
+					</NuxtLinkLocale>
+				</Button>
+				<Button v-else disabled size="sm" type="button" variant="ghost">
+					<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+					Edit
+				</Button>
+				<AlertDialog>
+					<AlertDialogTrigger as-child>
+						<Button :disabled="!isOwner || isDeleting" size="sm" variant="ghost">
+							<LucideIcon class="mr-1 size-4" name="Trash2" :stroke-width="2" />
+							Delete
+						</Button>
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Delete noskeinstance</AlertDialogTitle>
+							<AlertDialogDescription>
+								This will permanently delete "{{ noskeInstance.name }}". This action cannot be
+								undone.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Cancel</AlertDialogCancel>
+							<AlertDialogAction :disabled="isDeleting" @click="deleteInstance">
+								Delete
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+			</div>
 		</div>
 		<div class="mt-4 grid gap-6 lg:grid-cols-2">
 			<div class="flex flex-col gap-3">
-				<p><span class="text-xs">Version:</span> {{ noskeInstance.version }}</p>
 				<p><span class="text-xs">Host:</span> {{ noskeInstance.host }}</p>
+				<p><span class="text-xs">Version:</span> {{ noskeInstance.version }}</p>
 				<p><span class="text-xs">Public:</span> {{ noskeInstance.public ? "Yes" : "No" }}</p>
+			</div>
+			<div class="flex flex-col gap-3">
 				<p><span class="text-xs">Authentication:</span> {{ noskeInstance.authentication }}</p>
 				<p><span class="text-xs">Owned by:</span> {{ noskeInstance.owner.username }}</p>
-			</div>
-			<div class="flex flex-col gap-3 lg:items-start lg:justify-start">
-				<div class="flex flex-wrap gap-2">
-					<Button v-if="isOwner" as-child>
-						<NuxtLinkLocale :href="{ path: `/noskeinstance/edit/${noskeInstance._id}` }">
-							Edit
-						</NuxtLinkLocale>
-					</Button>
-					<Button v-else disabled>Edit</Button>
-					<AlertDialog>
-						<AlertDialogTrigger as-child>
-							<Button :disabled="!isOwner || isDeleting" variant="destructive"> Delete </Button>
-						</AlertDialogTrigger>
-						<AlertDialogContent>
-							<AlertDialogHeader>
-								<AlertDialogTitle>Delete noskeinstance</AlertDialogTitle>
-								<AlertDialogDescription>
-									This will permanently delete "{{ noskeInstance.name }}". This action cannot be
-									undone.
-								</AlertDialogDescription>
-							</AlertDialogHeader>
-							<AlertDialogFooter>
-								<AlertDialogCancel>Cancel</AlertDialogCancel>
-								<AlertDialogAction :disabled="isDeleting" @click="deleteInstance">
-									Delete
-								</AlertDialogAction>
-							</AlertDialogFooter>
-						</AlertDialogContent>
-					</AlertDialog>
-				</div>
 			</div>
 		</div>
 		<div class="mt-8">

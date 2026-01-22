@@ -27,6 +27,8 @@ const props = withDefaults(
 		resetLabel?: string;
 		showReset?: boolean;
 		initialValues?: Partial<NoskeFormValues>;
+		showActions?: boolean;
+		formId?: string;
 	}>(),
 	{
 		isSaving: false,
@@ -34,6 +36,8 @@ const props = withDefaults(
 		resetLabel: "Reset",
 		showReset: false,
 		initialValues: () => ({}),
+		showActions: true,
+		formId: undefined,
 	},
 );
 
@@ -127,7 +131,11 @@ const handleReset = () => {
 </script>
 
 <template>
-	<form class="mt-4 flex w-full flex-col gap-4" @submit.prevent="form.handleSubmit">
+	<form
+		:id="props.formId"
+		class="mt-4 flex w-full flex-col gap-4"
+		@submit.prevent="form.handleSubmit"
+	>
 		<div class="grid gap-6 lg:grid-cols-2">
 			<div class="flex flex-col gap-4">
 				<component
@@ -236,7 +244,12 @@ const handleReset = () => {
 								{{ option }}
 							</option>
 						</select>
-						<p v-if="hasError(state)" id="version-error" class="text-xs text-destructive" role="alert">
+						<p
+							v-if="hasError(state)"
+							id="version-error"
+							class="text-xs text-destructive"
+							role="alert"
+						>
 							{{ firstError(state) }}
 						</p>
 					</div>
@@ -246,7 +259,9 @@ const handleReset = () => {
 					:is="form.Field"
 					v-slot="{ field, state }"
 					name="authentication"
-					:validators="{ onChange: optionValidator(authOptions, t('NoskeForm.labels.authentication')) }"
+					:validators="{
+						onChange: optionValidator(authOptions, t('NoskeForm.labels.authentication')),
+					}"
 				>
 					<div class="grid gap-2">
 						<label class="text-sm font-medium" for="authentication">
@@ -301,7 +316,7 @@ const handleReset = () => {
 			</div>
 		</div>
 
-		<div class="flex flex-wrap gap-2">
+		<div v-if="props.showActions" class="flex flex-wrap gap-2">
 			<Button :disabled="props.isSaving" type="submit">{{ props.submitLabel }}</Button>
 			<Button
 				v-if="props.showReset"
