@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
+import type { VisualizationListItem } from "~/server/api/visualizations.get.ts";
 
 const route = useRoute();
 const t = useTranslations();
@@ -27,6 +28,8 @@ const queryId = computed(() => {
 });
 
 const { data: query } = await useFetch<QueryResponse>(() => `/api/query/${queryId.value}`);
+const { data: visualizations } =
+	await useFetch<Array<VisualizationListItem>>("/api/visualizations");
 
 const ownerNames = computed(
 	() =>
@@ -41,6 +44,12 @@ const isOwner = computed(() =>
 const facettingEntries = computed(() => {
 	const values = (query.value?.facettingValues ?? {}) as FacettingValues;
 	return Object.entries(values) as Array<[string, FacettingValues[string]]>;
+});
+
+const queryVisualizations = computed(() => {
+	const id = query.value?._id ?? queryId.value ?? "";
+	if (!id) return [];
+	return (visualizations.value ?? []).filter((visualization) => visualization.queries.includes(id));
 });
 </script>
 
@@ -125,6 +134,42 @@ const facettingEntries = computed(() => {
 						</table>
 					</div>
 				</div>
+			</div>
+		</div>
+		<div class="mt-8 grid gap-2">
+			<h2 class="text-lg font-semibold">Visualizations using this query</h2>
+			<div class="w-full overflow-hidden rounded-md border">
+				<table class="min-w-full text-sm">
+					<thead class="bg-muted/40 text-left">
+						<tr>
+							<th class="px-3 py-2 font-medium">Visualization</th>
+							<th class="px-3 py-2 font-medium">Charts</th>
+							<th class="px-3 py-2 text-right font-medium">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="visualization in queryVisualizations" :key="visualization._id">
+							<td class="px-3 py-2 font-medium">
+								<NuxtLinkLocale :href="{ path: `/visualization/${visualization._id}` }">
+									{{ visualization.name }}
+								</NuxtLinkLocale>
+							</td>
+							<td class="px-3 py-2">{{ visualization.visualizations.length }}</td>
+							<td class="px-3 py-2 text-right">
+								<Button as-child size="sm" variant="outline">
+									<NuxtLinkLocale :href="{ path: `/visualization/${visualization._id}` }">
+										View visualization
+									</NuxtLinkLocale>
+								</Button>
+							</td>
+						</tr>
+						<tr v-if="queryVisualizations.length === 0">
+							<td class="px-3 py-2 text-sm text-muted-foreground" colspan="3">
+								No visualizations yet.
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</MainContent>

@@ -21,7 +21,7 @@ const newSelectedCorpusKWICViewInfo: KWICAttrsStructs = {
 };
 
 export const useQueryStore = defineStore(
-	"QueryStoreWithNewStructureadsf",
+	"QueryStoreWithNewStructure",
 	() => {
 		const nextQueryId = ref(0);
 		const queries = ref([]) as Ref<Array<CorpusQuery>>;
