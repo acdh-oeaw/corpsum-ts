@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { defineEventHandler } from "h3";
 
 import { QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
-import { VisualizationModel } from "~/server/models/visualizations.schema";
+import {
+	type VisualizationDocument,
+	VisualizationModel,
+} from "~/server/models/visualizations.schema";
 import { requireAuth } from "~/server/utils/auth";
 
 const visualizationTypes = [
@@ -25,19 +29,8 @@ export interface VisualizationListItem {
 	visualizations: Array<VisualizationType>;
 	settings: Array<unknown>;
 	data: Array<unknown>;
-	createdAt: string;
-	updatedAt: string;
-}
-
-interface VisualizationRecord {
-	_id: { toString: () => string };
-	name: unknown;
-	queries: ReadonlyArray<{ toString: () => string }>;
-	visualizations: ReadonlyArray<unknown>;
-	settings: ReadonlyArray<unknown>;
-	data: ReadonlyArray<unknown>;
-	createdAt: Date;
-	updatedAt: Date;
+	createdAt: string | null;
+	updatedAt: string | null;
 }
 
 function toVisualizationType(value: unknown): VisualizationType {
@@ -46,7 +39,7 @@ function toVisualizationType(value: unknown): VisualizationType {
 		: "data-display-keyword-in-context";
 }
 
-function toResponse(record: VisualizationRecord): VisualizationListItem {
+function toResponse(record: VisualizationDocument): VisualizationListItem {
 	return {
 		_id: record._id.toString(),
 		name: String(record.name),
@@ -54,8 +47,8 @@ function toResponse(record: VisualizationRecord): VisualizationListItem {
 		visualizations: record.visualizations.map((value) => toVisualizationType(value)),
 		settings: [...record.settings],
 		data: [...record.data],
-		createdAt: record.createdAt.toISOString(),
-		updatedAt: record.updatedAt.toISOString(),
+		createdAt: record.createdAt ? record.createdAt.toISOString() : null,
+		updatedAt: record.updatedAt ? record.updatedAt.toISOString() : null,
 	};
 }
 
@@ -70,7 +63,7 @@ export default defineEventHandler(
 		}
 
 		if (String(user.accounttype) === "admin") {
-			const visualizations = await VisualizationModel.find({});
+			const visualizations = (await VisualizationModel.find({})) as Array<VisualizationDocument>;
 			return visualizations.map((record) => toResponse(record));
 		}
 
@@ -82,7 +75,7 @@ export default defineEventHandler(
 		const filter = {
 			queries: { $not: { $elemMatch: { $nin: ownedQueryIds } } },
 		};
-		const visualizations = await VisualizationModel.find(filter);
+		const visualizations = (await VisualizationModel.find(filter)) as Array<VisualizationDocument>;
 		return visualizations.map((record) => toResponse(record));
 	},
 );

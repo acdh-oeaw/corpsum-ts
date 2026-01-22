@@ -3,7 +3,10 @@ import mongoose from "mongoose";
 
 import { QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
-import { VisualizationModel } from "~/server/models/visualizations.schema";
+import {
+	type VisualizationDocument,
+	VisualizationModel,
+} from "~/server/models/visualizations.schema";
 import { requireAuth } from "~/server/utils/auth";
 
 const visualizationTypes = [
@@ -27,19 +30,8 @@ interface VisualizationResponse {
 	visualizations: Array<VisualizationType>;
 	settings: Array<unknown>;
 	data: Array<unknown>;
-	createdAt: string;
-	updatedAt: string;
-}
-
-interface VisualizationRecord {
-	_id: { toString: () => string };
-	name: unknown;
-	queries: ReadonlyArray<{ toString: () => string }>;
-	visualizations: ReadonlyArray<unknown>;
-	settings: ReadonlyArray<unknown>;
-	data: ReadonlyArray<unknown>;
-	createdAt: Date;
-	updatedAt: Date;
+	createdAt: string | null;
+	updatedAt: string | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -50,7 +42,7 @@ function isVisualizationType(value: unknown): value is VisualizationType {
 	return typeof value === "string" && visualizationTypeSet.has(value);
 }
 
-function toResponse(record: VisualizationRecord): VisualizationResponse {
+function toResponse(record: VisualizationDocument): VisualizationResponse {
 	return {
 		_id: record._id.toString(),
 		name: String(record.name),
@@ -60,8 +52,8 @@ function toResponse(record: VisualizationRecord): VisualizationResponse {
 		),
 		settings: [...record.settings],
 		data: [...record.data],
-		createdAt: record.createdAt.toISOString(),
-		updatedAt: record.updatedAt.toISOString(),
+		createdAt: record.createdAt ? record.createdAt.toISOString() : null,
+		updatedAt: record.updatedAt ? record.updatedAt.toISOString() : null,
 	};
 }
 
@@ -125,13 +117,13 @@ export default defineEventHandler(async (event): Promise<VisualizationResponse |
 		}
 	}
 
-	const visualization = await VisualizationModel.create({
+	const visualization = (await VisualizationModel.create({
 		name,
 		queries,
 		visualizations,
 		settings,
 		data,
-	});
+	})) as unknown as VisualizationDocument;
 
 	return toResponse(visualization);
 });

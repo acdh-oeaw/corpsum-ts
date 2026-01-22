@@ -1,7 +1,15 @@
-import { type InferRawDocType, Schema } from "mongoose";
+import { type HydratedDocument, Schema, type Types } from "mongoose";
 
 // eslint-disable-next-line import-x/no-unresolved
 import { defineMongooseModel } from "#nuxt/mongoose";
+
+export interface VisualizationSchema {
+	queries: Array<Types.ObjectId>;
+	visualizations: Array<string>;
+	name: string;
+	settings: Array<unknown>;
+	data: Array<unknown>;
+}
 
 const schemaDefinition = {
 	queries: [{ type: Schema.Types.ObjectId, ref: "queries", required: true }],
@@ -25,7 +33,10 @@ const schemaDefinition = {
 	data: [{ type: Schema.Types.Mixed, required: true }],
 } as const;
 
-export type VisualizationDocument = InferRawDocType<typeof schemaDefinition>;
+export type VisualizationDocument = HydratedDocument<VisualizationSchema> & {
+	createdAt?: Date;
+	updatedAt?: Date;
+};
 
 export const VisualizationModel = defineMongooseModel({
 	name: "visualizations",
