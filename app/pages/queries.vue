@@ -93,50 +93,76 @@ async function deleteQuery(query: QueryListItem) {
 							<TableCell>{{ query.type }}</TableCell>
 							<TableCell>{{ formatOwnerNames(query) }}</TableCell>
 							<TableCell class="text-right">
-								<div class="flex flex-wrap justify-end gap-2">
-									<Button as-child :disabled="!isOwner(query)" size="sm" variant="outline">
-										<NuxtLinkLocale :href="{ path: `/query/edit/${query._id}` }">
-											{{ t("Actions.edit") }}
-										</NuxtLinkLocale>
-									</Button>
-									<AlertDialog>
-										<AlertDialogTrigger as-child>
-											<Button
-												:disabled="!isOwner(query) || deletingId === query._id"
-												size="sm"
-												variant="destructive"
-											>
-												{{ t("Actions.delete") }}
-											</Button>
-										</AlertDialogTrigger>
-										<AlertDialogContent>
-											<AlertDialogHeader>
-												<AlertDialogTitle>{{ t("Dialogs.deleteQueryTitle") }}</AlertDialogTitle>
-												<AlertDialogDescription>
-													{{
-														t("Dialogs.deleteQueryDescription", {
-															name: query.name,
-														})
-													}}
-												</AlertDialogDescription>
-											</AlertDialogHeader>
-											<AlertDialogFooter>
-												<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
-												<AlertDialogAction
-													:disabled="deletingId === query._id"
-													@click="deleteQuery(query)"
+								<TooltipProvider :delay-duration="150">
+									<div
+										class="inline-flex w-full flex-nowrap items-center justify-end gap-1 rounded-md border bg-muted/40 p-1"
+									>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<Button
+													as-child
+													class="flex-1"
+													:disabled="!isOwner(query)"
+													size="sm"
+													variant="ghost"
 												>
-													{{ t("Actions.delete") }}
-												</AlertDialogAction>
-											</AlertDialogFooter>
-										</AlertDialogContent>
-									</AlertDialog>
-									<Button as-child size="sm" variant="outline">
-										<NuxtLinkLocale :href="{ path: `/query/${query._id}` }">
-											{{ t("Actions.view") }}
-										</NuxtLinkLocale>
-									</Button>
-								</div>
+													<NuxtLinkLocale :href="{ path: `/query/edit/${query._id}` }">
+														<LucideIcon class="size-4" name="Pencil" :stroke-width="2" />
+													</NuxtLinkLocale>
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent>{{ t("Actions.edit") }}</TooltipContent>
+										</Tooltip>
+										<AlertDialog>
+											<Tooltip>
+												<TooltipTrigger as-child>
+													<AlertDialogTrigger as-child>
+														<Button
+															class="flex-1 text-destructive hover:text-destructive"
+															:disabled="!isOwner(query) || deletingId === query._id"
+															size="sm"
+															variant="ghost"
+														>
+															<LucideIcon class="size-4" name="Trash2" :stroke-width="2" />
+														</Button>
+													</AlertDialogTrigger>
+												</TooltipTrigger>
+												<TooltipContent>{{ t("Actions.delete") }}</TooltipContent>
+											</Tooltip>
+											<AlertDialogContent>
+												<AlertDialogHeader>
+													<AlertDialogTitle>{{ t("Dialogs.deleteQueryTitle") }}</AlertDialogTitle>
+													<AlertDialogDescription>
+														{{
+															t("Dialogs.deleteQueryDescription", {
+																name: query.name,
+															})
+														}}
+													</AlertDialogDescription>
+												</AlertDialogHeader>
+												<AlertDialogFooter>
+													<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
+													<AlertDialogAction
+														:disabled="deletingId === query._id"
+														@click="deleteQuery(query)"
+													>
+														{{ t("Actions.delete") }}
+													</AlertDialogAction>
+												</AlertDialogFooter>
+											</AlertDialogContent>
+										</AlertDialog>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<Button as-child class="flex-1" size="sm" variant="ghost">
+													<NuxtLinkLocale :href="{ path: `/query/${query._id}` }">
+														<LucideIcon class="size-4" name="Eye" :stroke-width="2" />
+													</NuxtLinkLocale>
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent>{{ t("Actions.view") }}</TooltipContent>
+										</Tooltip>
+									</div>
+								</TooltipProvider>
 							</TableCell>
 						</TableRow>
 						<TableRow v-if="remainingQueries.length === 0">
