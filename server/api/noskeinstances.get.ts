@@ -42,12 +42,8 @@ export default defineEventHandler(
 			version: noskeinstance.version,
 			host: noskeinstance.host,
 			authentication: noskeinstance.authentication,
-			createdAt: noskeinstance.createdAt
-				? noskeinstance.createdAt.toISOString()
-				: null,
-			updatedAt: noskeinstance.updatedAt
-				? noskeinstance.updatedAt.toISOString()
-				: null,
+			createdAt: noskeinstance.createdAt ? noskeinstance.createdAt.toISOString() : null,
+			updatedAt: noskeinstance.updatedAt ? noskeinstance.updatedAt.toISOString() : null,
 			owner: {
 				_id: noskeinstance.owner._id.toString(),
 				username: noskeinstance.owner.username,
