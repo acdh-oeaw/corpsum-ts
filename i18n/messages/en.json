@@ -176,6 +176,7 @@
 		"edit": "Edit",
 		"newInstance": "New instance",
 		"newQuery": "New query",
+		"newVisualization": "New visualization",
 		"save": "Save",
 		"view": "View"
 	},
@@ -183,7 +184,9 @@
 		"deleteInstanceDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
 		"deleteInstanceTitle": "Delete instance",
 		"deleteQueryDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
-		"deleteQueryTitle": "Delete query"
+		"deleteQueryTitle": "Delete query",
+		"deleteVisualizationDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+		"deleteVisualizationTitle": "Delete visualization"
 	},
 	"Permissions": {
 		"queryEditDisabled": "You do not own this query. Editing is disabled.",
@@ -232,6 +235,53 @@
 			"documents": "Documents",
 			"noske": "NoSketch instance",
 			"createQuery": "Query"
+		}
+	},
+	"VisualizationsPage": {
+		"title": "Visualizations",
+		"newTitle": "New visualization",
+		"detailTitle": "Visualization",
+		"featuredTitle": "Featured visualizations",
+		"featuredDescription": "Showing the first {count} visualizations",
+		"moreTitle": "More visualizations",
+		"moreDescription": "Showing all remaining visualizations",
+		"empty": "No more visualizations to show.",
+		"queriesTitle": "Queries",
+		"queriesDescription": "Most recent queries",
+		"sectionsTitle": "Visualizations",
+		"sectionsDescription": "Saved visualization sections",
+		"emptySections": "No visualizations added yet.",
+		"card": {
+			"queryCount": "Queries",
+			"visualizationCount": "Charts"
+		},
+		"table": {
+			"name": "Name",
+			"queryCount": "Queries",
+			"visualizationCount": "Charts",
+			"actions": "Actions"
+		}
+	},
+	"VisualizationForm": {
+		"actions": {
+			"addQuery": "Add query",
+			"removeQuery": "Remove query"
+		},
+		"labels": {
+			"data": "Data (JSON array)",
+			"name": "Name",
+			"queries": "Queries",
+			"settings": "Settings (JSON array)",
+			"visualizations": "Visualizations"
+		},
+		"messages": {
+			"noQueries": "No queries available.",
+			"selectQueries": "Select queries to include.",
+			"noVisualizations": "No visualization types available."
+		},
+		"validation": {
+			"invalidJsonArray": "Provide valid JSON arrays for settings and data.",
+			"required": "Please fill in all required fields."
 		}
 	},
 	"NoskeInstancesPage": {

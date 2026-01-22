@@ -176,6 +176,7 @@
 		"edit": "Bearbeiten",
 		"newInstance": "Neue Instanz",
 		"newQuery": "Neue Abfrage",
+		"newVisualization": "Neue Visualisierung",
 		"save": "Speichern",
 		"view": "Ansehen"
 	},
@@ -183,7 +184,9 @@
 		"deleteInstanceDescription": "\"{name}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
 		"deleteInstanceTitle": "Instanz löschen",
 		"deleteQueryDescription": "\"{name}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
-		"deleteQueryTitle": "Abfrage löschen"
+		"deleteQueryTitle": "Abfrage löschen",
+		"deleteVisualizationDescription": "\"{name}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+		"deleteVisualizationTitle": "Visualisierung löschen"
 	},
 	"Permissions": {
 		"queryEditDisabled": "Diese Abfrage gehört Ihnen nicht. Bearbeiten ist deaktiviert.",
@@ -232,6 +235,53 @@
 			"documents": "Dokumente",
 			"noske": "NoSketch-Instanz",
 			"createQuery": "Abfrage"
+		}
+	},
+	"VisualizationsPage": {
+		"title": "Visualisierungen",
+		"newTitle": "Neue Visualisierung",
+		"detailTitle": "Visualisierung",
+		"featuredTitle": "Ausgewählte Visualisierungen",
+		"featuredDescription": "Zeigt die ersten {count} Visualisierungen",
+		"moreTitle": "Weitere Visualisierungen",
+		"moreDescription": "Zeigt alle übrigen Visualisierungen",
+		"empty": "Keine weiteren Visualisierungen verfügbar.",
+		"queriesTitle": "Abfragen",
+		"queriesDescription": "Neueste Abfragen",
+		"sectionsTitle": "Visualisierungen",
+		"sectionsDescription": "Gespeicherte Visualisierungssektionen",
+		"emptySections": "Noch keine Visualisierungen hinzugefügt.",
+		"card": {
+			"queryCount": "Abfragen",
+			"visualizationCount": "Charts"
+		},
+		"table": {
+			"name": "Name",
+			"queryCount": "Abfragen",
+			"visualizationCount": "Charts",
+			"actions": "Aktionen"
+		}
+	},
+	"VisualizationForm": {
+		"actions": {
+			"addQuery": "Abfrage hinzufügen",
+			"removeQuery": "Abfrage entfernen"
+		},
+		"labels": {
+			"data": "Daten (JSON-Array)",
+			"name": "Name",
+			"queries": "Abfragen",
+			"settings": "Einstellungen (JSON-Array)",
+			"visualizations": "Visualisierungen"
+		},
+		"messages": {
+			"noQueries": "Keine Abfragen verfügbar.",
+			"selectQueries": "Abfragen für die Visualisierung auswählen.",
+			"noVisualizations": "Keine Visualisierungstypen verfügbar."
+		},
+		"validation": {
+			"invalidJsonArray": "Bitte gültige JSON-Arrays für Einstellungen und Daten angeben.",
+			"required": "Bitte alle Pflichtfelder ausfüllen."
 		}
 	},
 	"NoskeInstancesPage": {
