@@ -7,8 +7,9 @@ const auth = useAuth();
 const { data: queries, refresh } = await useFetch<Array<QueryListItem>>("/api/queries", {});
 const deletingId = ref<string | null>(null);
 
-const featuredQueries = computed(() => queries.value?.slice(0, 5) ?? []);
-const remainingQueries = computed(() => queries.value?.slice(5) ?? []);
+const featuredCount = 5;
+const featuredQueries = computed(() => queries.value?.slice(0, featuredCount) ?? []);
+const remainingQueries = computed(() => queries.value?.slice(featuredCount) ?? []);
 const formatOwnerNames = (query: QueryListItem) =>
 	query.owner
 		.map((owner) => owner.username || owner._id)
@@ -57,8 +58,10 @@ async function deleteQuery(query: QueryListItem) {
 		</div>
 		<div class="mt-4">
 			<div class="flex items-end justify-between">
-				<h2 class="text-lg font-semibold">Featured queries</h2>
-				<p class="text-sm text-muted-foreground">Showing the first 10 queries</p>
+				<h2 class="text-lg font-semibold">{{ t("QueriesPage.featuredTitle") }}</h2>
+				<p class="text-sm text-muted-foreground">
+					{{ t("QueriesPage.featuredDescription", { count: featuredCount }) }}
+				</p>
 			</div>
 			<Carousel class="mt-3 w-full" :opts="{ align: 'start' }">
 				<CarouselContent>
@@ -72,18 +75,18 @@ async function deleteQuery(query: QueryListItem) {
 		</div>
 		<div class="mt-6">
 			<div class="flex items-end justify-between">
-				<h2 class="text-lg font-semibold">More queries</h2>
-				<p class="text-sm text-muted-foreground">Showing all remaining queries</p>
+				<h2 class="text-lg font-semibold">{{ t("QueriesPage.moreTitle") }}</h2>
+				<p class="text-sm text-muted-foreground">{{ t("QueriesPage.moreDescription") }}</p>
 			</div>
 			<div class="mt-3 max-w-full overflow-x-auto rounded-md border">
 				<Table class="w-full text-sm">
 					<TableHeader>
 						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Corpus</TableHead>
-							<TableHead>Type</TableHead>
-							<TableHead>Owner</TableHead>
-							<TableHead class="text-right">Actions</TableHead>
+							<TableHead>{{ t("QueriesPage.table.name") }}</TableHead>
+							<TableHead>{{ t("QueriesPage.table.corpus") }}</TableHead>
+							<TableHead>{{ t("QueriesPage.table.type") }}</TableHead>
+							<TableHead>{{ t("QueriesPage.table.owner") }}</TableHead>
+							<TableHead class="text-right">{{ t("QueriesPage.table.actions") }}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>

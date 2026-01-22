@@ -117,12 +117,6 @@
 		},
 		"title": "Seite nicht gefunden"
 	},
-	"NoskeInstancesPage": {
-		"title": "NoSketch-Instanzen"
-	},
-	"QueriesPage": {
-		"title": "Abfragen"
-	},
 	"QueryForm": {
 		"actions": {
 			"cancel": "Abbrechen",
@@ -194,6 +188,41 @@
 	"Permissions": {
 		"queryEditDisabled": "Diese Abfrage gehört Ihnen nicht. Bearbeiten ist deaktiviert.",
 		"instanceEditDisabled": "Diese Instanz gehört Ihnen nicht. Bearbeiten ist deaktiviert."
+	},
+	"QueryCard": {
+		"corpus": "Korpus",
+		"input": "Eingabe",
+		"owner": "Eigentümer",
+		"subCorpus": "Subkorpus",
+		"type": "Typ"
+	},
+	"NoskeInstanceCard": {
+		"authentication": "Authentifizierung",
+		"host": "Host",
+		"ownedBy": "Eigentümer",
+		"public": "Öffentlich",
+		"version": "Version"
+	},
+	"QueriesPage": {
+		"title": "Abfragen",
+		"featuredTitle": "Ausgewählte Abfragen",
+		"featuredDescription": "Zeigt die ersten {count} Abfragen",
+		"moreTitle": "Weitere Abfragen",
+		"moreDescription": "Zeigt alle übrigen Abfragen",
+		"table": {
+			"name": "Name",
+			"corpus": "Korpus",
+			"type": "Typ",
+			"owner": "Eigentümer",
+			"actions": "Aktionen"
+		}
+	},
+	"NoskeInstancesPage": {
+		"title": "NoSketch-Instanzen"
+	},
+	"Common": {
+		"no": "Nein",
+		"yes": "Ja"
 	},
 	"login": "Anmelden",
 	"password": "Passwort",

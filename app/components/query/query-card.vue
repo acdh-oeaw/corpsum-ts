@@ -39,13 +39,21 @@ async function deleteQuery() {
 	<Card class="flex h-full w-[350px] flex-col">
 		<CardHeader>
 			<CardTitle>{{ query.name }}</CardTitle>
-			<CardDescription>Corpus: {{ query.corpus }}</CardDescription>
+			<CardDescription>{{ t("QueryCard.corpus") }}: {{ query.corpus }}</CardDescription>
 		</CardHeader>
 		<CardContent class="flex-1">
-			<p><span class="text-xs">Type:</span> {{ query.type }}</p>
-			<p><span class="text-xs">Sub corpus:</span> {{ query.subCorpus }}</p>
-			<p><span class="text-xs">Owner:</span> {{ ownerNames.join(", ") }}</p>
-			<p><span class="text-xs">Input:</span> {{ query.userInput }}</p>
+			<p>
+				<span class="text-xs">{{ t("QueryCard.type") }}:</span> {{ query.type }}
+			</p>
+			<p>
+				<span class="text-xs">{{ t("QueryCard.subCorpus") }}:</span> {{ query.subCorpus }}
+			</p>
+			<p>
+				<span class="text-xs">{{ t("QueryCard.owner") }}:</span> {{ ownerNames.join(", ") }}
+			</p>
+			<p>
+				<span class="text-xs">{{ t("QueryCard.input") }}:</span> {{ query.userInput }}
+			</p>
 		</CardContent>
 		<CardFooter class="mt-auto w-full px-6 pb-6">
 			<TooltipProvider :delay-duration="150">

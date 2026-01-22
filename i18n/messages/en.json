@@ -117,12 +117,6 @@
 		},
 		"title": "Page not found"
 	},
-	"NoskeInstancesPage": {
-		"title": "NoSketch Instances"
-	},
-	"QueriesPage": {
-		"title": "Queries"
-	},
 	"QueryForm": {
 		"actions": {
 			"cancel": "Cancel",
@@ -194,6 +188,41 @@
 	"Permissions": {
 		"queryEditDisabled": "You do not own this query. Editing is disabled.",
 		"instanceEditDisabled": "You do not own this instance. Editing is disabled."
+	},
+	"QueryCard": {
+		"corpus": "Corpus",
+		"input": "Input",
+		"owner": "Owner",
+		"subCorpus": "Sub corpus",
+		"type": "Type"
+	},
+	"NoskeInstanceCard": {
+		"authentication": "Authentication",
+		"host": "Host",
+		"ownedBy": "Owned by",
+		"public": "Public",
+		"version": "Version"
+	},
+	"QueriesPage": {
+		"title": "Queries",
+		"featuredTitle": "Featured queries",
+		"featuredDescription": "Showing the first {count} queries",
+		"moreTitle": "More queries",
+		"moreDescription": "Showing all remaining queries",
+		"table": {
+			"name": "Name",
+			"corpus": "Corpus",
+			"type": "Type",
+			"owner": "Owner",
+			"actions": "Actions"
+		}
+	},
+	"NoskeInstancesPage": {
+		"title": "NoSketch instances"
+	},
+	"Common": {
+		"no": "No",
+		"yes": "Yes"
 	},
 	"login": "Log in",
 	"password": "Password",

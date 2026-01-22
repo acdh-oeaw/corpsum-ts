@@ -34,13 +34,26 @@ async function deleteInstance() {
 	<Card class="w-[350px]">
 		<CardHeader>
 			<CardTitle>{{ noskeInstance.name }}</CardTitle>
-			<CardDescription> Owned by: {{ noskeInstance.owner.username }}</CardDescription>
+			<CardDescription>
+				{{ t("NoskeInstanceCard.ownedBy") }}: {{ noskeInstance.owner.username }}
+			</CardDescription>
 		</CardHeader>
 		<CardContent>
-			<p><span class="text-xs">Version:</span> {{ noskeInstance.version }}</p>
-			<p><span class="text-xs">Host:</span> {{ noskeInstance.host }}</p>
-			<p><span class="text-xs">Public:</span> {{ noskeInstance.public ? "Yes" : "No" }}</p>
-			<p><span class="text-xs">Authentication:</span> {{ noskeInstance.authentication }}</p>
+			<p>
+				<span class="text-xs">{{ t("NoskeInstanceCard.version") }}:</span>
+				{{ noskeInstance.version }}
+			</p>
+			<p>
+				<span class="text-xs">{{ t("NoskeInstanceCard.host") }}:</span> {{ noskeInstance.host }}
+			</p>
+			<p>
+				<span class="text-xs">{{ t("NoskeInstanceCard.public") }}:</span>
+				{{ noskeInstance.public ? t("Common.yes") : t("Common.no") }}
+			</p>
+			<p>
+				<span class="text-xs">{{ t("NoskeInstanceCard.authentication") }}:</span>
+				{{ noskeInstance.authentication }}
+			</p>
 		</CardContent>
 		<CardFooter class="w-full px-6 pb-6">
 			<TooltipProvider :delay-duration="150">
