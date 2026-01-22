@@ -230,7 +230,8 @@
 			"language": "Sprache",
 			"words": "Wörter",
 			"documents": "Dokumente",
-			"noske": "NoSketch-Instanz"
+			"noske": "NoSketch-Instanz",
+			"createQuery": "Abfrage"
 		}
 	},
 	"NoskeInstancesPage": {

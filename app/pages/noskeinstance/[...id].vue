@@ -6,7 +6,7 @@ const auth = useAuth();
 const t = useTranslations();
 const localeRoute = useLocaleRoute();
 const locale = useLocale();
-const formatDate = (value?: string | Date) => {
+const formatDate = (value?: string | Date | null) => {
 	if (!value) return "—";
 	const date = typeof value === "string" ? new Date(value) : value;
 	if (Number.isNaN(date.getTime())) return "—";
