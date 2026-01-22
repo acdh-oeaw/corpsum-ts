@@ -14,12 +14,22 @@ function handleDeleted() {
 </script>
 
 <template>
-	<MainContent class="">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<PageTitle>{{ t("NoskeInstancesPage.title") }}</PageTitle>
-			<Button as-child>
-				<NuxtLinkLocale :href="{ path: '/noskeinstance/edit/new' }">New instance</NuxtLinkLocale>
-			</Button>
+	<MainContent class="mx-auto w-full max-w-5xl">
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
+				</div>
+				<PageTitle>{{ t("NoskeInstancesPage.title") }}</PageTitle>
+			</div>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button as-child size="sm" variant="ghost">
+					<NuxtLinkLocale :href="{ path: '/noskeinstance/edit/new' }">
+						<LucideIcon class="mr-1 size-4" name="Plus" :stroke-width="2" />
+						{{ t("Actions.newInstance") }}
+					</NuxtLinkLocale>
+				</Button>
+			</div>
 		</div>
 		<div class="mt-4 flex flex-wrap gap-3">
 			<NoskeInstanceCard

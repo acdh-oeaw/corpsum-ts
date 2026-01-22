@@ -175,6 +175,26 @@
 			"required": "{label} is required."
 		}
 	},
+	"Actions": {
+		"cancel": "Cancel",
+		"create": "Create",
+		"delete": "Delete",
+		"edit": "Edit",
+		"newInstance": "New instance",
+		"newQuery": "New query",
+		"save": "Save",
+		"view": "View"
+	},
+	"Dialogs": {
+		"deleteInstanceDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+		"deleteInstanceTitle": "Delete instance",
+		"deleteQueryDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+		"deleteQueryTitle": "Delete query"
+	},
+	"Permissions": {
+		"queryEditDisabled": "You do not own this query. Editing is disabled.",
+		"instanceEditDisabled": "You do not own this instance. Editing is disabled."
+	},
 	"login": "Log in",
 	"password": "Password",
 	"skip-to-main-content": "Skip to main content",

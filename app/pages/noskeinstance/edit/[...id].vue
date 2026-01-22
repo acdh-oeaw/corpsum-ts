@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 
+const t = useTranslations();
 const route = useRoute();
 const localeRoute = useLocaleRoute();
 const auth = useAuth();
@@ -85,16 +86,16 @@ function cancel() {
 					variant="ghost"
 				>
 					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
-					Save
+					{{ t("Actions.save") }}
 				</Button>
 				<Button size="sm" type="button" variant="ghost" @click="cancel">
 					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
-					Cancel
+					{{ t("Actions.cancel") }}
 				</Button>
 			</div>
 		</div>
 		<p v-if="!isOwner" class="text-sm text-muted-foreground">
-			You do not own this instance. Editing is disabled.
+			{{ t("Permissions.instanceEditDisabled") }}
 		</p>
 		<div class="w-full">
 			<NoskeForm
@@ -104,7 +105,7 @@ function cancel() {
 				reset-label="Reset"
 				:show-actions="false"
 				:show-reset="isOwner"
-				submit-label="Save"
+				:submit-label="t('Actions.save')"
 				@cancel="cancel"
 				@submit="save"
 			/>

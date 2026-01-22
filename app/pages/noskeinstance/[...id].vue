@@ -3,6 +3,7 @@ import type { components } from "~/lib/noske-types";
 
 const route = useRoute();
 const auth = useAuth();
+const t = useTranslations();
 const localeRoute = useLocaleRoute();
 const routeId = computed(() =>
 	Array.isArray(route.params.id) ? (route.params.id[0] ?? null) : (route.params.id ?? null),
@@ -63,32 +64,31 @@ async function deleteInstance() {
 				<Button v-if="isOwner" as-child size="sm" variant="ghost">
 					<NuxtLinkLocale :href="{ path: `/noskeinstance/edit/${noskeInstance._id}` }">
 						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
-						Edit
+						{{ t("Actions.edit") }}
 					</NuxtLinkLocale>
 				</Button>
 				<Button v-else disabled size="sm" type="button" variant="ghost">
 					<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
-					Edit
+					{{ t("Actions.edit") }}
 				</Button>
 				<AlertDialog>
 					<AlertDialogTrigger as-child>
 						<Button :disabled="!isOwner || isDeleting" size="sm" variant="ghost">
 							<LucideIcon class="mr-1 size-4" name="Trash2" :stroke-width="2" />
-							Delete
+							{{ t("Actions.delete") }}
 						</Button>
 					</AlertDialogTrigger>
 					<AlertDialogContent>
 						<AlertDialogHeader>
-							<AlertDialogTitle>Delete noskeinstance</AlertDialogTitle>
+							<AlertDialogTitle>{{ t("Dialogs.deleteInstanceTitle") }}</AlertDialogTitle>
 							<AlertDialogDescription>
-								This will permanently delete "{{ noskeInstance.name }}". This action cannot be
-								undone.
+								{{ t("Dialogs.deleteInstanceDescription", { name: noskeInstance.name }) }}
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
-							<AlertDialogCancel>Cancel</AlertDialogCancel>
+							<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
 							<AlertDialogAction :disabled="isDeleting" @click="deleteInstance">
-								Delete
+								{{ t("Actions.delete") }}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
@@ -143,7 +143,7 @@ async function deleteInstance() {
 											},
 										}"
 									>
-										New query
+										{{ t("Actions.newQuery") }}
 									</NuxtLinkLocale>
 								</Button>
 							</td>

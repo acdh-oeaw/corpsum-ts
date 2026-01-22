@@ -2,6 +2,7 @@
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 
+const t = useTranslations();
 const localeRoute = useLocaleRoute();
 const route = useRoute();
 
@@ -74,16 +75,16 @@ function cancel() {
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
 					<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
 				</div>
-				<PageTitle>New query</PageTitle>
+				<PageTitle>{{ t("Actions.newQuery") }}</PageTitle>
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
 				<Button :disabled="isSaving" :form="formId" size="sm" type="submit" variant="ghost">
 					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
-					Create
+					{{ t("Actions.create") }}
 				</Button>
 				<Button :disabled="isSaving" size="sm" type="button" variant="ghost" @click="cancel">
 					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
-					Cancel
+					{{ t("Actions.cancel") }}
 				</Button>
 			</div>
 		</div>
@@ -93,7 +94,7 @@ function cancel() {
 			:is-saving="isSaving"
 			:noske-instances="noskeInstances"
 			:show-actions="false"
-			submit-label="Create"
+			:submit-label="t('Actions.create')"
 			@cancel="cancel"
 			@submit="save"
 		/>

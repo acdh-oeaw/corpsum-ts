@@ -2,6 +2,7 @@
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 
+const t = useTranslations();
 const route = useRoute();
 const localeRoute = useLocaleRoute();
 const auth = useAuth();
@@ -98,16 +99,16 @@ function cancel() {
 					variant="ghost"
 				>
 					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
-					Save
+					{{ t("Actions.save") }}
 				</Button>
 				<Button size="sm" type="button" variant="ghost" @click="cancel">
 					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
-					Cancel
+					{{ t("Actions.cancel") }}
 				</Button>
 			</div>
 		</div>
 		<p v-if="!isOwner" class="text-sm text-muted-foreground">
-			You do not own this query. Editing is disabled.
+			{{ t("Permissions.queryEditDisabled") }}
 		</p>
 		<QueryForm
 			v-if="isOwner"
@@ -116,7 +117,7 @@ function cancel() {
 			:is-saving="isSaving"
 			:noske-instances="noskeInstances"
 			:show-actions="false"
-			submit-label="Save"
+			:submit-label="t('Actions.save')"
 			@cancel="cancel"
 			@submit="save"
 		/>

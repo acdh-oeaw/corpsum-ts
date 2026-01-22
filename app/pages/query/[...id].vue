@@ -47,12 +47,12 @@ const facettingEntries = computed(() => {
 				<Button v-if="isOwner" as-child size="sm" type="button" variant="ghost">
 					<NuxtLinkLocale :href="{ path: `/query/edit/${query._id}` }">
 						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
-						Edit
+						{{ t("Actions.edit") }}
 					</NuxtLinkLocale>
 				</Button>
 				<Button v-else disabled size="sm" type="button" variant="ghost">
 					<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
-					Edit
+					{{ t("Actions.edit") }}
 				</Button>
 			</div>
 		</div>

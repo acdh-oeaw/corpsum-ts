@@ -3,7 +3,8 @@ const props = defineProps<{
 	query: string;
 }>();
 
-const tokenizeCql = (input: string) => {
+const tokenizeCql = (input?: string) => {
+	const safeInput = input ?? "";
 	const tokens: Array<string> = [];
 	let buffer = "";
 	let inQuotes = false;
@@ -24,8 +25,8 @@ const tokenizeCql = (input: string) => {
 	const twoCharOperators = new Set(["!=", "=~", "!~", ">=", "<="]);
 	const singleCharOperators = new Set(["[", "]", "(", ")", "|", "&", "=", "<", ">"]);
 
-	for (let index = 0; index < input.length; index += 1) {
-		const char = input[index];
+	for (let index = 0; index < safeInput.length; index += 1) {
+		const char = safeInput.charAt(index);
 
 		if (inQuotes) {
 			buffer += char;
@@ -52,7 +53,7 @@ const tokenizeCql = (input: string) => {
 			continue;
 		}
 
-		const next = input[index + 1];
+		const next = safeInput.charAt(index + 1);
 		if (next && twoCharOperators.has(`${char}${next}`)) {
 			pushToken(`${char}${next}`);
 			index += 1;
@@ -71,8 +72,8 @@ const tokenizeCql = (input: string) => {
 	return tokens;
 };
 
-const prettyCql = (input: string) => {
-	const tokens = tokenizeCql(input.trim());
+const prettyCql = (input?: string) => {
+	const tokens = tokenizeCql(input?.trim() ?? "");
 	const lines: Array<string> = [];
 	let indent = 0;
 	let line = "";

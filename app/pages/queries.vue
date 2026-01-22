@@ -3,34 +3,67 @@ import QueryCard from "@/components/query/query-card.vue";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
 const t = useTranslations();
-const { data: queries } = await useFetch<Array<QueryListItem>>("/api/queries", {});
+const auth = useAuth();
+const { data: queries, refresh } = await useFetch<Array<QueryListItem>>("/api/queries", {});
+const deletingId = ref<string | null>(null);
 
-const featuredQueries = computed(() => queries.value?.slice(0, 10) ?? []);
-const remainingQueries = computed(() => queries.value?.slice(10) ?? []);
+const featuredQueries = computed(() => queries.value?.slice(0, 5) ?? []);
+const remainingQueries = computed(() => queries.value?.slice(5) ?? []);
 const formatOwnerNames = (query: QueryListItem) =>
 	query.owner
 		.map((owner) => owner.username || owner._id)
 		.filter((ownerName) => ownerName.length > 0)
 		.join(", ");
+
+const isOwner = (query: QueryListItem) =>
+	query.owner.some((owner) => owner.username === auth.username);
+
+function handleDeleted() {
+	void refresh();
+}
+
+async function deleteQuery(query: QueryListItem) {
+	if (!isOwner(query) || deletingId.value === query._id) return;
+	const currentId = query._id;
+	deletingId.value = currentId;
+	try {
+		await $fetch(`/api/query/${currentId}`, { method: "DELETE" });
+		handleDeleted();
+	} finally {
+		if (deletingId.value === currentId) {
+			deletingId.value = null;
+		}
+	}
+}
 </script>
 
 <template>
-	<MainContent class="w-full">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<PageTitle>{{ t("QueriesPage.title") }}</PageTitle>
-			<Button as-child>
-				<NuxtLinkLocale :href="{ path: '/query/edit/new' }">New query</NuxtLinkLocale>
-			</Button>
+	<MainContent class="mx-auto w-full max-w-5xl">
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
+				</div>
+				<PageTitle>{{ t("QueriesPage.title") }}</PageTitle>
+			</div>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button as-child size="sm" variant="ghost">
+					<NuxtLinkLocale :href="{ path: '/query/edit/new' }">
+						<LucideIcon class="mr-1 size-4" name="Plus" :stroke-width="2" />
+						{{ t("Actions.newQuery") }}
+					</NuxtLinkLocale>
+				</Button>
+			</div>
 		</div>
 		<div class="mt-4">
 			<div class="flex items-end justify-between">
 				<h2 class="text-lg font-semibold">Featured queries</h2>
 				<p class="text-sm text-muted-foreground">Showing the first 10 queries</p>
 			</div>
-			<Carousel class="mt-3 w-full overflow-hidden" :opts="{ align: 'start' }">
+			<Carousel class="mt-3 w-full" :opts="{ align: 'start' }">
 				<CarouselContent>
 					<CarouselItem v-for="query in featuredQueries" :key="query._id" class="basis-auto">
-						<QueryCard :query="query" />
+						<QueryCard :query="query" @deleted="handleDeleted" />
 					</CarouselItem>
 				</CarouselContent>
 				<CarouselPrevious />
@@ -60,9 +93,50 @@ const formatOwnerNames = (query: QueryListItem) =>
 							<TableCell>{{ query.type }}</TableCell>
 							<TableCell>{{ formatOwnerNames(query) }}</TableCell>
 							<TableCell class="text-right">
-								<Button as-child size="sm" variant="outline">
-									<NuxtLinkLocale :href="{ path: `/query/${query._id}` }"> View </NuxtLinkLocale>
-								</Button>
+								<div class="flex flex-wrap justify-end gap-2">
+									<Button as-child :disabled="!isOwner(query)" size="sm" variant="outline">
+										<NuxtLinkLocale :href="{ path: `/query/edit/${query._id}` }">
+											{{ t("Actions.edit") }}
+										</NuxtLinkLocale>
+									</Button>
+									<AlertDialog>
+										<AlertDialogTrigger as-child>
+											<Button
+												:disabled="!isOwner(query) || deletingId === query._id"
+												size="sm"
+												variant="destructive"
+											>
+												{{ t("Actions.delete") }}
+											</Button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>{{ t("Dialogs.deleteQueryTitle") }}</AlertDialogTitle>
+												<AlertDialogDescription>
+													{{
+														t("Dialogs.deleteQueryDescription", {
+															name: query.name,
+														})
+													}}
+												</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
+												<AlertDialogAction
+													:disabled="deletingId === query._id"
+													@click="deleteQuery(query)"
+												>
+													{{ t("Actions.delete") }}
+												</AlertDialogAction>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
+									<Button as-child size="sm" variant="outline">
+										<NuxtLinkLocale :href="{ path: `/query/${query._id}` }">
+											{{ t("Actions.view") }}
+										</NuxtLinkLocale>
+									</Button>
+								</div>
 							</TableCell>
 						</TableRow>
 						<TableRow v-if="remainingQueries.length === 0">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 
+const t = useTranslations();
 const localeRoute = useLocaleRoute();
 
 const isSaving = ref(false);
@@ -50,16 +51,16 @@ const formId = "noske-form";
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
 					<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
 				</div>
-				<PageTitle>New instance</PageTitle>
+				<PageTitle>{{ t("Actions.newInstance") }}</PageTitle>
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
 				<Button :disabled="isSaving" :form="formId" size="sm" type="submit" variant="ghost">
 					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
-					Create
+					{{ t("Actions.create") }}
 				</Button>
 				<Button :disabled="isSaving" size="sm" type="button" variant="ghost" @click="cancel">
 					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
-					Cancel
+					{{ t("Actions.cancel") }}
 				</Button>
 			</div>
 		</div>
@@ -68,7 +69,7 @@ const formId = "noske-form";
 				:form-id="formId"
 				:is-saving="isSaving"
 				:show-actions="false"
-				submit-label="Create"
+				:submit-label="t('Actions.create')"
 				@cancel="cancel"
 				@submit="save"
 			/>

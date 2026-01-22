@@ -175,6 +175,26 @@
 			"required": "{label} ist erforderlich."
 		}
 	},
+	"Actions": {
+		"cancel": "Abbrechen",
+		"create": "Erstellen",
+		"delete": "Löschen",
+		"edit": "Bearbeiten",
+		"newInstance": "Neue Instanz",
+		"newQuery": "Neue Abfrage",
+		"save": "Speichern",
+		"view": "Ansehen"
+	},
+	"Dialogs": {
+		"deleteInstanceDescription": "\"{name}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+		"deleteInstanceTitle": "Instanz löschen",
+		"deleteQueryDescription": "\"{name}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+		"deleteQueryTitle": "Abfrage löschen"
+	},
+	"Permissions": {
+		"queryEditDisabled": "Diese Abfrage gehört Ihnen nicht. Bearbeiten ist deaktiviert.",
+		"instanceEditDisabled": "Diese Instanz gehört Ihnen nicht. Bearbeiten ist deaktiviert."
+	},
 	"login": "Anmelden",
 	"password": "Passwort",
 	"skip-to-main-content": "Zum Hauptinhalt springen",

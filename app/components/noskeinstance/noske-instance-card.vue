@@ -2,6 +2,7 @@
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 
 const auth = useAuth();
+const t = useTranslations();
 
 const props = defineProps<{
 	noskeInstance: PopulatedNoskeDocument;
@@ -44,32 +45,34 @@ async function deleteInstance() {
 		<CardFooter class="flex flex-wrap gap-2 px-6 pb-6">
 			<Button v-if="isOwner" as-child>
 				<NuxtLinkLocale :href="{ path: `/noskeinstance/edit/${noskeInstance._id}` }">
-					Edit
+					{{ t("Actions.edit") }}
 				</NuxtLinkLocale>
 			</Button>
-			<Button v-else disabled>Edit</Button>
+			<Button v-else disabled>{{ t("Actions.edit") }}</Button>
 			<AlertDialog>
 				<AlertDialogTrigger as-child>
-					<Button :disabled="!isOwner || isDeleting" variant="destructive">Delete</Button>
+					<Button :disabled="!isOwner || isDeleting" variant="destructive">
+						{{ t("Actions.delete") }}
+					</Button>
 				</AlertDialogTrigger>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Delete noskeinstance</AlertDialogTitle>
+						<AlertDialogTitle>{{ t("Dialogs.deleteInstanceTitle") }}</AlertDialogTitle>
 						<AlertDialogDescription>
-							This will permanently delete "{{ noskeInstance.name }}". This action cannot be undone.
+							{{ t("Dialogs.deleteInstanceDescription", { name: noskeInstance.name }) }}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
 						<AlertDialogAction :disabled="isDeleting" @click="deleteInstance">
-							Delete
+							{{ t("Actions.delete") }}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
 			<Button as-child variant="outline">
 				<NuxtLinkLocale :href="{ path: `/noskeinstance/${noskeInstance._id}` }">
-					View Details
+					{{ t("Actions.view") }}
 				</NuxtLinkLocale>
 			</Button>
 		</CardFooter>
