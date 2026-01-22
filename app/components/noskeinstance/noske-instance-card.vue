@@ -42,39 +42,65 @@ async function deleteInstance() {
 			<p><span class="text-xs">Public:</span> {{ noskeInstance.public ? "Yes" : "No" }}</p>
 			<p><span class="text-xs">Authentication:</span> {{ noskeInstance.authentication }}</p>
 		</CardContent>
-		<CardFooter class="flex flex-wrap gap-2 px-6 pb-6">
-			<Button v-if="isOwner" as-child>
-				<NuxtLinkLocale :href="{ path: `/noskeinstance/edit/${noskeInstance._id}` }">
-					{{ t("Actions.edit") }}
-				</NuxtLinkLocale>
-			</Button>
-			<Button v-else disabled>{{ t("Actions.edit") }}</Button>
-			<AlertDialog>
-				<AlertDialogTrigger as-child>
-					<Button :disabled="!isOwner || isDeleting" variant="destructive">
-						{{ t("Actions.delete") }}
-					</Button>
-				</AlertDialogTrigger>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>{{ t("Dialogs.deleteInstanceTitle") }}</AlertDialogTitle>
-						<AlertDialogDescription>
-							{{ t("Dialogs.deleteInstanceDescription", { name: noskeInstance.name }) }}
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
-						<AlertDialogAction :disabled="isDeleting" @click="deleteInstance">
-							{{ t("Actions.delete") }}
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-			<Button as-child variant="outline">
-				<NuxtLinkLocale :href="{ path: `/noskeinstance/${noskeInstance._id}` }">
-					{{ t("Actions.view") }}
-				</NuxtLinkLocale>
-			</Button>
+		<CardFooter class="w-full px-6 pb-6">
+			<TooltipProvider :delay-duration="150">
+				<div class="flex w-full flex-nowrap items-center gap-1 rounded-md border bg-muted/40 p-1">
+					<Tooltip>
+						<TooltipTrigger as-child>
+							<Button v-if="isOwner" as-child class="flex-1" size="sm" variant="ghost">
+								<NuxtLinkLocale :href="{ path: `/noskeinstance/edit/${noskeInstance._id}` }">
+									<LucideIcon class="size-4" name="Pencil" :stroke-width="2" />
+								</NuxtLinkLocale>
+							</Button>
+							<Button v-else class="flex-1" disabled size="sm" type="button" variant="ghost">
+								<LucideIcon class="size-4" name="Pencil" :stroke-width="2" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{{ t("Actions.edit") }}</TooltipContent>
+					</Tooltip>
+					<AlertDialog>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<AlertDialogTrigger as-child>
+									<Button
+										class="flex-1 text-destructive hover:text-destructive"
+										:disabled="!isOwner || isDeleting"
+										size="sm"
+										variant="ghost"
+									>
+										<LucideIcon class="size-4" name="Trash2" :stroke-width="2" />
+									</Button>
+								</AlertDialogTrigger>
+							</TooltipTrigger>
+							<TooltipContent>{{ t("Actions.delete") }}</TooltipContent>
+						</Tooltip>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>{{ t("Dialogs.deleteInstanceTitle") }}</AlertDialogTitle>
+								<AlertDialogDescription>
+									{{ t("Dialogs.deleteInstanceDescription", { name: noskeInstance.name }) }}
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
+								<AlertDialogAction :disabled="isDeleting" @click="deleteInstance">
+									{{ t("Actions.delete") }}
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
+					<Tooltip>
+						<TooltipTrigger as-child>
+							<Button as-child class="flex-1" size="sm" variant="ghost">
+								<NuxtLinkLocale :href="{ path: `/noskeinstance/${noskeInstance._id}` }">
+									<LucideIcon class="size-4" name="Eye" :stroke-width="2" />
+								</NuxtLinkLocale>
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{{ t("Actions.view") }}</TooltipContent>
+					</Tooltip>
+				</div>
+			</TooltipProvider>
 		</CardFooter>
 	</Card>
 </template>

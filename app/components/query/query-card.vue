@@ -47,35 +47,65 @@ async function deleteQuery() {
 			<p><span class="text-xs">Owner:</span> {{ ownerNames.join(", ") }}</p>
 			<p><span class="text-xs">Input:</span> {{ query.userInput }}</p>
 		</CardContent>
-		<CardFooter class="mt-auto flex flex-wrap gap-2 px-6 pb-6">
-			<NuxtLinkLocale v-if="isOwner" :href="{ path: `/query/edit/${query._id}` }">
-				<Button>{{ t("Actions.edit") }}</Button>
-			</NuxtLinkLocale>
-			<Button v-else disabled>{{ t("Actions.edit") }}</Button>
-			<AlertDialog>
-				<AlertDialogTrigger as-child>
-					<Button :disabled="!isOwner || isDeleting" variant="destructive">
-						{{ t("Actions.delete") }}
-					</Button>
-				</AlertDialogTrigger>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>{{ t("Dialogs.deleteQueryTitle") }}</AlertDialogTitle>
-						<AlertDialogDescription>
-							{{ t("Dialogs.deleteQueryDescription", { name: query.name }) }}
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
-						<AlertDialogAction :disabled="isDeleting" @click="deleteQuery">
-							{{ t("Actions.delete") }}
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-			<NuxtLinkLocale :href="{ path: `/query/${query._id}` }">
-				<Button variant="outline">{{ t("Actions.view") }}</Button>
-			</NuxtLinkLocale>
+		<CardFooter class="mt-auto w-full px-6 pb-6">
+			<TooltipProvider :delay-duration="150">
+				<div class="flex w-full flex-nowrap items-center gap-1 rounded-md border bg-muted/40 p-1">
+					<Tooltip>
+						<TooltipTrigger as-child>
+							<Button v-if="isOwner" as-child class="flex-1" size="sm" variant="ghost">
+								<NuxtLinkLocale :href="{ path: `/query/edit/${query._id}` }">
+									<LucideIcon class="size-4" name="Pencil" :stroke-width="2" />
+								</NuxtLinkLocale>
+							</Button>
+							<Button v-else class="flex-1" disabled size="sm" type="button" variant="ghost">
+								<LucideIcon class="size-4" name="Pencil" :stroke-width="2" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{{ t("Actions.edit") }}</TooltipContent>
+					</Tooltip>
+					<AlertDialog>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<AlertDialogTrigger as-child>
+									<Button
+										class="flex-1 text-destructive hover:text-destructive"
+										:disabled="!isOwner || isDeleting"
+										size="sm"
+										variant="ghost"
+									>
+										<LucideIcon class="size-4" name="Trash2" :stroke-width="2" />
+									</Button>
+								</AlertDialogTrigger>
+							</TooltipTrigger>
+							<TooltipContent>{{ t("Actions.delete") }}</TooltipContent>
+						</Tooltip>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>{{ t("Dialogs.deleteQueryTitle") }}</AlertDialogTitle>
+								<AlertDialogDescription>
+									{{ t("Dialogs.deleteQueryDescription", { name: query.name }) }}
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>{{ t("Actions.cancel") }}</AlertDialogCancel>
+								<AlertDialogAction :disabled="isDeleting" @click="deleteQuery">
+									{{ t("Actions.delete") }}
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
+					<Tooltip>
+						<TooltipTrigger as-child>
+							<Button as-child class="flex-1" size="sm" variant="ghost">
+								<NuxtLinkLocale :href="{ path: `/query/${query._id}` }">
+									<LucideIcon class="size-4" name="Eye" :stroke-width="2" />
+								</NuxtLinkLocale>
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{{ t("Actions.view") }}</TooltipContent>
+					</Tooltip>
+				</div>
+			</TooltipProvider>
 		</CardFooter>
 	</Card>
 </template>
