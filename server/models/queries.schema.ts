@@ -1,4 +1,4 @@
-import { type InferRawDocType, Schema } from "mongoose";
+import { type InferRawDocType, Schema, type Types } from "mongoose";
 
 // eslint-disable-next-line import-x/no-unresolved
 import { defineMongooseModel } from "#nuxt/mongoose";
@@ -18,7 +18,11 @@ const schemaDefinition = {
 	facettingValues: { type: Schema.Types.Mixed, required: true },
 } as const;
 
-export type QueryDocument = InferRawDocType<typeof schemaDefinition>;
+export type QueryDocument = InferRawDocType<typeof schemaDefinition> & {
+	_id: Types.ObjectId;
+	createdAt?: Date;
+	updatedAt?: Date;
+};
 
 export const QueryModel = defineMongooseModel({
 	name: "queries",
