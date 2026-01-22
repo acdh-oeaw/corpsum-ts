@@ -21,7 +21,11 @@ const schemaDefinition = {
 	host: { type: Schema.Types.String, required: true },
 } as const;
 
-export type NoskeDocument = InferRawDocType<typeof schemaDefinition> & { _id: Types.ObjectId };
+export type NoskeDocument = InferRawDocType<typeof schemaDefinition> & {
+	_id: Types.ObjectId;
+	createdAt?: Date;
+	updatedAt?: Date;
+};
 export type NoskeDocumentSlim = Omit<NoskeDocument, "_id" | "owner">;
 
 export const NoskeModel = defineMongooseModel({
