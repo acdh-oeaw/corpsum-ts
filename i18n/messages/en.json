@@ -217,12 +217,30 @@
 			"actions": "Actions"
 		}
 	},
+	"CorporaPage": {
+		"title": "Corpora",
+		"description": "Browse available corpora.",
+		"featuredTitle": "Recent corpora",
+		"featuredDescription": "Sorted by last updated query",
+		"moreTitle": "More corpora",
+		"moreDescription": "All remaining corpora",
+		"empty": "No more corpora to show.",
+		"table": {
+			"corpus": "Corpus",
+			"language": "Language",
+			"words": "Words",
+			"documents": "Documents",
+			"noske": "NoSketch instance"
+		}
+	},
 	"NoskeInstancesPage": {
 		"title": "NoSketch instances"
 	},
 	"Common": {
 		"no": "No",
-		"yes": "Yes"
+		"yes": "Yes",
+		"createdAt": "Created",
+		"updatedAt": "Updated"
 	},
 	"login": "Log in",
 	"password": "Password",

@@ -217,12 +217,30 @@
 			"actions": "Aktionen"
 		}
 	},
+	"CorporaPage": {
+		"title": "Korpora",
+		"description": "Verfügbare Korpora durchsuchen.",
+		"featuredTitle": "Aktuelle Korpora",
+		"featuredDescription": "Sortiert nach zuletzt aktualisierter Abfrage",
+		"moreTitle": "Weitere Korpora",
+		"moreDescription": "Alle übrigen Korpora",
+		"empty": "Keine weiteren Korpora verfügbar.",
+		"table": {
+			"corpus": "Korpus",
+			"language": "Sprache",
+			"words": "Wörter",
+			"documents": "Dokumente",
+			"noske": "NoSketch-Instanz"
+		}
+	},
 	"NoskeInstancesPage": {
 		"title": "NoSketch-Instanzen"
 	},
 	"Common": {
 		"no": "Nein",
-		"yes": "Ja"
+		"yes": "Ja",
+		"createdAt": "Erstellt",
+		"updatedAt": "Aktualisiert"
 	},
 	"login": "Anmelden",
 	"password": "Passwort",

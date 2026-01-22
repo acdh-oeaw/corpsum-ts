@@ -5,6 +5,16 @@ const route = useRoute();
 const auth = useAuth();
 const t = useTranslations();
 const localeRoute = useLocaleRoute();
+const locale = useLocale();
+const formatDate = (value?: string | Date) => {
+	if (!value) return "—";
+	const date = typeof value === "string" ? new Date(value) : value;
+	if (Number.isNaN(date.getTime())) return "—";
+	return new Intl.DateTimeFormat(locale.value, {
+		dateStyle: "medium",
+		timeStyle: "short",
+	}).format(date);
+};
 const routeId = computed(() =>
 	Array.isArray(route.params.id) ? (route.params.id[0] ?? null) : (route.params.id ?? null),
 );
@@ -100,10 +110,18 @@ async function deleteInstance() {
 				<p><span class="text-xs">Host:</span> {{ noskeInstance.host }}</p>
 				<p><span class="text-xs">Version:</span> {{ noskeInstance.version }}</p>
 				<p><span class="text-xs">Public:</span> {{ noskeInstance.public ? "Yes" : "No" }}</p>
+				<p>
+					<span class="text-xs">{{ t("Common.createdAt") }}:</span>
+					{{ formatDate(noskeInstance.createdAt) }}
+				</p>
 			</div>
 			<div class="flex flex-col gap-3">
 				<p><span class="text-xs">Authentication:</span> {{ noskeInstance.authentication }}</p>
 				<p><span class="text-xs">Owned by:</span> {{ noskeInstance.owner.username }}</p>
+				<p>
+					<span class="text-xs">{{ t("Common.updatedAt") }}:</span>
+					{{ formatDate(noskeInstance.updatedAt) }}
+				</p>
 			</div>
 		</div>
 		<div class="mt-8">

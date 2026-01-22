@@ -4,6 +4,16 @@ import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 const route = useRoute();
 const t = useTranslations();
 const auth = useAuth();
+const locale = useLocale();
+const formatDate = (value?: string | Date) => {
+	if (!value) return "—";
+	const date = typeof value === "string" ? new Date(value) : value;
+	if (Number.isNaN(date.getTime())) return "—";
+	return new Intl.DateTimeFormat(locale.value, {
+		dateStyle: "medium",
+		timeStyle: "short",
+	}).format(date);
+};
 
 interface FacettingRegexSearch {
 	key: string;
@@ -63,6 +73,14 @@ const facettingEntries = computed(() => {
 				<p><span class="text-xs">Sub corpus:</span> {{ query.subCorpus }}</p>
 				<p><span class="text-xs">NoSketch Engine:</span> {{ query.noske }}</p>
 				<p><span class="text-xs">Owners:</span> {{ ownerNames.join(", ") }}</p>
+				<p>
+					<span class="text-xs">{{ t("Common.createdAt") }}:</span>
+					{{ formatDate(query.createdAt) }}
+				</p>
+				<p>
+					<span class="text-xs">{{ t("Common.updatedAt") }}:</span>
+					{{ formatDate(query.updatedAt) }}
+				</p>
 			</div>
 			<div class="flex flex-col gap-4">
 				<p v-if="query.type !== 'cqlrow'">
