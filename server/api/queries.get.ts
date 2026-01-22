@@ -1,6 +1,6 @@
 import { defineEventHandler } from "h3";
 
-import { QueryModel } from "~/server/models/queries.schema";
+import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
 import { requireAuth } from "~/server/utils/auth";
 
@@ -13,6 +13,7 @@ export interface QueryListItem {
 	subCorpus: string;
 	type: "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
 	userInput: string;
+	updatedAt: string;
 }
 
 interface Owner {
@@ -28,9 +29,10 @@ interface QueryRecord {
 	>;
 	noske: { toString: () => string };
 	corpus: unknown;
-	subCorpus: unknown;
+	subCorpus?: unknown;
 	type: unknown;
 	userInput: unknown;
+	updatedAt?: Date;
 }
 
 const queryTypes = ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"] as const;
@@ -67,6 +69,7 @@ function toResponse(query: QueryRecord): QueryListItem {
 		subCorpus: String(query.subCorpus),
 		type,
 		userInput: String(query.userInput),
+		updatedAt: query.updatedAt ? query.updatedAt.toISOString() : "",
 	};
 }
 
@@ -80,7 +83,7 @@ export default defineEventHandler(async (event): Promise<Array<QueryListItem> | 
 	}
 
 	const filter = String(user.accounttype) === "admin" ? {} : { owner: user._id };
-	const queries = await QueryModel.find(filter).populate<{
+	const queries = await QueryModel.find<QueryDocument>(filter).populate<{
 		owner: Array<{ _id: string; username: string }>;
 	}>("owner", "username");
 

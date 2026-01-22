@@ -1,7 +1,7 @@
 import { defineEventHandler, getRouterParam } from "h3";
 import mongoose from "mongoose";
 
-import { QueryModel } from "~/server/models/queries.schema";
+import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
 import { requireAuth } from "~/server/utils/auth";
 
@@ -15,6 +15,8 @@ export interface QueryResponse {
 	type: "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
 	userInput: string;
 	facettingValues: unknown;
+	createdAt: string;
+	updatedAt: string;
 }
 
 interface Owner {
@@ -30,10 +32,12 @@ interface QueryRecord {
 	>;
 	noske: { toString: () => string };
 	corpus: unknown;
-	subCorpus: unknown;
+	subCorpus?: unknown;
 	type: unknown;
 	userInput: unknown;
 	facettingValues: unknown;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
 const queryTypes = ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"] as const;
@@ -71,6 +75,8 @@ function toResponse(query: QueryRecord): QueryResponse {
 		type,
 		userInput: String(query.userInput),
 		facettingValues: query.facettingValues,
+		createdAt: query.createdAt ? query.createdAt.toISOString() : "",
+		updatedAt: query.updatedAt ? query.updatedAt.toISOString() : "",
 	};
 }
 
@@ -89,7 +95,7 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 		return;
 	}
 
-	const query = await QueryModel.findById(id).populate<{
+	const query = await QueryModel.findById<QueryDocument>(id).populate<{
 		owner: Array<{ _id: string; username: string }>;
 	}>("owner", "username");
 	if (!query) {

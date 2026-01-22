@@ -13,7 +13,12 @@ interface Owner {
 	username: string;
 }
 
-export type PopulatedNoskeDocument = NoskeDocumentSlim & { owner: Owner; _id: string };
+export type PopulatedNoskeDocument = Omit<NoskeDocumentSlim, "createdAt" | "updatedAt"> & {
+	owner: Owner;
+	_id: string;
+	createdAt: string | null;
+	updatedAt: string | null;
+};
 
 export default defineEventHandler(
 	async (event): Promise<Array<PopulatedNoskeDocument> | undefined> => {
@@ -37,6 +42,12 @@ export default defineEventHandler(
 			version: noskeinstance.version,
 			host: noskeinstance.host,
 			authentication: noskeinstance.authentication,
+			createdAt: noskeinstance.createdAt
+				? noskeinstance.createdAt.toISOString()
+				: null,
+			updatedAt: noskeinstance.updatedAt
+				? noskeinstance.updatedAt.toISOString()
+				: null,
 			owner: {
 				_id: noskeinstance.owner._id.toString(),
 				username: noskeinstance.owner.username,
