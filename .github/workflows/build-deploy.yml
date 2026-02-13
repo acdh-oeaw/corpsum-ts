@@ -26,7 +26,7 @@ jobs:
   build:
     needs: [env]
     environment:
-        name: ${{ needs.env.outputs.environment }}
+      name: ${{ needs.env.outputs.environment }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

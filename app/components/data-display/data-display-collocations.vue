@@ -78,7 +78,6 @@ const q = computed(() =>
 						const d = item.Stats?.find(({ n }) => n === "d");
 						const m = item.Stats?.find(({ n }) => n === "m");
 						const tStat = item.Stats?.find(({ n }) => n === "t");
-
 						return {
 							word: item.str!,
 							freq: item.freq!,
