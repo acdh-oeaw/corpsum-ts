@@ -69,7 +69,8 @@
 		"createSubcorpusConfirm2": "und einem Inhalt von",
 		"createSubcorpusConfirm3": "Dokumenten aus dem Korpus",
 		"corpusCreated": "Subkorpus erfolgreich erstellt!",
-		"cattr": "cattr"
+		"cattr": "cattr",
+		"correctionvalue": "Korrekturwert"
 	},
 	"DefaultLayout": {
 		"meta": {

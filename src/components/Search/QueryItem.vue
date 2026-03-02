@@ -8,6 +8,7 @@ import { useQueryStore } from "../../stores/query";
 
 const props = defineProps<{ query: CorpusQuery }>();
 const queries = useQueryStore();
+const t = useTranslations("Corpsum");
 
 const storeQuery = queries.queries.find((q) => q.id === props.query.id) as unknown as CorpusQuery;
 
@@ -32,46 +33,53 @@ const showFacettingInterface = ref(false);
 <template>
 	<VCard :key="props.query.id" :style="`border: 2px solid ${props.query.color};`">
 		<VCardTitle>
-			<div class="flex items-start justify-between gap-2">
-				<div class="flex shrink-0 gap-1">
-					<VBtn density="compact" icon="mdi-trash-can" @click="deleteQuery()"></VBtn>
-					<VBtn
-						density="compact"
-						icon="mdi-palette"
-						@click="storeQuery.showPicker = !storeQuery.showPicker"
-					></VBtn>
-					<VBadge
-						v-if="setFilters.length"
-						:color="query.color"
-						:content="setFilters.length"
-						location="bottom end"
+			<div class="flex flex-col gap-2">
+				<div class="flex items-start justify-between gap-2">
+					<div class="flex shrink-0 gap-1">
+						<VBtn density="compact" icon="mdi-trash-can" @click="deleteQuery()"></VBtn>
+						<VBtn
+							density="compact"
+							icon="mdi-palette"
+							@click="storeQuery.showPicker = !storeQuery.showPicker"
+						></VBtn>
+						<VBadge
+							v-if="setFilters.length"
+							:color="query.color"
+							:content="setFilters.length"
+							location="bottom end"
+						>
+							<VBtn
+								density="compact"
+								icon="mdi-filter"
+								@click="showFacettingInterface = true"
+							></VBtn>
+						</VBadge>
+						<VBtn
+							v-else
+							density="compact"
+							icon="mdi-filter"
+							@click="showFacettingInterface = true"
+						></VBtn>
+					</div>
+
+					<span
+						class="block min-w-0 flex-1 truncate text-right text-xl"
+						:style="`color: ${props.query.color}`"
 					>
-						<VBtn density="compact" icon="mdi-filter" @click="showFacettingInterface = true"></VBtn>
-					</VBadge>
-					<VBtn
-						v-else
-						density="compact"
-						icon="mdi-filter"
-						@click="showFacettingInterface = true"
-					></VBtn>
-					<!-- eslint-disable -->
-					<VNumberInput
-						v-model="props.query.SampleRatio"
-						control-variant="split"
-						:hide-input="false"
-						:inset="false"
-						label="Sample Ratio"
-						:reverse="false"
-					></VNumberInput>
+						{{ props.query.userInput }}
+						<VTooltip activator="parent">{{ props.query.userInput }}</VTooltip>
+					</span>
 				</div>
 
-				<span
-					class="block min-w-0 flex-1 truncate text-right text-xl"
-					:style="`color: ${props.query.color}`"
-				>
-					{{ props.query.userInput }}
-					<VTooltip activator="parent">{{ props.query.userInput }}</VTooltip>
-				</span>
+				<!-- eslint-disable -->
+				<VNumberInput
+					v-model="props.query.SampleRatio"
+					control-variant="default"
+					:hide-input="false"
+					:inset="false"
+					:label="t('correctionvalue')"
+					:reverse="false"
+				></VNumberInput>
 			</div>
 
 			<div class="mt-2 flex items-center justify-between"></div>
