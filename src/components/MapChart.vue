@@ -24,6 +24,16 @@ const chartOptions = computed(() => {
 		chart: {
 			map: mapAustria,
 		},
+		legend: {
+			layout: "vertical",
+			align: "right",
+			verticalAlign: "middle",
+			useHTML: false,
+			itemStyle: {
+				textOverflow: "clip",
+				whiteSpace: "normal",
+			},
+		},
 
 		colorAxis: {
 			max: Number(max) > 10 ? max : 10,
