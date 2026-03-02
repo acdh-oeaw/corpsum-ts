@@ -32,15 +32,14 @@ const showFacettingInterface = ref(false);
 <template>
 	<VCard :key="props.query.id" :style="`border: 2px solid ${props.query.color};`">
 		<VCardTitle>
-			<div class="flex justify-between gap-2">
-				<div class="flex gap-1">
+			<div class="flex items-start justify-between gap-2">
+				<div class="flex shrink-0 gap-1">
 					<VBtn density="compact" icon="mdi-trash-can" @click="deleteQuery()"></VBtn>
 					<VBtn
 						density="compact"
 						icon="mdi-palette"
 						@click="storeQuery.showPicker = !storeQuery.showPicker"
 					></VBtn>
-
 					<VBadge
 						v-if="setFilters.length"
 						:color="query.color"
@@ -66,7 +65,10 @@ const showFacettingInterface = ref(false);
 					></VNumberInput>
 				</div>
 
-				<span class="text-xl" :style="`color: ${props.query.color}`">
+				<span
+					class="block min-w-0 flex-1 truncate text-right text-xl"
+					:style="`color: ${props.query.color}`"
+				>
 					{{ props.query.userInput }}
 					<VTooltip activator="parent">{{ props.query.userInput }}</VTooltip>
 				</span>
