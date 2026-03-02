@@ -32,7 +32,7 @@
 		"wordrow": "Word search",
 		"lemmarow": "Lemma search",
 		"phraserow": "Phrase search",
-		"cqlrow": "Custom Query search",
+		"cqlrow": "CQL search",
 		"querytype": "Query Type",
 		"SearchTerm": "Your search term",
 		"SearchDimensions": "Search Dimensions",

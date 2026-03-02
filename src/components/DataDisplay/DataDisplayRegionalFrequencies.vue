@@ -109,7 +109,7 @@ const expand = ref(false);
 
 						<VTooltip activator="parent" location="top">combined map chart</VTooltip>
 					</VBtn>
-					<VBtn value="seperate" variant="outlined" mandatory>
+					<VBtn value="seperate" variant="outlined">
 						<VIcon class="z-30 bg-white" icon="mdi-map" />
 						<VIcon class="z-20 -mt-2 ml-[-0.80rem]" icon="mdi-map" />
 						<VTooltip activator="parent" location="top">seperated map charts</VTooltip>
