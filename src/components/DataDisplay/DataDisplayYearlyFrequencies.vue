@@ -175,7 +175,7 @@ const intervalseries = computed(() => {
 
 		<VCardText class="py-0">
 			<div class="mt-2 flex max-w-7xl">
-				<VBtnToggle v-model="mode" class="flex w-full" density="compact">
+				<VBtnToggle v-model="mode" class="flex w-full" density="compact" mandatory>
 					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>

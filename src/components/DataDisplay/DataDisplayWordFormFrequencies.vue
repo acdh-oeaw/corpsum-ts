@@ -68,7 +68,7 @@ const expand = ref(false);
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<VBtnToggle v-model="mode" density="compact">
+			<VBtnToggle v-model="mode" density="compact" mandatory>
 				<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 				<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 			</VBtnToggle>
