@@ -26,8 +26,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 	Highcharts.addEvent(Highcharts.Chart, "render", function () {
 		const chart = this as Highcharts.Chart & { __fullTitleText?: string };
 		const maxWidth = Math.max(120, chart.plotWidth);
-		const configuredTitle =
-			chart.userOptions.title?.text ?? chart.options.title?.text ?? "";
+		const configuredTitle = chart.userOptions.title?.text ?? chart.options.title?.text ?? "";
 		const fullTitle = chart.__fullTitleText ?? String(configuredTitle);
 		chart.__fullTitleText = fullTitle;
 		chart.title.css({ whiteSpace: "nowrap" });
