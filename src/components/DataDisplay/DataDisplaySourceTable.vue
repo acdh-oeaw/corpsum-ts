@@ -31,7 +31,12 @@ const columns = computed(() => {
 		<VTabs v-model="tab">
 			<div v-for="query of props.queries" :key="query.id">
 				<VTab :value="query.id">
-					<span :style="`color: ${query.color}`">{{ query.type }}: {{ query.userInput }}</span>
+					<span
+						class="inline-block max-w-[250px] truncate"
+						:style="`color: ${query.color}`"
+					>
+						{{ query.type }}: {{ query.userInput }}
+					</span>
 				</VTab>
 			</div>
 		</VTabs>
