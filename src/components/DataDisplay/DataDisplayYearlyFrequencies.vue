@@ -222,7 +222,14 @@ const intervalseries = computed(() => {
 					label="Interval"
 					style="flex-grow: 0"
 				></VSelect>
-				<VCheckbox v-model="reverse" class="w-32 flex-none" label="Reverse"></VCheckbox>
+				<VBtnToggle v-model="reverse" mandatory>
+					<VBtn :value="false">
+						<VIcon>mdi-clock-start</VIcon>
+					</VBtn>
+					<VBtn :value="true">
+						<VIcon>mdi-clock-end</VIcon>
+					</VBtn>
+				</VBtnToggle>
 			</div>
 			<HighCharts
 				:options="{
