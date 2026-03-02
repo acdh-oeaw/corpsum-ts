@@ -72,7 +72,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 				const labelWidth = Math.max(240, chartWidth);
 				const name = escapeHtml(this.name ?? "");
 				return [
-					`<span style="display:block;width:${labelWidth}px;`,
+					`<span style="display:block;width:${labelWidth.toString()}px;`,
 					'white-space:normal;overflow-wrap:anywhere;line-height:1.2;">',
 					name,
 					"</span>",
