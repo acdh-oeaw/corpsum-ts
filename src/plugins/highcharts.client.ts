@@ -2,6 +2,7 @@ import Highcharts from "highcharts";
 import AccessibilityModule from "highcharts/modules/accessibility";
 import ExportingDataModule from "highcharts/modules/export-data";
 import ExportingModule from "highcharts/modules/exporting";
+import OfflineExportingModule from "highcharts/modules/offline-exporting";
 import MapsModule from "highcharts/modules/map";
 import WordCloudModule from "highcharts/modules/wordcloud";
 import HighchartsVue from "highcharts-vue";
@@ -20,6 +21,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 	MapsModule(Highcharts);
 	ExportingModule(Highcharts);
 	ExportingDataModule(Highcharts);
+	OfflineExportingModule(Highcharts);
 	AccessibilityModule(Highcharts);
 	WordCloudModule(Highcharts);
 
