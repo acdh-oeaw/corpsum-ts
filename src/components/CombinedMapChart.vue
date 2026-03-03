@@ -126,6 +126,9 @@ const series = computed(() => [
 		dataLabels: {
 			enabled: true,
 			format: "{point.name}",
+			allowOverlap: true,
+			crop: false,
+			overflow: "allow",
 		},
 		joinBy: ["hc-key", "id"],
 		allAreas: true,
@@ -204,7 +207,6 @@ const chartOptions = computed(() => {
 						const nextCenter: [number, number] = hasShapeCenter
 							? [sx + sw / 2, sy + sh / 2]
 							: [regionPoint.plotX, regionPoint.plotY];
-
 						const currentCenter = s.options.center;
 						const currentX = typeof currentCenter?.[0] === "number" ? currentCenter[0] : NaN;
 						const currentY = typeof currentCenter?.[1] === "number" ? currentCenter[1] : NaN;
@@ -219,11 +221,42 @@ const chartOptions = computed(() => {
 						needsRedraw = true;
 					});
 
-					if (!needsRedraw) return;
+					if (needsRedraw) {
+						chart.__isSyncingPieCenters = true;
+						chart.redraw(false);
+						chart.__isSyncingPieCenters = false;
+					}
 
-					chart.__isSyncingPieCenters = true;
-					chart.redraw(false);
-					chart.__isSyncingPieCenters = false;
+					// Keep region labels exactly above their corresponding pies.
+					const piePositions = new Map<Region, { x: number; y: number; radius: number }>();
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					chart.series.forEach((s: any) => {
+						if (s.type !== "pie") return;
+						const linkedRegion = s.userOptions.custom?.region as Region | undefined;
+						if (!linkedRegion) return;
+						const cx = typeof s.center?.[0] === "number" ? s.center[0] : undefined;
+						const cy = typeof s.center?.[1] === "number" ? s.center[1] : undefined;
+						const diameter = typeof s.center?.[2] === "number" ? s.center[2] : undefined;
+						if (cx == null || cy == null || diameter == null) return;
+						piePositions.set(linkedRegion, { x: cx, y: cy, radius: diameter / 2 });
+					});
+
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					mapSeries.points.forEach((point: any) => {
+						const region = point.id as Region | undefined;
+						if (!region) return;
+						const piePos = piePositions.get(region);
+						if (!piePos) return;
+						const label = point.dataLabel;
+						if (!label) return;
+
+						const yOffset = 18;
+						label.attr({
+							x: piePos.x,
+							y: piePos.y - piePos.radius - yOffset,
+						});
+						label.css({ textAnchor: "middle" });
+					});
 				},
 			},
 		},
