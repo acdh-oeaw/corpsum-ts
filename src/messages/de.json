@@ -70,7 +70,9 @@
 		"createSubcorpusConfirm3": "Dokumenten aus dem Korpus",
 		"corpusCreated": "Subkorpus erfolgreich erstellt!",
 		"cattr": "cattr",
-		"correctionvalue": "Korrekturwert"
+		"correctionvalue": "Korrekturwert",
+		"reverse_start": "Beobachtungszeitraum von Beginn der Zeitreihe",
+		"reverse_end": "Beobachtungszeitraum vom Ende der Zeitreihe"
 	},
 	"DefaultLayout": {
 		"meta": {

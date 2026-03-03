@@ -225,9 +225,11 @@ const intervalseries = computed(() => {
 				<VBtnToggle v-model="reverse" mandatory>
 					<VBtn :value="false">
 						<VIcon>mdi-clock-start</VIcon>
+						<VTooltip activator="parent" location="top">{{ t("reverse_start") }}</VTooltip>
 					</VBtn>
 					<VBtn :value="true">
 						<VIcon>mdi-clock-end</VIcon>
+						<VTooltip activator="parent" location="top">{{ t("reverse_end") }}</VTooltip>
 					</VBtn>
 				</VBtnToggle>
 			</div>

@@ -100,7 +100,9 @@
 		"use-search-as-modes-modeindex-for-search-this-clears-the-rest-of-the-selection": "use '{0}' as '{1}' for search (this clears the rest of the selection)",
 		"clear-selection": "Clear Selection",
 		"cattr": "cattr",
-		"correctionvalue": "correction value"
+		"correctionvalue": "correction value",
+		"reverse_start": "Intervals from start of time series",
+		"reverse_end": "Intervals from end of time series"
 	},
 	"DefaultLayout": {
 		"meta": {
