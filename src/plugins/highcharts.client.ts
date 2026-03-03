@@ -2,8 +2,8 @@ import Highcharts from "highcharts";
 import AccessibilityModule from "highcharts/modules/accessibility";
 import ExportingDataModule from "highcharts/modules/export-data";
 import ExportingModule from "highcharts/modules/exporting";
-import OfflineExportingModule from "highcharts/modules/offline-exporting";
 import MapsModule from "highcharts/modules/map";
+import OfflineExportingModule from "highcharts/modules/offline-exporting";
 import WordCloudModule from "highcharts/modules/wordcloud";
 import HighchartsVue from "highcharts-vue";
 
