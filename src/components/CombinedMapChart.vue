@@ -100,11 +100,15 @@ const keys = computed(() => ["id", ...props.queries.map((q) => q.userInput), "va
 const pieSeries = computed(() =>
 	pieInfoWithData.value.map((piwd) => ({
 		type: "pie",
+		id: `pie-${piwd.region}`,
 		zIndex: 6,
 		size: pieSize,
 		...piwd,
 		region: undefined,
 		name: piwd.region,
+		custom: {
+			region: piwd.region,
+		},
 		dataLabels: {
 			enabled: false,
 		},
@@ -116,6 +120,7 @@ const pieSeries = computed(() =>
 
 const series = computed(() => [
 	{
+		id: "austria-regions",
 		mapData: mapAustria,
 		name: "Austria",
 		dataLabels: {
@@ -160,6 +165,67 @@ const chartOptions = computed(() => {
 		chart: {
 			map: mapAustria,
 			animation: false,
+			events: {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				render: function (this: any) {
+					const chart = this as typeof this & {
+						__isSyncingPieCenters?: boolean;
+					};
+					if (chart.__isSyncingPieCenters) return;
+
+					const mapSeries = chart.get("austria-regions");
+					if (!mapSeries || mapSeries.type !== "map") return;
+
+					let needsRedraw = false;
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					chart.series.forEach((s: any) => {
+						if (s.type !== "pie") return;
+
+						const linkedRegion = s.userOptions.custom?.region as Region | undefined;
+						if (!linkedRegion) return;
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						const regionPoint = mapSeries.points.find((point: any) => point.id === linkedRegion);
+						if (!regionPoint) return;
+						if (typeof regionPoint.plotX !== "number" || typeof regionPoint.plotY !== "number")
+							return;
+
+						const shape = regionPoint.shapeArgs as
+							| { x?: number; y?: number; width?: number; height?: number }
+							| undefined;
+						const hasShapeCenter =
+							typeof shape?.x === "number" &&
+							typeof shape?.y === "number" &&
+							typeof shape?.width === "number" &&
+							typeof shape?.height === "number";
+						const sx = shape?.x ?? 0;
+						const sy = shape?.y ?? 0;
+						const sw = shape?.width ?? 0;
+						const sh = shape?.height ?? 0;
+						const nextCenter: [number, number] = hasShapeCenter
+							? [sx + sw / 2, sy + sh / 2]
+							: [regionPoint.plotX, regionPoint.plotY];
+
+						const currentCenter = s.options.center;
+						const currentX = typeof currentCenter?.[0] === "number" ? currentCenter[0] : NaN;
+						const currentY = typeof currentCenter?.[1] === "number" ? currentCenter[1] : NaN;
+
+						if (
+							Math.abs(currentX - nextCenter[0]) < 0.5 &&
+							Math.abs(currentY - nextCenter[1]) < 0.5
+						)
+							return;
+
+						s.update({ center: nextCenter }, false);
+						needsRedraw = true;
+					});
+
+					if (!needsRedraw) return;
+
+					chart.__isSyncingPieCenters = true;
+					chart.redraw(false);
+					chart.__isSyncingPieCenters = false;
+				},
+			},
 		},
 		accessibility: {
 			description: t("map-showing-the-different-query-frequencies-relating-to-the-region"),
