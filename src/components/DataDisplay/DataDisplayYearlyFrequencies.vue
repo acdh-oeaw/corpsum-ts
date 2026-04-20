@@ -96,7 +96,7 @@ const sumInIntervals = function (
 					start = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
 				sum += numbers[numbers.length - 1 - (i * intervalSize + j)]![1]!;
 			}
-			results.push([`${start}-${finish}`, sum/intervalSize]);
+			results.push([`${start}-${finish}`, sum / intervalSize]);
 		}
 		results.reverse();
 	} else {
@@ -108,7 +108,7 @@ const sumInIntervals = function (
 				if (j === intervalSize - 1) finish = numbers[i * intervalSize + j]![0];
 				sum += numbers[i * intervalSize + j]![1]!;
 			}
-			results.push([`${start}-${finish}`, sum/intervalSize]);
+			results.push([`${start}-${finish}`, sum / intervalSize]);
 		}
 	}
 	return results;
