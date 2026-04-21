@@ -5,6 +5,8 @@ import { storeToRefs } from "pinia";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
+type FreqMlBlock = NonNullable<FreqMlResponse["Blocks"]>[number];
+type FreqMlItem = NonNullable<FreqMlBlock["Items"]>[number];
 
 const t = useTranslations();
 const queryStore = useQueryStore();
@@ -19,7 +21,20 @@ interface YearlyFrequency {
 	relative: number;
 }
 
-const mode = ref("relative");
+type FrequencyMode = "absolute" | "relative";
+type FrequencyPoint = [year: number, value: number];
+type IntervalFrequencyPoint = [yearRange: string, value: number];
+interface YearlyFrequencySeries<TPoint extends FrequencyPoint | IntervalFrequencyPoint> {
+	name: string;
+	data: Array<TPoint>;
+	color: string;
+}
+
+const firstChartYear = 1986;
+const lastChartYear = 2024;
+const intervalOptions = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+const mode = ref<FrequencyMode>("relative");
 const interval = ref(2);
 const reverse = ref(false);
 const expand = ref(false);
@@ -41,47 +56,37 @@ const q = computed(() =>
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				yearlyFrequenciesLoading.value[index] = true;
-				const { data, error } = await activeClient.GET("/search/freqml", {
-					params: {
-						query: {
-							corpname: query.corpus,
-							usesubcorp: query.subCorpus || undefined,
-							group: 0,
-							showpoc: 1,
-							showreltt: 1,
-							showrel: 1,
-							freqlevel: 1,
-							ml1attr: "doc.year",
-							ml1ctx: "0~0 > 0",
-							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
+				try {
+					const { data, error } = await activeClient.GET("/search/freqml", {
+						params: {
+							query: {
+								corpname: query.corpus,
+								usesubcorp: query.subCorpus || undefined,
+								group: 0,
+								showpoc: 1,
+								showreltt: 1,
+								showrel: 1,
+								freqlevel: 1,
+								ml1attr: "doc.year",
+								ml1ctx: "0~0 > 0",
+								json: JSON.stringify({
+									concordance_query: queryStore.getQueryWithFacetting(query),
+								}),
+							},
 						},
-					},
-				});
-				if (error) throw error;
-				return data;
+					});
+					if (error) throw error;
+					return data;
+				} catch (error) {
+					yearlyFrequenciesLoading.value[index] = false;
+					throw error;
+				}
 			},
 			select: (data: FreqMlResponse) => {
-				yearlyFrequencies.value[index] =
-					data.Blocks?.map(
-						(block) =>
-							block.Items?.map((item) => {
-								return {
-									absolute: item.frq!,
-									relative: item.reltt!,
-									year: Number(item.Word?.reduce((acc, cur) => acc + (cur.n ?? ""), "")),
-								};
-							}) ?? [],
-					)[0] ?? [];
-				const years = Array.from({ length: 2024 - 1986 + 1 }, (_, i) => 1986 + i);
-				years.forEach((year) => {
-					if (yearlyFrequencies.value[index]?.filter((item) => item.year === year).length === 0) {
-						yearlyFrequencies.value[index].push({
-							year,
-							absolute: 0,
-							relative: 0,
-						});
-					}
-				});
+				yearlyFrequencies.value[index] = appendMissingYearFrequencies(
+					parseYearlyFrequencies(data),
+					createYearRange(firstChartYear, lastChartYear),
+				);
 				yearlyFrequenciesLoading.value[index] = false;
 			},
 		};
@@ -90,92 +95,124 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const sumInIntervals = function (
-	numbers: Array<Array<number>>,
+function parseYearlyFrequencies(data: FreqMlResponse): Array<YearlyFrequency> {
+	return data.Blocks?.[0]?.Items?.map(parseYearlyFrequencyItem) ?? [];
+}
+
+function parseYearlyFrequencyItem(item: FreqMlItem): YearlyFrequency {
+	return {
+		absolute: item.frq ?? 0,
+		relative: item.reltt ?? 0,
+		year: parseYear(item),
+	};
+}
+
+function parseYear(item: FreqMlItem) {
+	return Number(item.Word?.map(({ n }) => n ?? "").join("") ?? 0);
+}
+
+function createYearRange(firstYear: number, lastYear: number) {
+	return Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index);
+}
+
+function appendMissingYearFrequencies(
+	frequencies: Array<YearlyFrequency>,
+	years: Array<number>,
+): Array<YearlyFrequency> {
+	const frequencyYears = new Set(frequencies.map((frequency) => frequency.year));
+	const missingFrequencies = years
+		.filter((year) => !frequencyYears.has(year))
+		.map((year) => ({
+			year,
+			absolute: 0,
+			relative: 0,
+		}));
+
+	return [...frequencies, ...missingFrequencies];
+}
+
+function createSeriesName(query: CorpusQuery) {
+	return `${query.type}: ${query.userInput} (${query.corpus}${
+		query.subCorpus ? ` / ${query.subCorpus})` : ")"
+	}`;
+}
+
+function getFrequencyValue(frequency: YearlyFrequency, selectedMode: FrequencyMode) {
+	return selectedMode === "relative" ? frequency.relative : frequency.absolute;
+}
+
+function createSampleAdjustedYearlySeries(
+	query: CorpusQuery,
+	frequencies: Array<YearlyFrequency>,
+	selectedMode: FrequencyMode,
+): YearlyFrequencySeries<FrequencyPoint> {
+	return {
+		name: createSeriesName(query),
+		data: applySampleRatio(
+			createYearlyFrequencyPoints(frequencies, selectedMode),
+			query.SampleRatio,
+		),
+		color: query.color,
+	};
+}
+
+function createYearlyFrequencyPoints(
+	frequencies: Array<YearlyFrequency>,
+	selectedMode: FrequencyMode,
+): Array<FrequencyPoint> {
+	return [...frequencies]
+		.sort((a, b) => a.year - b.year)
+		.map((frequency) => [frequency.year, getFrequencyValue(frequency, selectedMode)]);
+}
+
+function applySampleRatio<TYear extends string | number>(
+	points: Array<[TYear, number]>,
+	sampleRatio: number,
+): Array<[TYear, number]> {
+	return points.map(([year, value]) => [year, value * (sampleRatio / 100)]);
+}
+
+function groupFrequencyPointsIntoIntervals(
+	points: Array<FrequencyPoint>,
 	intervalSize: number,
-	reverseOrder: boolean,
-) {
-	const results = [];
-	const fullIntervals = Math.floor(numbers.length / intervalSize);
+	useReverseIntervals: boolean,
+): Array<IntervalFrequencyPoint> {
+	const intervalSource = useReverseIntervals ? [...points].reverse() : points;
+	const fullIntervalCount = Math.floor(intervalSource.length / intervalSize);
+	const intervals = Array.from({ length: fullIntervalCount }, (_, intervalIndex) => {
+		const intervalPoints = intervalSource.slice(
+			intervalIndex * intervalSize,
+			(intervalIndex + 1) * intervalSize,
+		);
 
-	if (reverseOrder) {
-		for (let i = 0; i < fullIntervals; i++) {
-			let sum = 0;
-			let start;
-			let finish;
-			for (let j = 0; j < intervalSize; j++) {
-				if (j === 0) finish = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
-				if (j === intervalSize - 1)
-					start = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
-				sum += numbers[numbers.length - 1 - (i * intervalSize + j)]![1]!;
-			}
-			results.push([`${start}-${finish}`, sum]);
-		}
-		results.reverse();
-	} else {
-		for (let i = 0; i < fullIntervals; i++) {
-			let sum = 0;
-			let start;
-			let finish;
-			for (let j = 0; j < intervalSize; j++) {
-				if (j === 0) start = numbers[i * intervalSize + j]![0];
-				if (j === intervalSize - 1) finish = numbers[i * intervalSize + j]![0];
-				sum += numbers[i * intervalSize + j]![1]!;
-			}
-			results.push([`${start}-${finish}`, sum]);
-		}
-	}
-	return results;
-};
-
-const applySampleSize = function (numbers: Array<Array<number>>, sampleSize: number) {
-	const results = [...numbers];
-	for (const entry of results) {
-		if (entry && Array.isArray(entry)) entry[1] = entry[1]! * (sampleSize / 100);
-	}
-	return results;
-};
-
-const series = computed(() => {
-	const result = queries.value
-		.filter((query, i) => yearlyFrequencies.value[i])
-		.map((query, index) => ({
-			name: `${query.type}: ${query.userInput} (${query.corpus}${
-				query.subCorpus ? ` / ${query.subCorpus})` : ")"
-			}`,
-			data: (yearlyFrequencies.value[index] ?? [])
-				.sort((a, b) => b.year - a.year)
-				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
-			color: query.color,
-		}));
-	result.forEach((entry, i) => {
-		if (entry.data)
-			result[i]!.data = applySampleSize(entry.data.reverse(), queries.value[i]!.SampleRatio);
+		return createIntervalFrequencyPoint(intervalPoints);
 	});
-	return result;
-});
 
-const intervalseries = computed(() => {
-	const result = queries.value
-		.filter((query, i) => yearlyFrequencies.value[i])
-		.map((query, index) => ({
-			name: `${query.type}: ${query.userInput} (${query.corpus}${
-				query.subCorpus ? ` / ${query.subCorpus})` : ")"
-			}`,
-			data: (yearlyFrequencies.value[index] ?? [])
-				.sort((a, b) => b.year - a.year)
-				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
-			color: query.color,
-		}));
-	result.forEach((entry, i) => {
-		if (entry.data) {
-			// @ts-expect-error highcharts internal usage
-			result[i]!.data = sumInIntervals(entry.data.reverse(), interval.value, reverse.value);
-			result[i]!.data = applySampleSize(entry.data, queries.value[i]!.SampleRatio);
-		}
-	});
-	return result;
-});
+	return useReverseIntervals ? intervals.reverse() : intervals;
+}
+
+function createIntervalFrequencyPoint(points: Array<FrequencyPoint>): IntervalFrequencyPoint {
+	const orderedYears = points.map(([year]) => year).sort((a, b) => a - b);
+	const totalValue = points.reduce((sum, [, value]) => sum + value, 0);
+
+	return [`${orderedYears[0]}-${orderedYears.at(-1)}`, totalValue];
+}
+
+const series = computed(() =>
+	queries.value.flatMap((query, index) => {
+		const frequencies = yearlyFrequencies.value[index];
+		if (!frequencies) return [];
+
+		return [createSampleAdjustedYearlySeries(query, frequencies, mode.value)];
+	}),
+);
+
+const intervalseries = computed(() =>
+	series.value.map((querySeries) => ({
+		...querySeries,
+		data: groupFrequencyPointsIntoIntervals(querySeries.data, interval.value, reverse.value),
+	})),
+);
 </script>
 
 <template>
@@ -223,15 +260,13 @@ const intervalseries = computed(() => {
 							<SelectValue :placeholder="t('interval')" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem :value="2">2 years</SelectItem>
-							<SelectItem :value="3">3 years</SelectItem>
-							<SelectItem :value="4">4 years</SelectItem>
-							<SelectItem :value="5">5 years</SelectItem>
-							<SelectItem :value="6">6 years</SelectItem>
-							<SelectItem :value="7">7 years</SelectItem>
-							<SelectItem :value="8">8 years</SelectItem>
-							<SelectItem :value="9">9 years</SelectItem>
-							<SelectItem :value="10">10 years</SelectItem>
+							<SelectItem
+								v-for="intervalOption of intervalOptions"
+								:key="intervalOption"
+								:value="intervalOption"
+							>
+								{{ intervalOption }} years
+							</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
