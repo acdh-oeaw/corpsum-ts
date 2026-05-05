@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
 import { requireAuth } from "~/server/utils/auth";
+import { requireReadableNoske } from "~/server/utils/noske";
+import type { AuthenticatedUser } from "~/server/utils/user";
 
 interface QueryResponse {
 	_id: string;
@@ -125,7 +127,12 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 		updates.name = payload.name;
 	}
 	if (Object.prototype.hasOwnProperty.call(payload, "noske")) {
-		updates.noske = payload.noske as QueryDocument["noske"];
+		if (typeof payload.noske !== "string") {
+			setResponseStatus(event, 400, "invalid noske");
+			return;
+		}
+		const noskeinstance = await requireReadableNoske(payload.noske, user as unknown as AuthenticatedUser);
+		updates.noske = noskeinstance._id as QueryDocument["noske"];
 	}
 	if (Object.prototype.hasOwnProperty.call(payload, "corpus")) {
 		if (typeof payload.corpus !== "string") {

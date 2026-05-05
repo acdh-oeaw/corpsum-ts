@@ -1,8 +1,8 @@
 import { defineEventHandler, type H3Event, readBody } from "h3";
 
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
-import { UserModel } from "~/server/models/users.schema";
-import { requireAuth } from "~/server/utils/auth";
+import { requireReadableNoske } from "~/server/utils/noske";
+import { requireUser } from "~/server/utils/user";
 
 interface QueryResponse {
 	_id: string;
@@ -59,13 +59,7 @@ function toResponse(query: QueryRecord): QueryResponse {
 }
 
 export default defineEventHandler(async (event): Promise<QueryResponse | undefined> => {
-	const { username } = await requireAuth(event);
-
-	const user = await UserModel.findOne({ username });
-	if (!user) {
-		setResponseStatus(event, 500, "authentication error");
-		return;
-	}
+	const user = await requireUser(event);
 
 	const payload = await readBodySafe(event);
 	if (!isRecord(payload)) {
@@ -80,18 +74,19 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 		typeof corpus !== "string" ||
 		typeof subCorpus !== "string" ||
 		typeof userInput !== "string" ||
-		!noske ||
+		typeof noske !== "string" ||
 		!isQueryType(type) ||
 		facettingValues === undefined
 	) {
 		setResponseStatus(event, 400, "invalid type");
 		return;
 	}
+	const noskeinstance = await requireReadableNoske(noske, user);
 
 	const query = await QueryModel.create({
 		name,
 		owner: [user._id],
-		noske: noske as QueryDocument["noske"],
+		noske: noskeinstance._id as QueryDocument["noske"],
 		corpus,
 		subCorpus,
 		type,
