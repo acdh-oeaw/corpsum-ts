@@ -102,7 +102,7 @@ router.afterEach((to, from) => {
 		<SidebarProvider :default-open="false">
 			<AppSidebar />
 			<SidebarInset class="w-full max-w-full overflow-x-hidden">
-				<div class="flex items-center gap-2 px-4">
+				<div class="block w-full min-w-0 px-4 sm:px-6 lg:px-8">
 					<ErrorBoundary>
 						<slot />
 					</ErrorBoundary>
