@@ -139,6 +139,7 @@ export default defineNuxtConfig({
 
 	runtimeConfig: {
 		authSecret: process.env.NUXT_AUTH_SECRET,
+		credentialSecret: process.env.NUXT_CREDENTIAL_SECRET ?? process.env.NUXT_AUTH_SECRET,
 		jwtExpiration: process.env.NUXT_JWT_EXPIRATION,
 		public: {
 			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL ?? "https://shadcn.acdh-ch-dev.oeaw.ac.at",
