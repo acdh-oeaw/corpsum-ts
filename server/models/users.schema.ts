@@ -41,7 +41,10 @@ export const UserModel = defineMongooseModel({
 	hooks(schema) {
 		schema.pre("save", function (this, next) {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-			if (this.password && this.username) next();
+			if (this.password && this.username) {
+				next();
+				return;
+			}
 
 			throw createError({
 				statusCode: 500,
