@@ -69,7 +69,7 @@ function cancel() {
 </script>
 
 <template>
-	<MainContent class="mx-auto my-4 flex w-full max-w-5xl flex-col gap-4">
+	<MainContent class="my-4 flex w-full min-w-0 flex-col gap-4">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">

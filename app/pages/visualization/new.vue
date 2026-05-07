@@ -152,7 +152,7 @@ function cancel() {
 </script>
 
 <template>
-	<MainContent class="mx-auto w-full max-w-5xl">
+	<MainContent class="w-full min-w-0">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
@@ -186,17 +186,28 @@ function cancel() {
 						<CarouselContent>
 							<CarouselItem v-for="query in selectedQueryItems" :key="query._id" class="basis-auto">
 								<Card
-									class="flex h-full w-[350px] flex-col bg-gradient-to-t from-primary/5 to-card"
+									class="flex h-full w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
 								>
-									<CardHeader class="flex flex-row items-start justify-between gap-2">
+									<CardHeader
+										class="flex flex-row items-start justify-between gap-2 border-b border-primary bg-primary text-primary-foreground"
+									>
 										<div>
-											<CardDescription>{{ query.corpus }}</CardDescription>
-											<CardTitle class="text-2xl font-semibold">{{ query.name }}</CardTitle>
+											<CardDescription class="font-semibold text-primary-foreground/80">
+												{{ query.corpus }}
+											</CardDescription>
+											<CardTitle class="text-2xl font-black tracking-normal">
+												{{ query.name }}
+											</CardTitle>
 										</div>
 										<TooltipProvider :delay-duration="150">
 											<Tooltip>
 												<TooltipTrigger as-child>
-													<Button size="sm" variant="ghost" @click="removeQuery(query._id)">
+													<Button
+														class="text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+														size="sm"
+														variant="ghost"
+														@click="removeQuery(query._id)"
+													>
 														<LucideIcon class="size-4" name="X" :stroke-width="2" />
 													</Button>
 												</TooltipTrigger>
@@ -206,7 +217,7 @@ function cancel() {
 											</Tooltip>
 										</TooltipProvider>
 									</CardHeader>
-									<CardFooter class="flex-col items-start gap-1.5 text-sm">
+									<CardFooter class="flex-col items-start gap-1.5 border-t bg-muted/20 text-sm">
 										<div class="line-clamp-1 flex gap-2 font-medium">
 											{{ query.type }}
 										</div>
@@ -215,10 +226,10 @@ function cancel() {
 								</Card>
 							</CarouselItem>
 							<CarouselItem class="basis-auto">
-								<Card class="flex h-full w-[350px] flex-col border-dashed">
+								<Card class="flex h-full w-[350px] flex-col rounded-sm border-2 border-dashed">
 									<CardHeader>
 										<CardDescription>{{ t("VisualizationForm.actions.addQuery") }}</CardDescription>
-										<CardTitle class="text-2xl font-semibold">—</CardTitle>
+										<CardTitle class="text-2xl font-black tracking-normal">—</CardTitle>
 									</CardHeader>
 									<CardFooter class="mt-auto">
 										<Button type="button" variant="ghost" @click="openDialog">

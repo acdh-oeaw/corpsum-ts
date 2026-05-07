@@ -32,7 +32,7 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 </script>
 
 <template>
-	<MainContent class="mx-auto w-full max-w-5xl">
+	<MainContent class="w-full min-w-0">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
@@ -63,9 +63,13 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 						:key="visualization._id"
 						class="basis-auto"
 					>
-						<Card class="flex h-full w-[350px] flex-col">
-							<CardHeader>
-								<CardTitle>{{ visualization.name }}</CardTitle>
+						<Card
+							class="flex h-full w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
+						>
+							<CardHeader class="border-b border-primary bg-primary text-primary-foreground">
+								<CardTitle class="text-2xl font-black tracking-normal">
+									{{ visualization.name }}
+								</CardTitle>
 							</CardHeader>
 							<CardContent class="flex-1">
 								<p>
@@ -79,7 +83,7 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 									{{ visualization.visualizations.length }}
 								</p>
 							</CardContent>
-							<CardFooter class="px-6 pb-6">
+							<CardFooter class="mt-auto border-t bg-muted/20 p-3">
 								<TooltipProvider :delay-duration="150">
 									<div
 										class="flex w-full flex-nowrap items-center gap-1 rounded-md border bg-muted/40 p-1"

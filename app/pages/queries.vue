@@ -39,7 +39,7 @@ async function deleteQuery(query: QueryListItem) {
 </script>
 
 <template>
-	<MainContent class="mx-auto w-full max-w-5xl">
+	<MainContent class="w-full min-w-0">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
