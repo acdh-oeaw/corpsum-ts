@@ -1,6 +1,5 @@
-import { type InferRawDocType, Schema, type Types } from "mongoose";
+import { Schema, type Types } from "mongoose";
 
-// eslint-disable-next-line import-x/no-unresolved
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
@@ -18,13 +17,21 @@ const schemaDefinition = {
 	facettingValues: { type: Schema.Types.Mixed, required: true },
 } as const;
 
-export type QueryDocument = InferRawDocType<typeof schemaDefinition> & {
+export interface QueryDocument {
 	_id: Types.ObjectId;
+	name: string;
+	owner: Array<Types.ObjectId>;
+	noske: Types.ObjectId;
+	corpus: string;
+	subCorpus?: string;
+	type: "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
+	userInput: string;
+	facettingValues: unknown;
 	createdAt?: Date;
 	updatedAt?: Date;
-};
+}
 
-export const QueryModel = defineMongooseModel({
+export const QueryModel = defineMongooseModel<QueryDocument>({
 	name: "queries",
 	schema: schemaDefinition,
 	options: { timestamps: true },

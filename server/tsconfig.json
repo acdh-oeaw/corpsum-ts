@@ -1,4 +1,30 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"extends": ["../.nuxt/tsconfig.server.json", "@acdh-oeaw/tsconfig"]
+	"extends": ["../.nuxt/tsconfig.server.json", "@acdh-oeaw/tsconfig"],
+	"include": [
+		"../.nuxt/types/nitro-nuxt.d.ts",
+		"../.nuxt/types/nitro.d.ts",
+		"../.nuxt/types/nitro-imports.d.ts",
+		"../.nuxt/types/schema.d.ts",
+		"../.nuxt/types/runtime-config.d.ts",
+		"../app/config/**/*.ts",
+		"../app/types/**/*.d.ts",
+		"../server/**/*.d.ts",
+		"../server/**/*.ts",
+		"../shared/**/*.d.ts",
+		"../types/**/*.d.ts"
+	],
+	"exclude": [
+		"../app/components/**",
+		"../app/composables/**",
+		"../app/layouts/**",
+		"../app/middleware/**",
+		"../app/pages/**",
+		"../app/plugins/**",
+		"../app/stores/**",
+		"../app/utils/**",
+		"../e2e/**",
+		"../node_modules/**",
+		"../.output/**"
+	]
 }

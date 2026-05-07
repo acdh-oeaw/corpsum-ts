@@ -41,7 +41,7 @@ export function assertObjectId(id: string | undefined, label = "id"): string {
 }
 
 export function canReadNoske(user: AuthenticatedUser, noske: ResolvedNoskeDocument): boolean {
-	return Boolean(noske.public) || canMutateNoske(user, noske);
+	return (noske.public satisfies boolean) || canMutateNoske(user, noske);
 }
 
 export function canMutateNoske(user: AuthenticatedUser, noske: ResolvedNoskeDocument): boolean {
@@ -76,11 +76,11 @@ export function serializeNoskeDocument(
 ) {
 	return {
 		_id: record._id.toString(),
-		name: String(record.name),
-		public: Boolean(record.public),
-		base: String(record.base),
+		name: record.name satisfies string,
+		public: record.public satisfies boolean,
+		base: record.base satisfies string,
 		version: record.version === "bonito" ? "bonito" : "openapi",
-		host: String(record.host),
+		host: record.host satisfies string,
 		authentication: record.authentication === "basic" ? "basic" : "none",
 		createdAt: record.createdAt ? record.createdAt.toISOString() : null,
 		updatedAt: record.updatedAt ? record.updatedAt.toISOString() : null,

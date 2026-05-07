@@ -22,7 +22,13 @@ export default defineNuxtConfig({
 		dataValue: "ui-color-scheme",
 	},
 
-	components: [{ extensions: [".vue"], path: "@/components", pathPrefix: false }],
+	components: [
+		{
+			extensions: [".vue"],
+			path: "@/components",
+			pathPrefix: false,
+		},
+	],
 
 	css: [
 		"tailwindcss/tailwind.css",
@@ -91,7 +97,6 @@ export default defineNuxtConfig({
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
 		"@nuxtjs/tailwindcss",
-		"shadcn-nuxt",
 		"nuxt-mongoose",
 		"@pinia/nuxt",
 		"pinia-plugin-persistedstate/nuxt",
@@ -112,11 +117,6 @@ export default defineNuxtConfig({
 		cookieOptions: {
 			sameSite: "strict",
 		},
-	},
-
-	shadcn: {
-		prefix: "",
-		componentDir: "./app/components/ui",
 	},
 
 	nitro: {

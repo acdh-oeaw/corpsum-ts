@@ -30,7 +30,7 @@ useHead({
 			{ href: "/icon.svg", rel: "icon", type: "image/svg+xml", sizes: "any" },
 			{ href: "/apple-icon.png", rel: "apple-touch-icon" },
 			{ href: "/manifest.webmanifest", rel: "manifest" },
-			{ href: inter, rel: "preload", as: "font", type: "font/woff2", crossorigin: true },
+			{ href: inter, rel: "preload", as: "font", type: "font/woff2", crossorigin: "" },
 			...(i18nHead.value.link ?? []),
 		];
 	}),

@@ -42,7 +42,7 @@ function toVisualizationType(value: unknown): VisualizationType {
 function toResponse(record: VisualizationDocument): VisualizationResponse {
 	return {
 		_id: record._id.toString(),
-		name: String(record.name),
+		name: record.name satisfies string,
 		queries: record.queries.map((queryId) => queryId.toString()),
 		visualizations: record.visualizations.map((value) => toVisualizationType(value)),
 		settings: [...record.settings],
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event): Promise<VisualizationResponse |
 		return;
 	}
 
-	if (String(user.accounttype) !== "admin") {
+	if ((user.accounttype satisfies string) !== "admin") {
 		const ownedCount = await QueryModel.countDocuments({
 			_id: { $in: visualization.queries },
 			owner: user._id,

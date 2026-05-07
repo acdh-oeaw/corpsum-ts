@@ -5,7 +5,7 @@ const algorithm = "aes-256-gcm";
 
 function getCredentialSecret(): string {
 	const config = useRuntimeConfig();
-	const secret = String(config.credentialSecret || config.authSecret || "");
+	const secret = (config.credentialSecret || config.authSecret || "") satisfies string;
 
 	if (secret.length < 32) {
 		throw createError({

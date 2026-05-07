@@ -45,7 +45,7 @@ function isVisualizationType(value: unknown): value is VisualizationType {
 function toResponse(record: VisualizationDocument): VisualizationResponse {
 	return {
 		_id: record._id.toString(),
-		name: String(record.name),
+		name: record.name satisfies string,
 		queries: record.queries.map((queryId) => queryId.toString()),
 		visualizations: record.visualizations.map((value) =>
 			isVisualizationType(value) ? value : "data-display-keyword-in-context",
@@ -106,7 +106,7 @@ export default defineEventHandler(async (event): Promise<VisualizationResponse |
 		return;
 	}
 
-	if (String(user.accounttype) !== "admin") {
+	if ((user.accounttype satisfies string) !== "admin") {
 		const ownedCount = await QueryModel.countDocuments({
 			_id: { $in: queries },
 			owner: user._id,

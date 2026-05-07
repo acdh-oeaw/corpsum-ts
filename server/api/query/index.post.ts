@@ -1,6 +1,6 @@
 import { defineEventHandler, type H3Event, readBody } from "h3";
 
-import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
+import { QueryModel } from "~/server/models/queries.schema";
 import { requireReadableNoske } from "~/server/utils/noske";
 import { requireUser } from "~/server/utils/user";
 
@@ -86,7 +86,7 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 	const query = await QueryModel.create({
 		name,
 		owner: [user._id],
-		noske: noskeinstance._id as QueryDocument["noske"],
+		noske: noskeinstance._id,
 		corpus,
 		subCorpus,
 		type,
@@ -94,5 +94,5 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 		facettingValues,
 	});
 
-	return toResponse(query);
+	return toResponse(query as unknown as QueryRecord);
 });

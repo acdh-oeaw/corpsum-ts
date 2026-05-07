@@ -2,8 +2,7 @@ import { defineEventHandler, getRouterParam, readBody } from "h3";
 import mongoose from "mongoose";
 
 import { type NoskeDocumentSlim, NoskeModel } from "~/server/models/noskeinstances.schema";
-import { UserModel } from "~/server/models/users.schema";
-import { requireAuth } from "~/server/utils/auth";
+import { requireUser } from "~/server/utils/user";
 
 interface Owner {
 	_id: string;
@@ -46,17 +45,11 @@ function isNoskeAuth(value: unknown): value is NoskePayload["authentication"] {
 }
 
 export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument | undefined> => {
-	const { username } = await requireAuth(event);
+	const user = await requireUser(event);
 	const id = getRouterParam(event, "id");
 
 	if (!id || !mongoose.isValidObjectId(id)) {
 		setResponseStatus(event, 400, "invalid id");
-		return;
-	}
-
-	const user = await UserModel.findOne({ username });
-	if (!user) {
-		setResponseStatus(event, 500, "authentication error");
 		return;
 	}
 
@@ -69,8 +62,8 @@ export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument 
 		return;
 	}
 
-	const ownsInstance = noskeinstance.owner._id.toString() === user._id.toString();
-	if (!ownsInstance && String(user.accounttype) !== "admin") {
+	const ownsInstance = (noskeinstance.owner._id satisfies string) === user._id.toString();
+	if (!ownsInstance && user.accounttype !== "admin") {
 		setResponseStatus(event, 403, "forbidden");
 		return;
 	}
@@ -149,15 +142,15 @@ export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument 
 
 	return {
 		_id: idValue,
-		name: String(noskeinstance.name),
-		public: Boolean(noskeinstance.public),
-		base: String(noskeinstance.base),
+		name: noskeinstance.name satisfies string,
+		public: noskeinstance.public satisfies boolean,
+		base: noskeinstance.base satisfies string,
 		version,
-		host: String(noskeinstance.host),
+		host: noskeinstance.host satisfies string,
 		authentication,
 		owner: {
-			_id: owner._id.toString(),
-			username: String(owner.username),
+			_id: owner._id satisfies string,
+			username: owner.username satisfies string,
 		},
 	};
 });

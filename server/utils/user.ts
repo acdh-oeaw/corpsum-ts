@@ -19,9 +19,9 @@ export async function requireUser(event: H3Event): Promise<AuthenticatedUser> {
 		});
 	}
 
-	return user as unknown as AuthenticatedUser;
+	return user;
 }
 
 export function isAdmin(user: UserDocument): boolean {
-	return String(user.accounttype) === "admin";
+	return (user.accounttype satisfies string) === "admin";
 }

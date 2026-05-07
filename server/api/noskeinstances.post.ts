@@ -1,8 +1,7 @@
 import { defineEventHandler, readBody } from "h3";
 
 import { type NoskeDocumentSlim, NoskeModel } from "~/server/models/noskeinstances.schema";
-import { UserModel } from "~/server/models/users.schema";
-import { requireAuth } from "~/server/utils/auth";
+import { requireUser } from "~/server/utils/user";
 
 interface Owner {
 	_id: string;
@@ -41,13 +40,7 @@ function isNoskeAuth(value: unknown): value is NoskePayload["authentication"] {
 }
 
 export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument | undefined> => {
-	const { username } = await requireAuth(event);
-
-	const user = await UserModel.findOne({ username });
-	if (!user) {
-		setResponseStatus(event, 500, "authentication error");
-		return;
-	}
+	const user = await requireUser(event);
 
 	const payload = (await readBody(event)) as unknown;
 	if (!isRecord(payload)) {
@@ -88,18 +81,18 @@ export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument 
 
 	const owner: Owner = {
 		_id: user._id.toString(),
-		username: String(user.username),
+		username: user.username,
 	};
 
-	const id = noskeinstance._id.toString();
+	const id = (noskeinstance as { _id: { toString: () => string } })._id.toString();
 
 	return {
 		_id: id,
-		name: String(noskeinstance.name),
-		public: Boolean(noskeinstance.public),
-		base: String(noskeinstance.base),
+		name: noskeinstance.name satisfies string,
+		public: noskeinstance.public satisfies boolean,
+		base: noskeinstance.base satisfies string,
 		version: payload.version,
-		host: String(noskeinstance.host),
+		host: noskeinstance.host satisfies string,
 		authentication: payload.authentication,
 		owner: {
 			_id: owner._id,

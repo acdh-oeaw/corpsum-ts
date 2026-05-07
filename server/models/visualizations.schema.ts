@@ -1,6 +1,5 @@
 import { type HydratedDocument, Schema, type Types } from "mongoose";
 
-// eslint-disable-next-line import-x/no-unresolved
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 export interface VisualizationSchema {
@@ -38,7 +37,7 @@ export type VisualizationDocument = HydratedDocument<VisualizationSchema> & {
 	updatedAt?: Date;
 };
 
-export const VisualizationModel = defineMongooseModel({
+export const VisualizationModel = defineMongooseModel<VisualizationSchema>({
 	name: "visualizations",
 	schema: schemaDefinition,
 	options: { timestamps: true },

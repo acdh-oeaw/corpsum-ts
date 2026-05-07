@@ -2,8 +2,7 @@ import { defineEventHandler, getRouterParam } from "h3";
 import mongoose from "mongoose";
 
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
-import { UserModel } from "~/server/models/users.schema";
-import { requireAuth } from "~/server/utils/auth";
+import { requireUser } from "~/server/utils/user";
 
 export interface QueryResponse {
 	_id: string;
@@ -81,17 +80,11 @@ function toResponse(query: QueryRecord): QueryResponse {
 }
 
 export default defineEventHandler(async (event): Promise<QueryResponse | undefined> => {
-	const { username } = await requireAuth(event);
+	const user = await requireUser(event);
 	const id = getRouterParam(event, "id");
 
 	if (!id || !mongoose.isValidObjectId(id)) {
 		setResponseStatus(event, 400, "invalid id");
-		return;
-	}
-
-	const user = await UserModel.findOne({ username });
-	if (!user) {
-		setResponseStatus(event, 500, "authentication error");
 		return;
 	}
 
@@ -103,10 +96,10 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 		return;
 	}
 
-	const owners = query.owner as NonNullable<QueryRecord["owner"]>;
+	const owners = query.owner;
 	const ownerIds = owners.map((owner) => toOwnerId(owner));
 	const isOwner = ownerIds.some((ownerId) => ownerId === user._id.toString());
-	if (!isOwner && String(user.accounttype) !== "admin") {
+	if (!isOwner && user.accounttype !== "admin") {
 		setResponseStatus(event, 403, "forbidden");
 		return;
 	}
