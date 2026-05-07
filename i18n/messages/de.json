@@ -172,6 +172,7 @@
 	"Actions": {
 		"cancel": "Abbrechen",
 		"create": "Erstellen",
+		"credentials": "Zugangsdaten",
 		"delete": "Löschen",
 		"edit": "Bearbeiten",
 		"newInstance": "Neue Instanz",
@@ -286,6 +287,27 @@
 	},
 	"NoskeInstancesPage": {
 		"title": "NoSketch-Instanzen"
+	},
+	"CredentialsPage": {
+		"title": "NoSketch-Zugangsdaten",
+		"labels": {
+			"username": "Benutzername",
+			"password": "Passwort"
+		},
+		"messages": {
+			"required": "Benutzername und Passwort sind erforderlich.",
+			"saved": "Zugangsdaten gespeichert.",
+			"deleted": "Zugangsdaten gelöscht.",
+			"saveFailed": "Zugangsdaten konnten nicht gespeichert werden.",
+			"deleteFailed": "Zugangsdaten konnten nicht gelöscht werden."
+		},
+		"placeholders": {
+			"keepExistingPassword": "Neues Passwort eingeben, um das gespeicherte zu ersetzen"
+		},
+		"status": {
+			"configured": "Konfiguriert",
+			"missing": "Fehlt"
+		}
 	},
 	"Common": {
 		"no": "Nein",
