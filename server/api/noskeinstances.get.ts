@@ -1,10 +1,7 @@
 import { defineEventHandler } from "h3";
 
 import { type NoskeDocument, NoskeModel } from "~/server/models/noskeinstances.schema";
-import {
-	type SerializedNoskeDocument,
-	serializeNoskeDocument,
-} from "~/server/utils/noske";
+import { type SerializedNoskeDocument, serializeNoskeDocument } from "~/server/utils/noske";
 import { requireUser } from "~/server/utils/user";
 
 export default defineEventHandler(
