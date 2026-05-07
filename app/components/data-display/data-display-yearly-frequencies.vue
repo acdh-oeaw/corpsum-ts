@@ -296,6 +296,13 @@ const intervalseries = computed(() =>
 					},
 				}"
 			/>
+			<Chart
+				chart-type="column"
+				class="h-96"
+				:series="intervalseries"
+				:title="`${intervalseries.length} ${t('queries')}`"
+				:y-axis="t('sources')"
+			></Chart>
 		</CardContent>
 
 		<Collapsible v-model:open="expand">
