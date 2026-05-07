@@ -131,8 +131,11 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 			setResponseStatus(event, 400, "invalid noske");
 			return;
 		}
-		const noskeinstance = await requireReadableNoske(payload.noske, user as unknown as AuthenticatedUser);
-		updates.noske = noskeinstance._id as QueryDocument["noske"];
+		const noskeinstance = await requireReadableNoske(
+			payload.noske,
+			user as unknown as AuthenticatedUser,
+		);
+		updates.noske = noskeinstance._id;
 	}
 	if (Object.prototype.hasOwnProperty.call(payload, "corpus")) {
 		if (typeof payload.corpus !== "string") {
