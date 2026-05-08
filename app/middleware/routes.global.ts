@@ -1,4 +1,8 @@
 export default defineNuxtRouteMiddleware(async (to) => {
+	if (import.meta.server) {
+		return;
+	}
+
 	const auth = useAuth();
 	const localePath = useLocalePath();
 	const { locale } = useI18n();
