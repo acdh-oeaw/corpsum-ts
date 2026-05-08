@@ -36,9 +36,11 @@ const props = withDefaults(
 		title?: string;
 		xAxis?: string;
 		yAxis?: string;
+		orientation?: "horizontal" | "vertical";
 	}>(),
 	{
 		chartType: "column",
+		orientation: "vertical",
 	},
 );
 const chartConfig = computed(() =>
@@ -280,6 +282,10 @@ const triggers = computed(() => ({
 		return div.innerHTML;
 	},
 }));
+
+const minTicks = computed(() => {
+	return Math.min(15, chartData.value?.length ?? 0);
+});
 </script>
 
 <template>
@@ -290,18 +296,20 @@ const triggers = computed(() => ({
 				<VisAxis
 					:grid-line="false"
 					:label="xAxis"
-					:num-ticks="15"
+					:num-ticks="minTicks"
 					:tick-format="tickFormat"
 					:tick-text-hide-overlapping="true"
-					type="x"
+					:tick-values="minTicks <= 3 ? chartData?.map((_, idx) => idx) : undefined"
+					:type="orientation === 'vertical' ? 'x' : 'y'"
 				></VisAxis>
-				<VisAxis :label="yAxis" type="y"></VisAxis>
+				<VisAxis :label="yAxis" :type="orientation === 'vertical' ? 'y' : 'x'"></VisAxis>
 				<VisGroupedBar
 					v-if="chartType === 'column'"
 					:bar-padding="0.25"
 					:color="color"
 					:events="barEvents"
 					:group-padding="0.2"
+					:orientation="orientation"
 					:rounded-corners="3"
 					:x="(_d: Data[], idx: number) => idx"
 					:y="yAccessors"

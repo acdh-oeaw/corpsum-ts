@@ -113,6 +113,26 @@ const expand = ref(false);
 						],
 					}"
 				/>
+				<Chart
+					chart-type="column"
+					class="h-96"
+					orientation="horizontal"
+					:series="[
+						{
+							color: query.color,
+							name: `${query.type}: ${query.userInput} (${query.corpus}${
+								query.subCorpus ? ` / ${query.subCorpus})` : ')'
+							}`,
+							data:
+								wordFormFrequencies[index]?.map(({ relative, absolute, word }) => [
+									word,
+									mode === 'relative' ? relative : absolute,
+								]) ?? [],
+						},
+					]"
+					:title="`${query.userInput}`"
+					:y-axis="t('sources')"
+				></Chart>
 			</div>
 		</CardContent>
 
