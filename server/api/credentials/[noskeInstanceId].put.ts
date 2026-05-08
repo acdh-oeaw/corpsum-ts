@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
 		});
 	}
 
-	const credentials = user.credentials ?? [];
+	const credentials = user.credentials;
 	const existing = credentials.find(
 		(credential) => credential.noskeinstance.toString() === noske._id.toString(),
 	);
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
 
 	return {
 		noskeinstance: noske._id.toString(),
-		noskeName: String(noske.name),
+		noskeName: noske.name,
 		username: nextCredential.username,
 	};
 });

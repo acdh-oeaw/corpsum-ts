@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 		});
 	}
 
-	const matches = bcrypt.compareSync(password, String(user.password));
+	const matches = bcrypt.compareSync(password, user.password);
 
 	if (!matches) {
 		throw createError({
@@ -35,11 +35,11 @@ export default defineEventHandler(async (event) => {
 		});
 	}
 
-	await setAuth(event, String(user.username));
+	await setAuth(event, user.username);
 
 	return {
 		loggedIn: true,
-		user: String(user.username),
+		user: user.username,
 		expires: Date.now() + parseInt(jwtExpiration),
 	};
 });

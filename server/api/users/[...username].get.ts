@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 			username: user.username,
 			email: user.email,
 			accounttype: user.accounttype,
-			credentials: user.credentials?.map((cred) => ({
+			credentials: user.credentials.map((cred) => ({
 				noskeinstance: cred.noskeinstance,
 				username: cred.username,
 			})),
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
 				username: user.username,
 				email: user.email,
 				accounttype: user.accounttype,
-				credentials: user.credentials?.map((cred) => ({
+				credentials: user.credentials.map((cred) => ({
 					noskeinstance: cred.noskeinstance,
 					username: cred.username,
 				})),

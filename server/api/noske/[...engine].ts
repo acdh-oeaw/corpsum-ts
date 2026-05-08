@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 	const body = method === "GET" ? undefined : await readBody(event);
 
 	if (noske.authentication === "basic") {
-		const credentials = user.credentials?.find(
+		const credentials = user.credentials.find(
 			(credential) => credential.noskeinstance.toString() === noske._id.toString(),
 		);
 		if (!credentials) {
@@ -28,8 +28,8 @@ export default defineEventHandler(async (event) => {
 				statusMessage: "No credentials configured for this NoSketch instance",
 			});
 		}
-		const password = decryptCredentialPassword(String(credentials.password));
-		authheader = `Basic ${btoa(`${String(credentials.username)}:${password}`)}`;
+		const password = decryptCredentialPassword(credentials.password);
+		authheader = `Basic ${btoa(`${credentials.username}:${password}`)}`;
 	}
 
 	const targetPath = targetSegments.length > 0 ? `/${targetSegments.join("/")}` : "/";
