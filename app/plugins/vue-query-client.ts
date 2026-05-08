@@ -21,9 +21,10 @@ export default defineNuxtPlugin((nuxt) => {
 			},
 		},
 		queryCache: new QueryCache({
-			async onError(error) {
-				const message = await getErrorMessage(error);
-				log.error(message);
+			onError(error) {
+				void getErrorMessage(error).then((message) => {
+					log.error(message);
+				});
 			},
 		}),
 	});
