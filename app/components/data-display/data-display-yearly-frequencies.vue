@@ -246,6 +246,13 @@ const intervalseries = computed(() =>
 					},
 				}"
 			/>
+			<Chart
+				chart-type="line"
+				class="h-96"
+				:series="series"
+				:title="`${series.length} ${t('queries')}`"
+				:y-axis="t('sources')"
+			></Chart>
 
 			<CardHeader class="px-0">
 				<CardTitle>{{ `${t("yearlyFrequenciesPer")}${interval} years` }}</CardTitle>

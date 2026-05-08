@@ -6,6 +6,10 @@ import {
 	VisAxis,
 	VisGroupedBar,
 	VisGroupedBarSelectors,
+	VisLine,
+	VisLineSelectors,
+	VisScatter,
+	VisScatterSelectors,
 	VisTooltip,
 	VisXYContainer,
 } from "@unovis/vue";
@@ -19,7 +23,11 @@ import {
 } from "./ui/chart";
 
 type IntervalFrequencyPoint = [yearRange: string, value: number];
-type SeriesData = ChartConfig[string] & { data: Array<IntervalFrequencyPoint>; name?: string };
+type FrequencyPoint = [year: number, value: number];
+type SeriesData = ChartConfig[string] & {
+	data: Array<IntervalFrequencyPoint | FrequencyPoint>;
+	name?: string;
+};
 
 const props = withDefaults(
 	defineProps<{
@@ -42,7 +50,7 @@ const chartConfig = computed(() =>
 	),
 );
 
-function zip(arrays: Array<Array<IntervalFrequencyPoint>>) {
+function zip(arrays: Array<Array<IntervalFrequencyPoint | FrequencyPoint>>) {
 	return arrays[0]?.map((_, i) => {
 		return arrays.map((array) => {
 			return array[i];
@@ -76,7 +84,70 @@ const titleAnnotation = computed(() => {
 const containerRef = ref<HTMLElement | null>(null);
 let lastSvg: SVGSVGElement | null = null;
 
-function applyHoverOpacity(activeIdx: number | null) {
+const snapPoint = ref<{ x: number; y: number; dataIdx: number; seriesIdx: number } | null>(null);
+
+function svgPointToScreen(ptEl: SVGGraphicsElement): { x: number; y: number } | null {
+	const ctm = ptEl.getScreenCTM();
+	if (!ctm) return null;
+	const origin = ptEl.ownerSVGElement!.createSVGPoint();
+	const screen = origin.matrixTransform(ctm);
+	return { x: screen.x, y: screen.y };
+}
+
+function updateSnapPoint(event: MouseEvent, seriesIdx: number) {
+	const svg = lastSvg ?? containerRef.value?.querySelector<SVGSVGElement>("svg");
+	if (!svg || !containerRef.value) {
+		snapPoint.value = null;
+		return;
+	}
+	const groups = svg.querySelectorAll(`.${VisScatterSelectors.pointGroup}`);
+	const activeGroup = groups[seriesIdx];
+	if (!activeGroup) {
+		snapPoint.value = null;
+		return;
+	}
+	const points = Array.from(activeGroup.querySelectorAll(`.${VisScatterSelectors.point}`));
+	let closestEl: SVGGraphicsElement | null = null;
+	let closestDataIdx = -1;
+	let minDist = Infinity;
+	points.forEach((pt) => {
+		const screen = svgPointToScreen(pt as SVGGraphicsElement);
+		if (!screen) return;
+		const dist = Math.abs(screen.x - event.clientX);
+		// pointIndex is the original data array index, unaffected by viewport filtering
+		const dataIdx =
+			(pt as unknown as { __data__?: { _point?: { pointIndex?: number } } }).__data__?._point
+				?.pointIndex ?? -1;
+		if (dist < minDist && dataIdx >= 0) {
+			minDist = dist;
+			closestEl = pt as SVGGraphicsElement;
+			closestDataIdx = dataIdx;
+		}
+	});
+	if (!closestEl || closestDataIdx < 0) {
+		snapPoint.value = null;
+		return;
+	}
+	const screen = svgPointToScreen(closestEl);
+	if (!screen) {
+		snapPoint.value = null;
+		return;
+	}
+	const containerRect = containerRef.value.getBoundingClientRect();
+	snapPoint.value = {
+		x: screen.x - containerRect.left,
+		y: screen.y - containerRect.top,
+		dataIdx: closestDataIdx,
+		seriesIdx,
+	};
+}
+
+const snapTooltipPayload = computed(() => {
+	if (!snapPoint.value) return [] as Array<[string, number]>;
+	return (chartData.value?.[snapPoint.value.dataIdx] ?? []) as Array<[string, number]>;
+});
+
+function applyBarHoverOpacity(activeIdx: number | null) {
 	const svg = lastSvg ?? containerRef.value?.querySelector<SVGSVGElement>("svg");
 	if (!svg) return;
 	for (const group of svg.querySelectorAll(`.${VisGroupedBarSelectors.barGroup}`)) {
@@ -88,21 +159,112 @@ function applyHoverOpacity(activeIdx: number | null) {
 	}
 }
 
+function applyLineHoverOpacity(activeIdx: number | null) {
+	const svg = lastSvg ?? containerRef.value?.querySelector<SVGSVGElement>("svg");
+	if (!svg) return;
+	Array.from(svg.querySelectorAll(`.${VisLineSelectors.line}`)).forEach((el, i) => {
+		const svgEl = el as SVGElement;
+		svgEl.style.transition = "opacity 50ms ease";
+		svgEl.style.opacity = activeIdx === null || activeIdx === i ? "1" : "0.3";
+	});
+	Array.from(svg.querySelectorAll(`.${VisScatterSelectors.pointGroup}`)).forEach((el, i) => {
+		const svgEl = el as SVGElement;
+		svgEl.style.transition = "opacity 50ms ease";
+		svgEl.style.opacity = activeIdx === null || activeIdx === i ? "1" : "0.3";
+	});
+}
+
+function applySeriesHoverOpacity(activeIdx: number | null) {
+	if (props.chartType === "column") applyBarHoverOpacity(activeIdx);
+	else applyLineHoverOpacity(activeIdx);
+}
+
 const barEvents = {
 	[VisGroupedBarSelectors.bar]: {
 		mouseover: (_d: Array<Data>, event: MouseEvent) => {
 			const target = event.target as SVGElement;
 			lastSvg = target.closest("svg");
 			const idx = Array.from(target.parentElement?.children ?? []).indexOf(target);
-			applyHoverOpacity(idx);
+			applyBarHoverOpacity(idx);
 		},
 		mouseleave: () => {
-			applyHoverOpacity(null);
+			applyBarHoverOpacity(null);
 		},
 	},
 	[VisGroupedBarSelectors.root]: {
 		mouseleave: () => {
-			applyHoverOpacity(null);
+			applyBarHoverOpacity(null);
+		},
+	},
+};
+const lineEvents = {
+	[VisLineSelectors.line]: {
+		mouseover: (_d: Array<Data>, event: MouseEvent) => {
+			const target = event.target as SVGElement;
+			lastSvg = target.closest("svg");
+			const lineEl = target.closest(`.${VisLineSelectors.line}`);
+			const idx = lineEl
+				? Array.from(lastSvg!.querySelectorAll(`.${VisLineSelectors.line}`)).indexOf(lineEl)
+				: -1;
+			if (idx >= 0) applyLineHoverOpacity(idx);
+		},
+		mousemove: (_d: Array<Data>, event: MouseEvent) => {
+			const target = event.target as SVGElement;
+			lastSvg = target.closest("svg") ?? lastSvg;
+			const lineEl = target.closest(`.${VisLineSelectors.line}`);
+			const idx = lineEl
+				? Array.from(lastSvg!.querySelectorAll(`.${VisLineSelectors.line}`)).indexOf(lineEl)
+				: -1;
+			if (idx >= 0) updateSnapPoint(event, idx);
+		},
+		mouseleave: () => {
+			applyLineHoverOpacity(null);
+			snapPoint.value = null;
+		},
+	},
+	[VisLineSelectors.root]: {
+		mouseleave: () => {
+			applyLineHoverOpacity(null);
+			snapPoint.value = null;
+		},
+	},
+};
+const scatterEvents = {
+	[VisScatterSelectors.point]: {
+		mouseover: (_d: Array<Data>, event: MouseEvent) => {
+			const target = event.target as SVGElement;
+			lastSvg = target.closest("svg");
+			const groupEl = target.closest(`.${VisScatterSelectors.pointGroup}`);
+			const seriesIdx = groupEl
+				? Array.from(lastSvg!.querySelectorAll(`.${VisScatterSelectors.pointGroup}`)).indexOf(
+						groupEl,
+					)
+				: -1;
+			if (seriesIdx < 0) return;
+			applyLineHoverOpacity(seriesIdx);
+			const datum = _d as unknown as { _point?: { pointIndex?: number } };
+			const dataIdx = datum._point?.pointIndex ?? -1;
+			const pointEl = target.closest(`.${VisScatterSelectors.point}`) as SVGGraphicsElement | null;
+			if (dataIdx < 0 || !pointEl || !lastSvg || !containerRef.value) return;
+			const screen = svgPointToScreen(pointEl);
+			if (!screen) return;
+			const containerRect = containerRef.value.getBoundingClientRect();
+			snapPoint.value = {
+				x: screen.x - containerRect.left,
+				y: screen.y - containerRect.top,
+				dataIdx,
+				seriesIdx,
+			};
+		},
+		mouseleave: () => {
+			applyLineHoverOpacity(null);
+			snapPoint.value = null;
+		},
+	},
+	[VisScatterSelectors.root]: {
+		mouseleave: () => {
+			applyLineHoverOpacity(null);
+			snapPoint.value = null;
 		},
 	},
 };
@@ -121,7 +283,7 @@ const triggers = computed(() => ({
 </script>
 
 <template>
-	<div ref="containerRef">
+	<div ref="containerRef" class="relative">
 		<ChartContainer class="min-h-[200px] w-full" :config="chartConfig">
 			<VisXYContainer :data="chartData">
 				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
@@ -135,6 +297,7 @@ const triggers = computed(() => ({
 				></VisAxis>
 				<VisAxis :label="yAxis" type="y"></VisAxis>
 				<VisGroupedBar
+					v-if="chartType === 'column'"
 					:bar-padding="0.25"
 					:color="color"
 					:events="barEvents"
@@ -143,12 +306,56 @@ const triggers = computed(() => ({
 					:x="(_d: Data[], idx: number) => idx"
 					:y="yAccessors"
 				/>
-				<VisTooltip :triggers="triggers"></VisTooltip>
+				<template v-if="chartType === 'line'">
+					<VisLine
+						:color="color"
+						:events="lineEvents"
+						:x="(_d: Data[], idx: number) => idx"
+						:y="yAccessors"
+					/>
+					<VisScatter
+						:color="color"
+						:events="scatterEvents"
+						:size="8"
+						:x="(_d: Data[], idx: number) => idx"
+						:y="yAccessors"
+					/>
+				</template>
+
+				<VisTooltip :follow-cursor="false" :triggers="triggers"></VisTooltip>
 			</VisXYContainer>
 			<ChartLegendContent
-				@series-hover="applyHoverOpacity"
-				@series-leave="applyHoverOpacity(null)"
+				@series-hover="applySeriesHoverOpacity"
+				@series-leave="applySeriesHoverOpacity(null)"
 			/>
 		</ChartContainer>
+
+		<template v-if="chartType === 'line' && snapPoint">
+			<div
+				class="pointer-events-none absolute rounded-full"
+				:style="{
+					left: `${snapPoint.x}px`,
+					top: `${snapPoint.y}px`,
+					transform: 'translate(-50%, -50%)',
+					width: '22px',
+					height: '22px',
+					border: `2px solid ${color[snapPoint.seriesIdx]}`,
+					opacity: '0.55',
+					transition: 'left 60ms ease, top 60ms ease',
+					zIndex: 10,
+				}"
+			/>
+			<div
+				class="pointer-events-none absolute z-20"
+				:style="{
+					left: `${snapPoint.x}px`,
+					top: `${snapPoint.y}px`,
+					transform: 'translate(-50%, calc(-100% - 14px))',
+					transition: 'left 60ms ease, top 60ms ease',
+				}"
+			>
+				<ChartTooltipContent :config="chartConfig" :payload="snapTooltipPayload" />
+			</div>
+		</template>
 	</div>
 </template>
