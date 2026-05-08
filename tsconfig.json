@@ -7,7 +7,9 @@
 		"app/**/*.ts",
 		"app/**/*.vue",
 		"eslint.config.js",
+		"i18n/**/*.ts",
 		"nuxt.config.ts",
+		"playwright.config.ts",
 		"tailwind.config.ts",
 		"types/**/*.d.ts"
 	],

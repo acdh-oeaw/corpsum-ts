@@ -1,5 +1,6 @@
 import { createUrl } from "@acdh-oeaw/lib";
 
+import { defaultLocale } from "@/config/i18n.config";
 import { expect, test } from "~/e2e/lib/test";
 
 if (process.env.NUXT_PUBLIC_MATOMO_BASE_URL && process.env.NUXT_PUBLIC_MATOMO_ID) {
