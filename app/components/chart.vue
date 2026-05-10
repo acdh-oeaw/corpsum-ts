@@ -330,8 +330,12 @@ const minTicks = computed(() => {
 					:label="xAxis"
 					:num-ticks="minTicks"
 					:tick-format="tickFormat"
-					:tick-text-hide-overlapping="true"
-					:tick-values="minTicks <= 3 ? chartData?.map((_, idx) => idx) : undefined"
+					:tick-text-hide-overlapping="orientation === 'vertical'"
+					:tick-values="
+						minTicks <= 3 || orientation === 'horizontal'
+							? chartData?.map((_, idx) => idx)
+							: undefined
+					"
 					:type="orientation === 'vertical' ? 'x' : 'y'"
 				></VisAxis>
 				<VisAxis :label="yAxis" :type="orientation === 'vertical' ? 'y' : 'x'"></VisAxis>
