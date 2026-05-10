@@ -304,7 +304,7 @@ const intervalseries = computed(() =>
 				}"
 			/>
 			<Chart
-				chart-type="column"
+				chart-type="bar"
 				class="h-96"
 				:series="intervalseries"
 				:title="`${intervalseries.length} ${t('queries')}`"

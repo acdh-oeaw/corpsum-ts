@@ -33,7 +33,8 @@ const series = computed(() => {
 			}`,
 			data: categories.value
 				.map((category) => props.sourceDistributions[i]?.find(({ media }) => category === media))
-				.map((entry) => (entry ? entry[props.mode] : 0)),
+				.map((entry) => (entry ? entry[props.mode] : 0))
+				.map((entry, idx) => [categories.value[idx], entry] as [string, number]),
 		};
 	});
 	return allSeries;
@@ -78,4 +79,12 @@ const highChartsOptions = computed(() => ({
 
 <template>
 	<HighCharts v-if="smoothReloadForBarChart" :options="highChartsOptions" style="height: 1200px" />
+	<Chart
+		chart-type="stack"
+		:height="1200"
+		orientation="horizontal"
+		:series="series"
+		:title="`${series.length} ${t('queries')}`"
+		:y-axis="t('sources')"
+	></Chart>
 </template>

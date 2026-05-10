@@ -114,7 +114,7 @@ const expand = ref(false);
 					}"
 				/>
 				<Chart
-					chart-type="column"
+					chart-type="bar"
 					class="h-96"
 					orientation="horizontal"
 					:series="[

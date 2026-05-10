@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GroupedBar } from "@unovis/ts";
+import { GroupedBar, StackedBar } from "@unovis/ts";
 import type { LengthUnit } from "@unovis/ts/types/misc";
 import {
 	VisAnnotations,
@@ -10,6 +10,8 @@ import {
 	VisLineSelectors,
 	VisScatter,
 	VisScatterSelectors,
+	VisStackedBar,
+	VisStackedBarSelectors,
 	VisTooltip,
 	VisXYContainer,
 } from "@unovis/vue";
@@ -32,14 +34,15 @@ type SeriesData = ChartConfig[string] & {
 const props = withDefaults(
 	defineProps<{
 		series: Array<SeriesData>;
-		chartType?: "column" | "line";
+		chartType?: "bar" | "line" | "stack";
 		title?: string;
 		xAxis?: string;
 		yAxis?: string;
 		orientation?: "horizontal" | "vertical";
+		height?: number;
 	}>(),
 	{
-		chartType: "column",
+		chartType: "bar",
 		orientation: "vertical",
 	},
 );
@@ -177,7 +180,7 @@ function applyLineHoverOpacity(activeIdx: number | null) {
 }
 
 function applySeriesHoverOpacity(activeIdx: number | null) {
-	if (props.chartType === "column") applyBarHoverOpacity(activeIdx);
+	if (props.chartType === "bar") applyBarHoverOpacity(activeIdx);
 	else applyLineHoverOpacity(activeIdx);
 }
 
@@ -194,6 +197,22 @@ const barEvents = {
 		},
 	},
 	[VisGroupedBarSelectors.root]: {
+		mouseleave: () => {
+			applyBarHoverOpacity(null);
+		},
+	},
+	[VisStackedBarSelectors.bar]: {
+		mouseover: (_d: Array<Data>, event: MouseEvent) => {
+			const target = event.target as SVGElement;
+			lastSvg = target.closest("svg");
+			const idx = Array.from(target.parentElement?.children ?? []).indexOf(target);
+			applyBarHoverOpacity(idx);
+		},
+		mouseleave: () => {
+			applyBarHoverOpacity(null);
+		},
+	},
+	[VisStackedBarSelectors.root]: {
 		mouseleave: () => {
 			applyBarHoverOpacity(null);
 		},
@@ -281,6 +300,15 @@ const triggers = computed(() => ({
 		render(vnode, div);
 		return div.innerHTML;
 	},
+	[StackedBar.selectors.bar]: (_data: unknown, x: number) => {
+		const data = (
+			_data && typeof _data === "object" && "data" in _data ? _data.data : _data
+		) as Array<[string, number]>;
+		const vnode = h(ChartTooltipContent, { payload: data, config: chartConfig.value, x });
+		const div = document.createElement("div");
+		render(vnode, div);
+		return div.innerHTML;
+	},
 }));
 
 const minTicks = computed(() => {
@@ -290,8 +318,12 @@ const minTicks = computed(() => {
 
 <template>
 	<div ref="containerRef" class="relative">
-		<ChartContainer class="min-h-[200px] w-full" :config="chartConfig">
-			<VisXYContainer :data="chartData">
+		<ChartContainer
+			v-if="series.length > 0"
+			class="aspect-auto h-fit min-h-[200px] w-full"
+			:config="chartConfig"
+		>
+			<VisXYContainer :data="chartData" :height="height">
 				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
 				<VisAxis
 					:grid-line="false"
@@ -304,7 +336,18 @@ const minTicks = computed(() => {
 				></VisAxis>
 				<VisAxis :label="yAxis" :type="orientation === 'vertical' ? 'y' : 'x'"></VisAxis>
 				<VisGroupedBar
-					v-if="chartType === 'column'"
+					v-if="chartType === 'bar'"
+					:bar-padding="0.25"
+					:color="color"
+					:events="barEvents"
+					:group-padding="0.2"
+					:orientation="orientation"
+					:rounded-corners="3"
+					:x="(_d: Data[], idx: number) => idx"
+					:y="yAccessors"
+				/>
+				<VisStackedBar
+					v-if="chartType === 'stack'"
 					:bar-padding="0.25"
 					:color="color"
 					:events="barEvents"
