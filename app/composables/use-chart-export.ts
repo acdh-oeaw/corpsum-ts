@@ -42,6 +42,32 @@ function getEffectiveBackground(containerRef: Ref<HTMLElement | null>): string {
 	return "white";
 }
 
+function triggerDownload(blob: Blob, filename: string) {
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = filename;
+	a.click();
+	URL.revokeObjectURL(url);
+}
+
+function buildExportClone(
+	containerRef: Ref<HTMLElement | null>,
+): { clone: SVGSVGElement; width: number; height: number } | null {
+	const svg = containerRef.value?.querySelector<SVGSVGElement>("svg:not(.lucide)");
+	if (!svg) return null;
+
+	const { width, height } = svg.getBoundingClientRect();
+
+	const clone = svg.cloneNode(true) as SVGSVGElement;
+	inlineSvgStyles(svg, clone);
+
+	clone.setAttribute("width", String(width));
+	clone.setAttribute("height", String(height));
+
+	return { clone, width, height };
+}
+
 export function useChartExport(
 	containerRef: Ref<HTMLElement | null>,
 	chartData: Ref<Array<Array<DataPoint>> | undefined>,
@@ -58,38 +84,55 @@ export function useChartExport(
 			return [xVal, ...yVals].join(",");
 		});
 		const csv = [headers.join(","), ...rows].join("\n");
-		const blob = new Blob([csv], { type: "text/csv" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = `${title.value ?? "chart"}.csv`;
-		a.click();
-		URL.revokeObjectURL(url);
+		triggerDownload(new Blob([csv], { type: "text/csv" }), `${title.value ?? "chart"}.csv`);
 	}
 
 	function exportSvg() {
-		const svg = containerRef.value?.querySelector<SVGSVGElement>("svg:not(.lucide)");
-		if (!svg) return;
+		const prepared = buildExportClone(containerRef);
+		if (!prepared) return;
 
-		const clone = svg.cloneNode(true) as SVGSVGElement;
-		inlineSvgStyles(svg, clone);
-
-		const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-		bg.setAttribute("width", clone.getAttribute("width") ?? "100%");
-		bg.setAttribute("height", clone.getAttribute("height") ?? "100%");
-		bg.setAttribute("fill", getEffectiveBackground(containerRef));
-		clone.insertBefore(bg, clone.firstChild);
-
-		const serializer = new XMLSerializer();
-		const svgStr = serializer.serializeToString(clone);
-		const blob = new Blob([svgStr], { type: "image/svg+xml" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = `${title.value ?? "chart"}.svg`;
-		a.click();
-		URL.revokeObjectURL(url);
+		const svgStr = new XMLSerializer().serializeToString(prepared.clone);
+		triggerDownload(new Blob([svgStr], { type: "image/svg+xml" }), `${title.value ?? "chart"}.svg`);
 	}
 
-	return { exportCsv, exportSvg };
+	async function exportRaster(format: "png" | "jpeg") {
+		const prepared = buildExportClone(containerRef);
+		if (!prepared) return;
+
+		const { clone, width, height } = prepared;
+		const svgStr = new XMLSerializer().serializeToString(clone);
+		const svgUrl = URL.createObjectURL(new Blob([svgStr], { type: "image/svg+xml" }));
+
+		const img = new Image();
+		await new Promise<void>((resolve, reject) => {
+			img.onload = () => { resolve(); };
+			img.onerror = reject;
+			img.src = svgUrl;
+		});
+		URL.revokeObjectURL(svgUrl);
+
+		const scale = window.devicePixelRatio || 1;
+		const canvas = document.createElement("canvas");
+		canvas.width = width * scale;
+		canvas.height = height * scale;
+		const ctx = canvas.getContext("2d")!;
+		ctx.scale(scale, scale);
+		if (format === "jpeg") {
+			ctx.fillStyle = getEffectiveBackground(containerRef);
+			ctx.fillRect(0, 0, width, height);
+		}
+		ctx.drawImage(img, 0, 0, width, height);
+
+		const ext = format === "png" ? "png" : "jpg";
+		canvas.toBlob(
+			(blob) => {if (blob) triggerDownload(blob, `${title.value ?? "chart"}.${ext}`)},
+			`image/${format}`,
+			format === "jpeg" ? 0.92 : undefined,
+		);
+	}
+
+	const exportPng = () => { void exportRaster("png"); };
+	const exportJpg = () => { void exportRaster("jpeg"); };
+
+	return { exportCsv, exportSvg, exportPng, exportJpg };
 }

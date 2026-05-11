@@ -30,6 +30,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
@@ -324,8 +325,10 @@ const minTicks = computed(() => {
 	return Math.min(15, chartData.value?.length ?? 0);
 });
 
+const t = useTranslations();
+
 const seriesLabels = computed(() => props.series.map((s) => String(s.label ?? s.name ?? "")));
-const { exportCsv, exportSvg } = useChartExport(
+const { exportCsv, exportSvg, exportPng, exportJpg } = useChartExport(
 	containerRef,
 	chartData,
 	seriesLabels,
@@ -353,8 +356,19 @@ const attributes = {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
-				<DropdownMenuItem @click="exportCsv">Export CSV</DropdownMenuItem>
-				<DropdownMenuItem @click="exportSvg">Export SVG</DropdownMenuItem>
+				<DropdownMenuItem class="text-xs" @click="exportCsv">{{
+					t("Chart.export.csv")
+				}}</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem class="text-xs" @click="exportSvg">{{
+					t("Chart.export.svg")
+				}}</DropdownMenuItem>
+				<DropdownMenuItem class="text-xs" @click="exportPng">{{
+					t("Chart.export.png")
+				}}</DropdownMenuItem>
+				<DropdownMenuItem class="text-xs" @click="exportJpg">{{
+					t("Chart.export.jpg")
+				}}</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 		<ChartContainer
@@ -379,7 +393,7 @@ const attributes = {
 					:type="orientation === 'vertical' ? 'x' : 'y'"
 				></VisAxis>
 				<VisAxis
-					:attributes="orientation !== 'vertical' ? attributes : null"
+					:attributes="orientation !== 'vertical' ? attributes : []"
 					:full-size="false"
 					:label="yAxis"
 					:type="orientation === 'vertical' ? 'y' : 'x'"

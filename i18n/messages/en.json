@@ -287,6 +287,14 @@
 	"NoskeInstancesPage": {
 		"title": "NoSketch instances"
 	},
+	"Chart": {
+		"export": {
+			"csv": "Export CSV",
+			"jpg": "Export JPG",
+			"png": "Export PNG",
+			"svg": "Export SVG"
+		}
+	},
 	"Common": {
 		"no": "No",
 		"yes": "Yes",
