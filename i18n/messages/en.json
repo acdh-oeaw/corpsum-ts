@@ -288,6 +288,7 @@
 		"title": "NoSketch instances"
 	},
 	"Chart": {
+		"fullscreen": "Open fullscreen",
 		"export": {
 			"csv": "Export CSV",
 			"jpg": "Export JPG",

@@ -288,6 +288,7 @@
 		"title": "NoSketch-Instanzen"
 	},
 	"Chart": {
+		"fullscreen": "Vollbild öffnen",
 		"export": {
 			"csv": "CSV exportieren",
 			"jpg": "JPG exportieren",

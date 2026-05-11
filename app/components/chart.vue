@@ -16,7 +16,7 @@ import {
 	VisTooltip,
 	VisXYContainer,
 } from "@unovis/vue";
-import { MoreHorizontal } from "lucide-vue-next";
+import { Maximize2, MoreHorizontal } from "lucide-vue-next";
 import { h, render } from "vue";
 
 import { Button } from "./ui/button";
@@ -326,6 +326,11 @@ const minTicks = computed(() => {
 });
 
 const t = useTranslations();
+const key = ref(0);
+
+function openFullscreen() {
+	containerRef.value?.querySelector("div")?.requestFullscreen();
+}
 
 const seriesLabels = computed(() => props.series.map((s) => String(s.label ?? s.name ?? "")));
 const { exportCsv, exportSvg, exportPng, exportJpg } = useChartExport(
@@ -341,10 +346,14 @@ const attributes = {
 		"clip-path": "inset(50px 0 0 0)",
 	},
 };
+
+function updateKey() {
+	if (!document.fullscreenElement) key.value++;
+}
 </script>
 
 <template>
-	<div ref="containerRef" class="relative">
+	<div :key="key" ref="containerRef" class="relative">
 		<DropdownMenu v-if="series.length > 0">
 			<DropdownMenuTrigger as-child>
 				<Button
@@ -356,6 +365,11 @@ const attributes = {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
+				<DropdownMenuItem class="text-xs" @click="openFullscreen">
+					<Maximize2 class="size-3" />
+					{{ t("Chart.fullscreen") }}
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
 				<DropdownMenuItem class="text-xs" @click="exportCsv">{{
 					t("Chart.export.csv")
 				}}</DropdownMenuItem>
@@ -373,8 +387,9 @@ const attributes = {
 		</DropdownMenu>
 		<ChartContainer
 			v-if="series.length > 0"
-			class="aspect-auto h-fit min-h-[200px] w-full"
+			class="aspect-auto h-fit min-h-[200px] w-full [&:fullscreen]:bg-white"
 			:config="chartConfig"
+			@fullscreenchange="updateKey"
 		>
 			<VisXYContainer :data="chartData" :height="height" :padding="{ top: 50 }">
 				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
