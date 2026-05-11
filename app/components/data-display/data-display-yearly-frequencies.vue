@@ -232,20 +232,6 @@ const intervalseries = computed(() =>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
 			</div>
-			<HighCharts
-				:options="{
-					series,
-					title: {
-						text: `${series.length} ${t('queries')}`,
-						align: 'center',
-					},
-					yAxis: {
-						title: {
-							text: t('sources'),
-						},
-					},
-				}"
-			/>
 			<Chart
 				chart-type="line"
 				class="h-96"
@@ -283,26 +269,6 @@ const intervalseries = computed(() =>
 				</div>
 			</div>
 
-			<HighCharts
-				:options="{
-					chart: {
-						type: 'column',
-					},
-					series: intervalseries,
-					title: {
-						text: `${intervalseries.length} ${t('queries')}`,
-						align: 'center',
-					},
-					yAxis: {
-						title: {
-							text: t('sources'),
-						},
-					},
-					xAxis: {
-						categories: intervalseries[0]?.data?.map(([year]) => year),
-					},
-				}"
-			/>
 			<Chart
 				chart-type="bar"
 				class="h-96"

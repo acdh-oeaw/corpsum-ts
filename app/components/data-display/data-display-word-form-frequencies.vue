@@ -84,35 +84,6 @@ const expand = ref(false);
 			</ToggleGroup>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="wordFormFrequenciesLoading[index]" :query="query" />
-				<HighCharts
-					:options="{
-						chart: {
-							type: 'bar',
-						},
-						title: {
-							text: query.userInput,
-						},
-						xAxis: {
-							categories: wordFormFrequencies[index]?.map(({ word }) => word),
-						},
-						yAxis: {
-							title: {
-								text: t('sources'),
-							},
-						},
-						series: [
-							{
-								color: query.color,
-								name: `${query.type}: ${query.userInput} (${query.corpus}${
-									query.subCorpus ? ` / ${query.subCorpus})` : ')'
-								}`,
-								data: wordFormFrequencies[index]?.map(({ relative, absolute }) =>
-									mode === 'relative' ? relative : absolute,
-								),
-							},
-						],
-					}"
-				/>
 				<Chart
 					chart-type="bar"
 					class="h-96"

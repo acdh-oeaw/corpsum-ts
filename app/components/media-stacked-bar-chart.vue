@@ -49,36 +49,9 @@ watch(
 		}, 1);
 	},
 );
-
-const highChartsOptions = computed(() => ({
-	chart: {
-		type: "bar",
-	},
-	title: {
-		text: `${series.value.length} ${t("queries")}`,
-		align: "center",
-	},
-	xAxis: {
-		categories: categories.value,
-	},
-	plotOptions: props.stack
-		? {
-				series: {
-					stacking: "normal",
-				},
-			}
-		: {},
-	yAxis: {
-		title: {
-			text: t("sources"),
-		},
-	},
-	series: series.value,
-}));
 </script>
 
 <template>
-	<HighCharts v-if="smoothReloadForBarChart" :options="highChartsOptions" style="height: 1200px" />
 	<Chart
 		chart-type="stack"
 		:height="1200"
