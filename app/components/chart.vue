@@ -4,6 +4,7 @@ import type { LengthUnit } from "@unovis/ts/types/misc";
 import {
 	VisAnnotations,
 	VisAxis,
+	VisAxisSelectors,
 	VisGroupedBar,
 	VisGroupedBarSelectors,
 	VisLine,
@@ -15,14 +16,22 @@ import {
 	VisTooltip,
 	VisXYContainer,
 } from "@unovis/vue";
+import { MoreHorizontal } from "lucide-vue-next";
 import { h, render } from "vue";
 
+import { Button } from "./ui/button";
 import {
 	type ChartConfig,
 	ChartContainer,
 	ChartLegendContent,
 	ChartTooltipContent,
 } from "./ui/chart";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 type IntervalFrequencyPoint = [yearRange: string, value: number];
 type FrequencyPoint = [year: number, value: number];
@@ -314,18 +323,49 @@ const triggers = computed(() => ({
 const minTicks = computed(() => {
 	return Math.min(15, chartData.value?.length ?? 0);
 });
+
+const seriesLabels = computed(() => props.series.map((s) => String(s.label ?? s.name ?? "")));
+const { exportCsv, exportSvg } = useChartExport(
+	containerRef,
+	chartData,
+	seriesLabels,
+	toRef(() => props.title),
+	toRef(() => props.xAxis),
+);
+
+const attributes = {
+	[VisAxisSelectors.grid]: {
+		"clip-path": "inset(50px 0 0 0)",
+	},
+};
 </script>
 
 <template>
 	<div ref="containerRef" class="relative">
+		<DropdownMenu v-if="series.length > 0">
+			<DropdownMenuTrigger as-child>
+				<Button
+					class="absolute right-1 top-1 z-10 size-7 text-muted-foreground"
+					size="icon"
+					variant="ghost"
+				>
+					<MoreHorizontal class="size-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end">
+				<DropdownMenuItem @click="exportCsv">Export CSV</DropdownMenuItem>
+				<DropdownMenuItem @click="exportSvg">Export SVG</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
 		<ChartContainer
 			v-if="series.length > 0"
 			class="aspect-auto h-fit min-h-[200px] w-full"
 			:config="chartConfig"
 		>
-			<VisXYContainer :data="chartData" :height="height">
+			<VisXYContainer :data="chartData" :height="height" :padding="{ top: 50 }">
 				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
 				<VisAxis
+					:full-size="false"
 					:grid-line="false"
 					:label="xAxis"
 					:num-ticks="minTicks"
@@ -338,7 +378,12 @@ const minTicks = computed(() => {
 					"
 					:type="orientation === 'vertical' ? 'x' : 'y'"
 				></VisAxis>
-				<VisAxis :label="yAxis" :type="orientation === 'vertical' ? 'y' : 'x'"></VisAxis>
+				<VisAxis
+					:attributes="orientation !== 'vertical' ? attributes : null"
+					:full-size="false"
+					:label="yAxis"
+					:type="orientation === 'vertical' ? 'y' : 'x'"
+				></VisAxis>
 				<VisGroupedBar
 					v-if="chartType === 'bar'"
 					:bar-padding="0.25"
