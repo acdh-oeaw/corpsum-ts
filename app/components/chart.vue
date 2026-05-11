@@ -333,7 +333,7 @@ function openFullscreen() {
 }
 
 const seriesLabels = computed(() => props.series.map((s) => String(s.label ?? s.name ?? "")));
-const { exportCsv, exportSvg, exportPng, exportJpg } = useChartExport(
+const { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg } = useChartExport(
 	containerRef,
 	chartData,
 	seriesLabels,
@@ -372,6 +372,9 @@ function updateKey() {
 				<DropdownMenuSeparator />
 				<DropdownMenuItem class="text-xs" @click="exportCsv">{{
 					t("Chart.export.csv")
+				}}</DropdownMenuItem>
+				<DropdownMenuItem class="text-xs" @click="exportXlsx">{{
+					t("Chart.export.xlsx")
 				}}</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem class="text-xs" @click="exportSvg">{{

@@ -75,16 +75,56 @@ export function useChartExport(
 	title: Ref<string | undefined>,
 	xAxisLabel: Ref<string | undefined>,
 ) {
-	function exportCsv() {
-		if (!chartData.value) return;
-		const headers = [xAxisLabel.value ?? "x", ...seriesLabels.value];
+	function buildExportTableData() {
+		if (!chartData.value) return null;
+
+		const headers = [xAxisLabel.value ?? "Categories", ...seriesLabels.value];
 		const rows = chartData.value.map((row) => {
 			const xVal = row[0]?.[0] ?? "";
 			const yVals = row.map((cell) => cell?.[1] ?? "");
-			return [xVal, ...yVals].join(",");
+			return [xVal, ...yVals];
 		});
-		const csv = [headers.join(","), ...rows].join("\n");
+
+		return { headers, rows };
+	}
+
+	function exportCsv() {
+		const tableData = buildExportTableData();
+		if (!tableData) return;
+
+		const rows = tableData.rows.map((row) => row.join(","));
+		const csv = [tableData.headers.join(","), ...rows].join("\n");
 		triggerDownload(new Blob([csv], { type: "text/csv" }), `${title.value ?? "chart"}.csv`);
+	}
+
+	async function exportXlsx() {
+		const tableData = buildExportTableData();
+		if (!tableData) return;
+
+		const response = await fetch("/api/export-table-xlsx", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				fileName: title.value ?? "chart",
+				sheetName: title.value ?? "Chart",
+				headers: tableData.headers,
+				rows: tableData.rows,
+			}),
+		});
+
+		if (!response.ok) {
+			throw new Error(`XLSX export failed with status ${String(response.status)}`);
+		}
+
+		const blob = new Blob(
+			[await response.arrayBuffer()],
+			{
+				type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			},
+		);
+		triggerDownload(blob, `${title.value ?? "chart"}.xlsx`);
 	}
 
 	function exportSvg() {
@@ -134,5 +174,5 @@ export function useChartExport(
 	const exportPng = () => { void exportRaster("png"); };
 	const exportJpg = () => { void exportRaster("jpeg"); };
 
-	return { exportCsv, exportSvg, exportPng, exportJpg };
+	return { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg };
 }

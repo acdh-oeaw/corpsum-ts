@@ -293,7 +293,8 @@
 			"csv": "CSV exportieren",
 			"jpg": "JPG exportieren",
 			"png": "PNG exportieren",
-			"svg": "SVG exportieren"
+			"svg": "SVG exportieren",
+			"xlsx": "XLSX exportieren"
 		}
 	},
 	"Common": {
