@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // noinspection ES6PreferShortImport
 import { defaultLocale, files } from "./app/config/i18n.config";
+import oxlintGlobals from "./modules/oxlint-globals";
 
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
 const databaseUrl = process.env.DATABASE_URL!;
@@ -40,13 +41,6 @@ export default defineNuxtConfig({
 
 	devtools: {
 		enabled: true,
-	},
-
-	eslint: {
-		config: {
-			autoInit: false,
-			standalone: true,
-		},
 	},
 
 	experimental: {
@@ -93,7 +87,7 @@ export default defineNuxtConfig({
 	},
 
 	modules: [
-		"@nuxt/eslint",
+		oxlintGlobals,
 		"@nuxt/fonts",
 		"@nuxt/hints",
 		"@nuxt/icon",

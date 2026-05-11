@@ -1,14 +1,19 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"extends": ["./.nuxt/tsconfig.json", "@acdh-oeaw/tsconfig"],
+	"compilerOptions": {
+		"ignoreDeprecations": "6.0"
+	},
 	"include": [
 		".nuxt/**/*.d.ts",
 		"app/**/*.d.ts",
 		"app/**/*.ts",
 		"app/**/*.vue",
-		"eslint.config.js",
 		"i18n/**/*.ts",
+		"modules/**/*.ts",
 		"nuxt.config.ts",
+		"oxfmt.config.ts",
+		"oxlint.config.ts",
 		"playwright.config.ts",
 		"tailwind.config.ts",
 		"types/**/*.d.ts"

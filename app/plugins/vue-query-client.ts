@@ -54,9 +54,7 @@ async function getErrorMessage(error: Error): Promise<string> {
 				const data = (await error.response.json()) as { message: string };
 
 				return data.message;
-			} catch {
-				/** */
-			}
+			} catch {}
 		}
 
 		return error.response.statusText;
