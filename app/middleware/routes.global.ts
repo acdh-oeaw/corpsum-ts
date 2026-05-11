@@ -1,3 +1,5 @@
+import { defaultLocale, isValidLocale } from "@/config/i18n.config";
+
 export default defineNuxtRouteMiddleware(async (to) => {
 	if (import.meta.server) {
 		return;
@@ -5,9 +7,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
 	const auth = useAuth();
 	const localePath = useLocalePath();
-	const { locale } = useI18n();
-	const loginPath = localePath("/login", locale.value);
+	const routeLocale = to.path.split("/")[1] ?? "";
+	const locale = isValidLocale(routeLocale) ? routeLocale : defaultLocale;
+	const loginPath = localePath("/login", locale);
+
 	if (!auth.isLoggedIn() && to.path !== loginPath) {
-		await navigateTo(loginPath);
+		return await navigateTo(loginPath);
 	}
 });
