@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 
 // noinspection ES6PreferShortImport
-import { defaultLocale, localesMap } from "./app/config/i18n.config";
+import { defaultLocale, files } from "./app/config/i18n.config";
 
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
 const databaseUrl = process.env.DATABASE_URL!;
@@ -70,7 +70,7 @@ export default defineNuxtConfig({
 	},
 
 	future: {
-		compatibilityVersion: 4,
+		compatibilityVersion: 5,
 	},
 
 	i18n: {
@@ -80,11 +80,12 @@ export default defineNuxtConfig({
 		detectBrowserLanguage: {
 			redirectOn: "root",
 		},
-		langDir: "../i18n/messages",
-		lazy: true,
-		locales: Object.values(localesMap),
+		experimental: {
+			typedOptionsAndMessages: "default",
+		},
+		langDir: "messages",
+		locales: files,
 		strategy: "prefix",
-		vueI18n: "../i18n/i18n.config.ts",
 	},
 
 	imports: {
@@ -93,6 +94,12 @@ export default defineNuxtConfig({
 
 	modules: [
 		"@nuxt/eslint",
+		"@nuxt/fonts",
+		"@nuxt/hints",
+		"@nuxt/icon",
+		"@nuxt/image",
+		"@nuxt/scripts",
+		"@nuxt/test-utils",
 		"@nuxtjs/color-mode",
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
@@ -107,10 +114,6 @@ export default defineNuxtConfig({
 		options: {},
 		modelsDir: "models",
 		devtools: false,
-	},
-
-	pinia: {
-		storesDirs: ["./app/stores/**"],
 	},
 
 	piniaPluginPersistedstate: {
@@ -166,5 +169,5 @@ export default defineNuxtConfig({
 		},
 	},
 
-	compatibilityDate: "2025-01-28",
+	compatibilityDate: "2026-01-01",
 });

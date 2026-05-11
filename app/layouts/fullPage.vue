@@ -10,7 +10,7 @@ const t = useTranslations();
 
 const router = useRouter();
 
-const i18nHead = useLocaleHead({ key: "id" });
+const i18nHead = useLocaleHead();
 
 useHead({
 	htmlAttrs: {
