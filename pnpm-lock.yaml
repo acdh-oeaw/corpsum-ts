@@ -92,7 +92,7 @@ importers:
         version: 2.0.4(@acdh-oeaw/eslint-config@2.0.1(@typescript-eslint/parser@8.4.0(eslint@9.10.0(jiti@1.21.6))(typescript@5.5.4))(eslint@9.10.0(jiti@1.21.6))(globals@15.9.0)(typescript@5.5.4))(eslint@9.10.0(jiti@1.21.6))
       '@acdh-oeaw/prettier-config':
         specifier: ^2.0.0
-        version: 2.0.0(prettier@3.3.3)
+        version: 2.0.0(prettier@3.5.3)
       '@acdh-oeaw/stylelint-config':
         specifier: ^2.0.3
         version: 2.0.4(postcss-html@1.7.0)(stylelint-order@6.0.4(stylelint@16.9.0(typescript@5.5.4)))(stylelint@16.9.0(typescript@5.5.4))
@@ -184,8 +184,8 @@ importers:
         specifier: ^12.0.2
         version: 12.1.5(postcss@8.4.45)
       prettier:
-        specifier: ^3.3.3
-        version: 3.3.3
+        specifier: ^3.5.3
+        version: 3.5.3
       sass:
         specifier: ^1.70.0
         version: 1.78.0
@@ -223,8 +223,8 @@ importers:
         specifier: ^2.0.29
         version: 2.1.6(typescript@5.5.4)
       vuetify:
-        specifier: ^3.5.1
-        version: 3.7.1(typescript@5.5.4)(vue@3.5.3(typescript@5.5.4))
+        specifier: ^3.8.0
+        version: 3.8.4(typescript@5.5.4)(vue@3.5.3(typescript@5.5.4))
 
 packages:
 
@@ -5140,6 +5140,11 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
+  prettier@3.5.3:
+    resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   pretty-bytes@6.1.1:
     resolution: {integrity: sha512-mQUvGU6aUFQ+rNvTIAcZuWGRT9a6f6Yrg9bHs4ImKF+HZCEK+plBvnAZYSIQztknZF2qnzNtr6F8s0+IuptdlQ==}
     engines: {node: ^14.13.1 || >=16.0.0}
@@ -6437,14 +6442,14 @@ packages:
       typescript:
         optional: true
 
-  vuetify@3.7.1:
-    resolution: {integrity: sha512-N1XlczbgeGt/O+JUk72QPrqcDaRIXUdptUciJqGyTvZ9cfMoSlEWs6TZO+dOOfXbKvmIMFMycYg4dgSHDpCPhg==}
+  vuetify@3.8.4:
+    resolution: {integrity: sha512-hfA1eqA6vhrF5LF8Yfk0uHdNUmh8Uckxn5wREiThO82HW/9Vfreh+IpxPgEtCsAhV33KW+NVamltQCu3HczRKw==}
     engines: {node: ^12.20 || >=14.13}
     peerDependencies:
       typescript: '>=4.7'
-      vite-plugin-vuetify: '>=1.0.0'
-      vue: ^3.3.0
-      webpack-plugin-vuetify: '>=2.0.0'
+      vite-plugin-vuetify: '>=2.1.0'
+      vue: ^3.5.0
+      webpack-plugin-vuetify: '>=3.1.0'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -6695,9 +6700,9 @@ snapshots:
 
   '@acdh-oeaw/lib@0.1.12': {}
 
-  '@acdh-oeaw/prettier-config@2.0.0(prettier@3.3.3)':
+  '@acdh-oeaw/prettier-config@2.0.0(prettier@3.5.3)':
     dependencies:
-      prettier: 3.3.3
+      prettier: 3.5.3
 
   '@acdh-oeaw/stylelint-config@2.0.4(postcss-html@1.7.0)(stylelint-order@6.0.4(stylelint@16.9.0(typescript@5.5.4)))(stylelint@16.9.0(typescript@5.5.4))':
     dependencies:
@@ -12586,6 +12591,8 @@ snapshots:
 
   prettier@3.3.3: {}
 
+  prettier@3.5.3: {}
+
   pretty-bytes@6.1.1: {}
 
   proc-log@3.0.0: {}
@@ -14142,7 +14149,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.5.4
 
-  vuetify@3.7.1(typescript@5.5.4)(vue@3.5.3(typescript@5.5.4)):
+  vuetify@3.8.4(typescript@5.5.4)(vue@3.5.3(typescript@5.5.4)):
     dependencies:
       vue: 3.5.3(typescript@5.5.4)
     optionalDependencies:

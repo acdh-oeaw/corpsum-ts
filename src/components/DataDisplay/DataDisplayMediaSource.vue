@@ -79,7 +79,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 
 		<VCardText>
 			<div class="flex items-center gap-2">
-				<VBtnToggle v-model="chartMode" density="compact">
+				<VBtnToggle v-model="chartMode" density="compact" mandatory>
 					<VBtn value="stack" variant="outlined">
 						<VIcon icon="mdi-chart-bar-stacked" />
 						<VTooltip activator="parent" location="top">stacked bar chart</VTooltip>
@@ -90,7 +90,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 					</VBtn>
 				</VBtnToggle>
 
-				<VBtnToggle v-model="mode" density="compact">
+				<VBtnToggle v-model="mode" density="compact" mandatory>
 					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>

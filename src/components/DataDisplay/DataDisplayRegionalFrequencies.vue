@@ -102,7 +102,7 @@ const expand = ref(false);
 
 		<VCardText class="py-0">
 			<div class="flex items-center gap-2">
-				<VBtnToggle v-model="chartMode" density="compact">
+				<VBtnToggle v-model="chartMode" density="compact" mandatory>
 					<VBtn value="combined" variant="outlined">
 						<VIcon icon="mdi-map" />
 						<VIcon class="ml-[-0.3rem]" icon="mdi-chart-pie-outline" />
@@ -115,7 +115,7 @@ const expand = ref(false);
 						<VTooltip activator="parent" location="top">seperated map charts</VTooltip>
 					</VBtn>
 				</VBtnToggle>
-				<VBtnToggle v-model="mode" density="compact">
+				<VBtnToggle v-model="mode" density="compact" mandatory>
 					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
 					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
 				</VBtnToggle>

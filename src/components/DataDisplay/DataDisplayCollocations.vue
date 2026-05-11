@@ -172,7 +172,7 @@ function pointFormatter() {
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<VBtnToggle v-model="mode" density="compact">
+			<VBtnToggle v-model="mode" density="compact" mandatory>
 				<VBtn value="coll_freq" variant="outlined">
 					{{ t("coll_freq") }}
 				</VBtn>

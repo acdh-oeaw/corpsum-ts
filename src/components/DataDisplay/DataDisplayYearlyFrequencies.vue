@@ -17,6 +17,8 @@ interface IyearlyFrequency {
 }
 
 const mode = ref("relative");
+const interval = ref(2);
+const reverse = ref(false);
 const expand = ref(false);
 const yearlyFrequencies: Ref<Array<Array<IyearlyFrequency>>> = ref([]);
 const yearlyFrequenciesLoading: Ref<Array<boolean>> = ref([]);
@@ -58,6 +60,16 @@ const q = computed(() =>
 								};
 							}) ?? [],
 					)[0] ?? [];
+				const years = Array.from({ length: 2024 - 1986 + 1 }, (_, i) => 1986 + i);
+				years.forEach((year) => {
+					if (yearlyFrequencies.value[index]?.filter((item) => item.year === year).length === 0) {
+						yearlyFrequencies.value[index].push({
+							year,
+							absolute: 0,
+							relative: 0,
+						});
+					}
+				});
 				yearlyFrequenciesLoading.value[index] = false;
 			},
 		};
@@ -66,8 +78,54 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const series = computed(() =>
-	queries.value
+const sumInIntervals = function (
+	numbers: Array<Array<number>>,
+	intervalSize: number,
+	reverse: boolean,
+) {
+	const results = [];
+	const fullIntervals = Math.floor(numbers.length / intervalSize);
+
+	if (reverse) {
+		for (let i = 0; i < fullIntervals; i++) {
+			let sum = 0;
+			let start, finish;
+			for (let j = 0; j < intervalSize; j++) {
+				if (j === 0) finish = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
+				if (j === intervalSize - 1)
+					start = numbers[numbers.length - 1 - (i * intervalSize + j)]![0];
+				sum += numbers[numbers.length - 1 - (i * intervalSize + j)]![1]!;
+			}
+			results.push([`${start}-${finish}`, sum / intervalSize]);
+		}
+		results.reverse();
+	} else {
+		for (let i = 0; i < fullIntervals; i++) {
+			let sum = 0;
+			let start, finish;
+			for (let j = 0; j < intervalSize; j++) {
+				if (j === 0) start = numbers[i * intervalSize + j]![0];
+				if (j === intervalSize - 1) finish = numbers[i * intervalSize + j]![0];
+				sum += numbers[i * intervalSize + j]![1]!;
+			}
+			results.push([`${start}-${finish}`, sum / intervalSize]);
+		}
+	}
+	return results;
+};
+
+const applySampleSize = function (numbers: Array<Array<number>>, sampleSize: number) {
+	const results = [...numbers];
+	// eslint-disable-next-line @typescript-eslint/prefer-for-of
+	for (let i = 0; i < results.length; i++) {
+		if (results[i] && Array.isArray(results[i]))
+			results[i]![1] = results[i]![1]! * (sampleSize / 100);
+	}
+	return results;
+};
+
+const series = computed(() => {
+	const q = queries.value
 		.filter((q, i) => yearlyFrequencies.value[i])
 		.map((query, index) => ({
 			name: `${query.type}: ${query.userInput} (${query.corpus}${
@@ -77,8 +135,34 @@ const series = computed(() =>
 				.sort((a, b) => b.year - a.year)
 				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
 			color: query.color,
-		})),
-);
+		}));
+	q.forEach((tq, i) => {
+		if (tq.data) q[i]!.data = applySampleSize(tq.data.reverse(), queries.value[i]!.SampleRatio);
+	});
+	return q;
+});
+
+const intervalseries = computed(() => {
+	const q = queries.value
+		.filter((q, i) => yearlyFrequencies.value[i])
+		.map((query, index) => ({
+			name: `${query.type}: ${query.userInput} (${query.corpus}${
+				query.subCorpus ? ` / ${query.subCorpus})` : ")"
+			}`,
+			data: (yearlyFrequencies.value[index] ?? [])
+				.sort((a, b) => b.year - a.year)
+				.map((point) => [point.year, mode.value === "relative" ? point.relative : point.absolute]),
+			color: query.color,
+		}));
+	q.forEach((tq, i) => {
+		if (tq.data) {
+			//@ts-expect-error used only for chart rendering
+			q[i]!.data = sumInIntervals(tq.data.reverse(), interval.value, reverse.value);
+			q[i]!.data = applySampleSize(tq.data, queries.value[i]!.SampleRatio);
+		}
+	});
+	return q;
+});
 </script>
 
 <template>
@@ -90,10 +174,12 @@ const series = computed(() =>
 		</VCardItem>
 
 		<VCardText class="py-0">
-			<VBtnToggle v-model="mode" density="compact">
-				<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
-				<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
-			</VBtnToggle>
+			<div class="mt-2 flex max-w-7xl">
+				<VBtnToggle v-model="mode" class="flex w-full" density="compact" mandatory>
+					<VBtn value="absolute" variant="outlined">{{ t("absolute") }}</VBtn>
+					<VBtn value="relative" variant="outlined">{{ t("relative") }}</VBtn>
+				</VBtnToggle>
+			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
 			</div>
@@ -108,6 +194,62 @@ const series = computed(() =>
 						title: {
 							text: t('sources'),
 						},
+					},
+				}"
+			></HighCharts>
+			<VCardItem :title="t('yearlyFrequenciesPer') + interval + ' years'">
+				<template #subtitle>
+					{{ t("yearlyFrequenciesDesc") }}
+				</template>
+			</VCardItem>
+			<div class="mt-2 flex">
+				<VSelect
+					v-model="interval"
+					class="ml-4 w-full flex-auto"
+					item-title="title"
+					item-value="value"
+					:items="[
+						{ title: '2 years', value: 2 },
+						{ title: '3 years', value: 3 },
+						{ title: '4 years', value: 4 },
+						{ title: '5 years', value: 5 },
+						{ title: '6 years', value: 6 },
+						{ title: '7 years', value: 7 },
+						{ title: '8 years', value: 8 },
+						{ title: '9 years', value: 9 },
+						{ title: '10 years', value: 10 },
+					]"
+					label="Interval"
+					style="flex-grow: 0"
+				></VSelect>
+				<VBtnToggle v-model="reverse" mandatory>
+					<VBtn :value="false">
+						<VIcon>mdi-clock-start</VIcon>
+						<VTooltip activator="parent" location="top">{{ t("reverse_start") }}</VTooltip>
+					</VBtn>
+					<VBtn :value="true">
+						<VIcon>mdi-clock-end</VIcon>
+						<VTooltip activator="parent" location="top">{{ t("reverse_end") }}</VTooltip>
+					</VBtn>
+				</VBtnToggle>
+			</div>
+			<HighCharts
+				:options="{
+					chart: {
+						type: 'column',
+					},
+					series: intervalseries,
+					title: {
+						text: `${intervalseries.length} ${t('queries')}`,
+						align: 'center',
+					},
+					yAxis: {
+						title: {
+							text: t('sources'),
+						},
+					},
+					xAxis: {
+						categories: intervalseries[0]?.data?.map(([year]) => year),
 					},
 				}"
 			></HighCharts>

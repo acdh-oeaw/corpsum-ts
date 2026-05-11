@@ -24,7 +24,7 @@
 		"sources": "Belege",
 		"ShowData": "Quelldaten anzeigen",
 		"HideData": "Quelldaten verstecken",
-		"Corpus": "Corpus",
+		"Corpus": "Korpus",
 		"SubCorpus": "Subkorpus",
 		"SelectSubCorpus": "Wählen Sie ein Subkorpus aus",
 		"NoData": "Keine Daten verfügbar.",
@@ -37,6 +37,7 @@
 		"SearchTerm": "Ihr Suchterm",
 		"SearchDimensions": "Ergebnistypen",
 		"yearlyFrequencies": "Zeitliche Verteilung (nach Jahren)",
+		"yearlyFrequenciesPer": "Zeitliche Verteilung ^pro ",
 		"yearlyFrequenciesDesc": "Zeigt absolute und relative (Treffer pro Millionen Token) Werte.",
 		"wordFormFrequencies": "Wortformen",
 		"wordFormFrequenciesDesc": "Zeigt absolute und relative (Treffer pro Millionen Token) Werte.",
@@ -68,7 +69,10 @@
 		"createSubcorpusConfirm2": "und einem Inhalt von",
 		"createSubcorpusConfirm3": "Dokumenten aus dem Korpus",
 		"corpusCreated": "Subkorpus erfolgreich erstellt!",
-		"cattr": "cattr"
+		"cattr": "cattr",
+		"correctionvalue": "Korrekturwert",
+		"reverse_start": "Beobachtungszeitraum von Beginn der Zeitreihe",
+		"reverse_end": "Beobachtungszeitraum vom Ende der Zeitreihe"
 	},
 	"DefaultLayout": {
 		"meta": {
