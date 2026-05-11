@@ -4,12 +4,12 @@
 		"commands": {
 			"oxlint": {
 				"glob": "**/*.{js,ts,vue}",
-				"run": "oxlint --fix {staged_files}",
+				"run": "pnpm exec oxlint --fix {staged_files}",
 				"stage_fixed": true
 			},
 			"stylelint": {
 				"glob": "**/*.{css,vue}",
-				"run": "stylelint --cache --fix {staged_files}",
+				"run": "pnpm exec stylelint --cache --fix {staged_files}",
 				"stage_fixed": true
 			},
 			"oxfmt": {
