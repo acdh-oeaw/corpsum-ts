@@ -1,5 +1,7 @@
 import { fileURLToPath } from "node:url";
 
+import tailwindcss from "@tailwindcss/vite";
+
 // noinspection ES6PreferShortImport
 import { defaultLocale, files } from "./app/config/i18n.config";
 
@@ -31,10 +33,8 @@ export default defineNuxtConfig({
 	],
 
 	css: [
-		"tailwindcss/tailwind.css",
 		"@fontsource-variable/inter/standard.css",
 		"@fontsource-variable/inter/standard-italic.css",
-		"@/styles/shadcn.css",
 		"@/styles/index.css",
 	],
 
@@ -103,7 +103,6 @@ export default defineNuxtConfig({
 		"@nuxtjs/color-mode",
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
-		"@nuxtjs/tailwindcss",
 		"nuxt-mongoose",
 		"@pinia/nuxt",
 		"pinia-plugin-persistedstate/nuxt",
@@ -129,12 +128,6 @@ export default defineNuxtConfig({
 		},
 		experimental: {
 			openAPI: true,
-		},
-	},
-
-	postcss: {
-		plugins: {
-			tailwindcss: {},
 		},
 	},
 
@@ -167,6 +160,13 @@ export default defineNuxtConfig({
 				},
 			},
 		},
+	},
+
+	vite: {
+		build: {
+			cssMinify: "lightningcss",
+		},
+		plugins: [tailwindcss()],
 	},
 
 	compatibilityDate: "2026-01-01",
