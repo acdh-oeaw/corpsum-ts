@@ -69,12 +69,14 @@ jobs:
           build-args: |
             "NUXT_PUBLIC_APP_BASE_URL=${{ vars.K8S_SECRET_NUXT_PUBLIC_APP_BASE_URL }}"
             "NUXT_PUBLIC_REDMINE_ID=${{ vars.NUXT_PUBLIC_REDMINE_ID }}"
+            "NUXT_PUBLIC_BOTS=${{ vars.NUXT_PUBLIC_BOTS }}"
+            "NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION=${{ vars.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION }}"
             "NUXT_PUBLIC_MATOMO_BASE_URL=${{ vars.K8S_SECRET_NUXT_PUBLIC_MATOMO_BASE_URL }}"
             "NUXT_PUBLIC_MATOMO_ID=${{ vars.NUXT_PUBLIC_MATOMO_ID }}"
-            "NUXT_PUBLIC_API_BASE_URL=${{ vars.K8S_SECRET_NUXT_PUBLIC_API_BASE_URL }}"
           secrets: |
             "DATABASE_URL=${{ secrets.K8S_SECRET_DATABASE_URL }}"
             "NUXT_AUTH_SECRET=${{ secrets.K8S_SECRET_NUXT_AUTH_SECRET }}"
+            "NUXT_CREDENTIAL_SECRET=${{ secrets.K8S_SECRET_NUXT_CREDENTIAL_SECRET }}"
             "NUXT_JWT_EXPIRATION=${{ secrets.K8S_SECRET_NUXT_JWT_EXPIRATION }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
