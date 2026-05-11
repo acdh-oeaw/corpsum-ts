@@ -23,7 +23,6 @@ ARG NUXT_PUBLIC_APP_BASE_URL
 ARG NUXT_PUBLIC_REDMINE_ID
 ARG NUXT_PUBLIC_MATOMO_BASE_URL
 ARG NUXT_PUBLIC_MATOMO_ID
-ARG NUXT_PUBLIC_API_BASE_URL
 
 FROM base AS dev
 ENV NODE_ENV development
@@ -42,9 +41,11 @@ ENV NODE_ENV=production
 # @see https://docs.docker.com/build/building/secrets/
 RUN --mount=type=secret,id=DATABASE_URL,uid=1000 \
     --mount=type=secret,id=NUXT_AUTH_SECRET,uid=1000 \
+    --mount=type=secret,id=NUXT_CREDENTIAL_SECRET,uid=1000 \
     --mount=type=secret,id=NUXT_JWT_EXPIRATION,uid=1000 \
   	DATABASE_URL=$(cat /run/secrets/DATABASE_URL) \
     NUXT_AUTH_SECRET=$(cat /run/secrets/NUXT_AUTH_SECRET) \
+    NUXT_CREDENTIAL_SECRET=$(cat /run/secrets/NUXT_CREDENTIAL_SECRET) \
     NUXT_JWT_EXPIRATION=$(cat /run/secrets/NUXT_JWT_EXPIRATION) \
     pnpm run build
 
