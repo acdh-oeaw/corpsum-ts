@@ -20,7 +20,7 @@
 		"lint:styles:fix": "stylelint \"./**/*.@(css|vue)\" --cache --fix --ignore-path ./.gitignore",
 		"postinstall": "nuxt prepare && pnpm run generate:noske-api",
 		"preinstall": "npx only-allow pnpm",
-		"prepare": "lefthook install",
+		"prepare": "is-in-ci || lefthook install",
 		"start": "nuxt preview --dotenv local.env",
 		"test": "exit 0",
 		"test:e2e": "playwright test",
