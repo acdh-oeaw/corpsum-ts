@@ -1,48 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, simple-import-sort/imports */
+/* eslint-disable simple-import-sort/imports */
 import Highcharts from "highcharts";
 import HighchartsVue from "highcharts-vue";
-import AccessibilityModule from "highcharts/modules/accessibility";
-import ExportingDataModule from "highcharts/modules/export-data";
-import ExportingModule from "highcharts/modules/exporting";
-import MapsModule from "highcharts/modules/map";
-import WordCloudModule from "highcharts/modules/wordcloud";
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-	const globalWithHighcharts = globalThis as typeof globalThis & {
-		_Highcharts?: typeof Highcharts;
-	};
-	globalWithHighcharts._Highcharts = Highcharts;
+	// Highcharts v12 module wrappers resolve from this global in some bundle modes.
+	(globalThis as typeof globalThis & { _Highcharts?: typeof Highcharts })._Highcharts = Highcharts;
 
-	const [MapsModule, ExportingModule, ExportingDataModule, AccessibilityModule, WordCloudModule] =
-		await Promise.all([
-			import("highcharts/modules/map.js"),
-			import("highcharts/modules/exporting.js"),
-			import("highcharts/modules/export-data.js"),
-			import("highcharts/modules/accessibility.js"),
-			import("highcharts/modules/wordcloud.js"),
-		]);
-
-	const resolveModule = (module: unknown) => {
-		if (typeof module === "function") return module;
-		if (typeof (module as { default?: unknown }).default === "function") {
-			return (module as { default: (h: typeof Highcharts) => void }).default;
+	const initModule = (module: { default?: unknown }) => {
+		if (typeof module.default === "function") {
+			(module.default as (highcharts: typeof Highcharts) => void)(Highcharts);
 		}
-		return null;
 	};
 
-	const mapsInit = resolveModule(MapsModule);
-	const exportingInit = resolveModule(ExportingModule);
-	const exportDataInit = resolveModule(ExportingDataModule);
-	const accessibilityInit = resolveModule(AccessibilityModule);
-	const wordCloudInit = resolveModule(WordCloudModule);
+	const mapModule = await import("highcharts/modules/map");
+	const exportingModule = await import("highcharts/modules/exporting");
+	const exportDataModule = await import("highcharts/modules/export-data");
+	const accessibilityModule = await import("highcharts/modules/accessibility");
+	const wordCloudModule = await import("highcharts/modules/wordcloud");
 
-	mapsInit?.(Highcharts);
-	exportingInit?.(Highcharts);
-	if ("Exporting" in Highcharts) {
-		exportDataInit?.(Highcharts);
-	}
-	accessibilityInit?.(Highcharts);
-	wordCloudInit?.(Highcharts);
+	initModule(mapModule);
+	initModule(exportingModule);
+	initModule(exportDataModule);
+	initModule(accessibilityModule);
+	initModule(wordCloudModule);
 
 	nuxtApp.vueApp.use(HighchartsVue, {
 		tagName: "HighCharts",
