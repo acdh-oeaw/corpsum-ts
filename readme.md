@@ -76,6 +76,16 @@ For Compose, `DATABASE_URL` should use the service hostname `corpsum-mongodb`, a
 `local.env.example`. If you want generated metadata to point at the Compose app instead of the
 direct Nuxt dev server, set `NUXT_PUBLIC_APP_BASE_URL` to `http://localhost:3001` in `local.env`.
 
+Create a gzipped MongoDB archive dump from the running Compose MongoDB service:
+
+```bash
+pnpm db:dump
+```
+
+The dump is written inside the MongoDB container under `/data/dumps` and appears on the host in the
+directory configured as `DOCKER_MONGODUMPS_DIR`. Use `pnpm db:dump -- --help` to see options for a
+different env file, service name, output directory, or archive name.
+
 ## Production Deployment
 
 Production deployment is handled by GitHub Actions in `.github/workflows/build-deploy.yml`.
@@ -115,6 +125,7 @@ variables; server secrets come from GitHub environment secrets.
 ```bash
 pnpm dev                 # run Nuxt locally with local.env
 pnpm build               # build the production bundle with local.env
+pnpm db:dump             # create a MongoDB archive dump through docker compose
 pnpm start               # preview the built app locally
 pnpm generate            # generate a static build when applicable
 pnpm generate:noske-api  # regenerate lib/noske-types.d.ts from public/noske.json
