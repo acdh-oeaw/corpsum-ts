@@ -2,11 +2,10 @@ import { defineEventHandler, getRouterParam } from "h3";
 import mongoose from "mongoose";
 
 import { NoskeModel } from "~/server/models/noskeinstances.schema";
-import { UserModel } from "~/server/models/users.schema";
-import { requireAuth } from "~/server/utils/auth";
+import { requireUser } from "~/server/utils/user";
 
 export default defineEventHandler(async (event) => {
-	const { username } = await requireAuth(event);
+	const user = await requireUser(event);
 	const id = getRouterParam(event, "id");
 
 	if (!id || !mongoose.isValidObjectId(id)) {
@@ -14,20 +13,14 @@ export default defineEventHandler(async (event) => {
 		return;
 	}
 
-	const user = await UserModel.findOne({ username });
-	if (!user) {
-		setResponseStatus(event, 500, "authentication error");
-		return;
-	}
-
-	const noskeinstance = await NoskeModel.findById(id);
+	const noskeinstance = await NoskeModel.findById<{ owner: { toString: () => string } }>(id);
 	if (!noskeinstance) {
 		setResponseStatus(event, 404, "instance not found");
 		return;
 	}
 
 	const ownsInstance = noskeinstance.owner.toString() === user._id.toString();
-	if (!ownsInstance && String(user.accounttype) !== "admin") {
+	if (!ownsInstance && user.accounttype !== "admin") {
 		setResponseStatus(event, 403, "forbidden");
 		return;
 	}

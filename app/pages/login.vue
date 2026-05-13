@@ -32,7 +32,7 @@ onBeforeMount(async () => {
 
 <template>
 	<MainContent
-		class="container relative hidden h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
+		class="relative hidden h-screen w-full min-w-0 flex-col items-center justify-center md:grid lg:grid-cols-2 lg:px-0"
 	>
 		<div class="relative h-full flex-col p-10 text-white dark:border-r lg:flex">
 			<div class="absolute inset-0 bg-zinc-900" />

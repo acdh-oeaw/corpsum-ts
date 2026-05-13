@@ -62,7 +62,7 @@ async function deleteInstance() {
 </script>
 
 <template>
-	<MainContent v-if="noskeInstance" class="mx-auto w-full max-w-5xl">
+	<MainContent v-if="noskeInstance" class="w-full min-w-0">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
@@ -71,6 +71,12 @@ async function deleteInstance() {
 				<PageTitle>{{ noskeInstance.name }}</PageTitle>
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button v-if="noskeInstance.authentication === 'basic'" as-child size="sm" variant="ghost">
+					<NuxtLinkLocale :href="{ path: '/credentials' }">
+						<LucideIcon class="size-4" name="LockKeyhole" :stroke-width="2" />
+						<span class="sr-only">{{ t("Actions.credentials") }}</span>
+					</NuxtLinkLocale>
+				</Button>
 				<Button v-if="isOwner" as-child size="sm" variant="ghost">
 					<NuxtLinkLocale :href="{ path: `/noskeinstance/edit/${noskeInstance._id}` }">
 						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />

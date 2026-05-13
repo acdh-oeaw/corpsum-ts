@@ -1,6 +1,5 @@
-import { type InferRawDocType, Schema, type Types } from "mongoose";
+import { Schema, type Types } from "mongoose";
 
-// eslint-disable-next-line import-x/no-unresolved
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
@@ -21,14 +20,21 @@ const schemaDefinition = {
 	host: { type: Schema.Types.String, required: true },
 } as const;
 
-export type NoskeDocument = InferRawDocType<typeof schemaDefinition> & {
+export interface NoskeDocument {
 	_id: Types.ObjectId;
+	owner: Types.ObjectId;
+	name: string;
+	base: string;
+	version: "openapi" | "bonito";
+	authentication: "none" | "basic";
+	public: boolean;
+	host: string;
 	createdAt?: Date;
 	updatedAt?: Date;
-};
+}
 export type NoskeDocumentSlim = Omit<NoskeDocument, "_id" | "owner">;
 
-export const NoskeModel = defineMongooseModel({
+export const NoskeModel = defineMongooseModel<NoskeDocument>({
 	name: "noskeinstances",
 	schema: schemaDefinition,
 	options: { timestamps: true },

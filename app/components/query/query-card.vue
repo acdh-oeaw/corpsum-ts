@@ -36,10 +36,14 @@ async function deleteQuery() {
 </script>
 
 <template>
-	<Card class="flex h-full w-[350px] flex-col">
-		<CardHeader>
-			<CardTitle>{{ query.name }}</CardTitle>
-			<CardDescription>{{ t("QueryCard.corpus") }}: {{ query.corpus }}</CardDescription>
+	<Card
+		class="flex h-full w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
+	>
+		<CardHeader class="border-b border-primary bg-primary text-primary-foreground">
+			<CardTitle class="text-2xl font-black tracking-normal">{{ query.name }}</CardTitle>
+			<CardDescription class="font-semibold text-primary-foreground/80">
+				{{ t("QueryCard.corpus") }}: {{ query.corpus }}
+			</CardDescription>
 		</CardHeader>
 		<CardContent class="flex-1">
 			<p>
@@ -55,7 +59,7 @@ async function deleteQuery() {
 				<span class="text-xs">{{ t("QueryCard.input") }}:</span> {{ query.userInput }}
 			</p>
 		</CardContent>
-		<CardFooter class="mt-auto w-full px-6 pb-6">
+		<CardFooter class="mt-auto w-full border-t bg-muted/20 p-3">
 			<TooltipProvider :delay-duration="150">
 				<div class="flex w-full flex-nowrap items-center gap-1 rounded-md border bg-muted/40 p-1">
 					<Tooltip>

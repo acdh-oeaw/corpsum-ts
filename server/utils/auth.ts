@@ -13,7 +13,7 @@ export async function setAuth(event: H3Event, username: string) {
 }
 
 export async function clearAuth(event: H3Event) {
-	return (await _useSession(event)).clear() as Promise<void>;
+	await (await _useSession(event)).clear();
 }
 
 export async function requireAuth(event: H3Event) {

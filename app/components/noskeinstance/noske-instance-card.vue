@@ -5,6 +5,7 @@ const auth = useAuth();
 const t = useTranslations();
 
 const props = defineProps<{
+	hasCredentials?: boolean;
 	noskeInstance: PopulatedNoskeDocument;
 }>();
 const emit = defineEmits<{
@@ -31,33 +32,84 @@ async function deleteInstance() {
 </script>
 
 <template>
-	<Card class="w-[350px]">
-		<CardHeader>
-			<CardTitle>{{ noskeInstance.name }}</CardTitle>
-			<CardDescription>
-				{{ t("NoskeInstanceCard.ownedBy") }}: {{ noskeInstance.owner.username }}
-			</CardDescription>
+	<Card
+		class="flex w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
+	>
+		<CardHeader
+			class="h-32 overflow-hidden border-b border-primary bg-primary text-primary-foreground"
+		>
+			<div class="flex items-start justify-between gap-3">
+				<div class="min-w-0">
+					<CardTitle class="truncate text-2xl font-black tracking-normal">
+						{{ noskeInstance.name }}
+					</CardTitle>
+					<CardDescription class="truncate font-semibold text-primary-foreground/80">
+						{{ t("NoskeInstanceCard.ownedBy") }}: {{ noskeInstance.owner.username }}
+					</CardDescription>
+				</div>
+				<div class="flex min-h-12 shrink-0 flex-col items-end gap-1.5">
+					<MetaBadge
+						:label="t('NoskeInstanceCard.authentication')"
+						tone="sky"
+						:value="noskeInstance.authentication"
+					>
+						<template #icon>
+							<LucideIcon class="size-3" name="ShieldCheck" :stroke-width="2" />
+						</template>
+					</MetaBadge>
+					<MetaBadge
+						v-if="noskeInstance.authentication === 'basic'"
+						:label="t('Actions.credentials')"
+						:tone="props.hasCredentials ? 'green' : 'red'"
+						:value="
+							props.hasCredentials
+								? t('CredentialsPage.status.configured')
+								: t('CredentialsPage.status.missing')
+						"
+					>
+						<template #icon>
+							<LucideIcon
+								class="size-3"
+								:name="props.hasCredentials ? 'KeyRound' : 'TriangleAlert'"
+								:stroke-width="2"
+							/>
+						</template>
+					</MetaBadge>
+				</div>
+			</div>
 		</CardHeader>
-		<CardContent>
-			<p>
-				<span class="text-xs">{{ t("NoskeInstanceCard.version") }}:</span>
-				{{ noskeInstance.version }}
-			</p>
-			<p>
-				<span class="text-xs">{{ t("NoskeInstanceCard.host") }}:</span> {{ noskeInstance.host }}
-			</p>
-			<p>
-				<span class="text-xs">{{ t("NoskeInstanceCard.public") }}:</span>
-				{{ noskeInstance.public ? t("Common.yes") : t("Common.no") }}
-			</p>
-			<p>
-				<span class="text-xs">{{ t("NoskeInstanceCard.authentication") }}:</span>
-				{{ noskeInstance.authentication }}
-			</p>
+		<CardContent class="flex-1 pt-4">
+			<dl class="grid gap-2 text-sm">
+				<div class="flex items-center justify-between gap-3">
+					<dt class="text-xs text-muted-foreground">{{ t("NoskeInstanceCard.version") }}</dt>
+					<dd class="truncate font-medium">{{ noskeInstance.version }}</dd>
+				</div>
+				<div class="flex items-center justify-between gap-3">
+					<dt class="text-xs text-muted-foreground">{{ t("NoskeInstanceCard.host") }}</dt>
+					<dd class="truncate font-medium">{{ noskeInstance.host }}</dd>
+				</div>
+				<div class="flex items-center justify-between gap-3">
+					<dt class="text-xs text-muted-foreground">{{ t("NoskeInstanceCard.public") }}</dt>
+					<dd class="truncate font-medium">
+						{{ noskeInstance.public ? t("Common.yes") : t("Common.no") }}
+					</dd>
+				</div>
+			</dl>
 		</CardContent>
-		<CardFooter class="w-full px-6 pb-6">
+		<CardFooter class="mt-auto w-full border-t bg-muted/20 p-3">
 			<TooltipProvider :delay-duration="150">
 				<div class="flex w-full flex-nowrap items-center gap-1 rounded-md border bg-muted/40 p-1">
+					<Tooltip v-if="noskeInstance.authentication === 'basic'">
+						<TooltipTrigger as-child>
+							<Button as-child class="flex-1" size="sm" variant="ghost">
+								<NuxtLinkLocale :href="{ path: '/credentials' }">
+									<LucideIcon class="size-4" name="LockKeyhole" :stroke-width="2" />
+									<span class="sr-only">{{ t("Actions.credentials") }}</span>
+								</NuxtLinkLocale>
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{{ t("Actions.credentials") }}</TooltipContent>
+					</Tooltip>
 					<Tooltip>
 						<TooltipTrigger as-child>
 							<Button v-if="isOwner" as-child class="flex-1" size="sm" variant="ghost">

@@ -1,17 +1,17 @@
 import { defineEventHandler } from "h3";
 
 import { type UserDocument, UserModel } from "~/server/models/users.schema";
-import { requireAuth } from "~/server/utils/auth";
+import { isAdmin, requireUser } from "~/server/utils/user";
 
 export default defineEventHandler(async (event) => {
-	const { username } = await requireAuth(event);
+	const authenticatedUser = await requireUser(event);
 	const param_username = getRouterParam(event, "username");
 
 	let user: UserDocument | null = null;
 
 	try {
 		user = await UserModel.findOne({
-			username,
+			username: authenticatedUser.username,
 		});
 	} catch (error) {
 		setResponseStatus(event, 500, "database error");
@@ -23,16 +23,16 @@ export default defineEventHandler(async (event) => {
 			username: user.username,
 			email: user.email,
 			accounttype: user.accounttype,
-			credentials: user.credentials?.map((cred) => ({
+			credentials: user.credentials.map((cred) => ({
 				noskeinstance: cred.noskeinstance,
 				username: cred.username,
 			})),
 		};
-	} else if (user && user.accounttype === "admin") {
+	} else if (isAdmin(authenticatedUser)) {
 		user = null;
 		try {
 			user = await UserModel.findOne({
-				param_username,
+				username: param_username,
 			});
 		} catch (error) {
 			setResponseStatus(event, 500, "database error");
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
 				username: user.username,
 				email: user.email,
 				accounttype: user.accounttype,
-				credentials: user.credentials?.map((cred) => ({
+				credentials: user.credentials.map((cred) => ({
 					noskeinstance: cred.noskeinstance,
 					username: cred.username,
 				})),

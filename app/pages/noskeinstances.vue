@@ -1,11 +1,23 @@
 <script lang="ts" setup>
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 
+interface CredentialListItem {
+	noskeinstance: string;
+	noskeName: string;
+	username: string;
+}
+
 const t = useTranslations();
 const { data: instancesData, refresh } = useGetNoskeinstances(null);
+const { data: credentials } = await useFetch<Array<CredentialListItem>>("/api/credentials", {
+	default: () => [],
+});
 const instances = computed<Array<PopulatedNoskeDocument>>(() => {
 	if (!instancesData.value) return [];
 	return Array.isArray(instancesData.value) ? instancesData.value : [instancesData.value];
+});
+const credentialIds = computed(() => {
+	return new Set((credentials.value ?? []).map((credential) => credential.noskeinstance));
 });
 
 function handleDeleted() {
@@ -14,7 +26,7 @@ function handleDeleted() {
 </script>
 
 <template>
-	<MainContent class="mx-auto w-full max-w-5xl">
+	<MainContent class="w-full min-w-0">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
@@ -35,6 +47,7 @@ function handleDeleted() {
 			<NoskeInstanceCard
 				v-for="instance in instances"
 				:key="instance._id"
+				:has-credentials="credentialIds.has(instance._id)"
 				:noske-instance="instance"
 				@deleted="handleDeleted"
 			/>

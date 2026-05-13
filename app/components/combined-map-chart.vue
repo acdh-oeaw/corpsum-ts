@@ -85,11 +85,11 @@ function pointFormatter() {
 	// @ts-expect-error highcharts internal usage
 	return `<b>${this.id}</b><br/>
 ${queryArray
-	.map(
-		(line) =>
-			`<span style="color:${line[2]}">\u25CF</span> ${line[0]}: ${Math.round(line[1] * 100) / 100} <br />`,
-	)
-	.join("")}`;
+		.map(
+			(line) =>
+				`<span style="color:${line[2]}">\u25CF</span> ${line[0]}: ${Math.round(line[1] * 100) / 100} <br />`,
+		)
+		.join("")}`;
 }
 const keys = computed(() => ["id", ...props.queries.map((query) => query.userInput), "value"]);
 

@@ -44,8 +44,8 @@ const dedupedCorpora = computed(() => {
 
 const formatCount = (value?: number) => (typeof value === "number" ? value.toLocaleString() : "—");
 
-const fetchCorpora = async (instanceName: string) => {
-	const path = `/api/noske/${instanceName}/ca/api/corpora`;
+const fetchCorpora = async (instanceId: string) => {
+	const path = `/api/noske/${instanceId}/ca/api/corpora`;
 	if (import.meta.server) {
 		const requestFetch = useRequestFetch() as typeof $fetch;
 		const response = await requestFetch<{ data?: Array<CorporaListItem> }>(path);
@@ -67,7 +67,7 @@ const corporaRecords = useAsyncData(
 			noskeIds.map(async (noskeId) => {
 				const instance = instanceById.value.get(noskeId);
 				if (!instance) return;
-				const corporaList = await fetchCorpora(instance.name);
+				const corporaList = await fetchCorpora(instance._id);
 				corporaByNoske.set(noskeId, corporaList);
 			}),
 		);
@@ -105,7 +105,7 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 </script>
 
 <template>
-	<MainContent class="mx-auto w-full max-w-5xl">
+	<MainContent class="w-full min-w-0">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
@@ -123,9 +123,13 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 			<Carousel class="mt-3 w-full" :opts="{ align: 'start' }">
 				<CarouselContent>
 					<CarouselItem v-for="item in featuredCorpora" :key="item.id" class="basis-auto">
-						<Card class="flex h-full w-[350px] flex-col">
-							<CardHeader>
-								<CardTitle>{{ item.corpus }}</CardTitle>
+						<Card
+							class="flex h-full w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
+						>
+							<CardHeader class="border-b border-primary bg-primary text-primary-foreground">
+								<CardTitle class="text-2xl font-black tracking-normal">
+									{{ item.corpus }}
+								</CardTitle>
 							</CardHeader>
 							<CardContent class="flex-1">
 								<p>
@@ -145,7 +149,7 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 									{{ item.noske }}
 								</p>
 							</CardContent>
-							<CardFooter class="px-6 pb-6">
+							<CardFooter class="mt-auto border-t bg-muted/20 p-3">
 								<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
 									<Button as-child size="sm" variant="ghost">
 										<NuxtLinkLocale

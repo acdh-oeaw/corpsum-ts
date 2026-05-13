@@ -28,7 +28,7 @@ export function useNoskeClient(id: MaybeRef<string | null>) {
 		if (!instance.value) return null;
 		if (resolvedId.value && instance.value._id !== resolvedId.value) return null;
 		return createClient<paths>({
-			baseUrl: `/api/noske/${instance.value.name}`,
+			baseUrl: `/api/noske/${instance.value._id}`,
 		});
 	});
 

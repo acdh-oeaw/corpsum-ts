@@ -172,6 +172,7 @@
 	"Actions": {
 		"cancel": "Cancel",
 		"create": "Create",
+		"credentials": "Credentials",
 		"delete": "Delete",
 		"edit": "Edit",
 		"newInstance": "New instance",
@@ -295,6 +296,27 @@
 			"png": "Export PNG",
 			"svg": "Export SVG",
 			"xlsx": "Export XLSX"
+		}
+	},
+	"CredentialsPage": {
+		"title": "NoSketch credentials",
+		"labels": {
+			"username": "Username",
+			"password": "Password"
+		},
+		"messages": {
+			"required": "Username and password are required.",
+			"saved": "Credentials saved.",
+			"deleted": "Credentials deleted.",
+			"saveFailed": "Could not save credentials.",
+			"deleteFailed": "Could not delete credentials."
+		},
+		"placeholders": {
+			"keepExistingPassword": "Enter a new password to replace the saved one"
+		},
+		"status": {
+			"configured": "Configured",
+			"missing": "Missing"
 		}
 	},
 	"Common": {

@@ -1,6 +1,5 @@
-import { type InferRawDocType, Schema } from "mongoose";
+import { Schema, type Types } from "mongoose";
 
-// eslint-disable-next-line import-x/no-unresolved
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const credentialsSchema = {
@@ -32,16 +31,32 @@ const schemaDefinition = {
 	credentials: [credentialsSchema],
 } as const;
 
-export type UserDocument = InferRawDocType<typeof schemaDefinition>;
+export interface UserCredential {
+	noskeinstance: Types.ObjectId;
+	username: string;
+	password: string;
+}
 
-export const UserModel = defineMongooseModel({
+export interface UserDocument {
+	_id: Types.ObjectId;
+	email?: string;
+	username: string;
+	password: string;
+	accounttype: "admin" | "user";
+	credentials: Array<UserCredential>;
+	createdAt?: Date;
+	updatedAt?: Date;
+}
+
+export const UserModel = defineMongooseModel<UserDocument>({
 	name: "users",
 	schema: schemaDefinition,
 	options: { timestamps: true },
 	hooks(schema) {
-		schema.pre("save", function (this, next) {
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-			if (this.password && this.username) next();
+		schema.pre("save", function () {
+			if (this.password && this.username) {
+				return;
+			}
 
 			throw createError({
 				statusCode: 500,

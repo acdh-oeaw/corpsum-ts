@@ -132,7 +132,7 @@ watch(
 </script>
 
 <template>
-	<MainContent v-if="visualization" class="mx-auto w-full max-w-5xl">
+	<MainContent v-if="visualization" class="w-full min-w-0">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
@@ -153,13 +153,17 @@ watch(
 						<CarouselContent>
 							<CarouselItem v-for="query in selectedQueryItems" :key="query._id" class="basis-auto">
 								<Card
-									class="flex h-full w-[350px] flex-col bg-gradient-to-t from-primary/5 to-card"
+									class="flex h-full w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
 								>
-									<CardHeader>
-										<CardDescription>{{ query.corpus }}</CardDescription>
-										<CardTitle class="text-2xl font-semibold">{{ query.name }}</CardTitle>
+									<CardHeader class="border-b border-primary bg-primary text-primary-foreground">
+										<CardDescription class="font-semibold text-primary-foreground/80">
+											{{ query.corpus }}
+										</CardDescription>
+										<CardTitle class="text-2xl font-black tracking-normal">
+											{{ query.name }}
+										</CardTitle>
 									</CardHeader>
-									<CardFooter class="flex-col items-start gap-1.5 text-sm">
+									<CardFooter class="flex-col items-start gap-1.5 border-t bg-muted/20 text-sm">
 										<div class="line-clamp-1 flex gap-2 font-medium">
 											{{ query.type }}
 										</div>

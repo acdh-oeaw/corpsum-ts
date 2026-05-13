@@ -6,7 +6,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USER
       MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - mongodata:/data/db
       - mongodumps:/data/dumps
@@ -22,8 +22,8 @@ services:
     networks:
       - corpsumnet
     ports:
-      - 3000:3000
-      - 4000:4000
+      - "3001:3000"
+      - "4000:4000"
     volumes:
       - localapp:/app/app
       - localserver:/app/server

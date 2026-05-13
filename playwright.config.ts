@@ -1,17 +1,20 @@
 import { join } from "node:path";
 
+import { config as dotenv } from "@dotenvx/dotenvx";
 import { defineConfig, devices } from "@playwright/test";
-import { isCI } from "ci-info";
-import { config as dotenv } from "dotenv";
-import { expand } from "dotenv-expand";
+import isCI from "is-in-ci";
 
 /**
- * Reading `.env` files here instead of using `dotenv-cli` so environment variables are
- * available to the vs code plugin as well.
+ * Reading `.env` files here instead of using `dotenvx run` so environment variables are available
+ * to the vs code plugin as well.
  */
-for (const envFilePath of [".env.test.local", "local.env", ".env.test", ".env"]) {
-	expand(dotenv({ path: join(process.cwd(), envFilePath) }));
-}
+dotenv({
+	path: [".env.test.local", "local.env", ".env.test", ".env"].map((envFilePath) =>
+		join(process.cwd(), envFilePath),
+	),
+	ignore: ["MISSING_ENV_FILE"],
+	quiet: true,
+});
 
 const port = 3000;
 const baseUrl = `http://localhost:${String(port)}`;
@@ -24,7 +27,7 @@ export default defineConfig({
 	retries: isCI ? 2 : 0,
 	maxFailures: 10,
 	workers: isCI ? 1 : undefined,
-	reporter: isCI ? "github" : "html",
+	reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["html"]],
 	use: {
 		baseURL: baseUrl,
 		trace: "on-first-retry",

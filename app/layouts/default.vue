@@ -10,7 +10,7 @@ const t = useTranslations();
 
 const router = useRouter();
 
-const i18nHead = useLocaleHead({ key: "id" });
+const i18nHead = useLocaleHead();
 
 useHead({
 	htmlAttrs: {
@@ -30,7 +30,7 @@ useHead({
 			{ href: "/icon.svg", rel: "icon", type: "image/svg+xml", sizes: "any" },
 			{ href: "/apple-icon.png", rel: "apple-touch-icon" },
 			{ href: "/manifest.webmanifest", rel: "manifest" },
-			{ href: inter, rel: "preload", as: "font", type: "font/woff2", crossorigin: true },
+			{ href: inter, rel: "preload", as: "font", type: "font/woff2", crossorigin: "" },
 			...(i18nHead.value.link ?? []),
 		];
 	}),
@@ -102,7 +102,7 @@ router.afterEach((to, from) => {
 		<SidebarProvider :default-open="false">
 			<AppSidebar />
 			<SidebarInset class="w-full max-w-full overflow-x-hidden">
-				<div class="flex items-center gap-2 px-4">
+				<div class="block w-full min-w-0 px-4 sm:px-6 lg:px-8">
 					<ErrorBoundary>
 						<slot />
 					</ErrorBoundary>

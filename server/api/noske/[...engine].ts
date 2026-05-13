@@ -1,61 +1,51 @@
 import { defineEventHandler, getHeaders, getQuery, readBody } from "h3";
 
-import { type NoskeDocument, NoskeModel } from "~/server/models/noskeinstances.schema";
-import { type UserDocument, UserModel } from "~/server/models/users.schema";
-import { requireAuth } from "~/server/utils/auth";
+import { decryptCredentialPassword } from "~/server/utils/credentials";
+import { requireReadableNoske } from "~/server/utils/noske";
+import { requireUser } from "~/server/utils/user";
 
 export default defineEventHandler(async (event) => {
-	const { username } = await requireAuth(event);
-	const requestedEngine = event.context.params?.engine?.split("/")[0];
-	let user: UserDocument | null = null;
-	let noske: NoskeDocument | null = null;
-	let authheader = "";
-
-	try {
-		user = await UserModel.findOne({ username });
-	} catch {
-		setResponseStatus(event, 401, "user not found - faulty token");
-		return `the user ${username} was not found in the database`;
-	}
-
-	try {
-		noske = await NoskeModel.findOne({ name: requestedEngine });
-	} catch {
-		setResponseStatus(event, 404, "engine not found - faulty request");
-		return event.context.params?.engine
-			? `the engine ${event.context.params.engine} was not found in the database`
-			: "no engine was specified";
-	}
+	const user = await requireUser(event);
+	const routeParam = event.context.params?.engine ?? "";
+	const [instanceId, ...targetSegments] = routeParam.split("/").filter(Boolean);
+	const noske = await requireReadableNoske(instanceId, user);
+	let authheader: string | undefined;
 
 	const method = event.method;
 	const params = getQuery(event);
-
 	const headers = getHeaders(event);
-	const url = event.node.req.url!;
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const body = method === "GET" ? undefined : await readBody(event);
 
-	if (noske!.authentication === "basic" && user) {
-		const credentials = user.credentials?.find(
-			(cred) => cred.noskeinstance.toString() === noske!._id.toString(),
+	if (noske.authentication === "basic") {
+		const credentials = user.credentials.find(
+			(credential) => credential.noskeinstance.toString() === noske._id.toString(),
 		);
 		if (!credentials) {
-			setResponseStatus(event, 401, "user not authorized for this engine");
-			return `the user ${username} has no credentials set up for engine ${noske!.name}`;
+			throw createError({
+				statusCode: 401,
+				statusMessage: "No credentials configured for this NoSketch instance",
+			});
 		}
-		authheader = `Basic ${btoa(`${credentials.username}:${credentials.password}`)}`;
+		const password = decryptCredentialPassword(credentials.password);
+		authheader = `Basic ${btoa(`${credentials.username}:${password}`)}`;
 	}
 
-	const targetPath = url.split(noske!.name)[1] ?? "/";
+	const targetPath = targetSegments.length > 0 ? `/${targetSegments.join("/")}` : "/";
 	const fetcher = $fetch as (input: string, opts: unknown) => Promise<unknown>;
+	const proxyHeaders: Record<string, string> = {};
+
+	if (headers["content-type"]) {
+		proxyHeaders["Content-Type"] = headers["content-type"];
+	}
+	if (authheader) {
+		proxyHeaders.Authorization = authheader;
+	}
 
 	return await fetcher(targetPath, {
-		headers: {
-			"Content-Type": headers["content-type"]!,
-			Authorization: authheader,
-		},
-		baseURL: noske!.base,
+		headers: proxyHeaders,
+		baseURL: noske.base,
 		method,
 		params,
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

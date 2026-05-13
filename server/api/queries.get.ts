@@ -82,7 +82,7 @@ export default defineEventHandler(async (event): Promise<Array<QueryListItem> | 
 		return;
 	}
 
-	const filter = String(user.accounttype) === "admin" ? {} : { owner: user._id };
+	const filter = user.accounttype === "admin" ? {} : { owner: user._id };
 	const queries = await QueryModel.find<QueryDocument>(filter).populate<{
 		owner: Array<{ _id: string; username: string }>;
 	}>("owner", "username");

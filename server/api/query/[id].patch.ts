@@ -2,8 +2,8 @@ import { defineEventHandler, getRouterParam, type H3Event, readBody } from "h3";
 import mongoose from "mongoose";
 
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
-import { UserModel } from "~/server/models/users.schema";
-import { requireAuth } from "~/server/utils/auth";
+import { requireReadableNoske } from "~/server/utils/noske";
+import { requireUser } from "~/server/utils/user";
 
 interface QueryResponse {
 	_id: string;
@@ -35,8 +35,6 @@ interface QueryRecord {
 	userInput: unknown;
 	facettingValues: unknown;
 }
-
-type FacettingValues = Array<unknown> | Record<string, unknown> | boolean | number | string | null;
 
 const queryTypes = ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"] as const;
 const queryTypeSet = new Set<string>(queryTypes);
@@ -82,17 +80,11 @@ function toResponse(query: QueryRecord): QueryResponse {
 }
 
 export default defineEventHandler(async (event): Promise<QueryResponse | undefined> => {
-	const { username } = await requireAuth(event);
+	const user = await requireUser(event);
 	const id = getRouterParam(event, "id");
 
 	if (!id || !mongoose.isValidObjectId(id)) {
 		setResponseStatus(event, 400, "invalid id");
-		return;
-	}
-
-	const user = await UserModel.findOne({ username });
-	if (!user) {
-		setResponseStatus(event, 500, "authentication error");
 		return;
 	}
 
@@ -102,9 +94,13 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 		return;
 	}
 
-	const owners = query.owner;
+	const owners = query.owner as Array<{ toString: () => string }> | null | undefined;
+	if (!owners) {
+		setResponseStatus(event, 500, "owner lookup failed");
+		return;
+	}
 	const isOwner = owners.some((ownerId) => ownerId.toString() === user._id.toString());
-	if (!isOwner && String(user.accounttype) !== "admin") {
+	if (!isOwner && user.accounttype !== "admin") {
 		setResponseStatus(event, 403, "forbidden");
 		return;
 	}
@@ -125,7 +121,12 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 		updates.name = payload.name;
 	}
 	if (Object.prototype.hasOwnProperty.call(payload, "noske")) {
-		updates.noske = payload.noske as QueryDocument["noske"];
+		if (typeof payload.noske !== "string") {
+			setResponseStatus(event, 400, "invalid noske");
+			return;
+		}
+		const noskeinstance = await requireReadableNoske(payload.noske, user);
+		updates.noske = noskeinstance._id;
 	}
 	if (Object.prototype.hasOwnProperty.call(payload, "corpus")) {
 		if (typeof payload.corpus !== "string") {
@@ -156,7 +157,7 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 		updates.userInput = payload.userInput;
 	}
 	if (Object.prototype.hasOwnProperty.call(payload, "facettingValues")) {
-		updates.facettingValues = payload.facettingValues as FacettingValues;
+		updates.facettingValues = payload.facettingValues;
 	}
 
 	if (Object.keys(updates).length === 0) {
@@ -168,5 +169,5 @@ export default defineEventHandler(async (event): Promise<QueryResponse | undefin
 	await query.save();
 	await query.populate<{ owner: Array<{ _id: string; username: string }> }>("owner", "username");
 
-	return toResponse(query);
+	return toResponse(query as unknown as QueryRecord);
 });

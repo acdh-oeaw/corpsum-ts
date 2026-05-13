@@ -11,7 +11,7 @@ usePageMetadata({
 </script>
 
 <template>
-	<MainContent class="container grid content-start gap-y-8 py-8">
+	<MainContent class="grid w-full min-w-0 content-start gap-y-8 py-8">
 		<PageTitle>{{ t("IndexPage.title") }}</PageTitle>
 	</MainContent>
 </template>

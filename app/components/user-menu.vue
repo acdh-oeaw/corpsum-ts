@@ -62,10 +62,12 @@ const logout = async () => {
 							<LucideIcon name="BadgeCheck" />
 							Account Settings
 						</DropdownMenuItem>
-						<DropdownMenuItem>
-							<LucideIcon name="LockKeyhole" />
-							Credential Management
-						</DropdownMenuItem>
+						<NuxtLinkLocale :href="{ path: '/credentials' }">
+							<DropdownMenuItem>
+								<LucideIcon name="LockKeyhole" />
+								Credential Management
+							</DropdownMenuItem>
+						</NuxtLinkLocale>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem @click="logout">
