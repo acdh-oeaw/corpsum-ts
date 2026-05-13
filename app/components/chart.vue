@@ -402,7 +402,7 @@ function updateKey() {
 		</DropdownMenu>
 		<ChartContainer
 			v-if="series.length > 0"
-			class="aspect-auto h-fit min-h-[200px] w-full [&:fullscreen]:bg-white"
+			class="aspect-auto h-fit min-h-50 w-full [&:fullscreen]:bg-white"
 			:config="chartConfig"
 			@fullscreenchange="updateKey"
 		>

@@ -1,3 +1,4 @@
+// oxlint-disable playwright/no-raw-locators
 import { expect, test } from "@playwright/experimental-ct-vue";
 import { VisGroupedBarSelectors, VisLineSelectors, VisStackedBarSelectors } from "@unovis/vue";
 
