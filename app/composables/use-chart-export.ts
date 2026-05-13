@@ -2,6 +2,11 @@ import type { Ref } from "vue";
 
 type DataPoint = [string | number, number] | undefined;
 
+interface TableData {
+	headers: Array<string>;
+	rows: Array<Array<string | number>>;
+}
+
 const SVG_INLINE_PROPS = [
 	"fill",
 	"stroke",
@@ -70,13 +75,15 @@ function buildExportClone(
 
 export function useChartExport(
 	containerRef: Ref<HTMLElement | null>,
-	chartData: Ref<Array<Array<DataPoint>> | undefined>,
+	chartData: Ref<Array<Array<DataPoint>> | TableData | undefined>,
 	seriesLabels: Ref<Array<string>>,
 	title: Ref<string | undefined>,
 	xAxisLabel: Ref<string | undefined>,
 ) {
-	function buildExportTableData() {
+	function buildExportTableData(): TableData | null {
 		if (!chartData.value) return null;
+
+		if ("headers" in chartData.value) return chartData.value;
 
 		const headers = [xAxisLabel.value ?? "Categories", ...seriesLabels.value];
 		const rows = chartData.value.map((row) => {
