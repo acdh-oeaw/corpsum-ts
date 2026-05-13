@@ -7,6 +7,7 @@ import isCI from "is-in-ci";
 
 export default defineConfig({
 	testDir: "./e2e/tests/components",
+	testMatch: "**/*.spec.ts",
 	snapshotDir: "./e2e/snapshots/components",
 	fullyParallel: true,
 	forbidOnly: isCI,
