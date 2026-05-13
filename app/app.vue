@@ -8,7 +8,8 @@ onMounted(async () => {
 	const routeLocale = route.path.split("/")[1] ?? "";
 	const locale = isValidLocale(routeLocale) ? routeLocale : defaultLocale;
 	const loginPath = `/${locale}/login`;
-	if (!auth.username && route.path !== loginPath) {
+	const signupPath = `/${locale}/signup`;
+	if (!auth.username && route.path !== loginPath && route.path !== signupPath) {
 		return navigateTo(loginPath);
 	}
 	return null;

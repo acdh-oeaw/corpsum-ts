@@ -15,25 +15,17 @@ const auth = useAuth();
 const username = ref("");
 const password = ref("");
 const isLoading = ref(false);
-const mode = ref<"login" | "signup">(route.query.mode === "signup" ? "signup" : "login");
 const statusMessage = ref(route.query.error === "sso" ? t("LoginPage.errors.sso") : "");
 const pageLocale = computed(() => {
 	const locale = route.path.split("/")[1] ?? "";
 	return isValidLocale(locale) ? locale : defaultLocale;
 });
 const homePath = computed(() => `/${pageLocale.value}`);
-const loginErrorPath = computed(() => {
-	const path = `/${pageLocale.value}/login`;
-	if (mode.value === "login") return path;
-	return `${path}?mode=${mode.value}`;
-});
-const submitLabel = computed(() => {
-	return mode.value === "login" ? t("login") : t("LoginPage.actions.createAccount");
-});
+const signupPath = computed(() => `/${pageLocale.value}/signup`);
 const githubLoginUrl = computed(() => {
 	const params = new URLSearchParams({
 		redirect: homePath.value,
-		errorRedirect: loginErrorPath.value,
+		errorRedirect: `/${pageLocale.value}/login`,
 	});
 	return `/api/auth/sso/github?${params.toString()}`;
 });
@@ -42,26 +34,22 @@ async function submitAuth() {
 	isLoading.value = true;
 	statusMessage.value = "";
 
-	const success =
-		mode.value === "login"
-			? await auth.login(username.value, password.value)
-			: await auth.register(username.value, password.value);
+	const success = await auth.login(username.value, password.value);
 
 	if (!success) {
 		isLoading.value = false;
-		statusMessage.value =
-			mode.value === "login" ? t("WrongCredentials") : t("LoginPage.errors.signup");
+		statusMessage.value = t("WrongCredentials");
 		return;
 	}
 	return await navigateTo(homePath.value);
 }
 
-function setMode(nextMode: "login" | "signup") {
-	mode.value = nextMode;
-	statusMessage.value = "";
-}
-
 onBeforeMount(async () => {
+	if (route.query.mode === "signup") {
+		const query = route.query.error === "sso" ? { error: "sso" } : undefined;
+		await navigateTo({ path: signupPath.value, query });
+		return;
+	}
 	if (auth.isLoggedIn()) await navigateTo(homePath.value);
 });
 </script>
@@ -107,27 +95,14 @@ onBeforeMount(async () => {
 							{{ statusMessage }}
 						</p>
 						<Button :disabled="isLoading" type="submit" variant="outline">
-							{{ submitLabel }}
+							{{ t("login") }}
 						</Button>
 						<div class="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-							<span>
-								{{
-									mode === "login"
-										? t("LoginPage.prompts.noAccount")
-										: t("LoginPage.prompts.hasAccount")
-								}}
-							</span>
-							<Button
-								class="px-1"
-								type="button"
-								variant="link"
-								@click="setMode(mode === 'login' ? 'signup' : 'login')"
-							>
-								{{
-									mode === "login"
-										? t("LoginPage.actions.createAccount")
-										: t("LoginPage.actions.loginInstead")
-								}}
+							<span>{{ t("LoginPage.prompts.noAccount") }}</span>
+							<Button as-child class="px-1" type="button" variant="link">
+								<NuxtLink :to="signupPath">
+									{{ t("LoginPage.actions.createAccount") }}
+								</NuxtLink>
 							</Button>
 						</div>
 						<div class="flex items-center gap-3 py-2 text-xs text-muted-foreground">

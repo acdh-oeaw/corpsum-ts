@@ -9,12 +9,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const routeLocale = to.path.split("/")[1] ?? "";
 	const locale = isValidLocale(routeLocale) ? routeLocale : defaultLocale;
 	const loginPath = `/${locale}/login`;
+	const signupPath = `/${locale}/signup`;
 
-	if (!auth.isLoggedIn() && to.path !== loginPath) {
-		const query =
-			to.query.error === "sso"
-				? { error: "sso", ...(to.query.mode === "signup" ? { mode: "signup" } : {}) }
-				: undefined;
-		return await navigateTo({ path: loginPath, query });
+	if (!auth.isLoggedIn() && to.path !== loginPath && to.path !== signupPath) {
+		const isSignupError = to.query.error === "sso" && to.query.mode === "signup";
+		const query = to.query.error === "sso" ? { error: "sso" } : undefined;
+		return await navigateTo({ path: isSignupError ? signupPath : loginPath, query });
 	}
 });
