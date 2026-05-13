@@ -125,12 +125,9 @@ export function useChartExport(
 			throw new Error(`XLSX export failed with status ${String(response.status)}`);
 		}
 
-		const blob = new Blob(
-			[await response.arrayBuffer()],
-			{
-				type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-			},
-		);
+		const blob = new Blob([await response.arrayBuffer()], {
+			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		});
 		triggerDownload(blob, `${title.value ?? "chart"}.xlsx`);
 	}
 
@@ -152,7 +149,9 @@ export function useChartExport(
 
 		const img = new Image();
 		await new Promise<void>((resolve, reject) => {
-			img.onload = () => { resolve(); };
+			img.onload = () => {
+				resolve();
+			};
 			img.onerror = reject;
 			img.src = svgUrl;
 		});
@@ -172,14 +171,20 @@ export function useChartExport(
 
 		const ext = format === "png" ? "png" : "jpg";
 		canvas.toBlob(
-			(blob) => {if (blob) triggerDownload(blob, `${title.value ?? "chart"}.${ext}`)},
+			(blob) => {
+				if (blob) triggerDownload(blob, `${title.value ?? "chart"}.${ext}`);
+			},
 			`image/${format}`,
 			format === "jpeg" ? 0.92 : undefined,
 		);
 	}
 
-	const exportPng = () => { void exportRaster("png"); };
-	const exportJpg = () => { void exportRaster("jpeg"); };
+	const exportPng = () => {
+		void exportRaster("png");
+	};
+	const exportJpg = () => {
+		void exportRaster("jpeg");
+	};
 
 	return { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg };
 }
