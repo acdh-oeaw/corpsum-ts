@@ -4,6 +4,7 @@ import {
 	createCodeChallenge,
 	createCodeVerifier,
 	createOAuthState,
+	getOAuthErrorRedirectPath,
 	getOAuthProvider,
 	getOAuthRedirectPath,
 	setOAuthCookies,
@@ -20,6 +21,7 @@ export default defineEventHandler(async (event) => {
 		state,
 		codeVerifier,
 		redirectPath: getOAuthRedirectPath(event),
+		errorRedirectPath: getOAuthErrorRedirectPath(event),
 	});
 
 	return await sendRedirect(

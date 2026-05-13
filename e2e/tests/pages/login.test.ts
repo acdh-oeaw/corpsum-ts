@@ -16,7 +16,19 @@ test.describe("login page", () => {
 			).toBeVisible();
 			await expect(
 				page.getByRole("link", { name: i18n.t("LoginPage.actions.continueWithGithub") }),
-			).toHaveAttribute("href", `/api/auth/sso/github?redirect=%2F${locale}`);
+			).toHaveAttribute(
+				"href",
+				`/api/auth/sso/github?redirect=%2F${locale}&errorRedirect=%2F${locale}%2Flogin`,
+			);
+
+			await page.getByRole("button", { name: i18n.t("LoginPage.actions.createAccount") }).click();
+
+			await expect(
+				page.getByRole("link", { name: i18n.t("LoginPage.actions.continueWithGithub") }),
+			).toHaveAttribute(
+				"href",
+				`/api/auth/sso/github?redirect=%2F${locale}&errorRedirect=%2F${locale}%2Flogin%3Fmode%3Dsignup`,
+			);
 		}
 	});
 });

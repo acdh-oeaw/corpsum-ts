@@ -6,12 +6,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	}
 
 	const auth = useAuth();
-	const localePath = useLocalePath();
 	const routeLocale = to.path.split("/")[1] ?? "";
 	const locale = isValidLocale(routeLocale) ? routeLocale : defaultLocale;
-	const loginPath = localePath("/login", locale);
+	const loginPath = `/${locale}/login`;
 
 	if (!auth.isLoggedIn() && to.path !== loginPath) {
-		return await navigateTo(loginPath);
+		const query =
+			to.query.error === "sso"
+				? { error: "sso", ...(to.query.mode === "signup" ? { mode: "signup" } : {}) }
+				: undefined;
+		return await navigateTo({ path: loginPath, query });
 	}
 });

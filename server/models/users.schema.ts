@@ -9,7 +9,6 @@ const credentialsSchema = {
 } as const;
 
 const schemaDefinition = {
-	_id: { type: Schema.Types.ObjectId },
 	email: {
 		type: Schema.Types.String,
 		unique: true,

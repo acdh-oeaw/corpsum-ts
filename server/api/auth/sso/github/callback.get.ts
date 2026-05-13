@@ -15,10 +15,20 @@ export default defineEventHandler(async (event) => {
 	const query = getQuery(event);
 	const code = typeof query.code === "string" ? query.code : undefined;
 	const receivedState = typeof query.state === "string" ? query.state : undefined;
-	const { state, codeVerifier, redirectPath } = readAndClearOAuthCookies(event, "github");
+	const { state, codeVerifier, redirectPath, errorRedirectPath } = readAndClearOAuthCookies(
+		event,
+		"github",
+	);
 
 	if (!code || !receivedState || !state || !codeVerifier || receivedState !== state) {
-		return await redirectToOAuthError(event, redirectPath);
+		console.error("GitHub OAuth callback failed state validation.", {
+			hasCode: Boolean(code),
+			hasReceivedState: Boolean(receivedState),
+			hasState: Boolean(state),
+			hasCodeVerifier: Boolean(codeVerifier),
+			stateMatches: receivedState === state,
+		});
+		return await redirectToOAuthError(event, errorRedirectPath);
 	}
 
 	try {
@@ -31,7 +41,8 @@ export default defineEventHandler(async (event) => {
 		await setAuth(event, user.username);
 
 		return await sendRedirect(event, redirectPath, 302);
-	} catch {
-		return await redirectToOAuthError(event, redirectPath);
+	} catch (error) {
+		console.error("GitHub OAuth callback failed.", error);
+		return await redirectToOAuthError(event, errorRedirectPath);
 	}
 });

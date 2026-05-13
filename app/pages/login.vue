@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { defaultLocale, isValidLocale } from "@/config/i18n.config";
 import { cn } from "@/utils/shadcn";
 
 definePageMeta({
@@ -8,9 +9,6 @@ definePageMeta({
 
 const t = useTranslations();
 
-const localeRoute = useLocaleRoute();
-const localePath = useLocalePath();
-const { locale } = useI18n();
 const route = useRoute();
 
 const auth = useAuth();
@@ -19,12 +17,25 @@ const password = ref("");
 const isLoading = ref(false);
 const mode = ref<"login" | "signup">(route.query.mode === "signup" ? "signup" : "login");
 const statusMessage = ref(route.query.error === "sso" ? t("LoginPage.errors.sso") : "");
-const homePath = computed(() => localePath("/", locale.value));
+const pageLocale = computed(() => {
+	const locale = route.path.split("/")[1] ?? "";
+	return isValidLocale(locale) ? locale : defaultLocale;
+});
+const homePath = computed(() => `/${pageLocale.value}`);
+const loginErrorPath = computed(() => {
+	const path = `/${pageLocale.value}/login`;
+	if (mode.value === "login") return path;
+	return `${path}?mode=${mode.value}`;
+});
 const submitLabel = computed(() => {
 	return mode.value === "login" ? t("login") : t("LoginPage.actions.createAccount");
 });
 const githubLoginUrl = computed(() => {
-	return `/api/auth/sso/github?redirect=${encodeURIComponent(homePath.value)}`;
+	const params = new URLSearchParams({
+		redirect: homePath.value,
+		errorRedirect: loginErrorPath.value,
+	});
+	return `/api/auth/sso/github?${params.toString()}`;
 });
 
 async function submitAuth() {
@@ -51,7 +62,7 @@ function setMode(nextMode: "login" | "signup") {
 }
 
 onBeforeMount(async () => {
-	if (auth.isLoggedIn()) await navigateTo(localeRoute("/", locale.value));
+	if (auth.isLoggedIn()) await navigateTo(homePath.value);
 });
 </script>
 

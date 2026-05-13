@@ -92,13 +92,28 @@ export function createCodeChallenge(codeVerifier: string): string {
 }
 
 export function getOAuthRedirectPath(event: H3Event): string {
+	return getSafeRequestPath(event, "redirect") ?? getFallbackRedirectPath(event);
+}
+
+export function getOAuthErrorRedirectPath(event: H3Event): string {
+	return (
+		getSafeRequestPath(event, "errorRedirect") ??
+		getLoginPathForRedirect(getFallbackRedirectPath(event))
+	);
+}
+
+function getSafeRequestPath(event: H3Event, parameter: string): string | undefined {
 	const requestUrl = getRequestURL(event);
-	const redirect = requestUrl.searchParams.get("redirect");
+	const redirect = requestUrl.searchParams.get(parameter);
 
 	if (redirect?.startsWith("/") === true && !redirect.startsWith("//")) {
 		return redirect;
 	}
 
+	return undefined;
+}
+
+function getFallbackRedirectPath(event: H3Event): string {
 	const referer = getHeader(event, "referer");
 	if (referer) {
 		try {
@@ -116,7 +131,7 @@ export function getOAuthRedirectPath(event: H3Event): string {
 export function setOAuthCookies(
 	event: H3Event,
 	provider: AuthProvider,
-	payload: { state: string; codeVerifier: string; redirectPath: string },
+	payload: { state: string; codeVerifier: string; redirectPath: string; errorRedirectPath: string },
 ): void {
 	const options = {
 		httpOnly: true,
@@ -129,6 +144,12 @@ export function setOAuthCookies(
 	setCookie(event, `${oauthCookiePrefix}_${provider}_state`, payload.state, options);
 	setCookie(event, `${oauthCookiePrefix}_${provider}_verifier`, payload.codeVerifier, options);
 	setCookie(event, `${oauthCookiePrefix}_${provider}_redirect`, payload.redirectPath, options);
+	setCookie(
+		event,
+		`${oauthCookiePrefix}_${provider}_error_redirect`,
+		payload.errorRedirectPath,
+		options,
+	);
 }
 
 export function readAndClearOAuthCookies(event: H3Event, provider: AuthProvider) {
@@ -136,12 +157,21 @@ export function readAndClearOAuthCookies(event: H3Event, provider: AuthProvider)
 	const codeVerifier = getCookie(event, `${oauthCookiePrefix}_${provider}_verifier`);
 	const redirectPath =
 		getCookie(event, `${oauthCookiePrefix}_${provider}_redirect`) ?? `/${defaultLocale}`;
+	const errorRedirectPath =
+		getCookie(event, `${oauthCookiePrefix}_${provider}_error_redirect`) ??
+		getLoginPathForRedirect(redirectPath);
 
 	deleteCookie(event, `${oauthCookiePrefix}_${provider}_state`, { path: "/" });
 	deleteCookie(event, `${oauthCookiePrefix}_${provider}_verifier`, { path: "/" });
 	deleteCookie(event, `${oauthCookiePrefix}_${provider}_redirect`, { path: "/" });
+	deleteCookie(event, `${oauthCookiePrefix}_${provider}_error_redirect`, { path: "/" });
 
-	return { state, codeVerifier, redirectPath };
+	return { state, codeVerifier, redirectPath, errorRedirectPath };
+}
+
+function getLoginPathForRedirect(redirectPath: string): string {
+	const locale = redirectPath.split("/")[1] ?? "";
+	return `/${isValidLocale(locale) ? locale : defaultLocale}/login`;
 }
 
 export function getOAuthCallbackUrl(event: H3Event, provider: AuthProvider): string {
