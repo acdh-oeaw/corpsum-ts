@@ -50,8 +50,23 @@
 		"title": "Startseite"
 	},
 	"LoginPage": {
+		"actions": {
+			"continueWithGithub": "Mit GitHub fortfahren",
+			"createAccount": "Konto erstellen",
+			"loginInstead": "Stattdessen anmelden",
+			"signup": "Registrieren"
+		},
+		"errors": {
+			"signup": "Konto konnte nicht erstellt werden.",
+			"sso": "Single Sign-on fehlgeschlagen."
+		},
 		"meta": {
 			"title": "Anmeldung"
+		},
+		"or": "oder",
+		"prompts": {
+			"hasAccount": "Sie haben bereits ein Konto?",
+			"noAccount": "Sie brauchen ein Konto?"
 		}
 	},
 	"LocaleSwitcher": {

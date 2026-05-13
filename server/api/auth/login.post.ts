@@ -26,6 +26,13 @@ export default defineEventHandler(async (event) => {
 		});
 	}
 
+	if (!user.password) {
+		throw createError({
+			statusCode: 401,
+			statusMessage: errorMessage,
+		});
+	}
+
 	const matches = bcrypt.compareSync(password, user.password);
 
 	if (!matches) {

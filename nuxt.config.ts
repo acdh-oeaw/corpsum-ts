@@ -131,6 +131,12 @@ export default defineNuxtConfig({
 		authSecret: process.env.NUXT_AUTH_SECRET,
 		credentialSecret: process.env.NUXT_CREDENTIAL_SECRET ?? process.env.NUXT_AUTH_SECRET,
 		jwtExpiration: process.env.NUXT_JWT_EXPIRATION,
+		oauth: {
+			github: {
+				clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
+				clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
+			},
+		},
 		public: {
 			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL ?? "http://localhost:3000",
 			bots: process.env.NUXT_PUBLIC_BOTS,

@@ -3,3 +3,9 @@ interface LoginResponse {
 	user: string;
 	expires: number;
 }
+
+interface RegisterResponse {
+	registered: boolean;
+	user: string;
+	expires: number;
+}

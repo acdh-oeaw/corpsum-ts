@@ -9,20 +9,45 @@ definePageMeta({
 const t = useTranslations();
 
 const localeRoute = useLocaleRoute();
+const localePath = useLocalePath();
 const { locale } = useI18n();
+const route = useRoute();
 
 const auth = useAuth();
 const username = ref("");
 const password = ref("");
 const isLoading = ref(false);
+const mode = ref<"login" | "signup">(route.query.mode === "signup" ? "signup" : "login");
+const statusMessage = ref(route.query.error === "sso" ? t("LoginPage.errors.sso") : "");
+const homePath = computed(() => localePath("/", locale.value));
+const submitLabel = computed(() => {
+	return mode.value === "login" ? t("login") : t("LoginPage.actions.createAccount");
+});
+const githubLoginUrl = computed(() => {
+	return `/api/auth/sso/github?redirect=${encodeURIComponent(homePath.value)}`;
+});
 
-async function login() {
+async function submitAuth() {
 	isLoading.value = true;
-	if (!(await auth.login(username.value, password.value))) {
+	statusMessage.value = "";
+
+	const success =
+		mode.value === "login"
+			? await auth.login(username.value, password.value)
+			: await auth.register(username.value, password.value);
+
+	if (!success) {
 		isLoading.value = false;
-		return alert(t("WrongCredentials"));
+		statusMessage.value =
+			mode.value === "login" ? t("WrongCredentials") : t("LoginPage.errors.signup");
+		return;
 	}
-	return await navigateTo(localeRoute("/", locale.value));
+	return await navigateTo(homePath.value);
+}
+
+function setMode(nextMode: "login" | "signup") {
+	mode.value = nextMode;
+	statusMessage.value = "";
 }
 
 onBeforeMount(async () => {
@@ -49,7 +74,7 @@ onBeforeMount(async () => {
 				<ColorSchemeSwitcher />
 			</div>
 			<div :class="cn('mx-auto grid h-full max-w-96 gap-6', $attrs.class ?? '')">
-				<form class="my-auto">
+				<form class="my-auto" @submit.prevent="submitAuth">
 					<div class="grid gap-2">
 						<div class="grid gap-1">
 							<Input
@@ -67,8 +92,43 @@ onBeforeMount(async () => {
 								type="password"
 							/>
 						</div>
-						<Button :disabled="isLoading" type="submit" variant="outline" @click="login">
-							{{ t("login") }}
+						<p v-if="statusMessage" class="text-sm text-destructive" role="alert">
+							{{ statusMessage }}
+						</p>
+						<Button :disabled="isLoading" type="submit" variant="outline">
+							{{ submitLabel }}
+						</Button>
+						<div class="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+							<span>
+								{{
+									mode === "login"
+										? t("LoginPage.prompts.noAccount")
+										: t("LoginPage.prompts.hasAccount")
+								}}
+							</span>
+							<Button
+								class="px-1"
+								type="button"
+								variant="link"
+								@click="setMode(mode === 'login' ? 'signup' : 'login')"
+							>
+								{{
+									mode === "login"
+										? t("LoginPage.actions.createAccount")
+										: t("LoginPage.actions.loginInstead")
+								}}
+							</Button>
+						</div>
+						<div class="flex items-center gap-3 py-2 text-xs text-muted-foreground">
+							<div class="h-px flex-1 bg-border" />
+							<span>{{ t("LoginPage.or") }}</span>
+							<div class="h-px flex-1 bg-border" />
+						</div>
+						<Button as-child :disabled="isLoading" variant="outline">
+							<a :href="githubLoginUrl">
+								<Icon class="mr-1 size-4" name="simple-icons:github" />
+								{{ t("LoginPage.actions.continueWithGithub") }}
+							</a>
 						</Button>
 					</div>
 				</form>

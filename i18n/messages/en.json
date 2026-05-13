@@ -50,8 +50,23 @@
 		"title": "Home"
 	},
 	"LoginPage": {
+		"actions": {
+			"continueWithGithub": "Continue with GitHub",
+			"createAccount": "Create account",
+			"loginInstead": "Log in instead",
+			"signup": "Sign up"
+		},
+		"errors": {
+			"signup": "Account creation failed.",
+			"sso": "Single sign-on failed."
+		},
 		"meta": {
 			"title": "Login"
+		},
+		"or": "or",
+		"prompts": {
+			"hasAccount": "Already have an account?",
+			"noAccount": "Need an account?"
 		}
 	},
 	"LocaleSwitcher": {

@@ -8,10 +8,7 @@ export default defineNuxtRouteMiddleware(async () => {
 	if (!hasRun) {
 		hasRun = true;
 		const auth = useAuth();
-		const res = await fetch("/api/auth/me", {
-			method: "GET",
-		});
-		if (!res.ok) {
+		if (!(await auth.refresh())) {
 			console.warn("token invalid, logging out");
 			await auth.logout();
 		}
