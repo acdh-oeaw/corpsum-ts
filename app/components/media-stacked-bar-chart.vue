@@ -53,7 +53,7 @@ watch(
 
 <template>
 	<Chart
-		chart-type="stack"
+		:chart-type="props.stack ? 'stack' : 'bar'"
 		:height="1200"
 		orientation="horizontal"
 		:series="series"

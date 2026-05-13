@@ -103,10 +103,10 @@ async function computeCloud() {
 		.rotate(() => 0)
 		.spiral("rectangular")
 		.font("Inter, sans-serif")
-		.fontSize((d) => d.fontSize)
+		.fontSize((d: CloudWord) => d.fontSize)
 		.fontWeight(() => 800)
-		.text((d) => d.label)
-		.on("end", (computed) => {
+		.text((d: CloudWord) => d.label)
+		.on("end", (computed: Array<CloudWord>) => {
 			computePending = false;
 			layoutedWords.value = computed;
 		})
@@ -153,7 +153,10 @@ function onWordEnter(word: CloudWord, e: MouseEvent) {
 function onWordFocus(word: CloudWord, e: FocusEvent) {
 	hoveredWord.value = word;
 	const rect = (e.currentTarget as Element).getBoundingClientRect();
-	pointer.value = { x: rect.left + window.scrollX, y: rect.bottom + window.scrollY };
+	pointer.value = {
+		x: rect.left + window.scrollX,
+		y: rect.bottom + window.scrollY,
+	};
 }
 
 function openFullscreen() {
@@ -177,6 +180,11 @@ const { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg } = useChartExpor
 	ref([]),
 	toRef(() => props.title),
 	ref(undefined),
+);
+
+watch(
+	() => props.words,
+	() => computeCloud(),
 );
 </script>
 

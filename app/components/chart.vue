@@ -17,7 +17,7 @@ import {
 	VisXYContainer,
 } from "@unovis/vue";
 import { Maximize2, MoreHorizontal } from "lucide-vue-next";
-import { h, render } from "vue";
+import { getCurrentInstance, h, render } from "vue";
 
 import { Button } from "./ui/button";
 import {
@@ -64,6 +64,17 @@ const chartConfig = computed(() =>
 		]),
 	),
 );
+const appContext = getCurrentInstance()?.appContext;
+
+function renderTooltipContent(data: Array<[string, number]>, x?: number) {
+	const vnode = h(ChartTooltipContent, { payload: data, config: chartConfig.value, x });
+	if (appContext) vnode.appContext = appContext;
+	const div = document.createElement("div");
+	render(vnode, div);
+	const html = div.innerHTML;
+	render(null, div);
+	return html;
+}
 
 function zip(arrays: Array<Array<IntervalFrequencyPoint | FrequencyPoint>>) {
 	return arrays[0]?.map((_, i) => {
@@ -305,19 +316,13 @@ const triggers = computed(() => ({
 		const data = (
 			_data && typeof _data === "object" && "data" in _data ? _data.data : _data
 		) as Array<[string, number]>;
-		const vnode = h(ChartTooltipContent, { payload: data, config: chartConfig.value, x });
-		const div = document.createElement("div");
-		render(vnode, div);
-		return div.innerHTML;
+		return renderTooltipContent(data, x);
 	},
 	[StackedBar.selectors.bar]: (_data: unknown, x: number) => {
 		const data = (
-			_data && typeof _data === "object" && "data" in _data ? _data.data : _data
+			_data && typeof _data === "object" && "datum" in _data ? _data.datum : _data
 		) as Array<[string, number]>;
-		const vnode = h(ChartTooltipContent, { payload: data, config: chartConfig.value, x });
-		const div = document.createElement("div");
-		render(vnode, div);
-		return div.innerHTML;
+		return renderTooltipContent(data, x);
 	},
 }));
 
