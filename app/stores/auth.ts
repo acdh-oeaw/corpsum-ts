@@ -1,5 +1,7 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 
+import type { NormalizedSignupPayload } from "@/utils/auth-validation";
+
 export const useAuth = defineStore(
 	"newAuth",
 	() => {
@@ -28,26 +30,23 @@ export const useAuth = defineStore(
 			return false;
 		}
 
-		async function register(_username: string, _password: string) {
-			if (_username && _password) {
-				const res = await fetch("/api/auth/register", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						username: _username,
-						password: _password,
-					}),
-				});
-				if (res.ok) {
-					const data: RegisterResponse = (await res.json()) as RegisterResponse;
-					username.value = data.user;
-					expiry.value = data.expires;
-					return true;
-				}
+		async function register(payload: NormalizedSignupPayload) {
+			const res = await fetch("/api/auth/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(payload),
+			});
+			if (res.ok) {
+				const data: RegisterResponse = (await res.json()) as RegisterResponse;
+				username.value = data.user;
+				expiry.value = data.expires;
+				return { ok: true as const, errors: {} };
 			}
-			return false;
+
+			const data = (await res.json().catch(() => ({}))) as RegisterErrorResponse;
+			return { ok: false as const, errors: data.errors ?? {} };
 		}
 
 		async function logout() {

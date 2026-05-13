@@ -9,3 +9,7 @@ interface RegisterResponse {
 	user: string;
 	expires: number;
 }
+
+interface RegisterErrorResponse {
+	errors?: import("@/utils/auth-validation").SignupFieldErrors;
+}

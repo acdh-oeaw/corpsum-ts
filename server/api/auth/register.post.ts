@@ -1,51 +1,65 @@
 import { hashSync } from "bcryptjs";
 
+import {
+	hasSignupErrors,
+	validateSignupPayload,
+	type SignupFieldErrors,
+} from "@/utils/auth-validation";
 import { UserModel } from "~/server/models/users.schema";
 import { setAuth } from "~/server/utils/auth";
 
 const { jwtExpiration } = useRuntimeConfig();
 
 export default defineEventHandler(async (event) => {
-	const { username, password } = await readBody<{
-		username?: string;
-		password?: string;
-	}>(event);
-	const normalizedUsername = username?.trim();
+	const payload = await readBody<unknown>(event);
+	const { errors, values } = validateSignupPayload(payload);
 
-	if (!normalizedUsername || !password) {
-		setResponseStatus(event, 400, "required field missing");
-		return;
+	if (hasSignupErrors(errors)) {
+		setResponseStatus(event, 400, "validation failed");
+		return { errors };
 	}
 
-	const existingUser = await UserModel.exists({ username: normalizedUsername });
-	if (existingUser) {
-		throw createError({
-			statusCode: 409,
-			statusMessage: "username already exists",
-		});
+	const duplicateErrors: SignupFieldErrors = {};
+	const [existingUsername, existingEmail] = await Promise.all([
+		UserModel.exists({ username: values.username }),
+		UserModel.exists({ email: values.email }),
+	]);
+
+	if (existingUsername) {
+		duplicateErrors.username = "duplicate";
+	}
+	if (existingEmail) {
+		duplicateErrors.email = "duplicate";
+	}
+	if (hasSignupErrors(duplicateErrors)) {
+		setResponseStatus(event, 409, "user already exists");
+		return { errors: duplicateErrors };
 	}
 
-	const hashed = hashSync(password, 10);
+	const hashed = hashSync(values.password, 10);
 
 	try {
-		await UserModel.create({ username: normalizedUsername, password: hashed, accounttype: "user" });
+		await UserModel.create({
+			accounttype: "user",
+			email: values.email,
+			password: hashed,
+			username: values.username,
+		});
 	} catch (error) {
 		if (isDuplicateKeyError(error)) {
-			throw createError({
-				statusCode: 409,
-				statusMessage: "username already exists",
-			});
+			setResponseStatus(event, 409, "user already exists");
+			return { errors: { email: "duplicate", username: "duplicate" } satisfies SignupFieldErrors };
 		}
 
 		setResponseStatus(event, 500, "database error");
 		return `ERROR: ${error as string}`;
 	}
 
-	await setAuth(event, normalizedUsername);
+	await setAuth(event, values.username);
 
 	return {
 		registered: true,
-		user: normalizedUsername,
+		user: values.username,
 		expires: Date.now() + parseInt(jwtExpiration),
 	};
 });
