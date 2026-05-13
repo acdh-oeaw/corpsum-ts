@@ -69,6 +69,27 @@
 			"noAccount": "Need an account?"
 		}
 	},
+	"SignupPage": {
+		"errors": {
+			"failed": "Account creation failed."
+		},
+		"labels": {
+			"email": "Email",
+			"passwordConfirmation": "Repeat password"
+		},
+		"meta": {
+			"title": "Create account"
+		},
+		"validation": {
+			"email": "Enter a valid email address.",
+			"emailDuplicate": "An account with this email already exists.",
+			"password": "Use at least {min} characters and at least three of: lowercase, uppercase, number, symbol.",
+			"passwordConfirmation": "Passwords must match.",
+			"required": "This field is required.",
+			"username": "Use 3-48 lowercase letters, numbers, hyphens, or underscores.",
+			"usernameDuplicate": "This username is already taken."
+		}
+	},
 	"LocaleSwitcher": {
 		"current-locale": "Current language: {locale}",
 		"switch-locale": "Switch to {locale}"
@@ -330,6 +351,7 @@
 		"createdAt": "Created",
 		"updatedAt": "Updated"
 	},
+	"email": "Email",
 	"login": "Log in",
 	"password": "Password",
 	"skip-to-main-content": "Skip to main content",

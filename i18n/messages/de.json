@@ -69,6 +69,27 @@
 			"noAccount": "Sie brauchen ein Konto?"
 		}
 	},
+	"SignupPage": {
+		"errors": {
+			"failed": "Konto konnte nicht erstellt werden."
+		},
+		"labels": {
+			"email": "E-Mail",
+			"passwordConfirmation": "Passwort wiederholen"
+		},
+		"meta": {
+			"title": "Konto erstellen"
+		},
+		"validation": {
+			"email": "Geben Sie eine gültige E-Mail-Adresse ein.",
+			"emailDuplicate": "Es gibt bereits ein Konto mit dieser E-Mail-Adresse.",
+			"password": "Verwenden Sie mindestens {min} Zeichen und mindestens drei davon: Kleinbuchstabe, Großbuchstabe, Zahl, Sonderzeichen.",
+			"passwordConfirmation": "Die Passwörter müssen übereinstimmen.",
+			"required": "Dieses Feld ist erforderlich.",
+			"username": "Verwenden Sie 3-48 Kleinbuchstaben, Zahlen, Bindestriche oder Unterstriche.",
+			"usernameDuplicate": "Dieser Benutzername ist bereits vergeben."
+		}
+	},
 	"LocaleSwitcher": {
 		"current-locale": "Aktuelle Sprache: {locale}",
 		"switch-locale": "Zu {locale} wechseln"
@@ -330,6 +351,7 @@
 		"createdAt": "Erstellt",
 		"updatedAt": "Aktualisiert"
 	},
+	"email": "E-Mail",
 	"login": "Anmelden",
 	"password": "Passwort",
 	"skip-to-main-content": "Zum Hauptinhalt springen",
