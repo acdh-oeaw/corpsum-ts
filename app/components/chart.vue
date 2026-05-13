@@ -17,7 +17,10 @@ import {
 	VisXYContainer,
 } from "@unovis/vue";
 import { Maximize2, MoreHorizontal } from "lucide-vue-next";
-import { getCurrentInstance, h, render } from "vue";
+import { computed, getCurrentInstance, h, ref, render, toRef } from "vue";
+
+import { useChartExport } from "@/composables/use-chart-export";
+import { useTranslations } from "@/composables/use-translations";
 
 import { Button } from "./ui/button";
 import {
@@ -34,10 +37,9 @@ import {
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-type IntervalFrequencyPoint = [yearRange: string, value: number];
-type FrequencyPoint = [year: number, value: number];
+type Datum = [year: string | number, value: number];
 type SeriesData = ChartConfig[string] & {
-	data: Array<IntervalFrequencyPoint | FrequencyPoint>;
+	data: Array<Datum>;
 	name?: string;
 };
 
@@ -76,7 +78,7 @@ function renderTooltipContent(data: Array<[string, number]>, x?: number) {
 	return html;
 }
 
-function zip(arrays: Array<Array<IntervalFrequencyPoint | FrequencyPoint>>) {
+function zip(arrays: Array<Array<Datum>>) {
 	return arrays[0]?.map((_, i) => {
 		return arrays.map((array) => {
 			return array[i];
@@ -112,6 +114,11 @@ let lastSvg: SVGSVGElement | null = null;
 
 const snapPoint = ref<{ x: number; y: number; dataIdx: number; seriesIdx: number } | null>(null);
 
+function getChartSvg() {
+	if (lastSvg?.isConnected) return lastSvg;
+	return containerRef.value?.querySelector<SVGSVGElement>("svg:not(.lucide)") ?? null;
+}
+
 function svgPointToScreen(ptEl: SVGGraphicsElement): { x: number; y: number } | null {
 	const ctm = ptEl.getScreenCTM();
 	if (!ctm) return null;
@@ -121,7 +128,7 @@ function svgPointToScreen(ptEl: SVGGraphicsElement): { x: number; y: number } | 
 }
 
 function updateSnapPoint(event: MouseEvent, seriesIdx: number) {
-	const svg = lastSvg ?? containerRef.value?.querySelector<SVGSVGElement>("svg");
+	const svg = getChartSvg();
 	if (!svg || !containerRef.value) {
 		snapPoint.value = null;
 		return;
@@ -174,7 +181,7 @@ const snapTooltipPayload = computed(() => {
 });
 
 function applyBarHoverOpacity(activeIdx: number | null) {
-	const svg = lastSvg ?? containerRef.value?.querySelector<SVGSVGElement>("svg");
+	const svg = getChartSvg();
 	if (!svg) return;
 	for (const group of svg.querySelectorAll(`.${VisGroupedBarSelectors.barGroup}`)) {
 		Array.from(group.children).forEach((child, i) => {
@@ -186,7 +193,7 @@ function applyBarHoverOpacity(activeIdx: number | null) {
 }
 
 function applyLineHoverOpacity(activeIdx: number | null) {
-	const svg = lastSvg ?? containerRef.value?.querySelector<SVGSVGElement>("svg");
+	const svg = getChartSvg();
 	if (!svg) return;
 	Array.from(svg.querySelectorAll(`.${VisLineSelectors.line}`)).forEach((el, i) => {
 		const svgEl = el as SVGElement;
