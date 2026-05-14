@@ -12,7 +12,8 @@
 		"format:check": "oxfmt --check",
 		"format:fix": "oxfmt --write",
 		"generate": "nuxt generate --dotenv local.env",
-		"generate:noske-api": "npx openapi-typescript ./public/noske.json -o ./lib/noske-types.d.ts",
+		"generate:noske-api": "node scripts/generate-noske-bonito-spec.ts && npx openapi-typescript ./public/noske.json -o ./lib/noske-types.d.ts",
+		"generate:noske-bonito-api-spec": "node scripts/generate-noske-bonito-spec.ts",
 		"lint:check": "run-p --continue-on-error \"lint:*:check\"",
 		"lint:code:check": "oxlint",
 		"lint:code:fix": "oxlint --fix",
@@ -30,7 +31,9 @@
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:update-snapshots": "playwright test --update-snapshots",
 		"types:check": "nuxt typecheck",
-		"validate": "run-p format:check lint:check types:check test test:e2e"
+		"validate": "run-p format:check lint:check types:check test test:e2e",
+		"validate:noske-bonito": "node scripts/validate-noske-bonito.ts",
+		"validate:noske-paths": "node scripts/validate-noske-path-translation.ts"
 	},
 	"dependencies": {
 		"@acdh-oeaw/lib": "^0.3.7",
