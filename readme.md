@@ -109,6 +109,8 @@ variables; server secrets come from GitHub environment secrets.
 | `NUXT_AUTH_SECRET`                     | yes        | server/build | Secret used for auth/session JWT signing. Use at least 32 characters.                           |
 | `NUXT_CREDENTIAL_SECRET`               | yes        | server/build | Secret used to encrypt stored NoSketch credentials. Use at least 32 characters.                 |
 | `NUXT_JWT_EXPIRATION`                  | yes        | server/build | JWT lifetime in milliseconds.                                                                   |
+| `NUXT_OAUTH_GITHUB_CLIENT_ID`          | no         | server       | GitHub OAuth app client id. GitHub sign-in is unavailable when unset.                           |
+| `NUXT_OAUTH_GITHUB_CLIENT_SECRET`      | no         | server       | GitHub OAuth app client secret. Keep this value secret.                                         |
 | `NUXT_PUBLIC_APP_BASE_URL`             | yes        | public/build | Canonical public app URL for i18n, metadata, robots, and sitemap output.                        |
 | `NUXT_PUBLIC_REDMINE_ID`               | yes        | public/build | ACDH Redmine service id used by the imprint component and deployment metadata.                  |
 | `NUXT_PUBLIC_BOTS`                     | no         | public/build | Set to `disabled` or `enabled` for robots handling.                                             |
@@ -119,6 +121,10 @@ variables; server secrets come from GitHub environment secrets.
 | `MONGO_ROOT_PASSWORD`                  | local only | Compose      | MongoDB root password for the local Compose service.                                            |
 | `DOCKER_MONGODATA_DIR`                 | local only | Compose      | Host directory bind-mounted to MongoDB `/data/db`.                                              |
 | `DOCKER_MONGODUMPS_DIR`                | local only | Compose      | Host directory bind-mounted to MongoDB `/data/dumps`.                                           |
+
+For GitHub sign-in, create a GitHub OAuth app and set its callback URL to
+`<NUXT_PUBLIC_APP_BASE_URL>/api/auth/sso/github/callback`, for example
+`http://localhost:3000/api/auth/sso/github/callback` in local development.
 
 ## Commands
 

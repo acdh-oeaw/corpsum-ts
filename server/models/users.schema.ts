@@ -9,10 +9,10 @@ const credentialsSchema = {
 } as const;
 
 const schemaDefinition = {
-	_id: { type: Schema.Types.ObjectId },
 	email: {
 		type: Schema.Types.String,
 		unique: true,
+		sparse: true,
 	},
 	username: {
 		type: Schema.Types.String,
@@ -21,7 +21,6 @@ const schemaDefinition = {
 	},
 	password: {
 		type: Schema.Types.String,
-		required: true,
 	},
 	accounttype: {
 		type: Schema.Types.String,
@@ -41,7 +40,7 @@ export interface UserDocument {
 	_id: Types.ObjectId;
 	email?: string;
 	username: string;
-	password: string;
+	password?: string;
 	accounttype: "admin" | "user";
 	credentials: Array<UserCredential>;
 	createdAt?: Date;
@@ -54,7 +53,7 @@ export const UserModel = defineMongooseModel<UserDocument>({
 	options: { timestamps: true },
 	hooks(schema) {
 		schema.pre("save", function () {
-			if (this.password && this.username) {
+			if (this.username) {
 				return;
 			}
 

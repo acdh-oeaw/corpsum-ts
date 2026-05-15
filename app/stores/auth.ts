@@ -1,5 +1,7 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
 
+import type { NormalizedSignupPayload } from "@/utils/auth-validation";
+
 export const useAuth = defineStore(
 	"newAuth",
 	() => {
@@ -28,6 +30,25 @@ export const useAuth = defineStore(
 			return false;
 		}
 
+		async function register(payload: NormalizedSignupPayload) {
+			const res = await fetch("/api/auth/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(payload),
+			});
+			if (res.ok) {
+				const data: RegisterResponse = (await res.json()) as RegisterResponse;
+				username.value = data.user;
+				expiry.value = data.expires;
+				return { ok: true as const, errors: {} };
+			}
+
+			const data = (await res.json().catch(() => ({}))) as RegisterErrorResponse;
+			return { ok: false as const, errors: data.errors ?? {} };
+		}
+
 		async function logout() {
 			await fetch("/api/auth/logout", {
 				method: "DELETE",
@@ -39,6 +60,7 @@ export const useAuth = defineStore(
 			const res = await fetch("/api/auth/refresh");
 			if (res.ok) {
 				const data: RefreshResponse = (await res.json()) as RefreshResponse;
+				username.value = data.username;
 				expiry.value = data.expires;
 				return true;
 			}
@@ -49,7 +71,7 @@ export const useAuth = defineStore(
 			return username.value !== "";
 		}
 
-		return { login, logout, isLoggedIn, refresh, username, expiry };
+		return { login, register, logout, isLoggedIn, refresh, username, expiry };
 	},
 	{
 		persist: {

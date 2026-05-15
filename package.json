@@ -7,6 +7,7 @@
 		"analyze": "nuxt analyze",
 		"build": "nuxt build --dotenv local.env",
 		"clean": "nuxt cleanup",
+		"db:dump": "node scripts/dump-mongodb.ts",
 		"dev": "nuxt dev --dotenv local.env",
 		"format:check": "oxfmt --check",
 		"format:fix": "oxfmt --write",
