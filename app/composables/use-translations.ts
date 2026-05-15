@@ -1,3 +1,5 @@
+import { useI18n } from "vue-i18n";
+
 import type { Locale, Schema } from "@/config/i18n.config";
 
 export function useTranslations() {

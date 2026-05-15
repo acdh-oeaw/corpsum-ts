@@ -288,6 +288,16 @@
 	"NoskeInstancesPage": {
 		"title": "NoSketch-Instanzen"
 	},
+	"Chart": {
+		"fullscreen": "Vollbild öffnen",
+		"export": {
+			"csv": "CSV exportieren",
+			"jpg": "JPG exportieren",
+			"png": "PNG exportieren",
+			"svg": "SVG exportieren",
+			"xlsx": "XLSX exportieren"
+		}
+	},
 	"CredentialsPage": {
 		"title": "NoSketch-Zugangsdaten",
 		"labels": {
@@ -319,5 +329,48 @@
 	"password": "Passwort",
 	"skip-to-main-content": "Zum Hauptinhalt springen",
 	"splashtext": "Zusammenfassungen im Großen fuer Ihre Korpora.",
-	"username": "Benutzername"
+	"username": "Benutzername",
+	"Corpsum": {
+		"left": "Links",
+		"link": "Link",
+		"open": "Öffnen",
+		"region": "Region",
+		"right": "Rechts",
+		"source": "Quelle",
+		"total-of-n-entries": "Insgesamt {0} Einträge.",
+		"word": "Wort"
+	},
+	"Attributes": "Attribute",
+	"Attributes and Structures": "Attribute und Strukturen",
+	"HideData": "Daten ausblenden",
+	"No results.": "Keine Ergebnisse.",
+	"ShowData": "Daten anzeigen",
+	"Structures": "Strukturen",
+	"absolute": "Absolut",
+	"all-queries-in-one-chart": "Alle Abfragen in einem Diagramm",
+	"cattr": "Kontextattribut",
+	"close": "Schließen",
+	"coll_freq": "Kollokationsfrequenz",
+	"collocations": "Kollokationen",
+	"freq": "Frequenz",
+	"interval": "Intervall",
+	"keywordInContext": "Keyword im Kontext",
+	"keywordInContextDesc": "Zeigt die Treffer im umgebenden Kontext an.",
+	"loading-the-full-ref": "Vollständige Referenz wird geladen",
+	"map-showing-the-different-query-frequencies-relating-to-the-region": "Karte mit den unterschiedlichen Abfragefrequenzen nach Region",
+	"mediaSources": "Medienquellen",
+	"mediaSourcesDesc": "Vergleicht die Verteilung der Treffer nach Medienquelle.",
+	"next": "Weiter",
+	"previous": "Zurück",
+	"queries": "Abfragen",
+	"regionalFrequencies": "Regionale Frequenzen",
+	"regionalFrequenciesDesc": "Vergleicht die Abfragefrequenzen zwischen Regionen.",
+	"relative": "Relativ",
+	"sources": "Quellen",
+	"viewOptions": "Ansichtsoptionen",
+	"wordFormFrequencies": "Wortformfrequenzen",
+	"wordFormFrequenciesDesc": "Vergleicht die häufigsten Wortformen je Abfrage.",
+	"yearlyFrequencies": "Jährliche Frequenzen",
+	"yearlyFrequenciesDesc": "Vergleicht die Abfragefrequenzen im Zeitverlauf.",
+	"yearlyFrequenciesPer": "Jährliche Frequenzen pro "
 }
