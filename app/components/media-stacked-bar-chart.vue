@@ -33,7 +33,8 @@ const series = computed(() => {
 			}`,
 			data: categories.value
 				.map((category) => props.sourceDistributions[i]?.find(({ media }) => category === media))
-				.map((entry) => (entry ? entry[props.mode] : 0)),
+				.map((entry) => (entry ? entry[props.mode] : 0))
+				.map((entry, idx) => [categories.value[idx], entry] as [string, number]),
 		};
 	});
 	return allSeries;
@@ -48,34 +49,15 @@ watch(
 		}, 1);
 	},
 );
-
-const highChartsOptions = computed(() => ({
-	chart: {
-		type: "bar",
-	},
-	title: {
-		text: `${series.value.length} ${t("queries")}`,
-		align: "center",
-	},
-	xAxis: {
-		categories: categories.value,
-	},
-	plotOptions: props.stack
-		? {
-				series: {
-					stacking: "normal",
-				},
-			}
-		: {},
-	yAxis: {
-		title: {
-			text: t("sources"),
-		},
-	},
-	series: series.value,
-}));
 </script>
 
 <template>
-	<HighCharts v-if="smoothReloadForBarChart" :options="highChartsOptions" style="height: 1200px" />
+	<Chart
+		:chart-type="props.stack ? 'stack' : 'bar'"
+		:height="1200"
+		orientation="horizontal"
+		:series="series"
+		:title="`${series.length} ${t('queries')}`"
+		:y-axis="t('sources')"
+	></Chart>
 </template>

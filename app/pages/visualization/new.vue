@@ -141,7 +141,6 @@ async function save() {
 		});
 		await navigateTo(localeRoute(`/visualization/${created._id}`));
 	} finally {
-		// eslint-disable-next-line require-atomic-updates
 		isSaving.value = false;
 	}
 }

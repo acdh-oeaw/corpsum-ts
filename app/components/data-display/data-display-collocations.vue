@@ -197,15 +197,12 @@ function pointFormatter() {
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
 				<QueryDisplay :loading="collocationsLoading[index]" :query="query" />
-				<HighCharts
+				<WordCloudGraph
 					v-if="!collocationsLoading[index]"
-					:options="{
-						series: series[index],
-						title: {
-							text: `${t(mode)} for ${query.userInput}`,
-							align: 'center',
-						},
-					}"
+					:color="query.color"
+					:query-label="query.userInput"
+					:title="`${t(mode)} for ${query.userInput}`"
+					:words="series[index]?.[0]?.data ?? []"
 				/>
 			</div>
 		</CardContent>
