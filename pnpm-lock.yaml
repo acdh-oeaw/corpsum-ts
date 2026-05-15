@@ -14691,7 +14691,7 @@ snapshots:
       birpc: 4.0.0
       defu: 6.1.7
       fs-extra: 11.3.5
-      mongoose: 9.6.2
+      mongoose: 9.6.1
       ofetch: 1.5.1
       pathe: 2.0.3
       pluralize: 8.0.0
