@@ -2,6 +2,7 @@ import { defineEventHandler, getHeaders, getQuery, readBody } from "h3";
 
 import { decryptCredentialPassword } from "~/server/utils/credentials";
 import { requireReadableNoske } from "~/server/utils/noske";
+import { resolveNoskeTargetPath } from "~/server/utils/noske-path";
 import { requireUser } from "~/server/utils/user";
 
 export default defineEventHandler(async (event) => {
@@ -33,6 +34,7 @@ export default defineEventHandler(async (event) => {
 	}
 
 	const targetPath = targetSegments.length > 0 ? `/${targetSegments.join("/")}` : "/";
+	const upstreamPath = resolveNoskeTargetPath(noske.version, targetPath);
 	const fetcher = $fetch as (input: string, opts: unknown) => Promise<unknown>;
 	const proxyHeaders: Record<string, string> = {};
 
@@ -43,7 +45,7 @@ export default defineEventHandler(async (event) => {
 		proxyHeaders.Authorization = authheader;
 	}
 
-	return await fetcher(targetPath, {
+	return await fetcher(upstreamPath, {
 		headers: proxyHeaders,
 		baseURL: noske.base,
 		method,

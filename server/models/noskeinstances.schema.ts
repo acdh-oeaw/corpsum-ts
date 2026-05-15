@@ -1,23 +1,23 @@
-import { Schema, type Types } from "mongoose";
+import { type Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
-	owner: { type: Schema.Types.ObjectId, ref: "users", required: true },
-	name: { type: Schema.Types.String, required: true },
-	base: { type: Schema.Types.String, required: true },
+	owner: { type: "ObjectId", ref: "users", required: true },
+	name: { type: String, required: true },
+	base: { type: String, required: true },
 	version: {
-		type: Schema.Types.String,
+		type: String,
 		enum: ["openapi", "bonito"],
 		required: true,
 	},
 	authentication: {
-		type: Schema.Types.String,
+		type: String,
 		enum: ["none", "basic"],
 		required: true,
 	},
-	public: { type: Schema.Types.Boolean, required: true },
-	host: { type: Schema.Types.String, required: true },
+	public: { type: Boolean, required: true },
+	host: { type: String, required: true },
 } as const;
 
 export interface NoskeDocument {

@@ -1,4 +1,4 @@
-import { Schema, type Types } from "mongoose";
+import { type Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
 
@@ -6,24 +6,24 @@ export type AuthProvider = "github";
 
 const schemaDefinition = {
 	provider: {
-		type: Schema.Types.String,
+		type: String,
 		enum: ["github"],
 		required: true,
 	},
 	providerAccountId: {
-		type: Schema.Types.String,
+		type: String,
 		required: true,
 	},
 	user: {
-		type: Schema.Types.ObjectId,
+		type: "ObjectId",
 		ref: "users",
 		required: true,
 	},
 	username: {
-		type: Schema.Types.String,
+		type: String,
 	},
 	email: {
-		type: Schema.Types.String,
+		type: String,
 	},
 } as const;
 

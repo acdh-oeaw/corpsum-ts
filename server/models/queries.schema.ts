@@ -1,20 +1,20 @@
-import { Schema, type Types } from "mongoose";
+import { type Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const schemaDefinition = {
-	name: { type: Schema.Types.String, required: true },
-	owner: [{ type: Schema.Types.ObjectId, ref: "users", required: true }],
-	noske: { type: Schema.Types.ObjectId, ref: "noskeinstances", required: true },
-	corpus: { type: Schema.Types.String, required: true },
-	subCorpus: { type: Schema.Types.String, required: false },
+	name: { type: String, required: true },
+	owner: [{ type: "ObjectId", ref: "users", required: true }],
+	noske: { type: "ObjectId", ref: "noskeinstances", required: true },
+	corpus: { type: String, required: true },
+	subCorpus: { type: String, required: false },
 	type: {
-		type: Schema.Types.String,
+		type: String,
 		enum: ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"],
 		required: true,
 	},
-	userInput: { type: Schema.Types.String, required: true },
-	facettingValues: { type: Schema.Types.Mixed, required: true },
+	userInput: { type: String, required: true },
+	facettingValues: { type: "Mixed", required: true },
 } as const;
 
 export interface QueryDocument {

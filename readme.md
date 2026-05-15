@@ -12,7 +12,15 @@ helpers live in `server/`; shared/generated types live in `lib/`.
 - The app does not call NoSketch Engine directly from the browser. Client code talks to
   `/api/noske/:instanceId/**`, and the server resolves the configured instance from MongoDB,
   checks access permissions, decrypts stored credentials when needed, and proxies the request.
+- The browser uses one canonical NoSketch API contract: `public/noske.json`. When a configured
+  NoSketch instance has version `bonito`, the server proxy rewrites canonical paths to the upstream
+  Bonito shape before forwarding. For example, `/search/corp_info` becomes `/corp_info`, and
+  `/ca/api/corpora` becomes `/corpora`. Instances with version `openapi` forward canonical paths
+  unchanged.
 - NoSketch Engine API types are generated from `public/noske.json` into `lib/noske-types.d.ts`.
+  `public/noske-bonito.json` is generated as an upstream validation/documentation spec for the
+  Bonito translation. To add another NoSketch API variant later, add its generated validation spec,
+  extend the instance version enum, and register a server-side path translator.
 
 ## Requirements
 
@@ -134,10 +142,12 @@ pnpm build               # build the production bundle with local.env
 pnpm db:dump             # create a MongoDB archive dump through docker compose
 pnpm start               # preview the built app locally
 pnpm generate            # generate a static build when applicable
-pnpm generate:noske-api  # regenerate lib/noske-types.d.ts from public/noske.json
+pnpm generate:noske-api  # regenerate canonical types and the Bonito validation spec
 pnpm format:check        # check formatting
 pnpm lint:check          # run code and style linters
 pnpm types:check         # run Nuxt type checking
+pnpm validate:noske-paths # validate server-side NoSketch path translation rules
+pnpm validate:noske-bonito # validate the generated Bonito spec against the CLARIN Bonito base
 pnpm test:e2e            # run Playwright tests
 pnpm validate            # run formatting, linting, type checking, and tests
 ```

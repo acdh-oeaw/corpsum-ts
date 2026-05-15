@@ -1,4 +1,4 @@
-import { type HydratedDocument, Schema, type Types } from "mongoose";
+import { type HydratedDocument, type Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
 
@@ -11,10 +11,10 @@ export interface VisualizationSchema {
 }
 
 const schemaDefinition = {
-	queries: [{ type: Schema.Types.ObjectId, ref: "queries", required: true }],
+	queries: [{ type: "ObjectId", ref: "queries", required: true }],
 	visualizations: [
 		{
-			type: Schema.Types.String,
+			type: String,
 			enum: [
 				"data-display-collocations",
 				"data-display-keyword-in-context",
@@ -27,9 +27,9 @@ const schemaDefinition = {
 			required: true,
 		},
 	],
-	name: { type: Schema.Types.String, required: true },
-	settings: [{ type: Schema.Types.Mixed, required: true }],
-	data: [{ type: Schema.Types.Mixed, required: true }],
+	name: { type: String, required: true },
+	settings: [{ type: "Mixed", required: true }],
+	data: [{ type: "Mixed", required: true }],
 } as const;
 
 export type VisualizationDocument = HydratedDocument<VisualizationSchema> & {

@@ -1,29 +1,29 @@
-import { Schema, type Types } from "mongoose";
+import { type Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
 
 const credentialsSchema = {
-	noskeinstance: { type: Schema.Types.ObjectId, ref: "noskeinstances", required: true },
-	username: { type: Schema.Types.String, required: true },
-	password: { type: Schema.Types.String, required: true },
+	noskeinstance: { type: "ObjectId", ref: "noskeinstances", required: true },
+	username: { type: String, required: true },
+	password: { type: String, required: true },
 } as const;
 
 const schemaDefinition = {
 	email: {
-		type: Schema.Types.String,
+		type: String,
 		unique: true,
 		sparse: true,
 	},
 	username: {
-		type: Schema.Types.String,
+		type: String,
 		unique: true,
 		required: true,
 	},
 	password: {
-		type: Schema.Types.String,
+		type: String,
 	},
 	accounttype: {
-		type: Schema.Types.String,
+		type: String,
 		enum: ["admin", "user"],
 		required: true,
 	},
