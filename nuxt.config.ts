@@ -1,7 +1,5 @@
 import { fileURLToPath } from "node:url";
 
-import tailwindcss from "@tailwindcss/vite";
-
 // noinspection ES6PreferShortImport
 import { defaultLocale, files } from "./app/config/i18n.config";
 import oxlintGlobals from "./modules/oxlint-globals";
@@ -115,6 +113,12 @@ export default defineNuxtConfig({
 		},
 	},
 
+	postcss: {
+		plugins: {
+			"@tailwindcss/postcss": {},
+		},
+	},
+
 	nitro: {
 		compressPublicAssets: true,
 		prerender: {
@@ -147,6 +151,11 @@ export default defineNuxtConfig({
 		},
 	},
 
+	sourcemap: {
+		client: "hidden",
+		server: "hidden",
+	},
+
 	typescript: {
 		shim: false,
 		strict: true,
@@ -165,8 +174,8 @@ export default defineNuxtConfig({
 	vite: {
 		build: {
 			cssMinify: "lightningcss",
+			sourcemap: "hidden",
 		},
-		plugins: [tailwindcss()],
 	},
 
 	compatibilityDate: "2026-01-01",
