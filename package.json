@@ -14,6 +14,7 @@
 		"generate": "nuxt generate --dotenv local.env",
 		"generate:noske-api": "node scripts/generate-noske-bonito-spec.ts && npx openapi-typescript ./public/noske.json -o ./lib/noske-types.d.ts",
 		"generate:noske-bonito-api-spec": "node scripts/generate-noske-bonito-spec.ts",
+		"github:env:sync": "node scripts/sync-github-environment.ts",
 		"lint:check": "run-p --continue-on-error \"lint:*:check\"",
 		"lint:code:check": "oxlint",
 		"lint:code:fix": "oxlint --fix",

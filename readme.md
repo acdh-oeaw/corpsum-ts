@@ -106,6 +106,26 @@ The workflow builds the Docker image, pushes it to GitHub Container Registry, an
 `acdh-oeaw/gl-autodevops-minimal-port`. Public build-time settings come from GitHub environment
 variables; server secrets come from GitHub environment secrets.
 
+### Sync GitHub Environment Values
+
+`dev.env` can be synced to the `acdh-oeaw/corpsum-ts` GitHub environment `review/dev` with:
+
+```bash
+pnpm github:env:sync
+```
+
+The script requires an authenticated GitHub CLI session with access to the repository:
+
+```bash
+gh auth status
+```
+
+Use `pnpm github:env:sync -- --dry-run` to print the GitHub variables and secrets that would be
+updated without writing values. The script maps local dotenv names to the deployment workflow's
+expected GitHub names, including the `K8S_SECRET_` prefix used by
+`acdh-oeaw/gl-autodevops-minimal-port`, and ignores local-only `DOCKER_*` and `MONGO_ROOT_*`
+settings.
+
 ## Environment Variables
 
 `local.env` is the canonical local environment file. Package scripts load it through
@@ -140,6 +160,7 @@ For GitHub sign-in, create a GitHub OAuth app and set its callback URL to
 pnpm dev                 # run Nuxt locally with local.env
 pnpm build               # build the production bundle with local.env
 pnpm db:dump             # create a MongoDB archive dump through docker compose
+pnpm github:env:sync     # sync dev.env to the review/dev GitHub environment
 pnpm start               # preview the built app locally
 pnpm generate            # generate a static build when applicable
 pnpm generate:noske-api  # regenerate canonical types and the Bonito validation spec
