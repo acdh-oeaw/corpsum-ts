@@ -6,7 +6,7 @@ node_modules/
 *.log
 
 # non-public environment variables
-local.env
+*.env
 .env.*.local
 
 # caches
