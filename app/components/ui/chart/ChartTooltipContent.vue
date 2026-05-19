@@ -12,7 +12,7 @@ const props = withDefaults(
 		payload?: Array<DataPoint>;
 		config?: ChartConfig;
 		class?: HTMLAttributes["class"];
-		x?: number | Date;
+		x?: number | Date | string;
 	}>(),
 	{
 		payload: () => [],
@@ -24,6 +24,8 @@ const yearRange = computed(() => {
 	const first = props.payload[0];
 	return Array.isArray(first) ? first[0] : "";
 });
+
+const title = computed(() => (typeof props.x === "string" ? props.x : yearRange.value));
 
 const rows = computed(() =>
 	Object.entries(props.config).map(([, entry], i) => {
@@ -47,7 +49,7 @@ const rows = computed(() =>
 			)
 		"
 	>
-		<div v-if="yearRange" class="font-medium">{{ yearRange }}</div>
+		<div v-if="title" class="font-medium">{{ title }}</div>
 		<div class="grid gap-1.5">
 			<div
 				v-for="{ label, color, value } in rows"
