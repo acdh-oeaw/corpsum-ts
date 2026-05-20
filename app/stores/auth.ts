@@ -8,6 +8,16 @@ export const useAuth = defineStore(
 		const username = ref("");
 		const expiry = ref(0);
 
+		function setSession(data: { username: string; expires: number }) {
+			username.value = data.username;
+			expiry.value = data.expires;
+		}
+
+		function clear() {
+			username.value = "";
+			expiry.value = 0;
+		}
+
 		async function login(_username: string, _password: string) {
 			if (_username && _password) {
 				const res = await fetch("/api/auth/login", {
@@ -22,11 +32,11 @@ export const useAuth = defineStore(
 				});
 				if (res.ok) {
 					const data: LoginResponse = (await res.json()) as LoginResponse;
-					username.value = data.user;
-					expiry.value = data.expires;
+					setSession({ username: data.user, expires: data.expires });
 					return true;
 				}
 			}
+			clear();
 			return false;
 		}
 
@@ -40,8 +50,7 @@ export const useAuth = defineStore(
 			});
 			if (res.ok) {
 				const data: RegisterResponse = (await res.json()) as RegisterResponse;
-				username.value = data.user;
-				expiry.value = data.expires;
+				setSession({ username: data.user, expires: data.expires });
 				return { ok: true as const, errors: {} };
 			}
 
@@ -53,29 +62,29 @@ export const useAuth = defineStore(
 			await fetch("/api/auth/logout", {
 				method: "DELETE",
 			});
-			username.value = "";
+			clear();
 		}
 
 		async function refresh() {
 			const res = await fetch("/api/auth/refresh");
 			if (res.ok) {
 				const data: RefreshResponse = (await res.json()) as RefreshResponse;
-				username.value = data.username;
-				expiry.value = data.expires;
+				setSession(data);
 				return true;
 			}
+			clear();
 			return false;
 		}
 
 		function isLoggedIn(): boolean {
-			return username.value !== "";
+			return username.value !== "" && expiry.value > Date.now();
 		}
 
-		return { login, register, logout, isLoggedIn, refresh, username, expiry };
+		return { clear, login, register, logout, isLoggedIn, refresh, setSession, username, expiry };
 	},
 	{
 		persist: {
-			pick: ["username"],
+			pick: ["username", "expiry"],
 		},
 	},
 );
