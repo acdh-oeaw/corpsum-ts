@@ -13,6 +13,22 @@ export function hexToRgb(hex: string): [number, number, number] {
 	];
 }
 
+export function linearInterpolate(
+	value: number,
+	maxVal: number,
+	minColor: [number, number, number],
+	maxColor: [number, number, number],
+): [number, number, number, number] {
+	if (maxVal <= 0) return [minColor[0], minColor[1], minColor[2], 255];
+	const t = Math.min(value / maxVal, 1);
+	return [
+		Math.round(minColor[0] + t * (maxColor[0] - minColor[0])),
+		Math.round(minColor[1] + t * (maxColor[1] - minColor[1])),
+		Math.round(minColor[2] + t * (maxColor[2] - minColor[2])),
+		255,
+	];
+}
+
 export function logInterpolate(
 	value: number,
 	maxVal: number,

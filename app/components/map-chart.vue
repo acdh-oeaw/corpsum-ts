@@ -2,13 +2,19 @@
 import { computed, watch } from "vue";
 
 import type { TooltipData } from "@/components/map.vue";
-import { hexToRgb, logInterpolate, MAP_USED_REGIONS } from "@/utils/map-colors";
+import { hexToRgb, linearInterpolate, logInterpolate, MAP_USED_REGIONS } from "@/utils/map-colors";
 
-const props = defineProps<{
-	query: CorpusQuery;
-	resdata: Array<RegionalFreqData>;
-	mode: string;
-}>();
+const props = withDefaults(
+	defineProps<{
+		query: CorpusQuery;
+		resdata: Array<RegionalFreqData>;
+		mode: string;
+		scale?: "log" | "linear";
+	}>(),
+	{
+		scale: "log",
+	},
+);
 
 const usedRegions = MAP_USED_REGIONS;
 
@@ -33,7 +39,9 @@ function getFillColor(feature: {
 	const maxColorRgb = hexToRgb(props.query.color);
 	const key = String(feature.properties?.["hc-key"] ?? "");
 	const value = currentValueMap.get(key) ?? 0;
-	return logInterpolate(value, maxVal, minColorRgb, maxColorRgb);
+	return props.scale === "linear"
+		? linearInterpolate(value, maxVal, minColorRgb, maxColorRgb)
+		: logInterpolate(value, maxVal, minColorRgb, maxColorRgb);
 }
 
 function getTooltip(feature: { properties?: Record<string, unknown> }): TooltipData | null {
@@ -65,16 +73,26 @@ const legendMaxVal = computed(() => {
 	return Math.round(Math.max(...(vals.length > 0 ? vals : [0]), 10));
 });
 
-// Mid and three-quarter values on the log scale matching logInterpolate
-const legendMidVal = computed(() => Math.round(Math.pow(legendMaxVal.value + 1, 0.5) - 1));
-const legendThreeQuarterVal = computed(() =>
-	Math.round(Math.pow(legendMaxVal.value + 1, 0.75) - 1),
-);
+const legendMidVal = computed(() => {
+	const max = legendMaxVal.value;
+	return props.scale === "linear" ? Math.round(max * 0.5) : Math.round(Math.pow(max + 1, 0.5) - 1);
+});
+const legendQuarterVal = computed(() => {
+	const max = legendMaxVal.value;
+	return props.scale === "linear"
+		? Math.round(max * 0.25)
+		: Math.round(Math.pow(max + 1, 0.25) - 1);
+});
+const legendThreeQuarterVal = computed(() => {
+	const max = legendMaxVal.value;
+	return props.scale === "linear"
+		? Math.round(max * 0.75)
+		: Math.round(Math.pow(max + 1, 0.75) - 1);
+});
 
 const legendGradient = computed(() => `linear-gradient(to right, #eeeeee, ${props.query.color})`);
 const currentLocale = useLocale();
 function formatLegendNum(n: number): string {
-	console.log(props.resdata);
 	return n.toLocaleString(currentLocale.value);
 }
 </script>
@@ -85,7 +103,7 @@ function formatLegendNum(n: number): string {
 		<Map
 			:get-fill-color="getFillColor"
 			:get-tooltip="getTooltip"
-			:update-triggers="[mode, query.color, resdata]"
+			:update-triggers="[mode, query.color, resdata, scale]"
 			:used-regions="usedRegions"
 		/>
 		<div class="space-y-1 px-1 w-64 mx-auto">
@@ -94,6 +112,10 @@ function formatLegendNum(n: number): string {
 				<span class="absolute left-0 flex flex-col items-center">
 					<span class="w-px h-1.5 bg-muted-foreground/50" />
 					0
+				</span>
+				<span class="absolute left-1/4 -translate-x-1/2 flex flex-col items-center">
+					<span class="w-px h-1.5 bg-muted-foreground/50" />
+					{{ formatLegendNum(legendQuarterVal) }}
 				</span>
 				<span class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
 					<span class="w-px h-1.5 bg-muted-foreground/50" />
