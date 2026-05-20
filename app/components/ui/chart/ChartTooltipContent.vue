@@ -38,6 +38,7 @@ const rows = computed(() =>
 		};
 	}),
 );
+const currentLocale = useLocale();
 </script>
 
 <template>
@@ -59,7 +60,7 @@ const rows = computed(() =>
 				<span class="size-2 shrink-0 rounded-full" :style="{ background: color }" />
 				<span class="text-muted-foreground">{{ label }}</span>
 				<span v-if="value != null" class="ml-auto pl-4 font-medium tabular-nums text-foreground">
-					{{ value.toLocaleString() }}
+					{{ value.toLocaleString(currentLocale) }}
 				</span>
 			</div>
 		</div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from "vue";
+import { computed, watch } from "vue";
 
 import type { TooltipData } from "@/components/map.vue";
 import { hexToRgb, logInterpolate, MAP_USED_REGIONS } from "@/utils/map-colors";
@@ -29,7 +29,7 @@ function getFillColor(feature: {
 }): [number, number, number, number] {
 	const vals = [...currentValueMap.values()];
 	const maxVal = Math.max(...(vals.length > 0 ? vals : [0]), 10);
-	const minColorRgb: [number, number, number] = [238, 238, 238];
+	const minColorRgb: [number, number, number] = hexToRgb("#eeeeee");
 	const maxColorRgb = hexToRgb(props.query.color);
 	const key = String(feature.properties?.["hc-key"] ?? "");
 	const value = currentValueMap.get(key) ?? 0;
@@ -57,6 +57,26 @@ watch(
 	},
 	{ deep: true },
 );
+
+const legendMaxVal = computed(() => {
+	const vals = props.resdata
+		.filter((d) => usedRegions.includes(d.region))
+		.map((d) => (props.mode === "relative" ? d.relative : d.absolute));
+	return Math.round(Math.max(...(vals.length > 0 ? vals : [0]), 10));
+});
+
+// Mid and three-quarter values on the log scale matching logInterpolate
+const legendMidVal = computed(() => Math.round(Math.pow(legendMaxVal.value + 1, 0.5) - 1));
+const legendThreeQuarterVal = computed(() =>
+	Math.round(Math.pow(legendMaxVal.value + 1, 0.75) - 1),
+);
+
+const legendGradient = computed(() => `linear-gradient(to right, #eeeeee, ${props.query.color})`);
+const currentLocale = useLocale();
+function formatLegendNum(n: number): string {
+	console.log(props.resdata);
+	return n.toLocaleString(currentLocale.value);
+}
 </script>
 
 <template>
@@ -68,5 +88,26 @@ watch(
 			:update-triggers="[mode, query.color, resdata]"
 			:used-regions="usedRegions"
 		/>
+		<div class="space-y-1 px-1 w-64 mx-auto">
+			<div class="h-3 w-full rounded" :style="{ background: legendGradient }" />
+			<div class="relative text-xs text-muted-foreground">
+				<span class="absolute left-0 flex flex-col items-center">
+					<span class="w-px h-1.5 bg-muted-foreground/50" />
+					0
+				</span>
+				<span class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
+					<span class="w-px h-1.5 bg-muted-foreground/50" />
+					{{ formatLegendNum(legendMidVal) }}
+				</span>
+				<span class="absolute left-3/4 -translate-x-1/2 flex flex-col items-center">
+					<span class="w-px h-1.5 bg-muted-foreground/50" />
+					{{ formatLegendNum(legendThreeQuarterVal) }}
+				</span>
+				<span class="absolute right-0 translate-x-1/2 flex flex-col items-center">
+					<span class="w-px h-1.5 bg-muted-foreground/50" />
+					{{ formatLegendNum(legendMaxVal) }}
+				</span>
+			</div>
+		</div>
 	</div>
 </template>
