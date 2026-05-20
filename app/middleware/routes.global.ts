@@ -6,7 +6,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const locale = isValidLocale(routeLocale) ? routeLocale : defaultLocale;
 	const loginPath = `/${locale}/login`;
 	const signupPath = `/${locale}/signup`;
-	const isPublicRoute = to.path === loginPath || to.path === signupPath;
+	const imprintPath = `/${locale}/imprint`;
+	const isPublicRoute = to.path === loginPath || to.path === signupPath || to.path === imprintPath;
 
 	if (import.meta.server && !isPublicRoute) {
 		try {
