@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed } from "vue";
 
 import type { TooltipData } from "@/components/map.vue";
+import { mapAustria } from "@/utils/map-austria";
 import { hexToRgb, linearInterpolate, logInterpolate, MAP_USED_REGIONS } from "@/utils/map-colors";
+
+const regionNames = Object.fromEntries(
+	mapAustria.features.map((f) => [String(f.properties["hc-key"]), String(f.properties["name"])]),
+);
 
 const props = withDefaults(
 	defineProps<{
@@ -18,9 +23,7 @@ const props = withDefaults(
 
 const usedRegions = MAP_USED_REGIONS;
 
-let currentValueMap = new Map<string, number>();
-
-function buildValueMap(): Map<string, number> {
+const valueMap = computed(() => {
 	const map = new Map<string, number>();
 	for (const d of props.resdata) {
 		if (usedRegions.includes(d.region)) {
@@ -28,43 +31,39 @@ function buildValueMap(): Map<string, number> {
 		}
 	}
 	return map;
-}
+});
 
-function getFillColor(feature: {
-	properties?: Record<string, unknown>;
-}): [number, number, number, number] {
-	const vals = [...currentValueMap.values()];
-	const maxVal = Math.max(...(vals.length > 0 ? vals : [0]), 10);
+const maxVal = computed(() => {
+	const vals = [...valueMap.value.values()];
+	return Math.max(...(vals.length > 0 ? vals : [0]), 10);
+});
+
+const colors = computed(() => {
 	const minColorRgb: [number, number, number] = hexToRgb("#eeeeee");
 	const maxColorRgb = hexToRgb(props.query.color);
-	const key = String(feature.properties?.["hc-key"] ?? "");
-	const value = currentValueMap.get(key) ?? 0;
-	return props.scale === "linear"
-		? linearInterpolate(value, maxVal, minColorRgb, maxColorRgb)
-		: logInterpolate(value, maxVal, minColorRgb, maxColorRgb);
-}
+	const result: Record<string, [number, number, number, number]> = {};
+	for (const region of usedRegions) {
+		const value = valueMap.value.get(region) ?? 0;
+		result[region] =
+			props.scale === "linear"
+				? linearInterpolate(value, maxVal.value, minColorRgb, maxColorRgb)
+				: logInterpolate(value, maxVal.value, minColorRgb, maxColorRgb);
+	}
+	return result;
+});
 
-function getTooltip(feature: { properties?: Record<string, unknown> }): TooltipData | null {
-	if (!feature.properties) return null;
-	const key = String(feature.properties["hc-key"] ?? "");
-	const name = String(feature.properties["name"] ?? key);
-	const value = currentValueMap.get(key) ?? 0;
-	return {
-		x: name,
-		payload: [[props.query.userInput, value]],
-		config: { "0": { label: props.query.userInput, color: props.query.color } },
-	};
-}
-
-currentValueMap = buildValueMap();
-
-watch(
-	() => [props.resdata, props.mode, props.query.color] as const,
-	() => {
-		currentValueMap = buildValueMap();
-	},
-	{ deep: true },
-);
+const regionData = computed(() => {
+	const result: Record<string, TooltipData> = {};
+	for (const region of usedRegions) {
+		const value = valueMap.value.get(region) ?? 0;
+		result[region] = {
+			x: regionNames[region] ?? region,
+			payload: [[props.query.userInput, value]],
+			config: { "0": { label: props.query.userInput, color: props.query.color } },
+		};
+	}
+	return result;
+});
 
 const legendMaxVal = computed(() => {
 	const vals = props.resdata
@@ -100,12 +99,7 @@ function formatLegendNum(n: number): string {
 <template>
 	<div class="space-y-2">
 		<h3 class="text-sm font-medium">{{ query.userInput }}</h3>
-		<Map
-			:get-fill-color="getFillColor"
-			:get-tooltip="getTooltip"
-			:update-triggers="[mode, query.color, resdata, scale]"
-			:used-regions="usedRegions"
-		/>
+		<Map :colors="colors" :region-data="regionData" :used-regions="usedRegions" />
 		<div class="space-y-1 px-1 w-64 mx-auto">
 			<div class="h-3 w-full rounded" :style="{ background: legendGradient }" />
 			<div class="relative text-xs text-muted-foreground">

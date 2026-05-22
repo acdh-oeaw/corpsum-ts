@@ -3,11 +3,21 @@ import { Deck, WebMercatorViewport } from "@deck.gl/core";
 import { GeoJsonLayer, PolygonLayer, TextLayer } from "@deck.gl/layers";
 import turfCentroid from "@turf/centroid";
 import { toWgs84 } from "@turf/projection";
+import { Maximize2, MoreHorizontal } from "lucide-vue-next";
 import { computed, h, onBeforeUnmount, onMounted, ref, render, shallowRef, watch } from "vue";
 
 import type { ChartConfig } from "@/components/ui/chart";
 import ChartTooltipContent from "@/components/ui/chart/ChartTooltipContent.vue";
 import { mapAustria } from "@/utils/map-austria";
+
+import { Button } from "./ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 type RegionFeature = { properties?: Record<string, unknown> };
 
@@ -35,17 +45,15 @@ function renderTooltipHtml(data: TooltipData): string {
 
 const props = withDefaults(
 	defineProps<{
-		getFillColor: (feature: RegionFeature) => [number, number, number, number];
-		getTooltip?: (feature: RegionFeature) => TooltipData | null;
+		colors: Record<string, [number, number, number, number]>;
+		regionData?: Record<string, TooltipData>;
 		height?: number | string;
 		pieSlices?: PieSliceData[];
-		updateTriggers?: Array<unknown>;
 		usedRegions?: Array<string>;
 	}>(),
 	{
 		height: 450,
 		pieSlices: () => [],
-		updateTriggers: () => [],
 		usedRegions: () => mapAustria.features.map((f) => f.properties["hc-key"]),
 	},
 );
@@ -55,8 +63,8 @@ const mapAustriaWgs84 = {
 	features: mapAustria.features.map((f) => toWgs84(f)),
 } as GeoJSON.FeatureCollection;
 
-const containerRef = ref<HTMLDivElement>();
-const canvasRef = ref<HTMLCanvasElement>();
+const containerRef = useTemplateRef("containerRef");
+const canvasRef = useTemplateRef("canvasRef");
 const centroidPixels = ref<Map<string, { x: number; y: number }>>(new Map());
 
 const viewState = {
@@ -94,7 +102,10 @@ function buildLayers() {
 			data: mapAustriaWgs84,
 			filled: true,
 			stroked: true,
-			getFillColor: props.getFillColor,
+			getFillColor: (feature: RegionFeature) => {
+				const key = String(feature.properties?.["hc-key"] ?? "");
+				return props.colors[key] ?? [200, 200, 200, 255];
+			},
 			getLineColor: [100, 100, 100, 255],
 			getLineWidth: 1,
 			lineWidthMinPixels: 1,
@@ -102,7 +113,7 @@ function buildLayers() {
 			autoHighlight: true,
 			highlightColor: [200, 200, 200, 100],
 			updateTriggers: {
-				getFillColor: props.updateTriggers,
+				getFillColor: props.colors,
 			},
 		}),
 	];
@@ -120,12 +131,11 @@ function buildLayers() {
 				filled: true,
 				stroked: true,
 				pickable: true,
-
 				autoHighlight: true,
 				highlightColor: [200, 200, 200, 100],
 				updateTriggers: {
-					getFillColor: props.updateTriggers,
-					getPolygon: props.updateTriggers,
+					getFillColor: props.pieSlices,
+					getPolygon: props.pieSlices,
 				},
 			}),
 		);
@@ -195,8 +205,12 @@ async function initDeck() {
 		layers: buildLayers() as any,
 		getTooltip: ({ object }: { object?: any }) => {
 			if (!object) return null;
-			const data: TooltipData | null =
-				object.tooltipData ?? (props.getTooltip ? props.getTooltip(object as RegionFeature) : null);
+			const data: TooltipData | null = (() => {
+				if (object.tooltipData) return object.tooltipData as TooltipData;
+				if (!props.regionData) return null;
+				const key = String(object.properties?.["hc-key"] ?? "");
+				return props.regionData[key] ?? null;
+			})();
 			if (!data) return null;
 			return {
 				html: renderTooltipHtml(data),
@@ -222,17 +236,86 @@ onBeforeUnmount(() => {
 });
 
 watch(
-	() => [props.updateTriggers, props.pieSlices] as const,
+	() => [props.colors, props.pieSlices] as const,
 	() => {
 		if (!deck.value) return;
 		deck.value.setProps({ layers: buildLayers() as any });
 	},
 	{ deep: true },
 );
+const t = useTranslations();
+
+const exportTableData = computed(() => {
+	const entries = Object.values(props.regionData ?? {});
+	if (entries.length === 0) return undefined;
+	const first = entries[0]!;
+	return {
+		headers: ["Region", ...first.payload.map(([label]) => label)],
+		rows: entries.map((d) => [String(d.x ?? ""), ...d.payload.map(([, value]) => value)]),
+	};
+});
+
+const { exportCsv, exportXlsx } = useChartExport(containerRef, exportTableData, ref("map"));
+
+function triggerDownload(blob: Blob, filename: string) {
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = filename;
+	a.click();
+	URL.revokeObjectURL(url);
+}
+
+function exportPng() {
+	canvasRef.value?.toBlob((blob) => {
+		if (blob) triggerDownload(blob, "map.png");
+	}, "image/png");
+}
+
+function exportJpg() {
+	canvasRef.value?.toBlob((blob) => {
+		if (blob) triggerDownload(blob, "map.jpg");
+	}, "image/jpeg");
+}
+
+function openFullscreen() {
+	containerRef.value?.requestFullscreen();
+}
 </script>
 
 <template>
-	<div ref="containerRef" class="relative" :style="{ height: heightStyle }">
+	<div ref="containerRef" class="relative [&:fullscreen]:bg-white" :style="{ height: heightStyle }">
+		<DropdownMenu>
+			<DropdownMenuTrigger as-child>
+				<Button
+					class="absolute right-1 top-1 z-10 size-7 text-muted-foreground"
+					size="icon"
+					variant="ghost"
+				>
+					<MoreHorizontal class="size-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end">
+				<DropdownMenuItem class="text-xs" @click="openFullscreen">
+					<Maximize2 class="size-3" />
+					{{ t("Chart.fullscreen") }}
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem class="text-xs" @click="exportCsv">{{
+					t("Chart.export.csv")
+				}}</DropdownMenuItem>
+				<DropdownMenuItem class="text-xs" @click="exportXlsx">{{
+					t("Chart.export.xlsx")
+				}}</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem class="text-xs" @click="exportPng">{{
+					t("Chart.export.png")
+				}}</DropdownMenuItem>
+				<DropdownMenuItem class="text-xs" @click="exportJpg">{{
+					t("Chart.export.jpg")
+				}}</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
 		<canvas ref="canvasRef" style="width: 100%; height: 100%" />
 	</div>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import turfCentroid from "@turf/centroid";
 import { toWgs84 } from "@turf/projection";
-import { ref, watch } from "vue";
+import { computed } from "vue";
 
 import type { PieSliceData, TooltipData } from "@/components/map.vue";
 import { mapAustria } from "@/utils/map-austria";
@@ -33,9 +33,11 @@ const wgs84Centroids = mapAustriaWgs84Features
 		};
 	});
 
-const currentRegionData = ref(new Map<string, { values: number[]; winnerIndex: number }>());
+const regionNames = Object.fromEntries(
+	mapAustria.features.map((f) => [String(f.properties["hc-key"]), String(f.properties["name"])]),
+);
 
-function buildRegionData(): Map<string, { values: number[]; winnerIndex: number }> {
+const currentRegionData = computed(() => {
 	const map = new Map<string, { values: number[]; winnerIndex: number }>();
 
 	for (const region of usedRegions) {
@@ -69,43 +71,46 @@ function buildRegionData(): Map<string, { values: number[]; winnerIndex: number 
 	}
 
 	return map;
-}
+});
 
-function getFillColor(feature: {
-	properties?: Record<string, unknown>;
-}): [number, number, number, number] {
-	const key = String(feature.properties?.["hc-key"] ?? "");
-	const entry = currentRegionData.value.get(key);
-	if (!entry || props.queries.length === 0) return [220, 220, 220, 255];
-	const winner = props.queries[entry.winnerIndex];
-	if (!winner) return [220, 220, 220, 255];
-	const [r, g, b] = hexToRgb(winner.color);
-	return [r, g, b, 200];
-}
+const colors = computed(() => {
+	const result: Record<string, [number, number, number, number]> = {};
+	for (const [key, entry] of currentRegionData.value) {
+		if (props.queries.length === 0) {
+			result[key] = [220, 220, 220, 255];
+			continue;
+		}
+		const winner = props.queries[entry.winnerIndex];
+		if (!winner) {
+			result[key] = [220, 220, 220, 255];
+			continue;
+		}
+		const [r, g, b] = hexToRgb(winner.color);
+		result[key] = [r, g, b, 200];
+	}
+	return result;
+});
 
-function getTooltip(feature: { properties?: Record<string, unknown> }): TooltipData | null {
-	if (!feature.properties) return null;
-	const key = String(feature.properties["hc-key"] ?? "");
-	const name = String(feature.properties["name"] ?? key);
-	const entry = currentRegionData.value.get(key);
-	if (!entry) return null;
+const regionData = computed(() => {
+	const result: Record<string, TooltipData> = {};
+	for (const [key, entry] of currentRegionData.value) {
+		const name = regionNames[key] ?? key;
+		const sorted = props.queries
+			.map((q, i) => ({ label: q.userInput, color: q.color, value: entry.values[i] ?? 0 }))
+			.sort((a, b) => b.value - a.value);
 
-	const sorted = props.queries
-		.map((q, i) => ({ label: q.userInput, color: q.color, value: entry.values[i] ?? 0 }))
-		.sort((a, b) => b.value - a.value);
+		result[key] = {
+			x: name,
+			payload: sorted.map((q) => [q.label, q.value]),
+			config: Object.fromEntries(
+				sorted.map((q, i) => [String(i), { label: q.label, color: q.color }]),
+			),
+		};
+	}
+	return result;
+});
 
-	return {
-		x: name,
-		payload: sorted.map((q) => [q.label, q.value]),
-		config: Object.fromEntries(
-			sorted.map((q, i) => [String(i), { label: q.label, color: q.color }]),
-		),
-	};
-}
-
-const pieSlices = ref<PieSliceData[]>([]);
-
-function computePieSlices(): PieSliceData[] {
+const pieSlices = computed(() => {
 	const result: PieSliceData[] = [];
 	if (props.queries.length <= 1) return result;
 
@@ -153,22 +158,7 @@ function computePieSlices(): PieSliceData[] {
 	}
 
 	return result;
-}
-
-function rebuild() {
-	currentRegionData.value = buildRegionData();
-	pieSlices.value = computePieSlices();
-}
-
-rebuild();
-
-watch(
-	() => [props.resdata, props.mode, props.queries] as const,
-	() => {
-		rebuild();
-	},
-	{ deep: true },
-);
+});
 </script>
 
 <template>
@@ -186,10 +176,9 @@ watch(
 		</div>
 
 		<Map
-			:get-fill-color="getFillColor"
-			:get-tooltip="getTooltip"
+			:colors="colors"
 			:pie-slices="pieSlices.length > 0 ? pieSlices : undefined"
-			:update-triggers="[mode, resdata, queries]"
+			:region-data="regionData"
 			:used-regions="usedRegions"
 		/>
 	</div>
