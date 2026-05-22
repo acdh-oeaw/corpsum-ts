@@ -177,9 +177,7 @@ const wordTableData = computed(() =>
 const { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg } = useChartExport(
 	containerRef,
 	wordTableData,
-	ref([]),
 	toRef(() => props.title),
-	ref(undefined),
 );
 
 watch(

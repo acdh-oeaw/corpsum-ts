@@ -4,10 +4,23 @@ import { GeoJsonLayer, PolygonLayer, TextLayer } from "@deck.gl/layers";
 import turfCentroid from "@turf/centroid";
 import { toWgs84 } from "@turf/projection";
 import { Maximize2, MoreHorizontal } from "lucide-vue-next";
-import { computed, h, onBeforeUnmount, onMounted, ref, render, shallowRef, watch } from "vue";
+import {
+	computed,
+	getCurrentInstance,
+	h,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	render,
+	shallowRef,
+	useTemplateRef,
+	watch,
+} from "vue";
 
 import type { ChartConfig } from "@/components/ui/chart";
 import ChartTooltipContent from "@/components/ui/chart/ChartTooltipContent.vue";
+import { useChartExport } from "@/composables/use-chart-export";
+import { useTranslations } from "@/composables/use-translations";
 import { mapAustria } from "@/utils/map-austria";
 
 import { Button } from "./ui/button";
@@ -316,6 +329,11 @@ function openFullscreen() {
 				}}</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
-		<canvas ref="canvasRef" style="width: 100%; height: 100%" />
+		<canvas
+			ref="canvasRef"
+			role="img"
+			:aria-label="t('Map.label')"
+			style="width: 100%; height: 100%"
+		/>
 	</div>
 </template>

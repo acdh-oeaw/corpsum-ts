@@ -17,4 +17,5 @@ beforeMount(async ({ app }) => {
 			},
 		}),
 	);
+	app.provide("disablePortal", true);
 });
