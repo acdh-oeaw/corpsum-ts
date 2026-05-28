@@ -7,7 +7,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	const loginPath = `/${locale}/login`;
 	const signupPath = `/${locale}/signup`;
 	const imprintPath = `/${locale}/imprint`;
-	const isPublicRoute = to.path === loginPath || to.path === signupPath || to.path === imprintPath;
+	const isPublishedRoute = to.path.startsWith("/v/") || to.path.startsWith(`/${locale}/v/`);
+	const isPublicRoute =
+		to.path === loginPath || to.path === signupPath || to.path === imprintPath || isPublishedRoute;
 
 	if (import.meta.server && !isPublicRoute) {
 		try {
