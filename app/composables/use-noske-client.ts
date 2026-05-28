@@ -27,9 +27,15 @@ export function useNoskeClient(id: MaybeRef<string | null>) {
 	const client = computed<NoskeClient | null>(() => {
 		if (!instance.value) return null;
 		if (resolvedId.value && instance.value._id !== resolvedId.value) return null;
-		return createClient<paths>({
+		const noskeClient = createClient<paths>({
 			baseUrl: `/api/noske/${instance.value._id}`,
 		});
+		noskeClient.use({
+			onResponse({ request, response }) {
+				recordNoskeCacheMetadataFromResponse(request, response);
+			},
+		});
+		return noskeClient;
 	});
 
 	const useNoskeQuery = <TData>(options: NoskeQueryOptions<TData>) => {
@@ -41,7 +47,9 @@ export function useNoskeClient(id: MaybeRef<string | null>) {
 				if (!activeClient) {
 					throw new Error("NoSketch client is not ready yet.");
 				}
-				return options.queryFn(activeClient);
+				return options.queryFn(
+					withNoskeCacheHeaders(activeClient, unref(options.queryKey)) as NoskeClient,
+				);
 			},
 		};
 
