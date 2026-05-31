@@ -1,24 +1,11 @@
 <script setup lang="ts">
+import {
+	type VisualizationType,
+	defaultTemporalFrequencyDistributionSettings,
+	temporalFrequencyDistributionType,
+	visualizationTypes,
+} from "~/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
-
-type VisualizationType =
-	| "data-display-collocations"
-	| "data-display-keyword-in-context"
-	| "data-display-media-source"
-	| "data-display-regional-frequencies"
-	| "data-display-source-table"
-	| "data-display-word-form-frequencies"
-	| "data-display-yearly-frequencies";
-
-const visualizationTypes: Array<VisualizationType> = [
-	"data-display-collocations",
-	"data-display-keyword-in-context",
-	"data-display-media-source",
-	"data-display-regional-frequencies",
-	"data-display-source-table",
-	"data-display-word-form-frequencies",
-	"data-display-yearly-frequencies",
-];
 
 const t = useTranslations();
 const localeRoute = useLocaleRoute();
@@ -29,7 +16,15 @@ const queriesList = computed(() => queries.value ?? []);
 const name = ref("");
 const selectedQueries = ref<Array<string>>([]);
 const selectedVisualizations = ref<Array<VisualizationType>>([]);
-const settingsText = ref("[]");
+const settingsText = computed(() =>
+	JSON.stringify(
+		selectedVisualizations.value.map((type) =>
+			type === temporalFrequencyDistributionType
+				? defaultTemporalFrequencyDistributionSettings
+				: {},
+		),
+	),
+);
 const dataText = ref("[]");
 const formError = ref("");
 const isSaving = ref(false);
@@ -286,9 +281,6 @@ function cancel() {
 			<div class="grid gap-2">
 				<p class="text-sm font-medium">{{ t("VisualizationForm.labels.visualizations") }}</p>
 				<div class="space-y-2 rounded-md border p-3">
-					<div v-if="visualizationTypes.length === 0" class="text-sm text-muted-foreground">
-						{{ t("VisualizationForm.messages.noVisualizations") }}
-					</div>
 					<div
 						v-for="visualization in visualizationTypes"
 						:key="visualization"
@@ -303,7 +295,7 @@ function cancel() {
 				</div>
 			</div>
 
-			<input id="viz-settings" v-model="settingsText" type="hidden" />
+			<input id="viz-settings" :value="settingsText" type="hidden" />
 			<input id="viz-data" v-model="dataText" type="hidden" />
 
 			<p v-if="formError" class="text-sm text-destructive" role="alert">

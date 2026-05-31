@@ -2,22 +2,18 @@
 import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
 import DataDisplayKeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
+import DataDisplayMetadataTemporalFrequencyDistribution from "@/components/data-display/data-display-metadata-temporal-frequency-distribution.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplaySourceTable from "@/components/data-display/data-display-source-table.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
-import DataDisplayYearlyFrequencies from "@/components/data-display/data-display-yearly-frequencies.vue";
 import { colors } from "@/utils/colors";
+import {
+	type VisualizationType,
+	normalizeTemporalFrequencyDistributionSettings,
+	temporalFrequencyDistributionType,
+} from "~/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
-
-type VisualizationType =
-	| "data-display-collocations"
-	| "data-display-keyword-in-context"
-	| "data-display-media-source"
-	| "data-display-regional-frequencies"
-	| "data-display-source-table"
-	| "data-display-word-form-frequencies"
-	| "data-display-yearly-frequencies";
 
 const t = useTranslations();
 const route = useRoute();
@@ -41,6 +37,7 @@ const isPublishing = ref(false);
 const publishedUid = ref("");
 
 const queriesList = computed(() => queries.value ?? []);
+const corpusQueries = computed(() => queryStore.queries);
 const selectedQueryItems = computed(() => {
 	const selected = new Set(visualization.value?.queries ?? []);
 	return queriesList.value.filter((query) => selected.has(query._id));
@@ -53,7 +50,7 @@ const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-regional-frequencies": DataDisplayRegionalFrequencies,
 	"data-display-source-table": DataDisplaySourceTable,
 	"data-display-word-form-frequencies": DataDisplayWordFormFrequencies,
-	"data-display-yearly-frequencies": DataDisplayYearlyFrequencies,
+	[temporalFrequencyDistributionType]: DataDisplayMetadataTemporalFrequencyDistribution,
 };
 
 const publishedLink = computed(() => {
@@ -140,6 +137,13 @@ const buildQuery = (item: QueryListItem, index: number): CorpusQuery => {
 		},
 	};
 };
+
+function getVisualizationSettings(index: number, type: VisualizationType) {
+	if (type === temporalFrequencyDistributionType) {
+		return normalizeTemporalFrequencyDistributionSettings(visualization.value?.settings[index]);
+	}
+	return visualization.value?.settings[index];
+}
 
 watch(
 	() => [visualization.value, selectedQueryItems.value],
@@ -298,8 +302,10 @@ async function publishVisualization() {
 				<div class="grid gap-4">
 					<component
 						:is="visualizationComponents[item]"
-						v-for="item in visualization.visualizations"
-						:key="item"
+						v-for="(item, index) in visualization.visualizations"
+						:key="`${item}-${index}`"
+						:queries="corpusQueries"
+						:settings="getVisualizationSettings(index, item)"
 					/>
 				</div>
 			</div>

@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import {
+	type CorpusMetadataMappingResponse,
+	type TemporalFrequencyDistributionSettings,
+	type VisualizationType,
+	normalizeTemporalFrequencyDistributionSettings,
+	normalizeVisualizationType,
+	temporalFrequencyDistributionType,
+} from "~/lib/visualization-types";
+
 interface PublishedQuerySnapshot {
 	id: number;
 	sourceQueryId: string;
@@ -20,6 +29,8 @@ interface PublishedPanelSnapshot {
 	type: VisualizationType;
 	queryId: string;
 	data: unknown;
+	settings?: unknown;
+	mapping?: CorpusMetadataMappingResponse | null;
 }
 
 interface PublishedVisualizationSnapshot {
@@ -27,15 +38,6 @@ interface PublishedVisualizationSnapshot {
 	visualizations: Array<VisualizationType>;
 	panels: Array<PublishedPanelSnapshot>;
 }
-
-type VisualizationType =
-	| "data-display-collocations"
-	| "data-display-keyword-in-context"
-	| "data-display-media-source"
-	| "data-display-regional-frequencies"
-	| "data-display-source-table"
-	| "data-display-word-form-frequencies"
-	| "data-display-yearly-frequencies";
 
 interface FreqMlItem {
 	Word?: Array<{ n?: string }>;
@@ -78,11 +80,16 @@ const mode = ref<"relative" | "absolute">("relative");
 
 const corpusQueries = computed(() => props.snapshot.queries.map(toCorpusQuery));
 const renderItems = computed(() =>
-	props.snapshot.visualizations.map((type) => ({ type, key: toSearchKey(type) })),
+	props.snapshot.visualizations.map((type) => ({
+		type: normalizeVisualizationType(type),
+		key: toSearchKey(normalizeVisualizationType(type)),
+	})),
 );
 
 function findPanel(type: PublishedPanelSnapshot["type"], queryId: string) {
-	return props.snapshot.panels.find((panel) => panel.type === type && panel.queryId === queryId);
+	return props.snapshot.panels.find(
+		(panel) => normalizeVisualizationType(panel.type) === type && panel.queryId === queryId,
+	);
 }
 
 function toCorpusQuery(query: PublishedQuerySnapshot): CorpusQuery {
@@ -144,20 +151,60 @@ function parseRegionalFrequencies(query: PublishedQuerySnapshot) {
 }
 
 function parseYearlyFrequencies(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-yearly-frequencies", query.sourceQueryId)?.data as
-		| FreqMlResponse
-		| undefined;
+	const panel = findPanel(temporalFrequencyDistributionType, query.sourceQueryId);
+	const data = panel?.data as FreqMlResponse | undefined;
+	const mapping = panel?.mapping;
 	const values =
-		data?.Blocks?.[0]?.Items?.map((item) => ({
-			year: Number(item.Word?.map(({ n }) => n ?? "").join("") ?? 0),
-			absolute: item.frq ?? 0,
-			relative: item.reltt ?? 0,
-		})) ?? [];
+		data?.Blocks?.[0]?.Items?.flatMap((item) => {
+			const rawValue = item.Word?.map(({ n }) => n ?? "").join("") ?? "";
+			const parsedYear = mapping ? parseTemporalYear(rawValue, mapping) : Number(rawValue);
+			if (!Number.isInteger(parsedYear)) return [];
+			const year = parsedYear as number;
+			return [
+				{
+					year,
+					absolute: item.frq ?? 0,
+					relative: item.reltt ?? 0,
+				},
+			];
+		}) ?? [];
+	const settings = getTemporalSettings(panel);
 	const existing = new Set(values.map(({ year }) => year));
-	const missing = Array.from({ length: 2024 - 1986 + 1 }, (_, index) => 1986 + index)
+	const missing = Array.from(
+		{ length: settings.yearRange.end - settings.yearRange.start + 1 },
+		(_, index) => settings.yearRange.start + index,
+	)
 		.filter((year) => !existing.has(year))
 		.map((year) => ({ year, absolute: 0, relative: 0 }));
 	return [...values, ...missing].sort((left, right) => left.year - right.year);
+}
+
+function parseTemporalYear(
+	rawValue: string,
+	mapping: CorpusMetadataMappingResponse,
+): number | null {
+	const normalized = mapping.valueMap[rawValue] ?? rawValue;
+	if (mapping.parser.mode === "year") {
+		const year = Number(normalized);
+		return Number.isInteger(year) ? year : null;
+	}
+	if (mapping.parser.mode === "date") {
+		const date = new Date(normalized);
+		const year = date.getUTCFullYear();
+		return Number.isInteger(year) && !Number.isNaN(date.getTime()) ? year : null;
+	}
+	if (!mapping.parser.pattern) return null;
+	const match = new RegExp(mapping.parser.pattern, "u").exec(normalized);
+	const captured = match?.[1] ?? match?.groups?.year;
+	if (!captured) return null;
+	const year = Number(captured);
+	return Number.isInteger(year) ? year : null;
+}
+
+function getTemporalSettings(
+	panel: PublishedPanelSnapshot | undefined,
+): TemporalFrequencyDistributionSettings {
+	return normalizeTemporalFrequencyDistributionSettings(panel?.settings);
 }
 
 function parseCollocations(query: PublishedQuerySnapshot) {
@@ -236,7 +283,7 @@ function toSearchKey(type: VisualizationType): SearchFunctionKey | "sourceTable"
 			return "regionalFrequencies";
 		case "data-display-word-form-frequencies":
 			return "wordFormFrequencies";
-		case "data-display-yearly-frequencies":
+		case temporalFrequencyDistributionType:
 			return "yearlyFrequencies";
 		case "data-display-source-table":
 			return "sourceTable";
