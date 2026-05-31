@@ -3,27 +3,28 @@ import { randomUUID } from "node:crypto";
 import { type Types } from "mongoose";
 
 import { colors } from "@/utils/colors";
+import {
+	type TemporalFrequencyDistributionSettings,
+	type VisualizationType,
+	defaultTemporalFrequencyDistributionSettings,
+	normalizeTemporalFrequencyDistributionSettings,
+	normalizeVisualizationType,
+	temporalFrequencyDistributionType,
+} from "~/lib/visualization-types";
+import type { CorpusMetadataMappingResponse } from "~/lib/visualization-types";
 import { type NoskeDocument, NoskeModel } from "~/server/models/noskeinstances.schema";
 import { NoskeQueryCacheModel } from "~/server/models/noskequerycache.schema";
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
 import type { UserDocument } from "~/server/models/users.schema";
 import type { VisualizationDocument } from "~/server/models/visualizations.schema";
+import {
+	resolveCorpusMetadataMapping,
+	serializeCorpusMetadataMapping,
+} from "~/server/utils/corpus-metadata-mappings";
 import { resolveNoskeTargetPath } from "~/server/utils/noske-path";
 import { createNoskeCacheIdentity } from "~/server/utils/noske-query-cache";
 
-export const publishedSchemaVersion = 1;
-
-export const visualizationTypes = [
-	"data-display-collocations",
-	"data-display-keyword-in-context",
-	"data-display-media-source",
-	"data-display-regional-frequencies",
-	"data-display-source-table",
-	"data-display-word-form-frequencies",
-	"data-display-yearly-frequencies",
-] as const;
-
-export type VisualizationType = (typeof visualizationTypes)[number];
+export const publishedSchemaVersion = 2;
 
 export interface PublishedQuerySnapshot {
 	id: number;
@@ -53,6 +54,8 @@ export interface PublishedPanelSnapshot {
 	cachedAt: string;
 	upstreamDurationMs: number;
 	data: unknown;
+	settings?: unknown;
+	mapping?: CorpusMetadataMappingResponse | null;
 }
 
 export interface MissingPublishedCacheEntry {
@@ -73,10 +76,6 @@ const keyToKey = {
 	wordrow: "word",
 } satisfies Record<QueryDocument["type"], string>;
 
-export function isVisualizationType(value: unknown): value is VisualizationType {
-	return typeof value === "string" && visualizationTypes.includes(value as VisualizationType);
-}
-
 export function generatePublishedVisualizationUid() {
 	return randomUUID().toLowerCase();
 }
@@ -93,13 +92,30 @@ export async function createPublishedSnapshot(input: {
 	const missing: Array<MissingPublishedCacheEntry> = [];
 	const panels: Array<PublishedPanelSnapshot> = [];
 
-	for (const type of input.visualization.visualizations) {
-		if (!isVisualizationType(type)) continue;
+	for (const value of input.visualization.visualizations) {
+		const type = normalizeVisualizationType(value);
 		if (type === "data-display-source-table") continue;
 		for (const query of queries) {
 			const noske = noskeById.get(query.noske.toString());
 			if (!noske) continue;
-			const request = createPanelRequest(type, query, noske, input.publisher._id.toString());
+			const settings = getVisualizationSettings(input.visualization, type);
+			const mapping = await getPanelMapping(type, query, input.publisher._id.toString());
+			if (type === temporalFrequencyDistributionType && !mapping) {
+				missing.push({
+					type,
+					queryId: query._id.toString(),
+					queryName: query.name,
+					cacheKey: "missing-corpus-metadata-mapping",
+				});
+				continue;
+			}
+			const request = createPanelRequest(
+				type,
+				query,
+				noske,
+				input.publisher._id.toString(),
+				mapping,
+			);
 			const cached = await NoskeQueryCacheModel.findOne({
 				user: input.publisher._id,
 				noske: query.noske,
@@ -122,6 +138,8 @@ export async function createPublishedSnapshot(input: {
 				cachedAt: cached.cachedAt.toISOString(),
 				upstreamDurationMs: cached.upstreamDurationMs,
 				data: cached.data,
+				settings,
+				mapping: mapping ? serializeCorpusMetadataMapping(mapping) : null,
 			});
 		}
 	}
@@ -192,10 +210,11 @@ function createPanelRequest(
 	query: QueryDocument,
 	noske: NoskeDocument,
 	userId: string,
+	mapping?: { attribute: string } | null,
 ) {
 	const targetPath = createTargetPath(type);
 	const upstreamPath = resolveNoskeTargetPath(noske.version, targetPath);
-	const params = createQueryParams(type, query);
+	const params = createQueryParams(type, query, mapping);
 	return createNoskeCacheIdentity({
 		userId,
 		noskeId: query.noske.toString(),
@@ -212,7 +231,11 @@ function createTargetPath(type: VisualizationType) {
 	return "/search/freqml";
 }
 
-function createQueryParams(type: VisualizationType, query: QueryDocument) {
+function createQueryParams(
+	type: VisualizationType,
+	query: QueryDocument,
+	mapping?: { attribute: string } | null,
+) {
 	const common = {
 		corpname: query.corpus,
 		usesubcorp: query.subCorpus || undefined,
@@ -260,7 +283,7 @@ function createQueryParams(type: VisualizationType, query: QueryDocument) {
 			ml1ctx: "0~0 > 0",
 		};
 	}
-	if (type === "data-display-yearly-frequencies") {
+	if (type === temporalFrequencyDistributionType) {
 		return {
 			...common,
 			group: "0",
@@ -268,7 +291,7 @@ function createQueryParams(type: VisualizationType, query: QueryDocument) {
 			showreltt: "1",
 			showrel: "1",
 			freqlevel: "1",
-			ml1attr: "doc.year",
+			ml1attr: mapping?.attribute ?? "doc.year",
 			ml1ctx: "0~0 > 0",
 		};
 	}
@@ -282,6 +305,30 @@ function createQueryParams(type: VisualizationType, query: QueryDocument) {
 		csortfn: "d",
 		citemsperpage: "10",
 	};
+}
+
+function getVisualizationSettings(
+	visualization: VisualizationDocument,
+	type: VisualizationType,
+): unknown {
+	if (type !== temporalFrequencyDistributionType) return undefined;
+	const index = visualization.visualizations.findIndex(
+		(value) => normalizeVisualizationType(value) === type,
+	);
+	return normalizeTemporalFrequencyDistributionSettings(
+		index >= 0 ? visualization.settings[index] : defaultTemporalFrequencyDistributionSettings,
+	) satisfies TemporalFrequencyDistributionSettings;
+}
+
+async function getPanelMapping(type: VisualizationType, query: QueryDocument, userId: string) {
+	if (type !== temporalFrequencyDistributionType) return null;
+	const resolved = await resolveCorpusMetadataMapping({
+		noske: query.noske,
+		corpus: query.corpus,
+		semantic: "temporal",
+		userId,
+	});
+	return resolved.resolved;
 }
 
 function getQueryWithFacetting(query: QueryDocument) {
