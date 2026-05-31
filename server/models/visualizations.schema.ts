@@ -1,6 +1,7 @@
 import { type HydratedDocument, type Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
+import { visualizationTypes } from "~/lib/visualization-types";
 
 export interface VisualizationSchema {
 	queries: Array<Types.ObjectId>;
@@ -15,15 +16,7 @@ const schemaDefinition = {
 	visualizations: [
 		{
 			type: String,
-			enum: [
-				"data-display-collocations",
-				"data-display-keyword-in-context",
-				"data-display-media-source",
-				"data-display-regional-frequencies",
-				"data-display-source-table",
-				"data-display-word-form-frequencies",
-				"data-display-yearly-frequencies",
-			],
+			enum: visualizationTypes,
 			required: true,
 		},
 	],
