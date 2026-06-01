@@ -210,6 +210,12 @@ async function publishVisualization() {
 				<PageTitle>{{ visualization.name || t("VisualizationsPage.detailTitle") }}</PageTitle>
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button as-child size="sm" type="button" variant="ghost">
+					<NuxtLinkLocale :href="{ path: `/visualization/edit/${visualization._id}` }">
+						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+						{{ t("Actions.edit") }}
+					</NuxtLinkLocale>
+				</Button>
 				<Dialog v-model:open="publishOpen">
 					<DialogTrigger as-child>
 						<Button size="sm" type="button" variant="ghost">

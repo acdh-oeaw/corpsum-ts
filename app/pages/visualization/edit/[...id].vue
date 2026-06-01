@@ -2,13 +2,25 @@
 import {
 	type VisualizationType,
 	defaultTemporalFrequencyDistributionSettings,
+	normalizeTemporalFrequencyDistributionSettings,
 	temporalFrequencyDistributionType,
 	visualizationTypes,
 } from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
+import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
 
 const t = useTranslations();
+const route = useRoute();
 const localeRoute = useLocaleRoute();
+
+const visualizationId = computed(() => {
+	const idParam = route.params.id;
+	return Array.isArray(idParam) ? idParam[0] : idParam;
+});
+
+const { data: visualization } = await useFetch<VisualizationResponse>(
+	() => `/api/visualization/${visualizationId.value}`,
+);
 const { data: queries } = await useFetch<Array<QueryListItem>>("/api/queries", {});
 
 const queriesList = computed(() => queries.value ?? []);
@@ -16,21 +28,46 @@ const queriesList = computed(() => queries.value ?? []);
 const name = ref("");
 const selectedQueries = ref<Array<string>>([]);
 const selectedVisualizations = ref<Array<VisualizationType>>([]);
-const settingsText = computed(() =>
-	JSON.stringify(
-		selectedVisualizations.value.map((type) =>
-			type === temporalFrequencyDistributionType
-				? defaultTemporalFrequencyDistributionSettings
-				: {},
-		),
-	),
-);
+const settingsByType = ref<Partial<Record<VisualizationType, unknown>>>({});
 const dataText = ref("[]");
 const formError = ref("");
 const isSaving = ref(false);
 const formId = "visualization-form";
 const dialogOpen = ref(false);
 const tempSelectedQueries = ref<Array<string>>([]);
+
+watch(
+	visualization,
+	(value) => {
+		if (!value) return;
+		name.value = value.name;
+		selectedQueries.value = [...value.queries];
+		selectedVisualizations.value = [...value.visualizations];
+		dataText.value = JSON.stringify(value.data);
+		settingsByType.value = value.visualizations.reduce<Partial<Record<VisualizationType, unknown>>>(
+			(settings, type, index) => {
+				settings[type] =
+					type === temporalFrequencyDistributionType
+						? normalizeTemporalFrequencyDistributionSettings(value.settings[index])
+						: (value.settings[index] ?? {});
+				return settings;
+			},
+			{},
+		);
+	},
+	{ immediate: true },
+);
+
+const settingsText = computed(() =>
+	JSON.stringify(
+		selectedVisualizations.value.map((type) => {
+			if (type === temporalFrequencyDistributionType) {
+				return normalizeTemporalFrequencyDistributionSettings(settingsByType.value[type]);
+			}
+			return settingsByType.value[type] ?? {};
+		}),
+	),
+);
 
 const toggleVisualizationSelection = (
 	value: VisualizationType,
@@ -40,6 +77,15 @@ const toggleVisualizationSelection = (
 	if (checked) {
 		if (!items.includes(value)) {
 			items.push(value);
+		}
+		if (settingsByType.value[value] === undefined) {
+			settingsByType.value = {
+				...settingsByType.value,
+				[value]:
+					value === temporalFrequencyDistributionType
+						? defaultTemporalFrequencyDistributionSettings
+						: {},
+			};
 		}
 		selectedVisualizations.value = items;
 		return;
@@ -101,7 +147,7 @@ const parseJsonArray = (value: string): Array<unknown> | null => {
 
 async function save() {
 	formError.value = "";
-	if (isSaving.value) return;
+	if (isSaving.value || !visualizationId.value) return;
 	if (!name.value.trim()) {
 		formError.value = t("VisualizationForm.validation.required");
 		return;
@@ -124,40 +170,45 @@ async function save() {
 
 	isSaving.value = true;
 	try {
-		const created = await $fetch<{ _id: string }>("/api/visualization", {
-			method: "POST",
-			body: {
-				name: name.value.trim(),
-				queries: selectedQueries.value,
-				visualizations: selectedVisualizations.value,
-				settings,
-				data,
+		const updated = await $fetch<VisualizationResponse>(
+			`/api/visualization/${visualizationId.value}`,
+			{
+				method: "PATCH",
+				body: {
+					name: name.value.trim(),
+					queries: selectedQueries.value,
+					visualizations: selectedVisualizations.value,
+					settings,
+					data,
+				},
 			},
-		});
-		await navigateTo(localeRoute(`/visualization/${created._id}`));
+		);
+		visualization.value = updated;
+		await navigateTo(localeRoute(`/visualization/${updated._id}`));
 	} finally {
 		isSaving.value = false;
 	}
 }
 
 function cancel() {
-	navigateTo(localeRoute("/visualizations"));
+	if (!visualizationId.value) return;
+	navigateTo(localeRoute(`/visualization/${visualizationId.value}`));
 }
 </script>
 
 <template>
-	<MainContent class="w-full min-w-0">
+	<MainContent v-if="visualization" class="w-full min-w-0">
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
 					<LucideIcon class="size-8 text-foreground" name="ChartColumn" :stroke-width="2" />
 				</div>
-				<PageTitle>{{ t("VisualizationsPage.newTitle") }}</PageTitle>
+				<PageTitle>{{ visualization.name || t("VisualizationsPage.detailTitle") }}</PageTitle>
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
 				<Button :disabled="isSaving" :form="formId" size="sm" type="submit" variant="ghost">
 					<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
-					{{ t("Actions.create") }}
+					{{ t("Actions.save") }}
 				</Button>
 				<Button :disabled="isSaving" size="sm" type="button" variant="ghost" @click="cancel">
 					<LucideIcon class="mr-1 size-4" name="X" :stroke-width="2" />
@@ -224,7 +275,7 @@ function cancel() {
 								<Card class="flex h-full w-[350px] flex-col rounded-sm border-2 border-dashed">
 									<CardHeader>
 										<CardDescription>{{ t("VisualizationForm.actions.addQuery") }}</CardDescription>
-										<CardTitle class="text-2xl font-black tracking-normal">—</CardTitle>
+										<CardTitle class="text-2xl font-black tracking-normal">-</CardTitle>
 									</CardHeader>
 									<CardFooter class="mt-auto">
 										<Button type="button" variant="ghost" @click="openDialog">
@@ -283,15 +334,15 @@ function cancel() {
 				<p class="text-sm font-medium">{{ t("VisualizationForm.labels.visualizations") }}</p>
 				<div class="space-y-2 rounded-md border p-3">
 					<div
-						v-for="visualization in visualizationTypes"
-						:key="visualization"
+						v-for="visualizationType in visualizationTypes"
+						:key="visualizationType"
 						class="flex items-center gap-2"
 					>
 						<Checkbox
-							:model-value="selectedVisualizations.includes(visualization)"
-							@update:model-value="toggleVisualizationSelection(visualization, $event)"
+							:model-value="selectedVisualizations.includes(visualizationType)"
+							@update:model-value="toggleVisualizationSelection(visualizationType, $event)"
 						/>
-						<span class="text-sm">{{ visualization }}</span>
+						<span class="text-sm">{{ visualizationType }}</span>
 					</div>
 				</div>
 			</div>

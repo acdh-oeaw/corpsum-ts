@@ -98,6 +98,18 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 											</TooltipTrigger>
 											<TooltipContent>{{ t("Actions.view") }}</TooltipContent>
 										</Tooltip>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<Button as-child class="flex-1" size="sm" variant="ghost">
+													<NuxtLinkLocale
+														:href="{ path: `/visualization/edit/${visualization._id}` }"
+													>
+														<LucideIcon class="size-4" name="Pencil" :stroke-width="2" />
+													</NuxtLinkLocale>
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent>{{ t("Actions.edit") }}</TooltipContent>
+										</Tooltip>
 										<AlertDialog>
 											<Tooltip>
 												<TooltipTrigger as-child>
@@ -182,6 +194,18 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 												</Button>
 											</TooltipTrigger>
 											<TooltipContent>{{ t("Actions.view") }}</TooltipContent>
+										</Tooltip>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<Button as-child class="flex-1" size="sm" variant="ghost">
+													<NuxtLinkLocale
+														:href="{ path: `/visualization/edit/${visualization._id}` }"
+													>
+														<LucideIcon class="size-4" name="Pencil" :stroke-width="2" />
+													</NuxtLinkLocale>
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent>{{ t("Actions.edit") }}</TooltipContent>
 										</Tooltip>
 										<AlertDialog>
 											<Tooltip>
