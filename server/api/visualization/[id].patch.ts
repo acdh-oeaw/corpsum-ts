@@ -5,7 +5,7 @@ import {
 	type VisualizationType,
 	isVisualizationType,
 	normalizeVisualizationType,
-} from "~/lib/visualization-types";
+} from "@/lib/visualization-types";
 import { QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
 import {

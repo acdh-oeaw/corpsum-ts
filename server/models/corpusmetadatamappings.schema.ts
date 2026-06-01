@@ -5,7 +5,7 @@ import type {
 	CorpusMetadataMappingScope,
 	CorpusMetadataSemantic,
 	TemporalParserConfig,
-} from "~/lib/visualization-types";
+} from "@/lib/visualization-types";
 
 const parserSchema = {
 	mode: {

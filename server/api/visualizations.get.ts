@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { defineEventHandler } from "h3";
 
-import { type VisualizationType, normalizeVisualizationType } from "~/lib/visualization-types";
+import { type VisualizationType, normalizeVisualizationType } from "@/lib/visualization-types";
 import { QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
 import {

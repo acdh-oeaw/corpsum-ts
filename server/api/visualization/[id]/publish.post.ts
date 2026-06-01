@@ -1,7 +1,7 @@
 import { defineEventHandler, getRouterParam, type H3Event, readBody } from "h3";
 import mongoose from "mongoose";
 
-import { normalizeVisualizationType } from "~/lib/visualization-types";
+import { normalizeVisualizationType } from "@/lib/visualization-types";
 import {
 	PublishedVisualizationModel,
 	type PublishedVisualizationDocument,

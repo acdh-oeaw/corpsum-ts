@@ -1,7 +1,7 @@
 import { type HydratedDocument, type Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
-import { visualizationTypes } from "~/lib/visualization-types";
+import { visualizationTypes } from "@/lib/visualization-types";
 
 export interface VisualizationSchema {
 	queries: Array<Types.ObjectId>;
