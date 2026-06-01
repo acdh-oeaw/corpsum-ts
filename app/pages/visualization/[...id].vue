@@ -8,10 +8,10 @@ import DataDisplaySourceTable from "@/components/data-display/data-display-sourc
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import {
 	type VisualizationType,
+	getVisualizationMetadataSemantics,
 	normalizeTemporalFrequencyDistributionSettings,
 	temporalFrequencyDistributionType,
 } from "@/lib/visualization-types";
-import { colors } from "@/utils/colors";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
 
@@ -37,11 +37,18 @@ const isPublishing = ref(false);
 const publishedUid = ref("");
 
 const queriesList = computed(() => queries.value ?? []);
-const corpusQueries = computed(() => queryStore.queries);
 const selectedQueryItems = computed(() => {
 	const selected = new Set(visualization.value?.queries ?? []);
 	return queriesList.value.filter((query) => selected.has(query._id));
 });
+const { buildCorpusQuery } = useCorpusQueryBuilder();
+const corpusQueries = computed(() =>
+	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
+);
+const { mappingsForQueries: temporalMetadataMappings } = await useCorpusMetadataMappings(
+	corpusQueries,
+	"temporal",
+);
 
 const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-collocations": DataDisplayCollocations,
@@ -72,72 +79,6 @@ const embedSnippet = computed(() => {
 	return `<iframe src="${src}" width="100%" height="720" loading="lazy" style="border:0;" title="${escapeAttribute(publishTitle.value)}"></iframe>`;
 });
 
-const keyToKey: Record<CorpusQueryType, CorpusQueryTypeValue> = {
-	charrow: "char",
-	cqlrow: "cql",
-	iqueryrow: "iquery",
-	lemmarow: "lemma",
-	phraserow: "phrase",
-	wordrow: "word",
-};
-
-const buildFinalQuery = (type: CorpusQueryType, userInput: string) => {
-	switch (type) {
-		case "wordrow":
-			return `[word="${userInput}"]`;
-		case "lemmarow":
-			return `[lemma="${userInput}"]`;
-		case "cqlrow":
-			return userInput;
-		case "charrow":
-		case "iqueryrow":
-		case "phraserow":
-			return `[word="${userInput}"]`;
-	}
-	return `[word="${userInput}"]`;
-};
-
-const buildQuery = (item: QueryListItem, index: number): CorpusQuery => {
-	const finalQuery = buildFinalQuery(item.type, item.userInput);
-	const concordance_query = {
-		queryselector: item.type,
-		[keyToKey[item.type]]: item.userInput,
-	} as ConcordanceQuery;
-
-	return {
-		id: index,
-		noske: item.noske,
-		type: item.type,
-		userInput: item.userInput,
-		finalQuery,
-		preparedQuery: `aword,${finalQuery}`,
-		color: colors[index % colors.length] ?? "#111827",
-		showPicker: false,
-		corpus: item.corpus,
-		subCorpus: item.subCorpus,
-		concordance_query,
-		KWICAttrsStructs: {
-			attributes: [],
-			structures: [...queryStore.fixedKWICStructures],
-		},
-		KWICAttrsStructsOptions: {
-			attributes: [],
-			structures: [],
-		},
-		KWICAdditionalViewHeaders: [],
-		facettingValues: {},
-		SampleRatio: 100,
-		loading: {
-			yearlyFrequencies: false,
-			wordFormFrequencies: false,
-			regionalFrequencies: false,
-			keywordInContext: false,
-			mediaSources: false,
-			collocations: false,
-		},
-	};
-};
-
 function getVisualizationSettings(index: number, type: VisualizationType) {
 	if (type === temporalFrequencyDistributionType) {
 		return normalizeTemporalFrequencyDistributionSettings(visualization.value?.settings[index]);
@@ -145,17 +86,22 @@ function getVisualizationSettings(index: number, type: VisualizationType) {
 	return visualization.value?.settings[index];
 }
 
+function getVisualizationMetadataMappings(type: VisualizationType) {
+	if (getVisualizationMetadataSemantics(type).includes("temporal")) {
+		return temporalMetadataMappings.value;
+	}
+	return undefined;
+}
+
 watch(
-	() => [visualization.value, selectedQueryItems.value],
+	() => [visualization.value, corpusQueries.value],
 	() => {
 		queryStore.queries = [];
 		queryStore.nextQueryId = 0;
 		if (!visualization.value) return;
-		if (selectedQueryItems.value.length === 0) return;
-		selectedQueryItems.value.forEach((item, index) => {
-			queryStore.queries.push(buildQuery(item, index));
-			queryStore.nextQueryId = index + 1;
-		});
+		if (corpusQueries.value.length === 0) return;
+		queryStore.queries = [...corpusQueries.value];
+		queryStore.nextQueryId = corpusQueries.value.length;
 	},
 	{ immediate: true },
 );
@@ -310,6 +256,7 @@ async function publishVisualization() {
 						:is="visualizationComponents[item]"
 						v-for="(item, index) in visualization.visualizations"
 						:key="`${item}-${index}`"
+						:metadata-mappings="getVisualizationMetadataMappings(item)"
 						:queries="corpusQueries"
 						:settings="getVisualizationSettings(index, item)"
 					/>

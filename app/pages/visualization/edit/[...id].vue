@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import {
+	type CorpusMetadataSemantic,
 	type VisualizationType,
 	defaultTemporalFrequencyDistributionSettings,
+	getEditableVisualizationMetadataSemantics,
 	normalizeTemporalFrequencyDistributionSettings,
 	temporalFrequencyDistributionType,
 	visualizationTypes,
@@ -100,6 +102,13 @@ const selectedQueryItems = computed(() =>
 const availableQueryItems = computed(() =>
 	queriesList.value.filter((query) => !selectedQueries.value.includes(query._id)),
 );
+const { buildCorpusQuery } = useCorpusQueryBuilder();
+const corpusQueries = computed(() =>
+	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
+);
+const editableMetadataSemantics = computed<Array<CorpusMetadataSemantic>>(() => [
+	...new Set(selectedVisualizations.value.flatMap(getEditableVisualizationMetadataSemantics)),
+]);
 
 const openDialog = () => {
 	tempSelectedQueries.value = [...selectedQueries.value];
@@ -332,17 +341,27 @@ function cancel() {
 
 			<div class="grid gap-2">
 				<p class="text-sm font-medium">{{ t("VisualizationForm.labels.visualizations") }}</p>
-				<div class="space-y-2 rounded-md border p-3">
-					<div
-						v-for="visualizationType in visualizationTypes"
-						:key="visualizationType"
-						class="flex items-center gap-2"
-					>
-						<Checkbox
-							:model-value="selectedVisualizations.includes(visualizationType)"
-							@update:model-value="toggleVisualizationSelection(visualizationType, $event)"
+				<div class="grid gap-3 md:grid-cols-2">
+					<div class="space-y-2 rounded-md border p-3">
+						<div
+							v-for="visualizationType in visualizationTypes"
+							:key="visualizationType"
+							class="flex items-center gap-2"
+						>
+							<Checkbox
+								:model-value="selectedVisualizations.includes(visualizationType)"
+								@update:model-value="toggleVisualizationSelection(visualizationType, $event)"
+							/>
+							<span class="text-sm">{{ visualizationType }}</span>
+						</div>
+					</div>
+					<div v-if="editableMetadataSemantics.length > 0" class="grid gap-3">
+						<VisualizationCorpusMetadataMappingEditor
+							v-for="semantic in editableMetadataSemantics"
+							:key="semantic"
+							:queries="corpusQueries"
+							:semantic="semantic"
 						/>
-						<span class="text-sm">{{ visualizationType }}</span>
 					</div>
 				</div>
 			</div>
