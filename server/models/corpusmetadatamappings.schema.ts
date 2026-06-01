@@ -1,4 +1,4 @@
-import { type HydratedDocument, type Types } from "mongoose";
+import { Schema, type HydratedDocument, type Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
 import type {
@@ -7,14 +7,17 @@ import type {
 	TemporalParserConfig,
 } from "@/lib/visualization-types";
 
-const parserSchema = {
-	mode: {
-		type: String,
-		enum: ["year", "date", "regex"],
-		required: true,
+const parserSchema = new Schema(
+	{
+		mode: {
+			type: String,
+			enum: ["year", "date", "regex"],
+			required: true,
+		},
+		pattern: { type: String, required: false },
 	},
-	pattern: { type: String, required: false },
-} as const;
+	{ _id: false },
+);
 
 const schemaDefinition = {
 	noske: { type: "ObjectId", ref: "noskeinstances", required: true },
