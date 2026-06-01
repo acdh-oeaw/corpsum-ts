@@ -58,6 +58,28 @@ export interface ResolvedCorpusMetadataMappingResponse {
 	default: CorpusMetadataMappingResponse | null;
 }
 
+export interface CorpusMetadataMappingLookupResponse extends ResolvedCorpusMetadataMappingResponse {
+	canEditDefault: boolean;
+}
+
+const visualizationMetadataSemantics: Partial<
+	Record<VisualizationType, Array<CorpusMetadataSemantic>>
+> = {
+	[temporalFrequencyDistributionType]: ["temporal"],
+};
+
+export function getVisualizationMetadataSemantics(
+	type: VisualizationType,
+): Array<CorpusMetadataSemantic> {
+	return visualizationMetadataSemantics[type] ?? [];
+}
+
+export function getEditableVisualizationMetadataSemantics(
+	type: VisualizationType,
+): Array<CorpusMetadataSemantic> {
+	return getVisualizationMetadataSemantics(type);
+}
+
 export type TemporalFrequencyMode = "absolute" | "relative";
 
 export interface TemporalFrequencyDistributionSettings {
