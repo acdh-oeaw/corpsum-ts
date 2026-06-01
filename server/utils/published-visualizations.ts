@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 
 import { type Types } from "mongoose";
 
-import { colors } from "@/utils/colors";
 import {
 	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
@@ -10,8 +9,9 @@ import {
 	normalizeTemporalFrequencyDistributionSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
-} from "~/lib/visualization-types";
-import type { CorpusMetadataMappingResponse } from "~/lib/visualization-types";
+} from "@/lib/visualization-types";
+import type { CorpusMetadataMappingResponse } from "@/lib/visualization-types";
+import { colors } from "@/utils/colors";
 import { type NoskeDocument, NoskeModel } from "~/server/models/noskeinstances.schema";
 import { NoskeQueryCacheModel } from "~/server/models/noskequerycache.schema";
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";

@@ -1,4 +1,4 @@
-import { type VisualizationType, normalizeVisualizationType } from "~/lib/visualization-types";
+import { type VisualizationType, normalizeVisualizationType } from "@/lib/visualization-types";
 import type { PublishedVisualizationDocument } from "~/server/models/publishedvisualizations.schema";
 import type {
 	PublishedPanelSnapshot,

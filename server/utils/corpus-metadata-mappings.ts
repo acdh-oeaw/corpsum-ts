@@ -6,7 +6,7 @@ import type {
 	CorpusMetadataMappingScope,
 	CorpusMetadataSemantic,
 	TemporalParserConfig,
-} from "~/lib/visualization-types";
+} from "@/lib/visualization-types";
 import {
 	type CorpusMetadataMappingDocument,
 	CorpusMetadataMappingModel,
