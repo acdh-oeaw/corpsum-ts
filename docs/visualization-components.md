@@ -3,8 +3,7 @@
 ## Temporal Metadata Frequency Distribution
 
 `data-display-metadata-temporal-frequency-distribution` is the pilot interface for
-visualizing NoSketch query results against corpus metadata. It replaces the older
-`data-display-yearly-frequencies` component.
+visualizing NoSketch frequency query results against corpus temporal metadata.
 
 The component receives `CorpusQuery` objects and temporal settings. It resolves a temporal
 metadata mapping for each query's `{ noske, corpus }` pair, executes one `/search/freqml`
@@ -43,6 +42,16 @@ Parser modes:
 - `year`: the mapped or raw value must be a numeric year.
 - `date`: the mapped or raw value must be parseable as a date; the UTC year is used.
 - `regex`: `pattern` must capture the year in group 1 or a named `year` group.
+
+Regex parser examples:
+
+```json
+{ "mode": "regex", "pattern": "session-(\\d{4})" }
+```
+
+```json
+{ "mode": "regex", "pattern": "session-(?<year>\\d{4})" }
+```
 
 `valueMap` is applied before parsing, so corpus-specific labels can be mapped to parseable
 year or date strings.
