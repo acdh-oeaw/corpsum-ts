@@ -7,7 +7,7 @@ import {
 	defaultTemporalFrequencyDistributionSettings,
 	legacyYearlyFrequenciesType,
 	temporalFrequencyDistributionType,
-} from "../lib/visualization-types.ts";
+} from "@/lib/visualization-types.ts";
 
 type MongoDatabase = NonNullable<mongoose.Connection["db"]>;
 
