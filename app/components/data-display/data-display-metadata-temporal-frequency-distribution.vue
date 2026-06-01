@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 
-import type { components } from "~/lib/noske-types";
 import {
 	type CorpusMetadataMappingResponse,
 	type TemporalFrequencyDistributionSettings,
 	defaultTemporalFrequencyDistributionSettings,
 	normalizeTemporalFrequencyDistributionSettings,
-} from "~/lib/visualization-types";
+} from "@/lib/visualization-types";
+import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
 type FreqMlBlock = NonNullable<FreqMlResponse["Blocks"]>[number];
