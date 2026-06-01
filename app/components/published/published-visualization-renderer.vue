@@ -6,7 +6,7 @@ import {
 	normalizeTemporalFrequencyDistributionSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
-} from "~/lib/visualization-types";
+} from "@/lib/visualization-types";
 
 interface PublishedQuerySnapshot {
 	id: number;

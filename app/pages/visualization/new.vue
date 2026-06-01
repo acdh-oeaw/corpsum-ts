@@ -4,7 +4,7 @@ import {
 	defaultTemporalFrequencyDistributionSettings,
 	temporalFrequencyDistributionType,
 	visualizationTypes,
-} from "~/lib/visualization-types";
+} from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
 const t = useTranslations();

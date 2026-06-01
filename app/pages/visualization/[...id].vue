@@ -6,12 +6,12 @@ import DataDisplayMetadataTemporalFrequencyDistribution from "@/components/data-
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplaySourceTable from "@/components/data-display/data-display-source-table.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
-import { colors } from "@/utils/colors";
 import {
 	type VisualizationType,
 	normalizeTemporalFrequencyDistributionSettings,
 	temporalFrequencyDistributionType,
-} from "~/lib/visualization-types";
+} from "@/lib/visualization-types";
+import { colors } from "@/utils/colors";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
 
