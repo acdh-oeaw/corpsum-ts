@@ -91,14 +91,14 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 <template>
 	<div v-if="query">
 		<div class="flex items-center gap-2">
-			<Checkbox id="kwic-view-options" v-model:checked="showViewOptionsMode" />
+			<Checkbox id="kwic-view-options" v-model="showViewOptionsMode" />
 			<Label for="kwic-view-options">{{ t("viewOptions") }}</Label>
 		</div>
-		<KWICAttributeSelect v-if="showViewOptionsMode" class="mt-4" :query="query" />
+		<kwicAttributeSelect v-if="showViewOptionsMode" class="mt-4" :query="query" />
 		<div class="mt-4">
 			<QueryDisplay :loading="loading" :query="query" />
 			<CorpsumDataTable v-if="!loading" :columns="columns" :data="KWICresults" />
-			<KWICDetailDialog
+			<kwicDetailDialog
 				v-if="selectedKWIC"
 				:kwic="selectedKWIC"
 				:query="query"

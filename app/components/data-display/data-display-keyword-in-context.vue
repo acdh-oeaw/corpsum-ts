@@ -15,7 +15,7 @@ const { queries } = storeToRefs(queryStore);
 		</CardHeader>
 		<CardContent>
 			<div v-for="query in queries" :key="query.id">
-				<KWICQueryDisplay :query="query" />
+				<kwicQueryDisplay :query="query" />
 			</div>
 		</CardContent>
 	</Card>
