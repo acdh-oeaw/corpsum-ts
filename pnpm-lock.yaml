@@ -107,12 +107,6 @@ importers:
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
-      highcharts:
-        specifier: ^12.5.0
-        version: 12.6.0
-      highcharts-vue:
-        specifier: ^2.0.1
-        version: 2.0.1(highcharts@12.6.0)(vue@3.5.34(typescript@6.0.3))
       jose:
         specifier: ^6.0.10
         version: 6.2.3
@@ -6344,23 +6338,6 @@ packages:
 
   hey-listen@1.0.8:
     resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==}
-
-  highcharts-vue@2.0.1:
-    resolution: {integrity: sha512-7yVaKvsWlx7OgmKFXE2D99fi/0tr2A85H4KUz3jL7CRQhAwvEvXgtDIyTBGLHJsOC5L9VlppAI7k6KfIi0j0hg==}
-    peerDependencies:
-      highcharts: '>=5.0.0'
-      vue: '>=3.0.0'
-
-  highcharts@12.6.0:
-    resolution: {integrity: sha512-zWwoXECOakJT2huBMqIZOjDNLLgyZFCcfZqTj2g6cvYOGxjF3nvooC+rIaF5aKiharluyGKNflfRNrzOAIjdRg==}
-    peerDependencies:
-      jspdf: ^4.1.0
-      svg2pdf.js: ^2.7.0
-    peerDependenciesMeta:
-      jspdf:
-        optional: true
-      svg2pdf.js:
-        optional: true
 
   hono@4.12.18:
     resolution: {integrity: sha512-RWzP96k/yv0PQfyXnWjs6zot20TqfpfsNXhOnev8d1InAxubW93L11/oNUc3tQqn2G0bSdAOBpX+2uDFHV7kdQ==}
@@ -15887,13 +15864,6 @@ snapshots:
   hex-rgb@4.3.0: {}
 
   hey-listen@1.0.8: {}
-
-  highcharts-vue@2.0.1(highcharts@12.6.0)(vue@3.5.34(typescript@6.0.3)):
-    dependencies:
-      highcharts: 12.6.0
-      vue: 3.5.34(typescript@6.0.3)
-
-  highcharts@12.6.0: {}
 
   hono@4.12.18: {}
 
