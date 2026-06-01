@@ -29,19 +29,14 @@ interface YearlyFrequencySeries<TPoint extends FrequencyPoint | IntervalFrequenc
 	color: string;
 }
 
-interface MappingLookupResponse {
-	resolved: CorpusMetadataMappingResponse | null;
-	user: CorpusMetadataMappingResponse | null;
-	default: CorpusMetadataMappingResponse | null;
-	canEditDefault: boolean;
-}
-
 const props = withDefaults(
 	defineProps<{
 		queries?: Array<CorpusQuery>;
 		settings?: Partial<TemporalFrequencyDistributionSettings>;
+		metadataMappings?: Array<CorpusMetadataMappingResponse | null>;
 	}>(),
 	{
+		metadataMappings: undefined,
 		queries: undefined,
 		settings: undefined,
 	},
@@ -88,38 +83,7 @@ watch([mode, interval, reverse, expand], () => {
 	});
 });
 
-const mappingLookupKey = computed(() =>
-	activeQueries.value
-		.map((query) => `${query.noske ?? ""}:${query.corpus}`)
-		.sort()
-		.join("|"),
-);
-
-const { data: mappingLookups, refresh: refreshMappings } = await useAsyncData<
-	Array<MappingLookupResponse>
->(
-	() => `temporal-metadata-mappings:${mappingLookupKey.value}`,
-	async () => {
-		const requestFetch = import.meta.server ? (useRequestFetch() as typeof $fetch) : $fetch;
-		return Promise.all(
-			activeQueries.value.map((query) =>
-				requestFetch<MappingLookupResponse>("/api/corpus-metadata-mappings", {
-					query: {
-						noske: query.noske,
-						corpus: query.corpus,
-						semantic: "temporal",
-					},
-				}),
-			),
-		);
-	},
-	{
-		default: () => [],
-		watch: [mappingLookupKey],
-	},
-);
-
-const mappings = computed(() => mappingLookups.value.map((entry) => entry.resolved));
+const mappings = computed(() => props.metadataMappings ?? []);
 const missingMappingQueries = computed(() =>
 	activeQueries.value.filter((_, index) => !mappings.value[index]),
 );
@@ -179,36 +143,6 @@ const yearlyFrequencies = computed(() =>
 const yearlyFrequenciesLoading = computed(() =>
 	queryResults.value.map((result) => result.isFetching || result.isLoading),
 );
-const mappingDrafts = ref<Record<string, string>>({});
-const mappingErrors = ref<Record<string, string>>({});
-const mappingSaving = ref<Record<string, boolean>>({});
-
-watchEffect(() => {
-	for (const [index, query] of activeQueries.value.entries()) {
-		const key = createMappingDraftKey(query);
-		if (mappingDrafts.value[key]) continue;
-		const mapping = mappingLookups.value[index]?.resolved;
-		mappingDrafts.value[key] = JSON.stringify(
-			mapping
-				? {
-						attribute: mapping.attribute,
-						parser: mapping.parser,
-						valueMap: mapping.valueMap,
-						label: mapping.label ?? "Temporal distribution",
-						description: mapping.description ?? "",
-					}
-				: {
-						attribute: "doc.year",
-						parser: { mode: "year" },
-						valueMap: {},
-						label: "Temporal distribution",
-						description: "",
-					},
-			null,
-			2,
-		);
-	}
-});
 
 const normalizationWarnings = computed(() =>
 	queryResults.value.map((result, index) => {
@@ -217,70 +151,6 @@ const normalizationWarnings = computed(() =>
 		return countUnparseableTemporalValues(result.data, mapping);
 	}),
 );
-
-const editableMappingQueries = computed(() =>
-	activeQueries.value.filter((_, index) => Boolean(mappingLookups.value[index]?.resolved)),
-);
-
-function createMappingDraftKey(query: CorpusQuery) {
-	return `${query.noske ?? ""}:${query.corpus}`;
-}
-
-async function saveMapping(query: CorpusQuery, index: number, forceUserCopy = false) {
-	const key = createMappingDraftKey(query);
-	const noske = query.noske;
-	if (!noske) return;
-	mappingErrors.value = { ...mappingErrors.value, [key]: "" };
-	mappingSaving.value = { ...mappingSaving.value, [key]: true };
-	try {
-		const parsed = JSON.parse(mappingDrafts.value[key] ?? "{}") as Record<string, unknown>;
-		const lookup = mappingLookups.value[index];
-		const target = !forceUserCopy && lookup?.canEditDefault ? lookup.default : lookup?.user;
-		const body = {
-			noske,
-			corpus: query.corpus,
-			semantic: "temporal",
-			scope: forceUserCopy || !lookup?.canEditDefault ? "user" : "default",
-			attribute: parsed.attribute,
-			parser: parsed.parser,
-			valueMap: parsed.valueMap ?? {},
-			label: parsed.label,
-			description: parsed.description,
-		};
-		if (target) {
-			await $fetch(`/api/corpus-metadata-mappings/${target._id}`, {
-				method: "PATCH",
-				body,
-			});
-		} else {
-			await $fetch("/api/corpus-metadata-mappings", {
-				method: "POST",
-				body,
-			});
-		}
-		await refreshMappings();
-	} catch (error) {
-		mappingErrors.value = {
-			...mappingErrors.value,
-			[key]: error instanceof Error ? error.message : "Could not save mapping.",
-		};
-	} finally {
-		mappingSaving.value = { ...mappingSaving.value, [key]: false };
-	}
-}
-
-function getMappingIndex(query: CorpusQuery) {
-	return activeQueries.value.findIndex(
-		(item) => item.noske === query.noske && item.corpus === query.corpus,
-	);
-}
-
-function getMappingActionLabel(query: CorpusQuery) {
-	const lookup = mappingLookups.value[getMappingIndex(query)];
-	if (lookup?.user) return "Save private mapping";
-	if (lookup?.canEditDefault) return "Save default mapping";
-	return "Save private copy";
-}
 
 function parseYearlyFrequencies(
 	data: FreqMlResponse,
@@ -471,89 +341,9 @@ const intervalseries = computed(() =>
 						{{ query.corpus }} on {{ query.noske }}
 					</li>
 				</ul>
-				<div
-					v-for="query in missingMappingQueries"
-					:key="`editor-${query.noske}-${query.corpus}`"
-					class="mt-4 grid gap-2"
-				>
-					<Label :for="`mapping-${query.noske}-${query.corpus}`">
-						{{ query.corpus }} temporal mapping
-					</Label>
-					<textarea
-						:id="`mapping-${query.noske}-${query.corpus}`"
-						v-model="mappingDrafts[createMappingDraftKey(query)]"
-						class="min-h-44 rounded-md border bg-background p-3 font-mono text-xs"
-					></textarea>
-					<p v-if="mappingErrors[createMappingDraftKey(query)]" class="text-xs text-destructive">
-						{{ mappingErrors[createMappingDraftKey(query)] }}
-					</p>
-					<Button
-						class="w-fit"
-						:disabled="mappingSaving[createMappingDraftKey(query)]"
-						size="sm"
-						type="button"
-						@click="saveMapping(query, getMappingIndex(query))"
-					>
-						{{
-							mappingSaving[createMappingDraftKey(query)] ? "Saving..." : "Save temporal mapping"
-						}}
-					</Button>
-				</div>
-				<Button class="mt-3" size="sm" type="button" variant="outline" @click="refreshMappings">
-					Refresh mappings
-				</Button>
 			</div>
 
 			<template v-else>
-				<details v-if="editableMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
-					<summary class="cursor-pointer font-medium">Temporal metadata mappings</summary>
-					<div
-						v-for="query in editableMappingQueries"
-						:key="`editable-${query.noske}-${query.corpus}`"
-						class="mt-4 grid gap-2"
-					>
-						<Label :for="`editable-mapping-${query.noske}-${query.corpus}`">
-							{{ query.corpus }} temporal mapping
-						</Label>
-						<textarea
-							:id="`editable-mapping-${query.noske}-${query.corpus}`"
-							v-model="mappingDrafts[createMappingDraftKey(query)]"
-							class="min-h-44 rounded-md border bg-background p-3 font-mono text-xs"
-						></textarea>
-						<p v-if="mappingErrors[createMappingDraftKey(query)]" class="text-xs text-destructive">
-							{{ mappingErrors[createMappingDraftKey(query)] }}
-						</p>
-						<div class="flex flex-wrap gap-2">
-							<Button
-								class="w-fit"
-								:disabled="mappingSaving[createMappingDraftKey(query)]"
-								size="sm"
-								type="button"
-								@click="saveMapping(query, getMappingIndex(query))"
-							>
-								{{
-									mappingSaving[createMappingDraftKey(query)]
-										? "Saving..."
-										: getMappingActionLabel(query)
-								}}
-							</Button>
-							<Button
-								v-if="
-									!mappingLookups[getMappingIndex(query)]?.user &&
-									mappingLookups[getMappingIndex(query)]?.default
-								"
-								:disabled="mappingSaving[createMappingDraftKey(query)]"
-								size="sm"
-								type="button"
-								variant="outline"
-								@click="saveMapping(query, getMappingIndex(query), true)"
-							>
-								Save private copy
-							</Button>
-						</div>
-					</div>
-				</details>
-
 				<div class="flex max-w-7xl">
 					<ToggleGroup v-model="mode" class="flex w-full" type="single">
 						<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
