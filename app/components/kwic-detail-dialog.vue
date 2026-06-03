@@ -30,10 +30,10 @@ const t = useTranslations();
 				</DialogTitle>
 			</DialogHeader>
 
-			<div class="flex gap-2">
-				{{ kwic.left }}
+			<div class="grid grid-cols-[1fr_auto_1fr] gap-8 items-center">
+				<span class="text-right">{{ kwic.left }}</span>
 				<span class="font-semibold">{{ kwic.word }}</span>
-				{{ kwic.right }}
+				<span>{{ kwic.right }}</span>
 			</div>
 
 			<div class="mt-4">

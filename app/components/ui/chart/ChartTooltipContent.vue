@@ -12,7 +12,7 @@ const props = withDefaults(
 		payload?: Array<DataPoint>;
 		config?: ChartConfig;
 		class?: HTMLAttributes["class"];
-		x?: number | Date;
+		x?: number | Date | string;
 	}>(),
 	{
 		payload: () => [],
@@ -25,6 +25,8 @@ const yearRange = computed(() => {
 	return Array.isArray(first) ? first[0] : "";
 });
 
+const title = computed(() => (typeof props.x === "string" ? props.x : yearRange.value));
+
 const rows = computed(() =>
 	Object.entries(props.config).map(([, entry], i) => {
 		const point = props.payload[i];
@@ -36,6 +38,7 @@ const rows = computed(() =>
 		};
 	}),
 );
+const currentLocale = useLocale();
 </script>
 
 <template>
@@ -47,7 +50,7 @@ const rows = computed(() =>
 			)
 		"
 	>
-		<div v-if="yearRange" class="font-medium">{{ yearRange }}</div>
+		<div v-if="title" class="font-medium">{{ title }}</div>
 		<div class="grid gap-1.5">
 			<div
 				v-for="{ label, color, value } in rows"
@@ -57,7 +60,7 @@ const rows = computed(() =>
 				<span class="size-2 shrink-0 rounded-full" :style="{ background: color }" />
 				<span class="text-muted-foreground">{{ label }}</span>
 				<span v-if="value != null" class="ml-auto pl-4 font-medium tabular-nums text-foreground">
-					{{ value.toLocaleString() }}
+					{{ value.toLocaleString(currentLocale) }}
 				</span>
 			</div>
 		</div>

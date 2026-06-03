@@ -76,16 +76,17 @@ function buildExportClone(
 export function useChartExport(
 	containerRef: Ref<HTMLElement | null>,
 	chartData: Ref<Array<Array<DataPoint>> | TableData | undefined>,
-	seriesLabels: Ref<Array<string>>,
+
 	title: Ref<string | undefined>,
-	xAxisLabel: Ref<string | undefined>,
+	seriesLabels?: Ref<Array<string>>,
+	xAxisLabel?: Ref<string | undefined>,
 ) {
 	function buildExportTableData(): TableData | null {
 		if (!chartData.value) return null;
 
 		if ("headers" in chartData.value) return chartData.value;
 
-		const headers = [xAxisLabel.value ?? "Categories", ...seriesLabels.value];
+		const headers = [xAxisLabel?.value ?? "Categories", ...(seriesLabels?.value ?? [])];
 		const rows = chartData.value.map((row) => {
 			const xVal = row[0]?.[0] ?? "";
 			const yVals = row.map((cell) => cell?.[1] ?? "");
@@ -175,7 +176,7 @@ export function useChartExport(
 				if (blob) triggerDownload(blob, `${title.value ?? "chart"}.${ext}`);
 			},
 			`image/${format}`,
-			format === "jpeg" ? 0.92 : undefined,
+			// format === "jpeg" ? 0.92 : undefined,
 		);
 	}
 

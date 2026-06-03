@@ -130,44 +130,12 @@ const series = computed(() =>
 					to: 0,
 				},
 				color: (point: { color: string }) => point.color,
-				tooltip: {
-					pointFormatter,
-				},
 			},
 		];
 	}),
 );
 
 useQueries({ queries: q });
-
-function pointFormatter() {
-	return (
-		`<b>${
-			// @ts-expect-error highcharts internal
-			this.name
-		}</b><br/>` +
-		`Frequency: ${
-			// @ts-expect-error highcharts internal
-			this.freq
-		}<br/>` +
-		`Collocational Frequency: ${
-			// @ts-expect-error highcharts internal
-			this.coll_freq
-		}<br/>` +
-		`D: ${
-			// @ts-expect-error highcharts internal
-			this.d
-		}<br/>` +
-		`M: ${
-			// @ts-expect-error highcharts internal
-			this.m
-		}<br/>` +
-		`T: ${
-			// @ts-expect-error highcharts internal
-			this.t
-		}`
-	);
-}
 </script>
 
 <template>

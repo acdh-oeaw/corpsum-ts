@@ -6,7 +6,9 @@ import {
 	DropdownMenuPortal,
 	useForwardPropsEmits,
 } from "reka-ui";
-import { computed, type HTMLAttributes } from "vue";
+import { computed, inject, type HTMLAttributes } from "vue";
+
+const disablePortal = inject("disablePortal", false);
 
 import { cn } from "@/lib/utils";
 
@@ -28,7 +30,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
-	<DropdownMenuPortal>
+	<DropdownMenuPortal :disabled="disablePortal">
 		<DropdownMenuContent
 			v-bind="forwarded"
 			:class="
