@@ -1,5 +1,11 @@
 <script setup lang="ts">
+import turfCentroid from "@turf/centroid";
+import { toWgs84 } from "@turf/projection";
+import { computed } from "vue";
+
+import type { PieSliceData, TooltipData } from "@/components/map.vue";
 import { mapAustria } from "@/utils/map-austria";
+import { hexToRgb, MAP_USED_REGIONS } from "@/utils/map-colors";
 
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
@@ -9,175 +15,171 @@ const props = defineProps<{
 
 const t = useTranslations();
 
-const usedRegion = ["amitte", "aost", "asuedost", "awest"];
+const usedRegions = MAP_USED_REGIONS;
 
-const pieSize = "15%";
+const PIE_RADIUS_DEG = 0.25;
+const PIE_SEGMENTS = 32;
 
-interface PieInfo {
-	region: Region;
-	center: Array<string>;
-}
+const mapAustriaWgs84Features = mapAustria.features.map((f) => toWgs84(f));
 
-interface PieInfoWithData extends PieInfo {
-	data: Array<{
-		y: number;
-		name: string;
-		color: string;
-	}>;
-}
-
-const pieInfo: Array<PieInfo> = [
-	{ region: "amitte", center: ["54.7%", "25%"] },
-	{ region: "aost", center: ["70%", "25%"] },
-	{ region: "asuedost", center: ["60.5%", "77.6%"] },
-	{ region: "awest", center: ["35%", "49%"] },
-];
-
-const pieInfoWithData: ComputedRef<Array<PieInfoWithData>> = computed(() => {
-	return dataByRegion.value.map((regionData) => {
-		const [region] = regionData;
-		const [, ...values] = regionData;
-		values.pop();
-		const queryData = props.queries.map((query) => ({
-			color: query.color,
-			name: query.userInput,
-		}));
-		const data = values.map(
-			(value, index) =>
-				({
-					y: Math.round(Number(value) * 100) / 100,
-					...queryData[index],
-				}) as { y: number; name: string; color: string },
-		);
+const wgs84Centroids = mapAustriaWgs84Features
+	.filter((f) => usedRegions.includes(String(f.properties?.["hc-key"] ?? "")))
+	.map((f) => {
+		const center = turfCentroid(f as Parameters<typeof turfCentroid>[0]);
 		return {
-			region: region as Region,
-			data,
-			center: pieInfo.find((pInfo) => pInfo.region === region)!.center,
+			key: String(f.properties?.["hc-key"] ?? ""),
+			name: String(f.properties?.["name"] ?? ""),
+			position: center.geometry.coordinates as [number, number],
 		};
 	});
-});
 
-function getValue(arr: Array<number | string>) {
-	let max = -1;
-	arr.forEach((value) => {
-		if (typeof value !== "number" || max > value) return;
-		max = value;
-	});
-	return arr.findIndex((value) => value === max) - 2;
-}
-
-const dataByRegion = computed(() => {
-	const result: Array<Array<number | string>> = usedRegion.map((region) => [region]);
-	props.resdata.forEach((rdata) =>
-		rdata.data.forEach(({ region, relative, absolute }) => {
-			const idx = usedRegion.findIndex((item) => item === region);
-			if (idx > -1) result[idx]!.push(props.mode === "relative" ? relative : absolute);
-		}),
-	);
-	return result.map((region) => [...region, getValue(region)]);
-});
-
-function pointFormatter() {
-	const queryArray = props.queries
-		// @ts-expect-error highcharts internal usage
-		.map((query) => [query.userInput, this[query.userInput], query.color])
-		.sort((a, b) => b[1] - a[1]);
-	// @ts-expect-error highcharts internal usage
-	return `<b>${this.id}</b><br/>
-${queryArray
-		.map(
-			(line) =>
-				`<span style="color:${line[2]}">\u25CF</span> ${line[0]}: ${Math.round(line[1] * 100) / 100} <br />`,
-		)
-		.join("")}`;
-}
-const keys = computed(() => ["id", ...props.queries.map((query) => query.userInput), "value"]);
-
-const pieSeries = computed(() =>
-	pieInfoWithData.value.map((piwd) => ({
-		type: "pie",
-		zIndex: 6,
-		size: pieSize,
-		...piwd,
-		region: undefined,
-		name: piwd.region,
-		dataLabels: {
-			enabled: false,
-		},
-		tooltip: {
-			pointFormat:
-				'<span style="color:{point.color}">\u25CF</span> <b>{point.name}</b>: {point.y} ({point.percentage:.1f}%)',
-		},
-	})),
+const regionNames = Object.fromEntries(
+	mapAustria.features.map((f) => [String(f.properties["hc-key"]), String(f.properties["name"])]),
 );
 
-const series = computed(() => [
-	{
-		mapData: mapAustria,
-		name: "Austria",
-		dataLabels: {
-			enabled: true,
-			format: "{point.name}",
-		},
-		joinBy: ["hc-key", "id"],
-		allAreas: true,
-		data: dataByRegion.value,
-		keys: keys.value,
-		tooltip: {
-			headerFormat: "",
-			pointFormatter,
-		},
-	},
-	{
-		name: "Connectors",
-		type: "mapline",
-		color: "rgba(130, 130, 130, 0.5)",
-		zIndex: 5,
-		showInLegend: false,
-		enableMouseTracking: false,
-		accessibility: {
-			enabled: false,
-		},
-	},
-	...pieSeries.value,
-]);
+const currentRegionData = computed(() => {
+	const map = new Map<string, { values: number[]; winnerIndex: number }>();
 
-const colorAxis = computed(() => ({
-	dataClasses: props.queries.map((query, i) => ({
-		from: i - 1,
-		to: i,
-		color: query.color,
-		name: query.userInput,
-	})),
-}));
+	for (const region of usedRegions) {
+		map.set(region, {
+			values: new Array(props.queries.length).fill(0) as number[],
+			winnerIndex: 0,
+		});
+	}
 
-const chartOptions = computed(() => {
-	return {
-		chart: {
-			map: mapAustria,
-			animation: false,
-		},
-		accessibility: {
-			description: t("map-showing-the-different-query-frequencies-relating-to-the-region"),
-		},
-		colorAxis: colorAxis.value,
-		exporting: {
-			scale: 1,
-			sourceWidth: 1200,
-			width: 1200,
-		},
-		type: "logarithmic",
-		minColor: "#eee",
-		title: {
-			text: t("all-queries-in-one-chart"),
-		},
-		series: series.value,
-	};
+	for (const rdata of props.resdata) {
+		const queryIdx = props.queries.findIndex((q) => q.id === rdata.query);
+		if (queryIdx === -1) continue;
+
+		for (const d of rdata.data) {
+			const entry = map.get(d.region);
+			if (!entry) continue;
+			entry.values[queryIdx] = props.mode === "relative" ? d.relative : d.absolute;
+		}
+	}
+
+	for (const entry of map.values()) {
+		let maxVal = 0;
+		let maxIdx = -1;
+		entry.values.forEach((v, i) => {
+			if (v > maxVal) {
+				maxVal = v;
+				maxIdx = i;
+			}
+		});
+		entry.winnerIndex = maxIdx;
+	}
+
+	return map;
+});
+
+const colors = computed(() => {
+	const result: Record<string, [number, number, number, number]> = {};
+	for (const [key, entry] of currentRegionData.value) {
+		if (props.queries.length === 0) {
+			result[key] = [220, 220, 220, 255];
+			continue;
+		}
+		const winner = props.queries[entry.winnerIndex];
+		if (!winner) {
+			result[key] = [220, 220, 220, 255];
+			continue;
+		}
+		const [r, g, b] = hexToRgb(winner.color);
+		result[key] = [r, g, b, 200];
+	}
+	return result;
+});
+
+const regionData = computed(() => {
+	const result: Record<string, TooltipData> = {};
+	for (const [key, entry] of currentRegionData.value) {
+		const name = regionNames[key] ?? key;
+		const sorted = props.queries
+			.map((q, i) => ({ label: q.userInput, color: q.color, value: entry.values[i] ?? 0 }))
+			.sort((a, b) => b.value - a.value);
+
+		result[key] = {
+			x: name,
+			payload: sorted.map((q) => [q.label, q.value]),
+			config: Object.fromEntries(
+				sorted.map((q, i) => [String(i), { label: q.label, color: q.color }]),
+			),
+		};
+	}
+	return result;
+});
+
+const pieSlices = computed(() => {
+	const result: PieSliceData[] = [];
+	if (props.queries.length <= 1) return result;
+
+	for (const centroid of wgs84Centroids) {
+		const entry = currentRegionData.value.get(centroid.key);
+		if (!entry) continue;
+
+		const total = entry.values.reduce((s, v) => s + v, 0);
+		if (total === 0) continue;
+
+		const [cx, cy] = centroid.position;
+		const cosLat = Math.cos((cy * Math.PI) / 180);
+
+		let startAngle = -Math.PI / 2;
+
+		for (let i = 0; i < props.queries.length; i++) {
+			const query = props.queries[i];
+			if (!query) continue;
+			const value = entry.values[i] ?? 0;
+			if (value <= 0) continue;
+
+			const tooltipData: TooltipData = {
+				x: centroid.name,
+				payload: [[query.userInput, value]],
+				config: { "0": { label: query.userInput, color: query.color } },
+			};
+
+			const angle = (value / total) * 2 * Math.PI;
+			const numSteps = Math.max(2, Math.ceil((angle / (2 * Math.PI)) * PIE_SEGMENTS));
+			const polygon: [number, number][] = [[cx, cy]];
+
+			for (let step = 0; step <= numSteps; step++) {
+				const a = startAngle + (angle * step) / numSteps;
+				polygon.push([
+					cx + (PIE_RADIUS_DEG / cosLat) * Math.cos(a),
+					cy + PIE_RADIUS_DEG * Math.sin(a),
+				]);
+			}
+
+			const [r, g, b] = hexToRgb(query.color);
+			result.push({ polygon, fillColor: [r, g, b, 255], tooltipData });
+
+			startAngle += angle;
+		}
+	}
+
+	return result;
 });
 </script>
 
 <template>
-	<div>
-		<HighCharts :constructor-type="'mapChart'" :options="chartOptions" />
+	<div class="space-y-3">
+		<h3 class="text-sm font-medium">{{ t("all-queries-in-one-chart") }}</h3>
+
+		<div class="flex flex-wrap gap-3">
+			<div v-for="query in queries" :key="query.id" class="flex items-center gap-1.5 text-xs">
+				<span
+					class="inline-block h-3 w-3 shrink-0 rounded-sm"
+					:style="{ backgroundColor: query.color }"
+				/>
+				{{ query.userInput }}
+			</div>
+		</div>
+
+		<Map
+			:colors="colors"
+			:pie-slices="pieSlices.length > 0 ? pieSlices : undefined"
+			:region-data="regionData"
+			:used-regions="usedRegions"
+		/>
 	</div>
 </template>

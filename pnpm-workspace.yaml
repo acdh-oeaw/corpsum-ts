@@ -2,6 +2,7 @@ allowBuilds:
   '@intlify/vue-i18n-bridge': true
   '@intlify/vue-router-bridge': true
   '@parcel/watcher': true
+  '@vaadin/vaadin-usage-statistics': true
   esbuild: true
   lefthook: true
   maplibre-gl: true
