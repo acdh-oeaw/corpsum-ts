@@ -30,13 +30,13 @@ export const getKWICColumns = (
 		},
 		{
 			accessorKey: "left",
-			header: () => h("div", { class: "text-right" }, t("Corpsum.left")),
+			header: () => h("div", { class: "text-right ml-auto" }, t("Corpsum.left")),
 			cell: ({ row }: RowObj) => {
 				const left = row.getValue("left");
 				return h(
 					"div",
 					{
-						class: "text-right font-medium overflow-hidden text-ellipsis",
+						class: "text-right font-medium overflow-hidden text-ellipsis ml-auto",
 						style: "max-width: 24rem; text-overflow: ellipsis;",
 					},
 					left,
@@ -45,10 +45,10 @@ export const getKWICColumns = (
 		},
 		{
 			accessorKey: "word",
-			header: () => h("div", { class: "text-right" }, t("Corpsum.word")),
+			header: () => h("div", { class: "text-center" }, t("Corpsum.word")),
 			cell: ({ row }: RowObj) => {
 				const word = row.getValue("word");
-				return h("div", { class: "text-right font-medium" }, word);
+				return h("div", { class: "text-center font-medium" }, word);
 			},
 		},
 		{
