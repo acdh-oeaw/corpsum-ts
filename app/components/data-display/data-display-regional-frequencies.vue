@@ -117,19 +117,23 @@ const expand = ref(false);
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger as-child>
-								<ToggleGroupItem value="combined">
-									<Map class="mr-1 size-4" />
-									<PieChart class="size-4" />
-								</ToggleGroupItem>
+								<div>
+									<ToggleGroupItem value="combined">
+										<Map class="mr-1 size-4" />
+										<PieChart class="size-4" />
+									</ToggleGroupItem>
+								</div>
 							</TooltipTrigger>
 							<TooltipContent>combined map chart</TooltipContent>
 						</Tooltip>
 						<Tooltip>
 							<TooltipTrigger as-child>
-								<ToggleGroupItem value="separate">
-									<Map class="mr-1 size-4" />
-									<Map class="size-4" />
-								</ToggleGroupItem>
+								<div>
+									<ToggleGroupItem value="separate">
+										<Map class="mr-1 size-4" />
+										<Map class="size-4" />
+									</ToggleGroupItem>
+								</div>
 							</TooltipTrigger>
 							<TooltipContent>separate map charts</TooltipContent>
 						</Tooltip>

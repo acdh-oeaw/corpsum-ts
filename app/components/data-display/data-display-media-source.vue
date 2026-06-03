@@ -96,17 +96,21 @@ const isStacked = computed(() => chartMode.value === "stack");
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger as-child>
-								<ToggleGroupItem value="stack">
-									<BarChart3 class="mr-1 size-4" />
-								</ToggleGroupItem>
+								<div>
+									<ToggleGroupItem value="stack">
+										<BarChart3 class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
 							</TooltipTrigger>
 							<TooltipContent>stacked bar chart</TooltipContent>
 						</Tooltip>
 						<Tooltip>
 							<TooltipTrigger as-child>
-								<ToggleGroupItem value="separate">
-									<BarChart4 class="mr-1 size-4" />
-								</ToggleGroupItem>
+								<div>
+									<ToggleGroupItem value="separate">
+										<BarChart4 class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
 							</TooltipTrigger>
 							<TooltipContent>separate bar chart</TooltipContent>
 						</Tooltip>

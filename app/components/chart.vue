@@ -348,8 +348,8 @@ const seriesLabels = computed(() => props.series.map((s) => String(s.label ?? s.
 const { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg } = useChartExport(
 	containerRef,
 	chartData,
-	seriesLabels,
 	toRef(() => props.title),
+	seriesLabels,
 	toRef(() => props.xAxis),
 );
 
