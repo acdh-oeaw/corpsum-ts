@@ -3,12 +3,6 @@ import { resolve } from "node:path";
 
 import mongoose from "mongoose";
 
-import {
-	defaultTemporalFrequencyDistributionSettings,
-	legacyYearlyFrequenciesType,
-	temporalFrequencyDistributionType,
-} from "@/lib/visualization-types.ts";
-
 type MongoDatabase = NonNullable<mongoose.Connection["db"]>;
 
 interface Migration {
@@ -47,76 +41,7 @@ function requireDatabaseUrl() {
 	return value;
 }
 
-const migrations: Array<Migration> = [
-	{
-		id: "20260531-rename-yearly-temporal-frequency-distribution",
-		async up(db) {
-			await db.collection("visualizations").updateMany(
-				{ visualizations: legacyYearlyFrequenciesType },
-				{
-					$set: {
-						"visualizations.$[item]": temporalFrequencyDistributionType,
-					},
-				},
-				{
-					arrayFilters: [{ item: legacyYearlyFrequenciesType }],
-				},
-			);
-
-			const visualizations = db.collection("visualizations").find({
-				visualizations: temporalFrequencyDistributionType,
-			});
-			for await (const visualization of visualizations) {
-				const types = Array.isArray(visualization.visualizations)
-					? visualization.visualizations
-					: [];
-				const settings = Array.isArray(visualization.settings) ? [...visualization.settings] : [];
-				let changed = false;
-
-				types.forEach((type, index) => {
-					if (type !== temporalFrequencyDistributionType) return;
-					const current = settings[index];
-					if (typeof current === "object" && current !== null && "type" in current) return;
-					settings[index] = { ...defaultTemporalFrequencyDistributionSettings };
-					changed = true;
-				});
-
-				if (changed) {
-					await db
-						.collection("visualizations")
-						.updateOne({ _id: visualization._id }, { $set: { settings } });
-				}
-			}
-
-			await db.collection("publishedvisualizations").updateMany(
-				{ visualizations: legacyYearlyFrequenciesType },
-				{
-					$set: {
-						"visualizations.$[item]": temporalFrequencyDistributionType,
-						schemaVersion: 2,
-					},
-				},
-				{
-					arrayFilters: [{ item: legacyYearlyFrequenciesType }],
-				},
-			);
-
-			await db.collection("publishedvisualizations").updateMany(
-				{ "panels.type": legacyYearlyFrequenciesType },
-				{
-					$set: {
-						"panels.$[panel].type": temporalFrequencyDistributionType,
-						"panels.$[panel].settings": defaultTemporalFrequencyDistributionSettings,
-						schemaVersion: 2,
-					},
-				},
-				{
-					arrayFilters: [{ "panel.type": legacyYearlyFrequenciesType }],
-				},
-			);
-		},
-	},
-];
+const migrations: Array<Migration> = [];
 
 async function main() {
 	await mongoose.connect(requireDatabaseUrl());
