@@ -6,6 +6,7 @@ import {
 	normalizeTemporalFrequencyDistributionSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
+	visualizationDefinitions,
 } from "@/lib/visualization-types";
 
 interface PublishedQuerySnapshot {
@@ -82,7 +83,7 @@ const corpusQueries = computed(() => props.snapshot.queries.map(toCorpusQuery));
 const renderItems = computed(() =>
 	props.snapshot.visualizations.map((type) => ({
 		type: normalizeVisualizationType(type),
-		key: toSearchKey(normalizeVisualizationType(type)),
+		key: visualizationDefinitions[normalizeVisualizationType(type)].searchKey,
 	})),
 );
 
@@ -270,25 +271,6 @@ const yearlySeries = computed(() =>
 		),
 	})),
 );
-
-function toSearchKey(type: VisualizationType): SearchFunctionKey | "sourceTable" {
-	switch (type) {
-		case "data-display-collocations":
-			return "collocations";
-		case "data-display-keyword-in-context":
-			return "keywordInContext";
-		case "data-display-media-source":
-			return "mediaSources";
-		case "data-display-regional-frequencies":
-			return "regionalFrequencies";
-		case "data-display-word-form-frequencies":
-			return "wordFormFrequencies";
-		case temporalFrequencyDistributionType:
-			return "yearlyFrequencies";
-		case "data-display-source-table":
-			return "sourceTable";
-	}
-}
 </script>
 
 <template>
@@ -302,7 +284,7 @@ function toSearchKey(type: VisualizationType): SearchFunctionKey | "sourceTable"
 
 		<Card v-for="{ type, key } in renderItems" :key="type">
 			<CardHeader v-if="!embed">
-				<CardTitle>{{ key === "sourceTable" ? "Source table" : t(key) }}</CardTitle>
+				<CardTitle>{{ t(key) }}</CardTitle>
 			</CardHeader>
 			<CardContent class="grid gap-4">
 				<template v-if="key === 'yearlyFrequencies'">

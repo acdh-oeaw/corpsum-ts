@@ -3,12 +3,11 @@ import { randomUUID } from "node:crypto";
 import { type Types } from "mongoose";
 
 import {
-	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
-	defaultTemporalFrequencyDistributionSettings,
-	normalizeTemporalFrequencyDistributionSettings,
 	normalizeVisualizationType,
+	normalizeVisualizationSettings,
 	temporalFrequencyDistributionType,
+	visualizationDefinitions,
 } from "@/lib/visualization-types";
 import type { CorpusMetadataMappingResponse } from "@/lib/visualization-types";
 import { colors } from "@/utils/colors";
@@ -94,7 +93,7 @@ export async function createPublishedSnapshot(input: {
 
 	for (const value of input.visualization.visualizations) {
 		const type = normalizeVisualizationType(value);
-		if (type === "data-display-source-table") continue;
+		if (!visualizationDefinitions[type].publishedPanel) continue;
 		for (const query of queries) {
 			const noske = noskeById.get(query.noske.toString());
 			if (!noske) continue;
@@ -226,9 +225,11 @@ function createPanelRequest(
 }
 
 function createTargetPath(type: VisualizationType) {
-	if (type === "data-display-keyword-in-context") return "/search/concordance";
-	if (type === "data-display-collocations") return "/search/collx";
-	return "/search/freqml";
+	const targetPath = visualizationDefinitions[type].noskeTargetPath;
+	if (!targetPath) {
+		throw new Error(`Visualization type ${type} does not have a NoSketch target path.`);
+	}
+	return targetPath;
 }
 
 function createQueryParams(
@@ -315,9 +316,10 @@ function getVisualizationSettings(
 	const index = visualization.visualizations.findIndex(
 		(value) => normalizeVisualizationType(value) === type,
 	);
-	return normalizeTemporalFrequencyDistributionSettings(
-		index >= 0 ? visualization.settings[index] : defaultTemporalFrequencyDistributionSettings,
-	) satisfies TemporalFrequencyDistributionSettings;
+	return normalizeVisualizationSettings(
+		type,
+		index >= 0 ? visualization.settings[index] : undefined,
+	);
 }
 
 async function getPanelMapping(type: VisualizationType, query: QueryDocument, userId: string) {

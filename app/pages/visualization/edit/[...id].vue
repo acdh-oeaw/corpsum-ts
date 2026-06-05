@@ -2,10 +2,9 @@
 import {
 	type CorpusMetadataSemantic,
 	type VisualizationType,
-	defaultTemporalFrequencyDistributionSettings,
 	getEditableVisualizationMetadataSemantics,
-	normalizeTemporalFrequencyDistributionSettings,
-	temporalFrequencyDistributionType,
+	getDefaultVisualizationSettings,
+	normalizeVisualizationSettings,
 	visualizationTypes,
 } from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
@@ -48,10 +47,7 @@ watch(
 		dataText.value = JSON.stringify(value.data);
 		settingsByType.value = value.visualizations.reduce<Partial<Record<VisualizationType, unknown>>>(
 			(settings, type, index) => {
-				settings[type] =
-					type === temporalFrequencyDistributionType
-						? normalizeTemporalFrequencyDistributionSettings(value.settings[index])
-						: (value.settings[index] ?? {});
+				settings[type] = normalizeVisualizationSettings(type, value.settings[index]);
 				return settings;
 			},
 			{},
@@ -62,12 +58,9 @@ watch(
 
 const settingsText = computed(() =>
 	JSON.stringify(
-		selectedVisualizations.value.map((type) => {
-			if (type === temporalFrequencyDistributionType) {
-				return normalizeTemporalFrequencyDistributionSettings(settingsByType.value[type]);
-			}
-			return settingsByType.value[type] ?? {};
-		}),
+		selectedVisualizations.value.map((type) =>
+			normalizeVisualizationSettings(type, settingsByType.value[type]),
+		),
 	),
 );
 
@@ -83,10 +76,7 @@ const toggleVisualizationSelection = (
 		if (settingsByType.value[value] === undefined) {
 			settingsByType.value = {
 				...settingsByType.value,
-				[value]:
-					value === temporalFrequencyDistributionType
-						? defaultTemporalFrequencyDistributionSettings
-						: {},
+				[value]: getDefaultVisualizationSettings(value),
 			};
 		}
 		selectedVisualizations.value = items;

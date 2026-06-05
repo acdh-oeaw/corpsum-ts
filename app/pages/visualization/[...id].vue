@@ -4,12 +4,11 @@ import DataDisplayKeywordInContext from "@/components/data-display/data-display-
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMetadataTemporalFrequencyDistribution from "@/components/data-display/data-display-metadata-temporal-frequency-distribution.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
-import DataDisplaySourceTable from "@/components/data-display/data-display-source-table.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import {
 	type VisualizationType,
 	getVisualizationMetadataSemantics,
-	normalizeTemporalFrequencyDistributionSettings,
+	normalizeVisualizationSettings,
 	temporalFrequencyDistributionType,
 } from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
@@ -55,7 +54,6 @@ const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-keyword-in-context": DataDisplayKeywordInContext,
 	"data-display-media-source": DataDisplayMediaSource,
 	"data-display-regional-frequencies": DataDisplayRegionalFrequencies,
-	"data-display-source-table": DataDisplaySourceTable,
 	"data-display-word-form-frequencies": DataDisplayWordFormFrequencies,
 	[temporalFrequencyDistributionType]: DataDisplayMetadataTemporalFrequencyDistribution,
 };
@@ -80,10 +78,7 @@ const embedSnippet = computed(() => {
 });
 
 function getVisualizationSettings(index: number, type: VisualizationType) {
-	if (type === temporalFrequencyDistributionType) {
-		return normalizeTemporalFrequencyDistributionSettings(visualization.value?.settings[index]);
-	}
-	return visualization.value?.settings[index];
+	return normalizeVisualizationSettings(type, visualization.value?.settings[index]);
 }
 
 function getVisualizationMetadataMappings(type: VisualizationType) {

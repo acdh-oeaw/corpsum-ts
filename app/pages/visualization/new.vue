@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {
 	type VisualizationType,
-	defaultTemporalFrequencyDistributionSettings,
-	temporalFrequencyDistributionType,
+	getDefaultVisualizationSettings,
 	visualizationTypes,
 } from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
@@ -17,13 +16,7 @@ const name = ref("");
 const selectedQueries = ref<Array<string>>([]);
 const selectedVisualizations = ref<Array<VisualizationType>>([]);
 const settingsText = computed(() =>
-	JSON.stringify(
-		selectedVisualizations.value.map((type) =>
-			type === temporalFrequencyDistributionType
-				? defaultTemporalFrequencyDistributionSettings
-				: {},
-		),
-	),
+	JSON.stringify(selectedVisualizations.value.map((type) => getDefaultVisualizationSettings(type))),
 );
 const dataText = ref("[]");
 const formError = ref("");
