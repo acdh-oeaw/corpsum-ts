@@ -1,30 +1,69 @@
-export const legacyYearlyFrequenciesType = "data-display-yearly-frequencies" as const;
-
 export const temporalFrequencyDistributionType =
 	"data-display-metadata-temporal-frequency-distribution" as const;
 
-export const visualizationTypes = [
-	"data-display-collocations",
-	"data-display-keyword-in-context",
-	"data-display-media-source",
-	"data-display-regional-frequencies",
-	"data-display-source-table",
-	"data-display-word-form-frequencies",
-	temporalFrequencyDistributionType,
-] as const;
+export type CorpusMetadataSemantic = "temporal";
 
-export type VisualizationType = (typeof visualizationTypes)[number];
+export const visualizationDefinitions = {
+	"data-display-collocations": {
+		metadataSemantics: [],
+		noskeTargetPath: "/search/collx",
+		publishedPanel: true,
+		searchKey: "collocations",
+	},
+	"data-display-keyword-in-context": {
+		metadataSemantics: [],
+		noskeTargetPath: "/search/concordance",
+		publishedPanel: true,
+		searchKey: "keywordInContext",
+	},
+	"data-display-media-source": {
+		metadataSemantics: [],
+		noskeTargetPath: "/search/freqml",
+		publishedPanel: true,
+		searchKey: "mediaSources",
+	},
+	"data-display-regional-frequencies": {
+		metadataSemantics: [],
+		noskeTargetPath: "/search/freqml",
+		publishedPanel: true,
+		searchKey: "regionalFrequencies",
+	},
+	"data-display-word-form-frequencies": {
+		metadataSemantics: [],
+		noskeTargetPath: "/search/freqml",
+		publishedPanel: true,
+		searchKey: "wordFormFrequencies",
+	},
+	[temporalFrequencyDistributionType]: {
+		metadataSemantics: ["temporal"],
+		noskeTargetPath: "/search/freqml",
+		publishedPanel: true,
+		searchKey: "yearlyFrequencies",
+	},
+} as const satisfies Record<
+	string,
+	{
+		metadataSemantics: Array<CorpusMetadataSemantic>;
+		noskeTargetPath: "/search/collx" | "/search/concordance" | "/search/freqml" | null;
+		publishedPanel: boolean;
+		searchKey: string;
+	}
+>;
+
+export type VisualizationType = keyof typeof visualizationDefinitions;
+export type VisualizationSearchKey =
+	(typeof visualizationDefinitions)[VisualizationType]["searchKey"];
+
+export const visualizationTypes = Object.keys(visualizationDefinitions) as Array<VisualizationType>;
 
 export function isVisualizationType(value: unknown): value is VisualizationType {
 	return typeof value === "string" && visualizationTypes.includes(value as VisualizationType);
 }
 
 export function normalizeVisualizationType(value: unknown): VisualizationType {
-	if (value === legacyYearlyFrequenciesType) return temporalFrequencyDistributionType;
 	return isVisualizationType(value) ? value : "data-display-keyword-in-context";
 }
 
-export type CorpusMetadataSemantic = "temporal";
 export type CorpusMetadataMappingScope = "default" | "user";
 export type TemporalParserMode = "year" | "date" | "regex";
 
@@ -62,16 +101,10 @@ export interface CorpusMetadataMappingLookupResponse extends ResolvedCorpusMetad
 	canEditDefault: boolean;
 }
 
-const visualizationMetadataSemantics: Partial<
-	Record<VisualizationType, Array<CorpusMetadataSemantic>>
-> = {
-	[temporalFrequencyDistributionType]: ["temporal"],
-};
-
 export function getVisualizationMetadataSemantics(
 	type: VisualizationType,
 ): Array<CorpusMetadataSemantic> {
-	return visualizationMetadataSemantics[type] ?? [];
+	return [...visualizationDefinitions[type].metadataSemantics];
 }
 
 export function getEditableVisualizationMetadataSemantics(
@@ -130,4 +163,17 @@ export function normalizeTemporalFrequencyDistributionSettings(
 		reverseIntervals: record.reverseIntervals === true,
 		sourceTableExpanded: record.sourceTableExpanded === true,
 	};
+}
+
+export function getDefaultVisualizationSettings(type: VisualizationType): unknown {
+	if (type === temporalFrequencyDistributionType)
+		return defaultTemporalFrequencyDistributionSettings;
+	return {};
+}
+
+export function normalizeVisualizationSettings(type: VisualizationType, value: unknown): unknown {
+	if (type === temporalFrequencyDistributionType) {
+		return normalizeTemporalFrequencyDistributionSettings(value);
+	}
+	return value ?? {};
 }
