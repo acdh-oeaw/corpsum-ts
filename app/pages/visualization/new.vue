@@ -5,6 +5,7 @@ type VisualizationType =
 	| "data-display-collocations"
 	| "data-display-keyword-in-context"
 	| "data-display-media-source"
+	| "data-display-media-type"
 	| "data-display-regional-frequencies"
 	| "data-display-source-table"
 	| "data-display-word-form-frequencies"
@@ -14,6 +15,7 @@ const visualizationTypes: Array<VisualizationType> = [
 	"data-display-collocations",
 	"data-display-keyword-in-context",
 	"data-display-media-source",
+	"data-display-media-type",
 	"data-display-regional-frequencies",
 	"data-display-source-table",
 	"data-display-word-form-frequencies",

@@ -2,6 +2,7 @@
 import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
 import DataDisplayKeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
+import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplaySourceTable from "@/components/data-display/data-display-source-table.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
@@ -14,6 +15,7 @@ type VisualizationType =
 	| "data-display-collocations"
 	| "data-display-keyword-in-context"
 	| "data-display-media-source"
+	| "data-display-media-type"
 	| "data-display-regional-frequencies"
 	| "data-display-source-table"
 	| "data-display-word-form-frequencies"
@@ -43,6 +45,7 @@ const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-collocations": DataDisplayCollocations,
 	"data-display-keyword-in-context": DataDisplayKeywordInContext,
 	"data-display-media-source": DataDisplayMediaSource,
+	"data-display-media-type": DataDisplayMediaType,
 	"data-display-regional-frequencies": DataDisplayRegionalFrequencies,
 	"data-display-source-table": DataDisplaySourceTable,
 	"data-display-word-form-frequencies": DataDisplayWordFormFrequencies,
@@ -71,7 +74,6 @@ const buildFinalQuery = (type: CorpusQueryType, userInput: string) => {
 		case "phraserow":
 			return `[word="${userInput}"]`;
 	}
-	return `[word="${userInput}"]`;
 };
 
 const buildQuery = (item: QueryListItem, index: number): CorpusQuery => {

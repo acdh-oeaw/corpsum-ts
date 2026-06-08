@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
-import { BarChart3, BarChart4 } from "lucide-vue-next";
+import { BarChart3, BarChart4, ChartBarStacked } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 
 import type { components } from "~/lib/noske-types";
@@ -24,7 +24,7 @@ const q = computed(() =>
 	queries.value.map((query, index) => {
 		return {
 			queryKey: [
-				"get-source-distribution",
+				"get-source-type-distribution",
 				noskeId.value,
 				query.corpus,
 				query.subCorpus,
@@ -47,7 +47,7 @@ const q = computed(() =>
 							showreltt: 1,
 							showrel: 1,
 							freqlevel: 1,
-							ml1attr: "doc.docsrc",
+							ml1attr: "doc.mediatype",
 							ml1ctx: "0~0 > 0",
 							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
 						},
@@ -57,6 +57,7 @@ const q = computed(() =>
 				return data;
 			},
 			select: (data: FreqMlResponse) => {
+				console.log(data);
 				sourceDistributions.value[index] =
 					data.Blocks?.map(
 						(block) =>
@@ -76,9 +77,9 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const chartMode: Ref<"separate" | "stack"> = ref("stack");
+const chartMode: Ref<"separate" | "stack" | "percentage"> = ref("stack");
 
-const isStacked = computed(() => chartMode.value === "stack");
+const isStacked = computed(() => chartMode.value !== "separate");
 </script>
 
 <template>
@@ -112,6 +113,16 @@ const isStacked = computed(() => chartMode.value === "stack");
 							</TooltipTrigger>
 							<TooltipContent>separate bar chart</TooltipContent>
 						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="percentage">
+										<ChartBarStacked class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>percentage bar chart</TooltipContent>
+						</Tooltip>
 					</TooltipProvider>
 				</ToggleGroup>
 
@@ -132,7 +143,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 					:queries="queries"
 					:source-distributions="sourceDistributions"
 					:stack="isStacked"
-					:height="1200"
+					:percent="chartMode === 'percentage'"
 				/>
 			</template>
 		</CardContent>

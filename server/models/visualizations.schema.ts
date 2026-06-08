@@ -19,6 +19,7 @@ const schemaDefinition = {
 				"data-display-collocations",
 				"data-display-keyword-in-context",
 				"data-display-media-source",
+				"data-display-media-type",
 				"data-display-regional-frequencies",
 				"data-display-source-table",
 				"data-display-word-form-frequencies",

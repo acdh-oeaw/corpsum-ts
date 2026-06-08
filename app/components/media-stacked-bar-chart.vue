@@ -5,6 +5,7 @@ const props = defineProps<{
 	sourceDistributions: Array<Array<IsourceDistribution>>;
 	mode: Mode;
 	stack: boolean;
+	percent?: boolean;
 }>();
 
 const t = useTranslations();
@@ -37,6 +38,18 @@ const series = computed(() => {
 				.map((entry, idx) => [categories.value[idx], entry] as [string, number]),
 		};
 	});
+	if (props.percent) {
+		const total = allSeries.reduce(
+			(prev: Array<number>, current) => {
+				prev.forEach((_, idx) => (prev[idx]! += current.data[idx]![1]));
+				return prev;
+			},
+			categories.value.map(() => 0),
+		);
+		allSeries.forEach((series) =>
+			series.data.forEach((_, idx) => (series.data[idx]![1] /= total[idx]!)),
+		);
+	}
 	return allSeries;
 });
 const smoothReloadForBarChart = ref(true);
@@ -54,10 +67,10 @@ watch(
 <template>
 	<Chart
 		:chart-type="props.stack ? 'stack' : 'bar'"
-		:height="1200"
 		orientation="horizontal"
 		:series="series"
 		:title="`${series.length} ${t('queries')}`"
 		:y-axis="t('sources')"
+		:percent="props.percent"
 	></Chart>
 </template>

@@ -52,6 +52,7 @@ const props = withDefaults(
 		yAxis?: string;
 		orientation?: "horizontal" | "vertical";
 		height?: number;
+		percent?: boolean;
 	}>(),
 	{
 		chartType: "bar",
@@ -69,7 +70,12 @@ const chartConfig = computed(() =>
 const appContext = getCurrentInstance()?.appContext;
 
 function renderTooltipContent(data: Array<[string, number]>, x?: number) {
-	const vnode = h(ChartTooltipContent, { payload: data, config: chartConfig.value, x });
+	const vnode = h(ChartTooltipContent, {
+		payload: data,
+		config: chartConfig.value,
+		x,
+		percent: props.percent,
+	});
 	if (appContext) vnode.appContext = appContext;
 	const div = document.createElement("div");
 	render(vnode, div);
@@ -89,6 +95,10 @@ const chartData = computed(() => zip(props.series.map((e) => e.data)));
 type Data = SeriesData["data"][number];
 const tickFormat = (tick: number) => {
 	return chartData.value?.[tick]?.[0]?.[0] ?? 0;
+};
+const yTickFormat = (tick: number) => {
+	if (props.percent && typeof tick === "number") return `${tick * 100}%`;
+	return tick;
 };
 const yAccessors = computed(() => props.series.map((_, i) => (d: Array<Data>) => d[i]?.[1] ?? 0));
 const color = computed(() => props.series.map((s) => s.color));
@@ -426,6 +436,7 @@ function updateKey() {
 					:attributes="orientation !== 'vertical' ? attributes : []"
 					:full-size="false"
 					:label="yAxis"
+					:tick-format="yTickFormat"
 					:type="orientation === 'vertical' ? 'y' : 'x'"
 				></VisAxis>
 				<VisGroupedBar
@@ -498,7 +509,11 @@ function updateKey() {
 					transition: 'left 60ms ease, top 60ms ease',
 				}"
 			>
-				<ChartTooltipContent :config="chartConfig" :payload="snapTooltipPayload" />
+				<ChartTooltipContent
+					:config="chartConfig"
+					:payload="snapTooltipPayload"
+					:percent="props.percent"
+				/>
 			</div>
 		</template>
 	</div>
