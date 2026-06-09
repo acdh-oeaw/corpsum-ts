@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-
-const corporaStore = useCorporaStore();
-const { corpInfoResponse, corporaLoading } = storeToRefs(corporaStore);
 const t = useTranslations();
 
 const props = defineProps<{ query: CorpusQuery }>();
@@ -50,9 +46,9 @@ const toggleSelection = (
 </script>
 
 <template>
-	<div v-if="!corporaLoading && corpInfoResponse">
+	<div v-if="currentQuery">
 		<h2 class="text-lg font-semibold">{{ t("Attributes and Structures") }}</h2>
-		<div v-if="currentQuery" class="mt-4 grid gap-6 md:grid-cols-2">
+		<div class="mt-4 grid gap-6 md:grid-cols-2">
 			<div class="space-y-3">
 				<h3 class="text-sm font-medium text-muted-foreground">{{ t("Attributes") }}</h3>
 				<div class="space-y-2 rounded-md border p-3">
