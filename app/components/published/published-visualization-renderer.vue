@@ -184,7 +184,7 @@ function parseTemporalYear(
 	rawValue: string,
 	mapping: CorpusMetadataMappingResponse,
 ): number | null {
-	const normalized = mapping.valueMap[rawValue] ?? rawValue;
+	const normalized = mapping.valueMap?.[rawValue] ?? rawValue;
 	if (mapping.parser.mode === "year") {
 		const year = Number(normalized);
 		return Number.isInteger(year) ? year : null;
