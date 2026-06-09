@@ -22,20 +22,22 @@ const sourceDistributionsLoading: Ref<Array<boolean>> = ref([]);
 
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-source-distribution",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			JSON.stringify(queryStore.getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-source-distribution",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				sourceDistributionsLoading.value[index] = true;
 				const { data, error } = await activeClient.GET("/search/freqml", {
+					headers: createNoskeCacheHeaders(queryKey),
 					params: {
 						query: {
 							corpname: query.corpus,
@@ -121,9 +123,11 @@ const isStacked = computed(() => chartMode.value === "stack");
 				</ToggleGroup>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<div v-if="sourceDistributionsLoading[index]">
-					<QueryDisplay :loading="sourceDistributionsLoading[index]" :query="query" />
-				</div>
+				<QueryDisplay
+					:loading="sourceDistributionsLoading[index]"
+					:query="query"
+					:query-key="q[index]?.queryKey"
+				/>
 			</div>
 
 			<template v-if="sourceDistributions && queries">

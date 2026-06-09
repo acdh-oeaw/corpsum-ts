@@ -23,20 +23,22 @@ const isCombined = computed(() => chartMode.value === "combined");
 
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-regional-frequencies",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			JSON.stringify(queryStore.getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-regional-frequencies",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				regionalFrequenciesLoading.value[index] = true;
 				const { data, error } = await activeClient.GET("/search/freqml", {
+					headers: createNoskeCacheHeaders(queryKey),
 					params: {
 						query: {
 							corpname: query.corpus,
@@ -145,7 +147,11 @@ const expand = ref(false);
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div class="mt-1">
-					<QueryDisplay :loading="regionalFrequenciesLoading[index]" :query="query" />
+					<QueryDisplay
+						:loading="regionalFrequenciesLoading[index]"
+						:query="query"
+						:query-key="q[index]?.queryKey"
+					/>
 					<ClientOnly v-if="!regionalFrequenciesLoading[index] && regionalFrequencies[index]">
 						<MapChart
 							v-if="!isCombined"

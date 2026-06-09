@@ -43,14 +43,15 @@ const yearlyFrequenciesLoading: Ref<Array<boolean>> = ref([]);
 
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-yearly-frequencies",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			JSON.stringify(queryStore.getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-yearly-frequencies",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
@@ -58,6 +59,7 @@ const q = computed(() =>
 				yearlyFrequenciesLoading.value[index] = true;
 				try {
 					const { data, error } = await activeClient.GET("/search/freqml", {
+						headers: createNoskeCacheHeaders(queryKey),
 						params: {
 							query: {
 								corpname: query.corpus,
@@ -230,7 +232,11 @@ const intervalseries = computed(() =>
 				</ToggleGroup>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
+				<QueryDisplay
+					:loading="yearlyFrequenciesLoading[index]"
+					:query="query"
+					:query-key="q[index]?.queryKey"
+				/>
 			</div>
 			<Chart
 				chart-type="line"

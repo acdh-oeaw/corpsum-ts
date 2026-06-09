@@ -19,20 +19,22 @@ const wordFormFrequenciesLoading: Ref<Array<boolean>> = ref([]);
 
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-wordform-frequencies",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			JSON.stringify(queryStore.getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-wordform-frequencies",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				wordFormFrequenciesLoading.value[index] = true;
 				const { data, error } = await activeClient.GET("/search/freqml", {
+					headers: createNoskeCacheHeaders(queryKey),
 					params: {
 						query: {
 							corpname: query.corpus,
@@ -83,7 +85,11 @@ const expand = ref(false);
 				<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
 			</ToggleGroup>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<QueryDisplay :loading="wordFormFrequenciesLoading[index]" :query="query" />
+				<QueryDisplay
+					:loading="wordFormFrequenciesLoading[index]"
+					:query="query"
+					:query-key="q[index]?.queryKey"
+				/>
 				<Chart
 					chart-type="bar"
 					class="h-96"

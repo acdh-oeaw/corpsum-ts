@@ -14,14 +14,16 @@ const { useNoskeQuery } = useNoskeClient(noskeId);
 
 const facettingQuery = computed(() => queryStore.getQueryWithFacetting(props.query));
 
+const kwicQueryKey = computed(() => [
+	"get-concordance",
+	props.query.corpus,
+	props.query.subCorpus,
+	props.query.KWICAttrsStructs,
+	facettingQuery.value,
+]);
+
 const kwicQuery = useNoskeQuery<ConcordanceResponse>({
-	queryKey: computed(() => [
-		"get-concordance",
-		props.query.corpus,
-		props.query.subCorpus,
-		props.query.KWICAttrsStructs,
-		facettingQuery.value,
-	]),
+	queryKey: kwicQueryKey,
 	async queryFn(client) {
 		const { data, error } = await client.GET("/search/concordance", {
 			params: {
@@ -96,7 +98,7 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 		</div>
 		<kwicAttributeSelect v-if="showViewOptionsMode" class="mt-4" :query="query" />
 		<div class="mt-4">
-			<QueryDisplay :loading="loading" :query="query" />
+			<QueryDisplay :loading="loading" :query="query" :query-key="kwicQueryKey" />
 			<CorpsumDataTable v-if="!loading" :columns="columns" :data="KWICresults" />
 			<kwicDetailDialog
 				v-if="selectedKWIC"
