@@ -69,7 +69,7 @@ const fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc"];
 const keyToKey = {
 	charrow: "char",
 	cqlrow: "cql",
-	iqueryrow: "iquery",
+	iquery: "iquery",
 	lemmarow: "lemma",
 	phraserow: "phrase",
 	wordrow: "word",
@@ -182,7 +182,7 @@ function buildFinalQuery(type: QueryDocument["type"], userInput: string) {
 		case "cqlrow":
 			return userInput;
 		case "charrow":
-		case "iqueryrow":
+		case "iquery":
 		case "phraserow":
 			return `[word="${userInput}"]`;
 	}

@@ -7,7 +7,7 @@ import { colors } from "@/utils/colors";
 const keyToKey = {
 	charrow: "char",
 	cqlrow: "cql",
-	iqueryrow: "iquery",
+	iquery: "iquery",
 	lemmarow: "lemma",
 	phraserow: "phrase",
 	wordrow: "word",
@@ -47,7 +47,7 @@ export const useQueryStore = defineStore(
 					finalQuery = userInput;
 					break;
 				case "charrow":
-				case "iqueryrow":
+				case "iquery":
 				case "phraserow":
 					finalQuery = `[word="${userInput}"]`;
 					break;

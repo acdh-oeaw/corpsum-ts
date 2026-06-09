@@ -28,7 +28,7 @@ interface QueryFormValues {
 const typeOptions: Array<QueryType> = [
 	"charrow",
 	"cqlrow",
-	"iqueryrow",
+	"iquery",
 	"lemmarow",
 	"phraserow",
 	"wordrow",

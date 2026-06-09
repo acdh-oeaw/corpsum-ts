@@ -4,7 +4,7 @@ import type { QueryListItem } from "~/server/api/queries.get.ts";
 const keyToKey: Record<CorpusQueryType, CorpusQueryTypeValue> = {
 	charrow: "char",
 	cqlrow: "cql",
-	iqueryrow: "iquery",
+	iquery: "iquery",
 	lemmarow: "lemma",
 	phraserow: "phrase",
 	wordrow: "word",
@@ -19,7 +19,7 @@ function buildFinalQuery(type: CorpusQueryType, userInput: string) {
 		case "cqlrow":
 			return userInput;
 		case "charrow":
-		case "iqueryrow":
+		case "iquery":
 		case "phraserow":
 			return `[word="${userInput}"]`;
 	}
