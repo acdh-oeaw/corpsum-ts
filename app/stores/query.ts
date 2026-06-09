@@ -3,15 +3,7 @@ import { type Ref, ref } from "vue";
 
 import { useCorporaStore } from "@/stores/corpora";
 import { colors } from "@/utils/colors";
-
-const keyToKey = {
-	charrow: "char",
-	cqlrow: "cql",
-	iquery: "iquery",
-	lemmarow: "lemma",
-	phraserow: "phrase",
-	wordrow: "word",
-};
+import { getConcordanceInputKey } from "@/utils/concordance-query";
 
 const fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc"];
 
@@ -32,8 +24,7 @@ export const useQueryStore = defineStore(
 
 			const concordanceQuery: Partial<ConcordanceQuery> = {};
 
-			// @ts-expect-error assigning via key
-			concordanceQuery[keyToKey[type]] = userInput;
+			concordanceQuery[getConcordanceInputKey(type)] = userInput;
 			concordanceQuery.queryselector = type;
 
 			switch (type) {

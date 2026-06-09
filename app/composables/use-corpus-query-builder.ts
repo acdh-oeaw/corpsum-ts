@@ -1,14 +1,6 @@
 import { colors } from "@/utils/colors";
+import { getConcordanceInputKey } from "@/utils/concordance-query";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
-
-const keyToKey: Record<CorpusQueryType, CorpusQueryTypeValue> = {
-	charrow: "char",
-	cqlrow: "cql",
-	iquery: "iquery",
-	lemmarow: "lemma",
-	phraserow: "phrase",
-	wordrow: "word",
-};
 
 function buildFinalQuery(type: CorpusQueryType, userInput: string) {
 	switch (type) {
@@ -32,7 +24,7 @@ export function useCorpusQueryBuilder() {
 		const finalQuery = buildFinalQuery(item.type, item.userInput);
 		const concordance_query = {
 			queryselector: item.type,
-			[keyToKey[item.type]]: item.userInput,
+			[getConcordanceInputKey(item.type)]: item.userInput,
 		} as ConcordanceQuery;
 
 		return {

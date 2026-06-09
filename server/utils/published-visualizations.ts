@@ -11,6 +11,7 @@ import {
 } from "@/lib/visualization-types";
 import type { CorpusMetadataMappingResponse } from "@/lib/visualization-types";
 import { colors } from "@/utils/colors";
+import { getConcordanceInputKey } from "@/utils/concordance-query";
 import { type NoskeDocument, NoskeModel } from "~/server/models/noskeinstances.schema";
 import { NoskeQueryCacheModel } from "~/server/models/noskequerycache.schema";
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
@@ -65,15 +66,6 @@ export interface MissingPublishedCacheEntry {
 }
 
 const fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc"];
-
-const keyToKey = {
-	charrow: "char",
-	cqlrow: "cql",
-	iquery: "iquery",
-	lemmarow: "lemma",
-	phraserow: "phrase",
-	wordrow: "word",
-} satisfies Record<QueryDocument["type"], string>;
 
 export function generatePublishedVisualizationUid() {
 	return randomUUID().toLowerCase();
@@ -148,7 +140,7 @@ export async function createPublishedSnapshot(input: {
 
 function createQuerySnapshot(query: QueryDocument, index: number): PublishedQuerySnapshot {
 	const finalQuery = buildFinalQuery(query.type, query.userInput);
-	const concordanceKey = keyToKey[query.type];
+	const concordanceKey = getConcordanceInputKey(query.type);
 	return {
 		id: index,
 		sourceQueryId: query._id.toString(),
@@ -336,7 +328,7 @@ async function getPanelMapping(type: VisualizationType, query: QueryDocument, us
 function getQueryWithFacetting(query: QueryDocument) {
 	const result: Record<string, string | Array<string>> = {
 		queryselector: query.type,
-		[keyToKey[query.type]]: query.userInput,
+		[getConcordanceInputKey(query.type)]: query.userInput,
 	};
 	const facettingValues = query.facettingValues;
 	if (!facettingValues || typeof facettingValues !== "object") return result;
