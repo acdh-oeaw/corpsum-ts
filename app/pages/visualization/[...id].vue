@@ -18,6 +18,7 @@ const t = useTranslations();
 const route = useRoute();
 const queryStore = useQueryStore();
 const env = useRuntimeConfig();
+const locale = useLocale();
 
 const visualizationId = computed(() => {
 	const idParam = route.params.id;
@@ -60,7 +61,7 @@ const visualizationComponents: Record<VisualizationType, unknown> = {
 
 const publishedLink = computed(() => {
 	if (!publishedUid.value) return "";
-	return new URL(`/v/${publishedUid.value}`, env.public.appBaseUrl).toString();
+	return new URL(`/${locale.value}/v/${publishedUid.value}`, env.public.appBaseUrl).toString();
 });
 
 function escapeAttribute(value: string) {
@@ -73,7 +74,10 @@ function escapeAttribute(value: string) {
 
 const embedSnippet = computed(() => {
 	if (!publishedUid.value) return "";
-	const src = new URL(`/v/${publishedUid.value}/embed`, env.public.appBaseUrl).toString();
+	const src = new URL(
+		`/${locale.value}/v/${publishedUid.value}/embed`,
+		env.public.appBaseUrl,
+	).toString();
 	return `<iframe src="${src}" width="100%" height="720" loading="lazy" style="border:0;" title="${escapeAttribute(publishTitle.value)}"></iframe>`;
 });
 
