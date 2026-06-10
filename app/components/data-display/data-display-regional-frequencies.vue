@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
 import { Map, PieChart } from "lucide-vue-next";
+import { BarChart3, BarChart4, ChartBarStacked } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 
+import { mapAustria } from "@/utils/map-austria";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
@@ -100,6 +102,28 @@ watch(queries.value, () => {
 });
 
 const expand = ref(false);
+
+const regionNames = Object.fromEntries(
+	mapAustria.features.map((f) => [String(f.properties["hc-key"]), String(f.properties["name"])]),
+);
+
+const regionalBarSeries = computed(() =>
+	queries.value.map((query, index) => {
+		const data = regionalFrequencies.value[index]?.data ?? [];
+		return {
+			color: query.color,
+			name: `${query.type}: ${query.userInput} (${query.corpus}${
+				query.subCorpus ? ` / ${query.subCorpus})` : ")"
+			}`,
+			data: data.map((item) => {
+				const value = item ? (mode.value === "relative" ? item.relative : item.absolute) : 0;
+				return [regionNames[item.region] ?? item.region, value] as [string, number];
+			}),
+		};
+	}),
+);
+
+const barChartMode: Ref<"bar" | "stack" | "percent"> = ref("bar");
 </script>
 
 <template>
@@ -159,6 +183,52 @@ const expand = ref(false);
 			<div v-if="isCombined && !loading && queries.length > 0">
 				<CombinedMapChart :mode="mode" :queries="queries" :resdata="regionalFrequencies" />
 			</div>
+			<div class="flex flex-wrap items-center gap-3">
+				<ToggleGroup v-model="barChartMode" class="flex" type="single">
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="stack">
+										<BarChart3 class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>stacked bar chart</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="bar">
+										<BarChart4 class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>separate bar chart</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="percent">
+										<ChartBarStacked class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>percentage bar chart</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				</ToggleGroup>
+			</div>
+
+			<Chart
+				v-if="!loading && queries.length > 0"
+				:chart-type="barChartMode"
+				:percent="true"
+				class="h-96"
+				:series="regionalBarSeries"
+				:title="`${regionalBarSeries.length} ${t('queries')}`"
+				:y-axis="t('freq')"
+			/>
 		</CardContent>
 
 		<Collapsible v-model:open="expand">
