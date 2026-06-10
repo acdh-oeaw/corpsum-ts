@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+import {
+	fixedKWICStructures,
+	getKWICqueryAttrStrcs,
+	getQueryWithFacetting,
+} from "@/utils/corpus-query";
 import { getKWICColumns } from "@/utils/kwic";
 import type { components } from "~/lib/noske-types";
 
@@ -7,12 +12,10 @@ type ConcordanceResponse = components["schemas"]["06_concordance"];
 const props = defineProps<{ query: CorpusQuery }>();
 const showViewOptionsMode = ref(false);
 
-const queryStore = useQueryStore();
-
 const noskeId = computed(() => props.query.noske ?? null);
 const { useNoskeQuery } = useNoskeClient(noskeId);
 
-const facettingQuery = computed(() => queryStore.getQueryWithFacetting(props.query));
+const facettingQuery = computed(() => getQueryWithFacetting(props.query));
 
 const kwicQueryKey = computed(() => [
 	"get-concordance",
@@ -31,7 +34,7 @@ const kwicQuery = useNoskeQuery<ConcordanceResponse>({
 					corpname: props.query.corpus,
 					usesubcorp: props.query.subCorpus || undefined,
 					viewmode: "kwic",
-					...queryStore.getKWICqueryAttrStrcs(props.query),
+					...getKWICqueryAttrStrcs(props.query),
 					refs: props.query.KWICAttrsStructs.structures.map((s: string) => `=${s}`).join(","),
 					pagesize: 1000,
 					json: JSON.stringify({ concordance_query: facettingQuery.value }),
@@ -83,7 +86,7 @@ const columns = computed(() => {
 		translateWithoutNamespace as unknown as (s: string) => string,
 		open,
 		props.query.KWICAttrsStructs.structures,
-		queryStore.fixedKWICStructures,
+		fixedKWICStructures,
 	);
 });
 

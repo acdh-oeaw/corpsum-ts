@@ -16,7 +16,6 @@ import type { VisualizationResponse } from "~/server/api/visualization/[id].get.
 
 const t = useTranslations();
 const route = useRoute();
-const queryStore = useQueryStore();
 const env = useRuntimeConfig();
 const locale = useLocale();
 
@@ -91,19 +90,6 @@ function getVisualizationMetadataMappings(type: VisualizationType) {
 	}
 	return undefined;
 }
-
-watch(
-	() => [visualization.value, corpusQueries.value],
-	() => {
-		queryStore.queries = [];
-		queryStore.nextQueryId = 0;
-		if (!visualization.value) return;
-		if (corpusQueries.value.length === 0) return;
-		queryStore.queries = [...corpusQueries.value];
-		queryStore.nextQueryId = corpusQueries.value.length;
-	},
-	{ immediate: true },
-);
 
 watch(
 	visualization,

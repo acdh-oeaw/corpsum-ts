@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-
 import {
 	type CorpusMetadataMappingResponse,
 	type TemporalFrequencyDistributionSettings,
 	defaultTemporalFrequencyDistributionSettings,
 	normalizeTemporalFrequencyDistributionSettings,
 } from "@/lib/visualization-types";
+import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
@@ -31,13 +30,12 @@ interface YearlyFrequencySeries<TPoint extends FrequencyPoint | IntervalFrequenc
 
 const props = withDefaults(
 	defineProps<{
-		queries?: Array<CorpusQuery>;
+		queries: Array<CorpusQuery>;
 		settings?: Partial<TemporalFrequencyDistributionSettings>;
 		metadataMappings?: Array<CorpusMetadataMappingResponse | null>;
 	}>(),
 	{
 		metadataMappings: undefined,
-		queries: undefined,
 		settings: undefined,
 	},
 );
@@ -47,10 +45,8 @@ const emit = defineEmits<{
 }>();
 
 const t = useTranslations();
-const queryStore = useQueryStore();
-const { queries: storeQueries } = storeToRefs(queryStore);
 
-const activeQueries = computed(() => props.queries ?? storeQueries.value);
+const activeQueries = computed(() => props.queries);
 const normalizedSettings = computed(() =>
 	normalizeTemporalFrequencyDistributionSettings(props.settings),
 );
@@ -100,7 +96,7 @@ const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
 			query.corpus,
 			query.subCorpus,
 			mapping?.attribute,
-			JSON.stringify(queryStore.getQueryWithFacetting(query)),
+			JSON.stringify(getQueryWithFacetting(query)),
 		] as const;
 		return {
 			queryKey,
@@ -117,7 +113,7 @@ const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
 				ml1attr: mapping?.attribute ?? "",
 				ml1ctx: "0~0 > 0",
 				json: JSON.stringify({
-					concordance_query: queryStore.getQueryWithFacetting(query),
+					concordance_query: getQueryWithFacetting(query),
 				}),
 			},
 		};

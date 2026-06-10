@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import { fixedKWICStructures } from "@/utils/corpus-query";
+
 const t = useTranslations();
 
 const props = defineProps<{ query: CorpusQuery }>();
 
-const queryStore = useQueryStore();
-
-const currentQuery = computed(() => queryStore.queries.find((q) => q.id === props.query.id));
+const currentQuery = computed(() => props.query);
 
 const structureOptions = computed(() => {
 	const options: Array<string> = [];
@@ -28,8 +28,6 @@ const attributeOptions = computed(
 	() =>
 		currentQuery.value?.KWICAttrsStructsOptions.attributes.map((structure) => structure.name) ?? [],
 );
-
-const fixed = queryStore.fixedKWICStructures;
 
 const toggleSelection = (
 	list: Array<string>,
@@ -79,7 +77,7 @@ const toggleSelection = (
 					>
 						<Checkbox
 							:checked="currentQuery.KWICAttrsStructs.structures.includes(structure)"
-							:disabled="fixed.includes(structure)"
+							:disabled="fixedKWICStructures.includes(structure)"
 							@update:checked="
 								toggleSelection(currentQuery.KWICAttrsStructs.structures, structure, $event)
 							"

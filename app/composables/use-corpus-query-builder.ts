@@ -1,25 +1,9 @@
 import { colors } from "@/utils/colors";
 import { getConcordanceInputKey } from "@/utils/concordance-query";
+import { buildFinalQuery, fixedKWICStructures } from "@/utils/corpus-query";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
-function buildFinalQuery(type: CorpusQueryType, userInput: string) {
-	switch (type) {
-		case "wordrow":
-			return `[word="${userInput}"]`;
-		case "lemmarow":
-			return `[lemma="${userInput}"]`;
-		case "cqlrow":
-			return userInput;
-		case "charrow":
-		case "iquery":
-		case "phraserow":
-			return `[word="${userInput}"]`;
-	}
-}
-
 export function useCorpusQueryBuilder() {
-	const queryStore = useQueryStore();
-
 	function buildCorpusQuery(item: QueryListItem, index: number): CorpusQuery {
 		const finalQuery = buildFinalQuery(item.type, item.userInput);
 		const concordance_query = {
@@ -41,7 +25,7 @@ export function useCorpusQueryBuilder() {
 			concordance_query,
 			KWICAttrsStructs: {
 				attributes: [],
-				structures: [...queryStore.fixedKWICStructures],
+				structures: [...fixedKWICStructures],
 			},
 			KWICAttrsStructsOptions: {
 				attributes: [],
