@@ -43,7 +43,8 @@ documented separately.
 ## Routing And Forwarding
 
 The first path segment after `/api/noske/` is the CorpSum NoSke instance id. All remaining path
-segments are treated as the NoSke target path.
+segments are treated as the NoSke target path and are assembled and typed as described in the
+NoSke OpenAPI Definition.
 
 Example:
 

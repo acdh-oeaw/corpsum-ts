@@ -185,7 +185,8 @@
 			"facettingRequired": "Facetting values are required.",
 			"invalidValue": "Invalid value.",
 			"required": "{label} is required."
-		}
+		},
+		"copyName": "Copied from {name}"
 	},
 	"WrongCredentials": "Wrong credentials.",
 	"NoskeForm": {
@@ -207,6 +208,7 @@
 	},
 	"Actions": {
 		"cancel": "Cancel",
+		"copy": "Copy",
 		"create": "Create",
 		"credentials": "Credentials",
 		"delete": "Delete",

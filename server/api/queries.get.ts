@@ -1,6 +1,6 @@
 import { defineEventHandler } from "h3";
 
-import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
+import { type QueryDocument, QueryModel, type QueryType } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
 import { requireAuth } from "~/server/utils/auth";
 
@@ -11,8 +11,9 @@ export interface QueryListItem {
 	noske: string;
 	corpus: string;
 	subCorpus: string;
-	type: "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
+	type: QueryType;
 	userInput: string;
+	facettingValues: unknown;
 	updatedAt: string;
 }
 
@@ -32,10 +33,18 @@ interface QueryRecord {
 	subCorpus?: unknown;
 	type: unknown;
 	userInput: unknown;
+	facettingValues: unknown;
 	updatedAt?: Date;
 }
 
-const queryTypes = ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"] as const;
+const queryTypes: ReadonlyArray<QueryType> = [
+	"charrow",
+	"cqlrow",
+	"iquery",
+	"lemmarow",
+	"phraserow",
+	"wordrow",
+];
 const queryTypeSet = new Set<string>(queryTypes);
 type QueryOwner = NonNullable<QueryRecord["owner"]>[number];
 
@@ -69,6 +78,7 @@ function toResponse(query: QueryRecord): QueryListItem {
 		subCorpus: String(query.subCorpus),
 		type,
 		userInput: String(query.userInput),
+		facettingValues: query.facettingValues,
 		updatedAt: query.updatedAt ? query.updatedAt.toISOString() : "",
 	};
 }

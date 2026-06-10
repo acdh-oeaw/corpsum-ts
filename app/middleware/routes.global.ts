@@ -12,12 +12,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		to.path === loginPath || to.path === signupPath || to.path === imprintPath || isPublishedRoute;
 
 	if (import.meta.server && !isPublicRoute) {
-		try {
-			const requestFetch = useRequestFetch();
-			const session = await requestFetch<RefreshResponse>("/api/auth/refresh");
-			auth.setSession(session);
-			return;
-		} catch {
+		const requestFetch = useRequestFetch() as typeof $fetch;
+		if (await auth.refresh(requestFetch)) return;
+		else {
 			return await navigateTo(loginPath, { redirectCode: 302 });
 		}
 	}

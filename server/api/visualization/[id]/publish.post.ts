@@ -1,6 +1,7 @@
 import { defineEventHandler, getRouterParam, type H3Event, readBody } from "h3";
 import mongoose from "mongoose";
 
+import { normalizeVisualizationType } from "@/lib/visualization-types";
 import {
 	PublishedVisualizationModel,
 	type PublishedVisualizationDocument,
@@ -47,7 +48,9 @@ async function createWithUniqueUid(input: {
 				title: input.title,
 				description: input.description,
 				queries: input.queries,
-				visualizations: input.visualization.visualizations,
+				visualizations: input.visualization.visualizations.map((type) =>
+					normalizeVisualizationType(type),
+				),
 				panels: input.panels,
 				isPublic: true,
 				publishedAt: new Date(),

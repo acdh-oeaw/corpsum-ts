@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
-import { storeToRefs } from "pinia";
 
+import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type CollxResponse = components["schemas"]["10_collx"];
 
 const t = useTranslations();
-const queryStore = useQueryStore();
-const { queries } = storeToRefs(queryStore);
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+}>();
 
+const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const { client } = useNoskeClient(noskeId);
 
@@ -44,7 +46,7 @@ const q = computed(() =>
 			query.id,
 			cattr.value,
 			cbgrfns,
-			JSON.stringify(queryStore.getQueryWithFacetting(query)),
+			JSON.stringify(getQueryWithFacetting(query)),
 		] as const;
 		return {
 			queryKey,
@@ -67,7 +69,7 @@ const q = computed(() =>
 							csortfn: "d",
 							citemsperpage: 10,
 							// @ts-expect-error openapi json parameter mismatch
-							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
+							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 						},
 					},
 				});

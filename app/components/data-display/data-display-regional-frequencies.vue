@@ -1,16 +1,18 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
 import { Map, PieChart } from "lucide-vue-next";
-import { storeToRefs } from "pinia";
 
+import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
 
 const t = useTranslations();
-const queryStore = useQueryStore();
-const { queries } = storeToRefs(queryStore);
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+}>();
 
+const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const { client } = useNoskeClient(noskeId);
 
@@ -28,7 +30,7 @@ const q = computed(() =>
 			noskeId.value,
 			query.corpus,
 			query.subCorpus,
-			JSON.stringify(queryStore.getQueryWithFacetting(query)),
+			JSON.stringify(getQueryWithFacetting(query)),
 		] as const;
 		return {
 			queryKey,
@@ -50,7 +52,7 @@ const q = computed(() =>
 							freqlevel: 1,
 							ml1attr: "doc.region",
 							ml1ctx: "0~0 > 0",
-							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
+							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 						},
 					},
 				});
@@ -90,7 +92,7 @@ watch(mode, (value?: string) => {
 	if (!value) mode.value = "relative";
 });
 
-watch(queries.value, () => {
+watch(queries, () => {
 	const queryIds = queries.value.map(({ id }) => id);
 	regionalFrequencies.value = regionalFrequencies.value.filter(({ query }) =>
 		queryIds.includes(query),

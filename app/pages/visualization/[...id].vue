@@ -2,27 +2,22 @@
 import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
 import DataDisplayKeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
+import DataDisplayMetadataTemporalFrequencyDistribution from "@/components/data-display/data-display-metadata-temporal-frequency-distribution.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
-import DataDisplaySourceTable from "@/components/data-display/data-display-source-table.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
-import DataDisplayYearlyFrequencies from "@/components/data-display/data-display-yearly-frequencies.vue";
-import { colors } from "@/utils/colors";
+import {
+	type VisualizationType,
+	getVisualizationMetadataSemantics,
+	normalizeVisualizationSettings,
+	temporalFrequencyDistributionType,
+} from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
 
-type VisualizationType =
-	| "data-display-collocations"
-	| "data-display-keyword-in-context"
-	| "data-display-media-source"
-	| "data-display-regional-frequencies"
-	| "data-display-source-table"
-	| "data-display-word-form-frequencies"
-	| "data-display-yearly-frequencies";
-
 const t = useTranslations();
 const route = useRoute();
-const queryStore = useQueryStore();
 const env = useRuntimeConfig();
+const locale = useLocale();
 
 const visualizationId = computed(() => {
 	const idParam = route.params.id;
@@ -45,20 +40,27 @@ const selectedQueryItems = computed(() => {
 	const selected = new Set(visualization.value?.queries ?? []);
 	return queriesList.value.filter((query) => selected.has(query._id));
 });
+const { buildCorpusQuery } = useCorpusQueryBuilder();
+const corpusQueries = computed(() =>
+	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
+);
+const { mappingsForQueries: temporalMetadataMappings } = await useCorpusMetadataMappings(
+	corpusQueries,
+	"temporal",
+);
 
 const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-collocations": DataDisplayCollocations,
 	"data-display-keyword-in-context": DataDisplayKeywordInContext,
 	"data-display-media-source": DataDisplayMediaSource,
 	"data-display-regional-frequencies": DataDisplayRegionalFrequencies,
-	"data-display-source-table": DataDisplaySourceTable,
 	"data-display-word-form-frequencies": DataDisplayWordFormFrequencies,
-	"data-display-yearly-frequencies": DataDisplayYearlyFrequencies,
+	[temporalFrequencyDistributionType]: DataDisplayMetadataTemporalFrequencyDistribution,
 };
 
 const publishedLink = computed(() => {
 	if (!publishedUid.value) return "";
-	return new URL(`/v/${publishedUid.value}`, env.public.appBaseUrl).toString();
+	return new URL(`/${locale.value}/v/${publishedUid.value}`, env.public.appBaseUrl).toString();
 });
 
 function escapeAttribute(value: string) {
@@ -71,90 +73,23 @@ function escapeAttribute(value: string) {
 
 const embedSnippet = computed(() => {
 	if (!publishedUid.value) return "";
-	const src = new URL(`/v/${publishedUid.value}/embed`, env.public.appBaseUrl).toString();
+	const src = new URL(
+		`/${locale.value}/v/${publishedUid.value}/embed`,
+		env.public.appBaseUrl,
+	).toString();
 	return `<iframe src="${src}" width="100%" height="720" loading="lazy" style="border:0;" title="${escapeAttribute(publishTitle.value)}"></iframe>`;
 });
 
-const keyToKey: Record<CorpusQueryType, CorpusQueryTypeValue> = {
-	charrow: "char",
-	cqlrow: "cql",
-	iqueryrow: "iquery",
-	lemmarow: "lemma",
-	phraserow: "phrase",
-	wordrow: "word",
-};
+function getVisualizationSettings(index: number, type: VisualizationType) {
+	return normalizeVisualizationSettings(type, visualization.value?.settings[index]);
+}
 
-const buildFinalQuery = (type: CorpusQueryType, userInput: string) => {
-	switch (type) {
-		case "wordrow":
-			return `[word="${userInput}"]`;
-		case "lemmarow":
-			return `[lemma="${userInput}"]`;
-		case "cqlrow":
-			return userInput;
-		case "charrow":
-		case "iqueryrow":
-		case "phraserow":
-			return `[word="${userInput}"]`;
+function getVisualizationMetadataMappings(type: VisualizationType) {
+	if (getVisualizationMetadataSemantics(type).includes("temporal")) {
+		return temporalMetadataMappings.value;
 	}
-	return `[word="${userInput}"]`;
-};
-
-const buildQuery = (item: QueryListItem, index: number): CorpusQuery => {
-	const finalQuery = buildFinalQuery(item.type, item.userInput);
-	const concordance_query = {
-		queryselector: item.type,
-		[keyToKey[item.type]]: item.userInput,
-	} as ConcordanceQuery;
-
-	return {
-		id: index,
-		noske: item.noske,
-		type: item.type,
-		userInput: item.userInput,
-		finalQuery,
-		preparedQuery: `aword,${finalQuery}`,
-		color: colors[index % colors.length] ?? "#111827",
-		showPicker: false,
-		corpus: item.corpus,
-		subCorpus: item.subCorpus,
-		concordance_query,
-		KWICAttrsStructs: {
-			attributes: [],
-			structures: [...queryStore.fixedKWICStructures],
-		},
-		KWICAttrsStructsOptions: {
-			attributes: [],
-			structures: [],
-		},
-		KWICAdditionalViewHeaders: [],
-		facettingValues: {},
-		SampleRatio: 100,
-		loading: {
-			yearlyFrequencies: false,
-			wordFormFrequencies: false,
-			regionalFrequencies: false,
-			keywordInContext: false,
-			mediaSources: false,
-			collocations: false,
-		},
-	};
-};
-
-watch(
-	() => [visualization.value, selectedQueryItems.value],
-	() => {
-		queryStore.queries = [];
-		queryStore.nextQueryId = 0;
-		if (!visualization.value) return;
-		if (selectedQueryItems.value.length === 0) return;
-		selectedQueryItems.value.forEach((item, index) => {
-			queryStore.queries.push(buildQuery(item, index));
-			queryStore.nextQueryId = index + 1;
-		});
-	},
-	{ immediate: true },
-);
+	return undefined;
+}
 
 watch(
 	visualization,
@@ -206,6 +141,12 @@ async function publishVisualization() {
 				<PageTitle>{{ visualization.name || t("VisualizationsPage.detailTitle") }}</PageTitle>
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button as-child size="sm" type="button" variant="ghost">
+					<NuxtLinkLocale :href="{ path: `/visualization/edit/${visualization._id}` }">
+						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+						{{ t("Actions.edit") }}
+					</NuxtLinkLocale>
+				</Button>
 				<Dialog v-model:open="publishOpen">
 					<DialogTrigger as-child>
 						<Button size="sm" type="button" variant="ghost">
@@ -298,8 +239,11 @@ async function publishVisualization() {
 				<div class="grid gap-4">
 					<component
 						:is="visualizationComponents[item]"
-						v-for="item in visualization.visualizations"
-						:key="item"
+						v-for="(item, index) in visualization.visualizations"
+						:key="`${item}-${index}`"
+						:metadata-mappings="getVisualizationMetadataMappings(item)"
+						:queries="corpusQueries"
+						:settings="getVisualizationSettings(index, item)"
 					/>
 				</div>
 			</div>

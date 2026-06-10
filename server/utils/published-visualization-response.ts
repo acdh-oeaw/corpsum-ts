@@ -1,8 +1,8 @@
+import { type VisualizationType, normalizeVisualizationType } from "@/lib/visualization-types";
 import type { PublishedVisualizationDocument } from "~/server/models/publishedvisualizations.schema";
 import type {
 	PublishedPanelSnapshot,
 	PublishedQuerySnapshot,
-	VisualizationType,
 } from "~/server/utils/published-visualizations";
 
 export interface PublishedVisualizationResponse {
@@ -41,7 +41,7 @@ export function toPublishedVisualizationResponse(
 		title: record.title,
 		description: record.description,
 		queries: [...record.queries] as Array<PublishedQuerySnapshot>,
-		visualizations: [...record.visualizations] as Array<VisualizationType>,
+		visualizations: record.visualizations.map((type) => normalizeVisualizationType(type)),
 		panels: [...record.panels] as Array<PublishedPanelSnapshot>,
 		isPublic: record.isPublic,
 		publishedAt: record.publishedAt.toISOString(),

@@ -1,7 +1,7 @@
 import { defineEventHandler, getRouterParam } from "h3";
 import mongoose from "mongoose";
 
-import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
+import { type QueryDocument, QueryModel, type QueryType } from "~/server/models/queries.schema";
 import { requireUser } from "~/server/utils/user";
 
 export interface QueryResponse {
@@ -11,7 +11,7 @@ export interface QueryResponse {
 	noske: string;
 	corpus: string;
 	subCorpus: string;
-	type: "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
+	type: QueryType;
 	userInput: string;
 	facettingValues: unknown;
 	createdAt: string;
@@ -39,7 +39,14 @@ interface QueryRecord {
 	updatedAt?: Date;
 }
 
-const queryTypes = ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"] as const;
+const queryTypes: ReadonlyArray<QueryType> = [
+	"charrow",
+	"cqlrow",
+	"iquery",
+	"lemmarow",
+	"phraserow",
+	"wordrow",
+];
 const queryTypeSet = new Set<string>(queryTypes);
 type QueryOwner = NonNullable<QueryRecord["owner"]>[number];
 
