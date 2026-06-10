@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
+import { LineChart, ChartBarStacked, BarChart4 } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 
 import type { components } from "~/lib/noske-types";
@@ -213,6 +214,9 @@ const intervalseries = computed(() =>
 		data: groupFrequencyPointsIntoIntervals(querySeries.data, interval.value, reverse.value),
 	})),
 );
+
+const chartMode = ref<"line" | "percent">("line");
+const intervallChartMode = ref<"bar" | "percent">("bar");
 </script>
 
 <template>
@@ -224,6 +228,30 @@ const intervalseries = computed(() =>
 
 		<CardContent class="space-y-6">
 			<div class="flex max-w-7xl">
+				<ToggleGroup v-model="chartMode" class="flex" type="single">
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="line">
+										<LineChart class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>stacked bar chart</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="percent">
+										<ChartBarStacked class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>percentage bar chart</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				</ToggleGroup>
 				<ToggleGroup v-model="mode" class="flex w-full" type="single">
 					<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
 					<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
@@ -233,7 +261,7 @@ const intervalseries = computed(() =>
 				<QueryDisplay :loading="yearlyFrequenciesLoading[index]" :query="query" />
 			</div>
 			<Chart
-				chart-type="line"
+				:chart-type="chartMode"
 				class="h-96"
 				:series="series"
 				:title="`${series.length} ${t('queries')}`"
@@ -246,6 +274,30 @@ const intervalseries = computed(() =>
 			</CardHeader>
 
 			<div class="flex flex-wrap items-center gap-3">
+				<ToggleGroup v-model="intervallChartMode" class="flex self-end" type="single">
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="bar">
+										<BarChart4 class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>stacked bar chart</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="percent">
+										<ChartBarStacked class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>percentage bar chart</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				</ToggleGroup>
 				<div class="space-y-1">
 					<Label for="yearly-interval">Interval</Label>
 					<Select v-model="interval" :aria-label="t('interval')">
@@ -270,7 +322,7 @@ const intervalseries = computed(() =>
 			</div>
 
 			<Chart
-				chart-type="bar"
+				:chart-type="intervallChartMode"
 				class="h-96"
 				:series="intervalseries"
 				:title="`${intervalseries.length} ${t('queries')}`"
