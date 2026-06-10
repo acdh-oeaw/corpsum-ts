@@ -13,6 +13,7 @@ export interface QueryListItem {
 	subCorpus: string;
 	type: QueryType;
 	userInput: string;
+	facettingValues: unknown;
 	updatedAt: string;
 }
 
@@ -32,6 +33,7 @@ interface QueryRecord {
 	subCorpus?: unknown;
 	type: unknown;
 	userInput: unknown;
+	facettingValues: unknown;
 	updatedAt?: Date;
 }
 
@@ -76,6 +78,7 @@ function toResponse(query: QueryRecord): QueryListItem {
 		subCorpus: String(query.subCorpus),
 		type,
 		userInput: String(query.userInput),
+		facettingValues: query.facettingValues,
 		updatedAt: query.updatedAt ? query.updatedAt.toISOString() : "",
 	};
 }

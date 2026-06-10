@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { createCopiedQueryName, queryCopyNameKey } from "@/utils/query-copy";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
 const auth = useAuth();
 const t = useTranslations();
+const locale = useLocale();
 
 const props = defineProps<{
 	query: QueryListItem;
@@ -22,6 +24,19 @@ const isOwner = computed(() => query.value.owner.some((owner) => owner.username 
 const setDeleting = (value: boolean) => {
 	isDeleting.value = value;
 };
+const copyQueryParams = computed(() => ({
+	name: createCopiedQueryName(
+		query.value.name,
+		t(queryCopyNameKey, { name: query.value.name }),
+		locale.value,
+	),
+	noske: query.value.noske,
+	corpus: query.value.corpus,
+	subCorpus: query.value.subCorpus,
+	type: query.value.type,
+	userInput: query.value.userInput,
+	facettingValues: JSON.stringify(query.value.facettingValues ?? {}),
+}));
 
 async function deleteQuery() {
 	if (!isOwner.value || isDeleting.value) return;
@@ -74,6 +89,16 @@ async function deleteQuery() {
 							</Button>
 						</TooltipTrigger>
 						<TooltipContent>{{ t("Actions.edit") }}</TooltipContent>
+					</Tooltip>
+					<Tooltip>
+						<TooltipTrigger as-child>
+							<Button as-child class="flex-1" size="sm" variant="ghost">
+								<NuxtLinkLocale :href="{ path: '/query/edit/new', query: copyQueryParams }">
+									<LucideIcon class="size-4" name="Copy" :stroke-width="2" />
+								</NuxtLinkLocale>
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>{{ t("Actions.copy") }}</TooltipContent>
 					</Tooltip>
 					<AlertDialog>
 						<Tooltip>

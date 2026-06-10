@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { createCopiedQueryName, queryCopyNameKey } from "@/utils/query-copy";
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 import type { VisualizationListItem } from "~/server/api/visualizations.get.ts";
 
@@ -51,6 +52,23 @@ const queryVisualizations = computed(() => {
 	if (!id) return [];
 	return (visualizations.value ?? []).filter((visualization) => visualization.queries.includes(id));
 });
+
+const copyQueryParams = computed(() => {
+	if (!query.value) return {};
+	return {
+		name: createCopiedQueryName(
+			query.value.name,
+			t(queryCopyNameKey, { name: query.value.name }),
+			locale.value,
+		),
+		noske: query.value.noske,
+		corpus: query.value.corpus,
+		subCorpus: query.value.subCorpus,
+		type: query.value.type,
+		userInput: query.value.userInput,
+		facettingValues: JSON.stringify(query.value.facettingValues ?? {}),
+	};
+});
 </script>
 
 <template>
@@ -72,6 +90,12 @@ const queryVisualizations = computed(() => {
 				<Button v-else disabled size="sm" type="button" variant="ghost">
 					<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
 					{{ t("Actions.edit") }}
+				</Button>
+				<Button as-child size="sm" type="button" variant="ghost">
+					<NuxtLinkLocale :href="{ path: '/query/edit/new', query: copyQueryParams }">
+						<LucideIcon class="mr-1 size-4" name="Copy" :stroke-width="2" />
+						{{ t("Actions.copy") }}
+					</NuxtLinkLocale>
 				</Button>
 			</div>
 		</div>

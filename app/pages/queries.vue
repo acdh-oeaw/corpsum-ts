@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import QueryCard from "@/components/query/query-card.vue";
+import { createCopiedQueryName, queryCopyNameKey } from "@/utils/query-copy";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
 const t = useTranslations();
 const auth = useAuth();
+const locale = useLocale();
 const { data: queries, refresh } = await useFetch<Array<QueryListItem>>("/api/queries", {});
 const deletingId = ref<string | null>(null);
 
@@ -18,6 +20,15 @@ const formatOwnerNames = (query: QueryListItem) =>
 
 const isOwner = (query: QueryListItem) =>
 	query.owner.some((owner) => owner.username === auth.username);
+const copyQueryParams = (query: QueryListItem) => ({
+	name: createCopiedQueryName(query.name, t(queryCopyNameKey, { name: query.name }), locale.value),
+	noske: query.noske,
+	corpus: query.corpus,
+	subCorpus: query.subCorpus,
+	type: query.type,
+	userInput: query.userInput,
+	facettingValues: JSON.stringify(query.facettingValues ?? {}),
+});
 
 function handleDeleted() {
 	void refresh();
@@ -115,6 +126,18 @@ async function deleteQuery(query: QueryListItem) {
 												</Button>
 											</TooltipTrigger>
 											<TooltipContent>{{ t("Actions.edit") }}</TooltipContent>
+										</Tooltip>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<Button as-child class="flex-1" size="sm" variant="ghost">
+													<NuxtLinkLocale
+														:href="{ path: '/query/edit/new', query: copyQueryParams(query) }"
+													>
+														<LucideIcon class="size-4" name="Copy" :stroke-width="2" />
+													</NuxtLinkLocale>
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent>{{ t("Actions.copy") }}</TooltipContent>
 										</Tooltip>
 										<AlertDialog>
 											<Tooltip>
