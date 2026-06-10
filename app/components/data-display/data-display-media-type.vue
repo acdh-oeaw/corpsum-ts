@@ -77,12 +77,29 @@ const q = computed(() =>
 useQueries({ queries: q });
 
 const chartMode: Ref<"bar" | "stack" | "percent"> = ref("stack");
+
+const allMediaTypes = computed(() => {
+	const allMedia = sourceDistributions.value.flatMap((distribution) =>
+		distribution.map((item) => item.media),
+	);
+	return [...new Set(allMedia)];
+});
+
+const mediaTypeSeries = computed(() =>
+	queries.value.map((_, index) =>
+		(sourceDistributions.value[index] ?? []).map((item) => ({
+			label: item.media,
+			data: [[item.media, item[mode.value]] as [string, number]],
+			color: categoryColors[allMediaTypes.value.indexOf(item.media) % 5],
+		})),
+	),
+);
 </script>
 
 <template>
 	<Card>
 		<CardHeader>
-			<CardTitle>{{ t("mediaSources") }}</CardTitle>
+			<CardTitle>{{ t("mediaTypes") }}</CardTitle>
 			<CardDescription>{{ t("mediaSourcesDesc") }}</CardDescription>
 		</CardHeader>
 
@@ -142,6 +159,14 @@ const chartMode: Ref<"bar" | "stack" | "percent"> = ref("stack");
 					:chart-mode="chartMode"
 				/>
 			</template>
+
+			<h4 class="mt-16 text-center font-semibold">{{ t("mediaTypeDistribution") }}</h4>
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<div v-for="(query, index) of queries" :key="query.id">
+					<QueryDisplay :query="query" />
+					<Chart chart-type="donut" :series="mediaTypeSeries[index] ?? []" :height="150" />
+				</div>
+			</div>
 		</CardContent>
 
 		<Collapsible v-model:open="expand">

@@ -400,6 +400,8 @@
 	"map-showing-the-different-query-frequencies-relating-to-the-region": "Karte mit den unterschiedlichen Abfragefrequenzen nach Region",
 	"mediaSources": "Medienquellen",
 	"mediaSourcesDesc": "Vergleicht die Verteilung der Treffer nach Medienquelle.",
+	"mediaTypes": "Medientypen",
+	"mediaTypeDistribution": "Verteilung der Medientypen pro Abfrage",
 	"next": "Weiter",
 	"previous": "Zurück",
 	"queries": "Abfragen",

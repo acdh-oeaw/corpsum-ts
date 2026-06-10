@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GroupedBar, StackedBar } from "@unovis/ts";
+import { GroupedBar, NestedDonut, StackedBar } from "@unovis/ts";
 import type { LengthUnit } from "@unovis/ts/types/misc";
 import {
 	VisAnnotations,
@@ -9,8 +9,11 @@ import {
 	VisGroupedBarSelectors,
 	VisLine,
 	VisLineSelectors,
+	VisNestedDonut,
+	VisNestedDonutSelectors,
 	VisScatter,
 	VisScatterSelectors,
+	VisSingleContainer,
 	VisStackedBar,
 	VisStackedBarSelectors,
 	VisTooltip,
@@ -46,7 +49,7 @@ type SeriesData = ChartConfig[string] & {
 const props = withDefaults(
 	defineProps<{
 		series: Array<SeriesData>;
-		chartType?: "bar" | "line" | "stack" | "percent";
+		chartType?: "bar" | "line" | "stack" | "percent" | "donut";
 		title?: string;
 		xAxis?: string;
 		yAxis?: string;
@@ -69,12 +72,17 @@ const chartConfig = computed(() =>
 );
 const appContext = getCurrentInstance()?.appContext;
 
-function renderTooltipContent(data: Array<[string, number]>, x?: number) {
+function renderTooltipContent(
+	data: Array<[string, number]>,
+	x?: number,
+	config: ChartConfig = chartConfig.value,
+	isPercent: boolean = percent.value,
+) {
 	const vnode = h(ChartTooltipContent, {
 		payload: data,
-		config: chartConfig.value,
+		config,
 		x,
-		percent: percent.value,
+		percent: isPercent,
 	});
 	if (appContext) vnode.appContext = appContext;
 	const div = document.createElement("div");
@@ -101,6 +109,24 @@ const chartData = computed(() => {
 		);
 	});
 });
+type DonutDatum = { label: string; value: number; color?: string };
+const donutData = computed<Array<DonutDatum>>(() =>
+	props.series.map((s) => ({
+		label: String(s.label ?? s.name ?? ""),
+		value: s.data.reduce((sum, d) => sum + (d?.[1] ?? 0), 0),
+		color: s.color,
+	})),
+);
+const donutLayers = [(d: DonutDatum) => d.label];
+const currentLocale = useLocale();
+function donutSegmentLabel(segment: { data?: { values?: Array<DonutDatum> } }) {
+	const value = segment.data?.values?.[0]?.value;
+	return value != null
+		? value.toLocaleString(currentLocale.value, {
+				maximumFractionDigits: 2,
+			})
+		: "";
+}
 type Data = SeriesData["data"][number];
 const tickFormat = (tick: number) => {
 	return chartData.value?.[tick]?.[0]?.[0] ?? 0;
@@ -226,8 +252,24 @@ function applyLineHoverOpacity(activeIdx: number | null) {
 	});
 }
 
+function applyDonutHoverOpacity(activeIdx: number | null) {
+	const svg = getChartSvg();
+	if (!svg) return;
+	svg
+		.querySelectorAll(
+			`.${VisNestedDonutSelectors.segmentArc}, .${VisNestedDonutSelectors.segmentLabel}`,
+		)
+		.forEach((el) => {
+			const svgEl = el as SVGElement;
+			const idx = (svgEl as unknown as { __data__?: { _index?: number } }).__data__?._index;
+			svgEl.style.transition = "opacity 50ms ease";
+			svgEl.style.opacity = activeIdx === null || activeIdx === idx ? "1" : "0.25";
+		});
+}
+
 function applySeriesHoverOpacity(activeIdx: number | null) {
 	if (props.chartType === "bar") applyBarHoverOpacity(activeIdx);
+	else if (props.chartType === "donut") applyDonutHoverOpacity(activeIdx);
 	else applyLineHoverOpacity(activeIdx);
 }
 
@@ -352,6 +394,32 @@ const triggers = computed(() => ({
 	},
 }));
 
+const donutEvents = {
+	[VisNestedDonutSelectors.segmentArc]: {
+		mouseover: (d: { _index?: number }, event: MouseEvent) => {
+			const target = event.target as SVGElement;
+			lastSvg = target.closest("svg");
+			applyDonutHoverOpacity(d?._index ?? null);
+		},
+		mouseleave: () => {
+			applyDonutHoverOpacity(null);
+		},
+	},
+};
+
+const donutTriggers = {
+	[NestedDonut.selectors.segmentArc]: (d: { data?: { values?: Array<DonutDatum> } }) => {
+		const datum = d?.data?.values?.[0];
+		if (!datum) return "";
+		return renderTooltipContent(
+			[[datum.label, datum.value]],
+			undefined,
+			{ segment: { label: datum.label, color: datum.color } },
+			false,
+		);
+	},
+};
+
 const minTicks = computed(() => {
 	return Math.min(15, chartData.value?.length ?? 0);
 });
@@ -425,7 +493,12 @@ function updateKey() {
 			:config="chartConfig"
 			@fullscreenchange="updateKey"
 		>
-			<VisXYContainer :data="chartData" :height="height" :padding="{ top: 50 }">
+			<VisXYContainer
+				v-if="chartType !== 'donut'"
+				:data="chartData"
+				:height="height"
+				:padding="{ top: 50 }"
+			>
 				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
 				<VisAxis
 					:full-size="false"
@@ -488,6 +561,18 @@ function updateKey() {
 
 				<VisTooltip :follow-cursor="false" :triggers="triggers"></VisTooltip>
 			</VisXYContainer>
+			<VisSingleContainer v-else :data="donutData" :height="height" :padding="{ top: 50 }">
+				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
+				<VisNestedDonut
+					:events="donutEvents"
+					:layers="donutLayers"
+					:segment-color="color"
+					:segment-label="donutSegmentLabel"
+					:value="(d: DonutDatum) => d.value"
+					:layerSettings="{ width: 40 }"
+				/>
+				<VisTooltip :follow-cursor="false" :triggers="donutTriggers"></VisTooltip>
+			</VisSingleContainer>
 			<ChartLegendContent
 				@series-hover="applySeriesHoverOpacity"
 				@series-leave="applySeriesHoverOpacity(null)"
