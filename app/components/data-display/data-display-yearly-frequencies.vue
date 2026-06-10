@@ -216,7 +216,7 @@ const intervalseries = computed(() =>
 );
 
 const chartMode = ref<"line" | "percent">("line");
-const intervallChartMode = ref<"bar" | "percent">("bar");
+const intervalChartMode = ref<"bar" | "percent">("bar");
 </script>
 
 <template>
@@ -274,7 +274,7 @@ const intervallChartMode = ref<"bar" | "percent">("bar");
 			</CardHeader>
 
 			<div class="flex flex-wrap items-center gap-3">
-				<ToggleGroup v-model="intervallChartMode" class="flex self-end" type="single">
+				<ToggleGroup v-model="intervalChartMode" class="flex self-end" type="single">
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger as-child>
@@ -322,7 +322,7 @@ const intervallChartMode = ref<"bar" | "percent">("bar");
 			</div>
 
 			<Chart
-				:chart-type="intervallChartMode"
+				:chart-type="intervalChartMode"
 				class="h-96"
 				:series="intervalseries"
 				:title="`${intervalseries.length} ${t('queries')}`"
