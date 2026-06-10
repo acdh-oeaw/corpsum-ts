@@ -46,19 +46,19 @@ type SeriesData = ChartConfig[string] & {
 const props = withDefaults(
 	defineProps<{
 		series: Array<SeriesData>;
-		chartType?: "bar" | "line" | "stack";
+		chartType?: "bar" | "line" | "stack" | "percent";
 		title?: string;
 		xAxis?: string;
 		yAxis?: string;
 		orientation?: "horizontal" | "vertical";
 		height?: number;
-		percent?: boolean;
 	}>(),
 	{
 		chartType: "bar",
 		orientation: "vertical",
 	},
 );
+const percent = computed(() => props.chartType === "percent");
 const chartConfig = computed(() =>
 	Object.fromEntries(
 		props.series.map((entry) => [
@@ -74,7 +74,7 @@ function renderTooltipContent(data: Array<[string, number]>, x?: number) {
 		payload: data,
 		config: chartConfig.value,
 		x,
-		percent: props.percent,
+		percent: percent.value,
 	});
 	if (appContext) vnode.appContext = appContext;
 	const div = document.createElement("div");
@@ -91,13 +91,22 @@ function zip(arrays: Array<Array<Datum>>) {
 		});
 	});
 }
-const chartData = computed(() => zip(props.series.map((e) => e.data)));
+const chartData = computed(() => {
+	const zipped = zip(props.series.map((e) => e.data));
+	if (!percent.value || !zipped) return zipped;
+	return zipped.map((row) => {
+		const total = row.reduce((sum, datum) => sum + (datum?.[1] ?? 0), 0);
+		return row.map((datum) =>
+			datum ? ([datum[0], total ? datum[1] / total : 0] as Datum) : datum,
+		);
+	});
+});
 type Data = SeriesData["data"][number];
 const tickFormat = (tick: number) => {
 	return chartData.value?.[tick]?.[0]?.[0] ?? 0;
 };
 const yTickFormat = (tick: number) => {
-	if (props.percent && typeof tick === "number") return `${tick * 100}%`;
+	if (percent.value && typeof tick === "number") return `${tick * 100}%`;
 	return tick;
 };
 const yAccessors = computed(() => props.series.map((_, i) => (d: Array<Data>) => d[i]?.[1] ?? 0));
@@ -451,7 +460,7 @@ function updateKey() {
 					:y="yAccessors"
 				/>
 				<VisStackedBar
-					v-if="chartType === 'stack'"
+					v-if="chartType === 'stack' || chartType === 'percent'"
 					:bar-padding="0.25"
 					:color="color"
 					:events="barEvents"
@@ -512,7 +521,7 @@ function updateKey() {
 				<ChartTooltipContent
 					:config="chartConfig"
 					:payload="snapTooltipPayload"
-					:percent="props.percent"
+					:percent="props.chartType === 'percent'"
 				/>
 			</div>
 		</template>

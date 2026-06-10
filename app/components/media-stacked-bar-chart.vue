@@ -4,8 +4,7 @@ const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	sourceDistributions: Array<Array<IsourceDistribution>>;
 	mode: Mode;
-	stack: boolean;
-	percent?: boolean;
+	chartMode: "stack" | "bar" | "percent";
 }>();
 
 const t = useTranslations();
@@ -26,7 +25,7 @@ const categories = computed(() => {
 });
 
 const series = computed(() => {
-	const allSeries = props.queries.map((query: CorpusQuery, i) => {
+	return props.queries.map((query: CorpusQuery, i) => {
 		return {
 			color: query.color,
 			name: `${query.type}: ${query.userInput} (${query.corpus}${
@@ -38,23 +37,10 @@ const series = computed(() => {
 				.map((entry, idx) => [categories.value[idx], entry] as [string, number]),
 		};
 	});
-	if (props.percent) {
-		const total = allSeries.reduce(
-			(prev: Array<number>, current) => {
-				prev.forEach((_, idx) => (prev[idx]! += current.data[idx]![1]));
-				return prev;
-			},
-			categories.value.map(() => 0),
-		);
-		allSeries.forEach((series) =>
-			series.data.forEach((_, idx) => (series.data[idx]![1] /= total[idx]!)),
-		);
-	}
-	return allSeries;
 });
 const smoothReloadForBarChart = ref(true);
 watch(
-	() => props.stack,
+	() => props.chartMode,
 	() => {
 		smoothReloadForBarChart.value = false;
 		setTimeout(() => {
@@ -66,11 +52,10 @@ watch(
 
 <template>
 	<Chart
-		:chart-type="props.stack ? 'stack' : 'bar'"
+		:chart-type="chartMode"
 		orientation="horizontal"
 		:series="series"
 		:title="`${series.length} ${t('queries')}`"
 		:y-axis="t('sources')"
-		:percent="props.percent"
 	></Chart>
 </template>

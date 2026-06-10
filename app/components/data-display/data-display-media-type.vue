@@ -57,7 +57,6 @@ const q = computed(() =>
 				return data;
 			},
 			select: (data: FreqMlResponse) => {
-				console.log(data);
 				sourceDistributions.value[index] =
 					data.Blocks?.map(
 						(block) =>
@@ -77,9 +76,7 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const chartMode: Ref<"separate" | "stack" | "percentage"> = ref("stack");
-
-const isStacked = computed(() => chartMode.value !== "separate");
+const chartMode: Ref<"bar" | "stack" | "percent"> = ref("stack");
 </script>
 
 <template>
@@ -106,7 +103,7 @@ const isStacked = computed(() => chartMode.value !== "separate");
 						<Tooltip>
 							<TooltipTrigger as-child>
 								<div>
-									<ToggleGroupItem value="separate">
+									<ToggleGroupItem value="bar">
 										<BarChart4 class="mr-1 size-4" />
 									</ToggleGroupItem>
 								</div>
@@ -116,7 +113,7 @@ const isStacked = computed(() => chartMode.value !== "separate");
 						<Tooltip>
 							<TooltipTrigger as-child>
 								<div>
-									<ToggleGroupItem value="percentage">
+									<ToggleGroupItem value="percent">
 										<ChartBarStacked class="mr-1 size-4" />
 									</ToggleGroupItem>
 								</div>
@@ -142,8 +139,7 @@ const isStacked = computed(() => chartMode.value !== "separate");
 					:mode="mode"
 					:queries="queries"
 					:source-distributions="sourceDistributions"
-					:stack="isStacked"
-					:percent="chartMode === 'percentage'"
+					:chart-mode="chartMode"
 				/>
 			</template>
 		</CardContent>
