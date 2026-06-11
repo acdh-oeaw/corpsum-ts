@@ -1,6 +1,6 @@
 import { defineEventHandler, type H3Event, readBody } from "h3";
 
-import { QueryModel } from "~/server/models/queries.schema";
+import { QueryModel, type QueryType } from "~/server/models/queries.schema";
 import { requireReadableNoske } from "~/server/utils/noske";
 import { requireUser } from "~/server/utils/user";
 
@@ -11,7 +11,7 @@ interface QueryResponse {
 	noske: string;
 	corpus: string;
 	subCorpus: string;
-	type: "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
+	type: QueryType;
 	userInput: string;
 	facettingValues: unknown;
 }
@@ -30,7 +30,14 @@ interface QueryRecord {
 
 type FacettingValues = Array<unknown> | Record<string, unknown> | boolean | number | string | null;
 
-const queryTypes = ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"] as const;
+const queryTypes: ReadonlyArray<QueryType> = [
+	"charrow",
+	"cqlrow",
+	"iquery",
+	"lemmarow",
+	"phraserow",
+	"wordrow",
+];
 const queryTypeSet = new Set<string>(queryTypes);
 const readBodySafe = readBody as (event: H3Event) => Promise<unknown>;
 

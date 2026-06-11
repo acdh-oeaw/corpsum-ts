@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
-import { storeToRefs } from "pinia";
 
+import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
 
 const t = useTranslations();
-const queryStore = useQueryStore();
-const { queries } = storeToRefs(queryStore);
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+}>();
 
+const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const { client } = useNoskeClient(noskeId);
 
@@ -19,27 +21,29 @@ const wordFormFrequenciesLoading: Ref<Array<boolean>> = ref([]);
 
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-wordform-frequencies",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			JSON.stringify(getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-wordform-frequencies",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				wordFormFrequenciesLoading.value[index] = true;
 				const { data, error } = await activeClient.GET("/search/freqml", {
+					headers: createNoskeCacheHeaders(queryKey),
 					params: {
 						query: {
 							corpname: query.corpus,
 							usesubcorp: query.subCorpus || undefined,
 							ml1attr: "word",
 							ml1ctx: "0<0~0>0",
-							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
+							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 						},
 					},
 				});
@@ -83,7 +87,11 @@ const expand = ref(false);
 				<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
 			</ToggleGroup>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<QueryDisplay :loading="wordFormFrequenciesLoading[index]" :query="query" />
+				<QueryDisplay
+					:loading="wordFormFrequenciesLoading[index]"
+					:query="query"
+					:query-key="q[index]?.queryKey"
+				/>
 				<Chart
 					chart-type="bar"
 					class="h-96"

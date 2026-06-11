@@ -96,8 +96,6 @@ export default defineNuxtConfig({
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
 		"nuxt-mongoose",
-		"@pinia/nuxt",
-		"pinia-plugin-persistedstate/nuxt",
 	],
 
 	mongoose: {
@@ -105,12 +103,6 @@ export default defineNuxtConfig({
 		options: {},
 		modelsDir: "models",
 		devtools: false,
-	},
-
-	piniaPluginPersistedstate: {
-		cookieOptions: {
-			sameSite: "strict",
-		},
 	},
 
 	postcss: {

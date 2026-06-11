@@ -1,16 +1,18 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
-import { BarChart3, BarChart4 } from "lucide-vue-next";
-import { storeToRefs } from "pinia";
+import { BarChart3, BarChart4, ChartBarStacked } from "lucide-vue-next";
 
+import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
 
 const t = useTranslations();
-const queryStore = useQueryStore();
-const { queries } = storeToRefs(queryStore);
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+}>();
 
+const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const { client } = useNoskeClient(noskeId);
 
@@ -22,20 +24,22 @@ const sourceDistributionsLoading: Ref<Array<boolean>> = ref([]);
 
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-source-distribution",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			JSON.stringify(getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-source-distribution",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				sourceDistributionsLoading.value[index] = true;
 				const { data, error } = await activeClient.GET("/search/freqml", {
+					headers: createNoskeCacheHeaders(queryKey),
 					params: {
 						query: {
 							corpname: query.corpus,
@@ -49,7 +53,7 @@ const q = computed(() =>
 							freqlevel: 1,
 							ml1attr: "doc.docsrc",
 							ml1ctx: "0~0 > 0",
-							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
+							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 						},
 					},
 				});
@@ -76,7 +80,7 @@ const q = computed(() =>
 
 useQueries({ queries: q });
 
-const chartMode: Ref<"separate" | "stack"> = ref("stack");
+const chartMode: Ref<"bar" | "stack" | "percent"> = ref("stack");
 
 const isStacked = computed(() => chartMode.value === "stack");
 </script>
@@ -95,6 +99,16 @@ const isStacked = computed(() => chartMode.value === "stack");
 						<Tooltip>
 							<TooltipTrigger as-child>
 								<div>
+									<ToggleGroupItem value="bar">
+										<BarChart4 class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>separate bar chart</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
 									<ToggleGroupItem value="stack">
 										<BarChart3 class="mr-1 size-4" />
 									</ToggleGroupItem>
@@ -105,12 +119,12 @@ const isStacked = computed(() => chartMode.value === "stack");
 						<Tooltip>
 							<TooltipTrigger as-child>
 								<div>
-									<ToggleGroupItem value="separate">
-										<BarChart4 class="mr-1 size-4" />
+									<ToggleGroupItem value="percent">
+										<ChartBarStacked class="mr-1 size-4" />
 									</ToggleGroupItem>
 								</div>
 							</TooltipTrigger>
-							<TooltipContent>separate bar chart</TooltipContent>
+							<TooltipContent>percentage bar chart</TooltipContent>
 						</Tooltip>
 					</TooltipProvider>
 				</ToggleGroup>
@@ -121,9 +135,11 @@ const isStacked = computed(() => chartMode.value === "stack");
 				</ToggleGroup>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<div v-if="sourceDistributionsLoading[index]">
-					<QueryDisplay :loading="sourceDistributionsLoading[index]" :query="query" />
-				</div>
+				<QueryDisplay
+					:loading="sourceDistributionsLoading[index]"
+					:query="query"
+					:query-key="q[index]?.queryKey"
+				/>
 			</div>
 
 			<template v-if="sourceDistributions && queries">
@@ -133,6 +149,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 					:source-distributions="sourceDistributions"
 					:stack="isStacked"
 					:height="1200"
+					:chart-mode="chartMode"
 				/>
 			</template>
 		</CardContent>

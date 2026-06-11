@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
-
 const t = useTranslations();
-const queryStore = useQueryStore();
 
-const { queries } = storeToRefs(queryStore);
+defineProps<{
+	queries: Array<CorpusQuery>;
+}>();
 </script>
 
 <template>

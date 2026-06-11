@@ -1,7 +1,7 @@
 import { defineEventHandler, getRouterParam, type H3Event, readBody } from "h3";
 import mongoose from "mongoose";
 
-import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
+import { type QueryDocument, QueryModel, type QueryType } from "~/server/models/queries.schema";
 import { requireReadableNoske } from "~/server/utils/noske";
 import { requireUser } from "~/server/utils/user";
 
@@ -12,7 +12,7 @@ interface QueryResponse {
 	noske: string;
 	corpus: string;
 	subCorpus: string;
-	type: "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
+	type: QueryType;
 	userInput: string;
 	facettingValues: unknown;
 }
@@ -36,7 +36,14 @@ interface QueryRecord {
 	facettingValues: unknown;
 }
 
-const queryTypes = ["charrow", "cqlrow", "iqueryrow", "lemmarow", "phraserow", "wordrow"] as const;
+const queryTypes: ReadonlyArray<QueryType> = [
+	"charrow",
+	"cqlrow",
+	"iquery",
+	"lemmarow",
+	"phraserow",
+	"wordrow",
+];
 const queryTypeSet = new Set<string>(queryTypes);
 type QueryOwner = NonNullable<QueryRecord["owner"]>[number];
 const readBodySafe = readBody as (event: H3Event) => Promise<unknown>;

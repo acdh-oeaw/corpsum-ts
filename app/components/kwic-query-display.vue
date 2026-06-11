@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+import {
+	fixedKWICStructures,
+	getKWICqueryAttrStrcs,
+	getQueryWithFacetting,
+} from "@/utils/corpus-query";
 import { getKWICColumns } from "@/utils/kwic";
 import type { components } from "~/lib/noske-types";
 
@@ -7,21 +12,21 @@ type ConcordanceResponse = components["schemas"]["06_concordance"];
 const props = defineProps<{ query: CorpusQuery }>();
 const showViewOptionsMode = ref(false);
 
-const queryStore = useQueryStore();
-
 const noskeId = computed(() => props.query.noske ?? null);
 const { useNoskeQuery } = useNoskeClient(noskeId);
 
-const facettingQuery = computed(() => queryStore.getQueryWithFacetting(props.query));
+const facettingQuery = computed(() => getQueryWithFacetting(props.query));
+
+const kwicQueryKey = computed(() => [
+	"get-concordance",
+	props.query.corpus,
+	props.query.subCorpus,
+	props.query.KWICAttrsStructs,
+	facettingQuery.value,
+]);
 
 const kwicQuery = useNoskeQuery<ConcordanceResponse>({
-	queryKey: computed(() => [
-		"get-concordance",
-		props.query.corpus,
-		props.query.subCorpus,
-		props.query.KWICAttrsStructs,
-		facettingQuery.value,
-	]),
+	queryKey: kwicQueryKey,
 	async queryFn(client) {
 		const { data, error } = await client.GET("/search/concordance", {
 			params: {
@@ -29,7 +34,7 @@ const kwicQuery = useNoskeQuery<ConcordanceResponse>({
 					corpname: props.query.corpus,
 					usesubcorp: props.query.subCorpus || undefined,
 					viewmode: "kwic",
-					...queryStore.getKWICqueryAttrStrcs(props.query),
+					...getKWICqueryAttrStrcs(props.query),
 					refs: props.query.KWICAttrsStructs.structures.map((s: string) => `=${s}`).join(","),
 					pagesize: 1000,
 					json: JSON.stringify({ concordance_query: facettingQuery.value }),
@@ -81,7 +86,7 @@ const columns = computed(() => {
 		translateWithoutNamespace as unknown as (s: string) => string,
 		open,
 		props.query.KWICAttrsStructs.structures,
-		queryStore.fixedKWICStructures,
+		fixedKWICStructures,
 	);
 });
 
@@ -96,7 +101,7 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 		</div>
 		<kwicAttributeSelect v-if="showViewOptionsMode" class="mt-4" :query="query" />
 		<div class="mt-4">
-			<QueryDisplay :loading="loading" :query="query" />
+			<QueryDisplay :loading="loading" :query="query" :query-key="kwicQueryKey" />
 			<CorpsumDataTable v-if="!loading" :columns="columns" :data="KWICresults" />
 			<kwicDetailDialog
 				v-if="selectedKWIC"

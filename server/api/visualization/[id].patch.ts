@@ -1,6 +1,11 @@
 import { defineEventHandler, getRouterParam, type H3Event, readBody } from "h3";
 import mongoose from "mongoose";
 
+import {
+	type VisualizationType,
+	isVisualizationType,
+	normalizeVisualizationType,
+} from "@/lib/visualization-types";
 import { QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
 import {
@@ -8,20 +13,6 @@ import {
 	VisualizationModel,
 } from "~/server/models/visualizations.schema";
 import { requireAuth } from "~/server/utils/auth";
-
-const visualizationTypes = [
-	"data-display-collocations",
-	"data-display-keyword-in-context",
-	"data-display-media-source",
-	"data-display-media-type",
-	"data-display-regional-frequencies",
-	"data-display-source-table",
-	"data-display-word-form-frequencies",
-	"data-display-yearly-frequencies",
-] as const;
-
-type VisualizationType = (typeof visualizationTypes)[number];
-const visualizationTypeSet = new Set<string>(visualizationTypes);
 const readBodySafe = readBody as (event: H3Event) => Promise<unknown>;
 
 interface VisualizationResponse {
@@ -39,22 +30,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
 }
 
-function isVisualizationType(value: unknown): value is VisualizationType {
-	return typeof value === "string" && visualizationTypeSet.has(value);
-}
-
-function toVisualizationType(value: unknown): VisualizationType {
-	return visualizationTypeSet.has(String(value))
-		? (value as VisualizationType)
-		: "data-display-keyword-in-context";
-}
-
 function toResponse(record: VisualizationDocument): VisualizationResponse {
 	return {
 		_id: record._id.toString(),
 		name: record.name satisfies string,
 		queries: record.queries.map((queryId) => queryId.toString()),
-		visualizations: record.visualizations.map((value) => toVisualizationType(value)),
+		visualizations: record.visualizations.map((value) => normalizeVisualizationType(value)),
 		settings: [...record.settings],
 		data: [...record.data],
 		createdAt: record.createdAt ? record.createdAt.toISOString() : null,

@@ -2,17 +2,19 @@
 import { useQueries } from "@tanstack/vue-query";
 import { Map, PieChart } from "lucide-vue-next";
 import { BarChart3, BarChart4, ChartBarStacked } from "lucide-vue-next";
-import { storeToRefs } from "pinia";
 
+import { getQueryWithFacetting } from "@/utils/corpus-query";
 import { mapAustria } from "@/utils/map-austria";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
 
 const t = useTranslations();
-const queryStore = useQueryStore();
-const { queries } = storeToRefs(queryStore);
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+}>();
 
+const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const { client } = useNoskeClient(noskeId);
 
@@ -25,20 +27,22 @@ const isCombined = computed(() => chartMode.value === "combined");
 
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-regional-frequencies",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			JSON.stringify(getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-regional-frequencies",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				regionalFrequenciesLoading.value[index] = true;
 				const { data, error } = await activeClient.GET("/search/freqml", {
+					headers: createNoskeCacheHeaders(queryKey),
 					params: {
 						query: {
 							corpname: query.corpus,
@@ -50,7 +54,7 @@ const q = computed(() =>
 							freqlevel: 1,
 							ml1attr: "doc.region",
 							ml1ctx: "0~0 > 0",
-							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
+							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 						},
 					},
 				});
@@ -90,7 +94,7 @@ watch(mode, (value?: string) => {
 	if (!value) mode.value = "relative";
 });
 
-watch(queries.value, () => {
+watch(queries, () => {
 	const queryIds = queries.value.map(({ id }) => id);
 	regionalFrequencies.value = regionalFrequencies.value.filter(({ query }) =>
 		queryIds.includes(query),
@@ -169,7 +173,11 @@ const barChartMode: Ref<"bar" | "stack" | "percent"> = ref("bar");
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<div class="mt-1">
-					<QueryDisplay :loading="regionalFrequenciesLoading[index]" :query="query" />
+					<QueryDisplay
+						:loading="regionalFrequenciesLoading[index]"
+						:query="query"
+						:query-key="q[index]?.queryKey"
+					/>
 					<ClientOnly v-if="!regionalFrequenciesLoading[index] && regionalFrequencies[index]">
 						<MapChart
 							v-if="!isCombined"

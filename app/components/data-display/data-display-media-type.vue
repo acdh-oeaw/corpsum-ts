@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
 import { BarChart3, BarChart4, ChartBarStacked } from "lucide-vue-next";
-import { storeToRefs } from "pinia";
 
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
 
 const t = useTranslations();
-const queryStore = useQueryStore();
-const { queries } = storeToRefs(queryStore);
-
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+}>();
+const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const { client } = useNoskeClient(noskeId);
 
@@ -28,7 +28,7 @@ const q = computed(() =>
 				noskeId.value,
 				query.corpus,
 				query.subCorpus,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
+				JSON.stringify(getQueryWithFacetting(query)),
 			] as const,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
@@ -49,7 +49,7 @@ const q = computed(() =>
 							freqlevel: 1,
 							ml1attr: "doc.mediatype",
 							ml1ctx: "0~0 > 0",
-							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
+							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 						},
 					},
 				});
@@ -110,22 +110,22 @@ const mediaTypeSeries = computed(() =>
 						<Tooltip>
 							<TooltipTrigger as-child>
 								<div>
-									<ToggleGroupItem value="stack">
-										<BarChart3 class="mr-1 size-4" />
-									</ToggleGroupItem>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent>stacked bar chart</TooltipContent>
-						</Tooltip>
-						<Tooltip>
-							<TooltipTrigger as-child>
-								<div>
 									<ToggleGroupItem value="bar">
 										<BarChart4 class="mr-1 size-4" />
 									</ToggleGroupItem>
 								</div>
 							</TooltipTrigger>
 							<TooltipContent>separate bar chart</TooltipContent>
+						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger as-child>
+								<div>
+									<ToggleGroupItem value="stack">
+										<BarChart3 class="mr-1 size-4" />
+									</ToggleGroupItem>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>stacked bar chart</TooltipContent>
 						</Tooltip>
 						<Tooltip>
 							<TooltipTrigger as-child>

@@ -185,7 +185,8 @@
 			"facettingRequired": "Facettierungswerte sind erforderlich.",
 			"invalidValue": "Ungültiger Wert.",
 			"required": "{label} ist erforderlich."
-		}
+		},
+		"copyName": "Kopiert von {name}"
 	},
 	"WrongCredentials": "Falsche Zugangsdaten.",
 	"NoskeForm": {
@@ -207,6 +208,7 @@
 	},
 	"Actions": {
 		"cancel": "Abbrechen",
+		"copy": "Kopieren",
 		"create": "Erstellen",
 		"credentials": "Zugangsdaten",
 		"delete": "Löschen",

@@ -3,27 +3,22 @@ import DataDisplayCollocations from "@/components/data-display/data-display-coll
 import DataDisplayKeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
+import DataDisplayMetadataTemporalFrequencyDistribution from "@/components/data-display/data-display-metadata-temporal-frequency-distribution.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
-import DataDisplaySourceTable from "@/components/data-display/data-display-source-table.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
-import DataDisplayYearlyFrequencies from "@/components/data-display/data-display-yearly-frequencies.vue";
-import { colors } from "@/utils/colors";
+import {
+	type VisualizationType,
+	getVisualizationMetadataSemantics,
+	normalizeVisualizationSettings,
+	temporalFrequencyDistributionType,
+} from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
 
-type VisualizationType =
-	| "data-display-collocations"
-	| "data-display-keyword-in-context"
-	| "data-display-media-source"
-	| "data-display-media-type"
-	| "data-display-regional-frequencies"
-	| "data-display-source-table"
-	| "data-display-word-form-frequencies"
-	| "data-display-yearly-frequencies";
-
 const t = useTranslations();
 const route = useRoute();
-const queryStore = useQueryStore();
+const env = useRuntimeConfig();
+const locale = useLocale();
 
 const visualizationId = computed(() => {
 	const idParam = route.params.id;
@@ -34,12 +29,26 @@ const { data: visualization } = await useFetch<VisualizationResponse>(
 	() => `/api/visualization/${visualizationId.value}`,
 );
 const { data: queries } = await useFetch<Array<QueryListItem>>("/api/queries", {});
+const publishOpen = ref(false);
+const publishTitle = ref("");
+const publishDescription = ref("");
+const publishError = ref("");
+const isPublishing = ref(false);
+const publishedUid = ref("");
 
 const queriesList = computed(() => queries.value ?? []);
 const selectedQueryItems = computed(() => {
 	const selected = new Set(visualization.value?.queries ?? []);
 	return queriesList.value.filter((query) => selected.has(query._id));
 });
+const { buildCorpusQuery } = useCorpusQueryBuilder();
+const corpusQueries = computed(() =>
+	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
+);
+const { mappingsForQueries: temporalMetadataMappings } = await useCorpusMetadataMappings(
+	corpusQueries,
+	"temporal",
+);
 
 const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-collocations": DataDisplayCollocations,
@@ -47,90 +56,81 @@ const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-media-source": DataDisplayMediaSource,
 	"data-display-media-type": DataDisplayMediaType,
 	"data-display-regional-frequencies": DataDisplayRegionalFrequencies,
-	"data-display-source-table": DataDisplaySourceTable,
 	"data-display-word-form-frequencies": DataDisplayWordFormFrequencies,
-	"data-display-yearly-frequencies": DataDisplayYearlyFrequencies,
+	[temporalFrequencyDistributionType]: DataDisplayMetadataTemporalFrequencyDistribution,
 };
 
-const keyToKey: Record<CorpusQueryType, CorpusQueryTypeValue> = {
-	charrow: "char",
-	cqlrow: "cql",
-	iqueryrow: "iquery",
-	lemmarow: "lemma",
-	phraserow: "phrase",
-	wordrow: "word",
-};
+const publishedLink = computed(() => {
+	if (!publishedUid.value) return "";
+	return new URL(`/${locale.value}/v/${publishedUid.value}`, env.public.appBaseUrl).toString();
+});
 
-const buildFinalQuery = (type: CorpusQueryType, userInput: string) => {
-	switch (type) {
-		case "wordrow":
-			return `[word="${userInput}"]`;
-		case "lemmarow":
-			return `[lemma="${userInput}"]`;
-		case "cqlrow":
-			return userInput;
-		case "charrow":
-		case "iqueryrow":
-		case "phraserow":
-			return `[word="${userInput}"]`;
+function escapeAttribute(value: string) {
+	return value
+		.replaceAll("&", "&amp;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;");
+}
+
+const embedSnippet = computed(() => {
+	if (!publishedUid.value) return "";
+	const src = new URL(
+		`/${locale.value}/v/${publishedUid.value}/embed`,
+		env.public.appBaseUrl,
+	).toString();
+	return `<iframe src="${src}" width="100%" height="720" loading="lazy" style="border:0;" title="${escapeAttribute(publishTitle.value)}"></iframe>`;
+});
+
+function getVisualizationSettings(index: number, type: VisualizationType) {
+	return normalizeVisualizationSettings(type, visualization.value?.settings[index]);
+}
+
+function getVisualizationMetadataMappings(type: VisualizationType) {
+	if (getVisualizationMetadataSemantics(type).includes("temporal")) {
+		return temporalMetadataMappings.value;
 	}
-};
-
-const buildQuery = (item: QueryListItem, index: number): CorpusQuery => {
-	const finalQuery = buildFinalQuery(item.type, item.userInput);
-	const concordance_query = {
-		queryselector: item.type,
-		[keyToKey[item.type]]: item.userInput,
-	} as ConcordanceQuery;
-
-	return {
-		id: index,
-		noske: item.noske,
-		type: item.type,
-		userInput: item.userInput,
-		finalQuery,
-		preparedQuery: `aword,${finalQuery}`,
-		color: colors[index % colors.length] ?? "#111827",
-		showPicker: false,
-		corpus: item.corpus,
-		subCorpus: item.subCorpus,
-		concordance_query,
-		KWICAttrsStructs: {
-			attributes: [],
-			structures: [...queryStore.fixedKWICStructures],
-		},
-		KWICAttrsStructsOptions: {
-			attributes: [],
-			structures: [],
-		},
-		KWICAdditionalViewHeaders: [],
-		facettingValues: {},
-		SampleRatio: 100,
-		loading: {
-			yearlyFrequencies: false,
-			wordFormFrequencies: false,
-			regionalFrequencies: false,
-			keywordInContext: false,
-			mediaSources: false,
-			collocations: false,
-		},
-	};
-};
+	return undefined;
+}
 
 watch(
-	() => [visualization.value, selectedQueryItems.value],
-	() => {
-		queryStore.queries = [];
-		queryStore.nextQueryId = 0;
-		if (!visualization.value) return;
-		if (selectedQueryItems.value.length === 0) return;
-		selectedQueryItems.value.forEach((item, index) => {
-			queryStore.queries.push(buildQuery(item, index));
-			queryStore.nextQueryId = index + 1;
-		});
+	visualization,
+	(value) => {
+		if (!value) return;
+		publishTitle.value = value.name;
 	},
 	{ immediate: true },
 );
+
+async function publishVisualization() {
+	if (!visualization.value || isPublishing.value) return;
+	publishError.value = "";
+	publishedUid.value = "";
+	isPublishing.value = true;
+	try {
+		const published = await $fetch<{ uid: string }>(
+			`/api/visualization/${visualization.value._id}/publish`,
+			{
+				method: "POST",
+				body: {
+					title: publishTitle.value.trim() || visualization.value.name,
+					description: publishDescription.value,
+				},
+			},
+		);
+		publishedUid.value = published.uid;
+	} catch (error) {
+		const data = (error as { data?: { data?: { missing?: Array<unknown> }; message?: string } })
+			.data;
+		const missing = data?.data?.missing;
+		publishError.value =
+			Array.isArray(missing) && missing.length > 0
+				? `Cannot publish yet. ${missing.length} cached result(s) are missing; view or refresh the selected visualization panels first.`
+				: (data?.message ?? "Publishing failed.");
+	} finally {
+		isPublishing.value = false;
+	}
+}
 </script>
 
 <template>
@@ -141,6 +141,62 @@ watch(
 					<LucideIcon class="size-8 text-foreground" name="ChartColumn" :stroke-width="2" />
 				</div>
 				<PageTitle>{{ visualization.name || t("VisualizationsPage.detailTitle") }}</PageTitle>
+			</div>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button as-child size="sm" type="button" variant="ghost">
+					<NuxtLinkLocale :href="{ path: `/visualization/edit/${visualization._id}` }">
+						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+						{{ t("Actions.edit") }}
+					</NuxtLinkLocale>
+				</Button>
+				<Dialog v-model:open="publishOpen">
+					<DialogTrigger as-child>
+						<Button size="sm" type="button" variant="ghost">
+							<LucideIcon class="mr-1 size-4" name="Upload" :stroke-width="2" />
+							Publish
+						</Button>
+					</DialogTrigger>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>Publish visualization</DialogTitle>
+							<DialogDescription>
+								Create an immutable public snapshot from cached NoSketch results.
+							</DialogDescription>
+						</DialogHeader>
+						<div class="grid gap-4">
+							<div class="grid gap-2">
+								<Label for="published-title">Title</Label>
+								<Input id="published-title" v-model="publishTitle" :disabled="isPublishing" />
+							</div>
+							<div class="grid gap-2">
+								<Label for="published-description">Description</Label>
+								<textarea
+									id="published-description"
+									v-model="publishDescription"
+									class="min-h-28 rounded-md border bg-background px-3 py-2 text-sm"
+									:disabled="isPublishing"
+								></textarea>
+							</div>
+							<p v-if="publishError" class="text-sm text-destructive">{{ publishError }}</p>
+							<div v-if="publishedUid" class="grid gap-2 rounded-md border bg-muted/40 p-3 text-sm">
+								<p class="font-medium">Published link</p>
+								<a class="break-all underline" :href="publishedLink">{{ publishedLink }}</a>
+								<p class="font-medium">Embed snippet</p>
+								<code class="whitespace-pre-wrap break-all rounded bg-background p-2 text-xs">{{
+									embedSnippet
+								}}</code>
+							</div>
+						</div>
+						<DialogFooter>
+							<Button
+								:disabled="isPublishing || !publishTitle.trim()"
+								@click="publishVisualization"
+							>
+								{{ isPublishing ? "Publishing..." : "Publish" }}
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
 			</div>
 		</div>
 
@@ -185,8 +241,11 @@ watch(
 				<div class="grid gap-4">
 					<component
 						:is="visualizationComponents[item]"
-						v-for="item in visualization.visualizations"
-						:key="item"
+						v-for="(item, index) in visualization.visualizations"
+						:key="`${item}-${index}`"
+						:metadata-mappings="getVisualizationMetadataMappings(item)"
+						:queries="corpusQueries"
+						:settings="getVisualizationSettings(index, item)"
 					/>
 				</div>
 			</div>

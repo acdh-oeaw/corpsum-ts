@@ -1,4 +1,5 @@
-type CorpusQueryType = "charrow" | "cqlrow" | "iqueryrow" | "lemmarow" | "phraserow" | "wordrow";
+type CorpusQueryType =
+	import("~/lib/noske-types").components["parameters"]["127_concordance_query_queryselector"];
 
 type CorpusQueryTypeValue = "char" | "cql" | "iquery" | "lemma" | "phrase" | "word";
 

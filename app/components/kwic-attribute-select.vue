@@ -1,15 +1,11 @@
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
+import { fixedKWICStructures } from "@/utils/corpus-query";
 
-const corporaStore = useCorporaStore();
-const { corpInfoResponse, corporaLoading } = storeToRefs(corporaStore);
 const t = useTranslations();
 
 const props = defineProps<{ query: CorpusQuery }>();
 
-const queryStore = useQueryStore();
-
-const currentQuery = computed(() => queryStore.queries.find((q) => q.id === props.query.id));
+const currentQuery = computed(() => props.query);
 
 const structureOptions = computed(() => {
 	const options: Array<string> = [];
@@ -33,8 +29,6 @@ const attributeOptions = computed(
 		currentQuery.value?.KWICAttrsStructsOptions.attributes.map((structure) => structure.name) ?? [],
 );
 
-const fixed = queryStore.fixedKWICStructures;
-
 const toggleSelection = (
 	list: Array<string>,
 	value: string,
@@ -50,9 +44,9 @@ const toggleSelection = (
 </script>
 
 <template>
-	<div v-if="!corporaLoading && corpInfoResponse">
+	<div v-if="currentQuery">
 		<h2 class="text-lg font-semibold">{{ t("Attributes and Structures") }}</h2>
-		<div v-if="currentQuery" class="mt-4 grid gap-6 md:grid-cols-2">
+		<div class="mt-4 grid gap-6 md:grid-cols-2">
 			<div class="space-y-3">
 				<h3 class="text-sm font-medium text-muted-foreground">{{ t("Attributes") }}</h3>
 				<div class="space-y-2 rounded-md border p-3">
@@ -83,7 +77,7 @@ const toggleSelection = (
 					>
 						<Checkbox
 							:checked="currentQuery.KWICAttrsStructs.structures.includes(structure)"
-							:disabled="fixed.includes(structure)"
+							:disabled="fixedKWICStructures.includes(structure)"
 							@update:checked="
 								toggleSelection(currentQuery.KWICAttrsStructs.structures, structure, $event)
 							"

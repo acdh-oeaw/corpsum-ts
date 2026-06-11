@@ -17,6 +17,15 @@ const setSaving = (value: boolean) => {
 	isSaving.value = value;
 };
 
+const queryTypes: ReadonlyArray<QueryResponse["type"]> = [
+	"charrow",
+	"cqlrow",
+	"iquery",
+	"lemmarow",
+	"phraserow",
+	"wordrow",
+];
+
 const getQueryString = (key: string) => {
 	const raw = route.query[key];
 	if (Array.isArray(raw)) {
@@ -25,12 +34,33 @@ const getQueryString = (key: string) => {
 	return typeof raw === "string" ? raw : undefined;
 };
 
+const getQueryType = () => {
+	const type = getQueryString("type");
+	return queryTypes.includes(type as QueryResponse["type"])
+		? (type as QueryResponse["type"])
+		: undefined;
+};
+
+const getFacettingValuesText = () => {
+	const facettingValues = getQueryString("facettingValues");
+	if (!facettingValues) return undefined;
+	try {
+		return JSON.stringify(JSON.parse(facettingValues), null, 2);
+	} catch {
+		return facettingValues;
+	}
+};
+
 const initialValues = computed(() => ({
 	name: getQueryString("name"),
 	noske: getQueryString("noske"),
 	corpus: getQueryString("corpus"),
 	subCorpus: getQueryString("subCorpus"),
+	type: getQueryType(),
+	userInput: getQueryString("userInput"),
+	facettingValuesText: getFacettingValuesText(),
 }));
+const formKey = computed(() => JSON.stringify(initialValues.value));
 const formId = "query-form";
 
 async function save(payload: {
@@ -89,6 +119,7 @@ function cancel() {
 			</div>
 		</div>
 		<QueryForm
+			:key="formKey"
 			:form-id="formId"
 			:initial-values="initialValues"
 			:is-saving="isSaving"

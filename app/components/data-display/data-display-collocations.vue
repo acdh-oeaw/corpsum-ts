@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
-import { storeToRefs } from "pinia";
 
+import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type CollxResponse = components["schemas"]["10_collx"];
 
 const t = useTranslations();
-const queryStore = useQueryStore();
-const { queries } = storeToRefs(queryStore);
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+}>();
 
+const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const { client } = useNoskeClient(noskeId);
 
@@ -36,23 +38,25 @@ const collocationsLoading: Ref<Array<boolean>> = ref([]);
 const cbgrfns = "dmt";
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-yearly-frequencies",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			query.id,
+			cattr.value,
+			cbgrfns,
+			JSON.stringify(getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-yearly-frequencies",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				query.id,
-				cattr.value,
-				cbgrfns,
-				JSON.stringify(queryStore.getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				collocationsLoading.value[index] = true;
 				const { data, error } = await activeClient.GET("/search/collx", {
+					headers: createNoskeCacheHeaders(queryKey),
 					params: {
 						query: {
 							corpname: query.corpus,
@@ -65,7 +69,7 @@ const q = computed(() =>
 							csortfn: "d",
 							citemsperpage: 10,
 							// @ts-expect-error openapi json parameter mismatch
-							json: JSON.stringify({ concordance_query: queryStore.getQueryWithFacetting(query) }),
+							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 						},
 					},
 				});
@@ -164,7 +168,11 @@ useQueries({ queries: q });
 				</div>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<QueryDisplay :loading="collocationsLoading[index]" :query="query" />
+				<QueryDisplay
+					:loading="collocationsLoading[index]"
+					:query="query"
+					:query-key="q[index]?.queryKey"
+				/>
 				<WordCloudGraph
 					v-if="!collocationsLoading[index]"
 					:color="query.color"
