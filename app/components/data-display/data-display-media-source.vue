@@ -104,7 +104,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 									</ToggleGroupItem>
 								</div>
 							</TooltipTrigger>
-							<TooltipContent>separate bar chart</TooltipContent>
+							<TooltipContent>{{ t("separateBarChart") }}</TooltipContent>
 						</Tooltip>
 						<Tooltip>
 							<TooltipTrigger as-child>
@@ -114,7 +114,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 									</ToggleGroupItem>
 								</div>
 							</TooltipTrigger>
-							<TooltipContent>stacked bar chart</TooltipContent>
+							<TooltipContent>{{ t("stackedBarChart") }}</TooltipContent>
 						</Tooltip>
 						<Tooltip>
 							<TooltipTrigger as-child>
@@ -124,7 +124,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 									</ToggleGroupItem>
 								</div>
 							</TooltipTrigger>
-							<TooltipContent>percentage bar chart</TooltipContent>
+							<TooltipContent>{{ t("percentageBarChart") }}</TooltipContent>
 						</Tooltip>
 					</TooltipProvider>
 				</ToggleGroup>
