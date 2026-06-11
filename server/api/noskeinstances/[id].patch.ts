@@ -2,6 +2,7 @@ import { defineEventHandler, getRouterParam, readBody } from "h3";
 import mongoose from "mongoose";
 
 import { type NoskeDocumentSlim, NoskeModel } from "~/server/models/noskeinstances.schema";
+import { normalizeNoskeBaseUrl } from "~/server/utils/noske-url";
 import { requireUser } from "~/server/utils/user";
 
 interface Owner {
@@ -88,7 +89,12 @@ export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument 
 			setResponseStatus(event, 400, "invalid base");
 			return;
 		}
-		updates.base = payload.base;
+		const normalizedBase = normalizeNoskeBaseUrl(payload.base);
+		if (!normalizedBase) {
+			setResponseStatus(event, 400, "invalid base");
+			return;
+		}
+		updates.base = normalizedBase;
 	}
 	if (Object.prototype.hasOwnProperty.call(payload, "host")) {
 		if (typeof payload.host !== "string") {

@@ -1,6 +1,7 @@
 import { defineEventHandler, readBody } from "h3";
 
 import { type NoskeDocumentSlim, NoskeModel } from "~/server/models/noskeinstances.schema";
+import { normalizeNoskeBaseUrl } from "~/server/utils/noske-url";
 import { requireUser } from "~/server/utils/user";
 
 interface Owner {
@@ -69,9 +70,15 @@ export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument 
 		return;
 	}
 
+	const normalizedBase = normalizeNoskeBaseUrl(base);
+	if (!normalizedBase) {
+		setResponseStatus(event, 400, "invalid base");
+		return;
+	}
+
 	const noskeinstance = await NoskeModel.create({
 		name,
-		base,
+		base: normalizedBase,
 		version: payload.version,
 		authentication: payload.authentication,
 		public: isPublic,
