@@ -22,20 +22,22 @@ const sourceDistributionsLoading: Ref<Array<boolean>> = ref([]);
 
 const q = computed(() =>
 	queries.value.map((query, index) => {
+		const queryKey = [
+			"get-source-type-distribution",
+			noskeId.value,
+			query.corpus,
+			query.subCorpus,
+			JSON.stringify(getQueryWithFacetting(query)),
+		] as const;
 		return {
-			queryKey: [
-				"get-source-type-distribution",
-				noskeId.value,
-				query.corpus,
-				query.subCorpus,
-				JSON.stringify(getQueryWithFacetting(query)),
-			] as const,
+			queryKey,
 			enabled: Boolean(client.value),
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				sourceDistributionsLoading.value[index] = true;
 				const { data, error } = await activeClient.GET("/search/freqml", {
+					headers: createNoskeCacheHeaders(queryKey),
 					params: {
 						query: {
 							corpname: query.corpus,
@@ -146,9 +148,11 @@ const mediaTypeSeries = computed(() =>
 				</ToggleGroup>
 			</div>
 			<div v-for="(query, index) of queries" :key="query.id">
-				<div v-if="sourceDistributionsLoading[index]">
-					<QueryDisplay :loading="sourceDistributionsLoading[index]" :query="query" />
-				</div>
+				<QueryDisplay
+					:loading="sourceDistributionsLoading[index]"
+					:query="query"
+					:query-key="q[index]?.queryKey"
+				/>
 			</div>
 
 			<template v-if="sourceDistributions && queries">
@@ -163,7 +167,7 @@ const mediaTypeSeries = computed(() =>
 			<h4 class="mt-16 text-center font-semibold">{{ t("mediaTypeDistribution") }}</h4>
 			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				<div v-for="(query, index) of queries" :key="query.id">
-					<QueryDisplay :query="query" />
+					<QueryDisplay :query="query" class="justify-center" />
 					<Chart chart-type="donut" :series="mediaTypeSeries[index] ?? []" :height="150" />
 				</div>
 			</div>
