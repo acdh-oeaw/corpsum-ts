@@ -1,6 +1,10 @@
 import { colors } from "@/utils/colors";
 import { getConcordanceInputKey } from "@/utils/concordance-query";
-import { buildFinalQuery, fixedKWICStructures } from "@/utils/corpus-query";
+import {
+	buildFinalQuery,
+	fixedKWICStructures,
+	normalizeFacettingValues,
+} from "@/utils/corpus-query";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
 export function useCorpusQueryBuilder() {
@@ -32,7 +36,7 @@ export function useCorpusQueryBuilder() {
 				structures: [],
 			},
 			KWICAdditionalViewHeaders: [],
-			facettingValues: {},
+			facettingValues: normalizeFacettingValues(item.facettingValues),
 			SampleRatio: 100,
 			loading: {
 				yearlyFrequencies: false,
