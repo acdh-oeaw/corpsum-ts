@@ -55,10 +55,12 @@ const props = withDefaults(
 		yAxis?: string;
 		orientation?: "horizontal" | "vertical";
 		height?: number;
+		fillPatterns?: boolean;
 	}>(),
 	{
 		chartType: "bar",
 		orientation: "vertical",
+		fillPatterns: false,
 	},
 );
 const percent = computed(() => props.chartType === "percent");
@@ -137,6 +139,46 @@ const yTickFormat = (tick: number) => {
 };
 const yAccessors = computed(() => props.series.map((_, i) => (d: Array<Data>) => d[i]?.[1] ?? 0));
 const color = computed(() => props.series.map((s) => s.color));
+const patternedColor = computed(() => props.series.map((_, i) => `var(--vis-color${i})`));
+const fillColor = computed(() => (props.fillPatterns ? patternedColor.value : color.value));
+const patternColorVars = computed(() =>
+	props.fillPatterns
+		? Object.fromEntries(
+				props.series.flatMap((s, i) => (s.color ? [[`--vis-color${i}`, s.color]] : [])),
+			)
+		: {},
+);
+const fillPatternCount = 6;
+function fillPatternMask(seriesIdx: number) {
+	return `var(--vis-pattern-fill${seriesIdx % fillPatternCount})`;
+}
+const groupedBarAttributes = computed(() =>
+	props.fillPatterns
+		? {
+				[VisGroupedBarSelectors.bar]: {
+					mask: (_d: unknown, i: number) => fillPatternMask(i % (props.series.length || 1)),
+				},
+			}
+		: {},
+);
+const stackedBarAttributes = computed(() =>
+	props.fillPatterns
+		? {
+				[VisStackedBarSelectors.bar]: {
+					mask: (d: { stackIndex?: number }) => fillPatternMask(d.stackIndex ?? 0),
+				},
+			}
+		: {},
+);
+const donutAttributes = computed(() =>
+	props.fillPatterns
+		? {
+				[VisNestedDonutSelectors.segmentArc]: {
+					mask: (d: { _index?: number }) => fillPatternMask(d._index ?? 0),
+				},
+			}
+		: {},
+);
 
 const titleAnnotation = computed(() => {
 	return props.title
@@ -440,7 +482,7 @@ const { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg } = useChartExpor
 	toRef(() => props.xAxis),
 );
 
-const attributes = {
+const axisAttributes = {
 	[VisAxisSelectors.grid]: {
 		"clip-path": "inset(50px 0 0 0)",
 	},
@@ -491,6 +533,7 @@ function updateKey() {
 			v-if="series.length > 0"
 			class="aspect-auto h-fit min-h-50 w-full [&:fullscreen]:bg-white"
 			:config="chartConfig"
+			:style="patternColorVars"
 			@fullscreenchange="updateKey"
 		>
 			<VisXYContainer
@@ -515,7 +558,7 @@ function updateKey() {
 					:type="orientation === 'vertical' ? 'x' : 'y'"
 				></VisAxis>
 				<VisAxis
-					:attributes="orientation !== 'vertical' ? attributes : []"
+					:attributes="orientation !== 'vertical' ? axisAttributes : []"
 					:full-size="false"
 					:label="yAxis"
 					:tick-format="yTickFormat"
@@ -523,8 +566,9 @@ function updateKey() {
 				></VisAxis>
 				<VisGroupedBar
 					v-if="chartType === 'bar'"
+					:attributes="groupedBarAttributes"
 					:bar-padding="0.25"
-					:color="color"
+					:color="fillColor"
 					:events="barEvents"
 					:group-padding="0.2"
 					:orientation="orientation"
@@ -534,8 +578,9 @@ function updateKey() {
 				/>
 				<VisStackedBar
 					v-if="chartType === 'stack' || chartType === 'percent'"
+					:attributes="stackedBarAttributes"
 					:bar-padding="0.25"
-					:color="color"
+					:color="fillColor"
 					:events="barEvents"
 					:group-padding="0.2"
 					:orientation="orientation"
@@ -564,9 +609,10 @@ function updateKey() {
 			<VisSingleContainer v-else :data="donutData" :height="height" :padding="{ top: 50 }">
 				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
 				<VisNestedDonut
+					:attributes="donutAttributes"
 					:events="donutEvents"
 					:layers="donutLayers"
-					:segment-color="color"
+					:segment-color="fillColor"
 					:segment-label="donutSegmentLabel"
 					:value="(d: DonutDatum) => d.value"
 					:layerSettings="{ width: 40 }"
