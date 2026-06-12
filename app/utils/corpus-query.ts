@@ -34,3 +34,29 @@ export function getQueryWithFacetting(query: CorpusQuery) {
 	}
 	return result;
 }
+
+export function normalizeFacettingValues(value: unknown): FacettingValues {
+	if (!isRecord(value) || Array.isArray(value)) return {};
+
+	return Object.entries(value).reduce<FacettingValues>((facets, [key, entry]) => {
+		if (Array.isArray(entry)) {
+			if (entry.every((item) => typeof item === "string")) {
+				facets[key] = entry;
+			}
+			return facets;
+		}
+
+		if (isRecord(entry) && typeof entry.key === "string" && typeof entry.value === "string") {
+			facets[key] = {
+				key: entry.key,
+				value: entry.value,
+			};
+		}
+
+		return facets;
+	}, {});
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null;
+}

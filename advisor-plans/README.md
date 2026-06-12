@@ -17,7 +17,7 @@ pre-existing unrelated `plans/postgres-kysely-migration-plan.md` and no
 | 002  | Run real Playwright tests in CI                | P1       | S      | -               | TODO   |
 | 003  | Constrain NoSketch proxy targets               | P1       | M      | 002 recommended | DONE   |
 | 004  | Replace or harden XLSX export path             | P1       | M      | 002 recommended | TODO   |
-| 005  | Preserve saved facets in visualization queries | P1       | S      | 002 recommended | TODO   |
+| 005  | Preserve saved facets in visualization queries | P1       | S      | 002 recommended | DONE   |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) |
 REJECTED (with one-line rationale).
