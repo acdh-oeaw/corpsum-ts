@@ -15,7 +15,7 @@ USER node
 
 COPY --chown=node:node .npmrc package.json pnpm-lock.yaml ./
 
-RUN pnpm fetch
+RUN CI=true pnpm fetch
 
 COPY --chown=node:node ./ ./
 
