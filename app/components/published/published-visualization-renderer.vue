@@ -6,7 +6,7 @@ import {
 	formatTemporalFrequencyInterval,
 	formatTemporalTimestamp,
 	groupTemporalFrequencyPoints,
-} from "@/components/data-display/data-display-metadata-temporal-frequency-distribution.transformations";
+} from "@/components/data-display/data-display-temporal-frequency-distribution.transformations.ts";
 import {
 	type CorpusMetadataMappingResponse,
 	type TemporalFrequencyDistributionSettings,

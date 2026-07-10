@@ -21,7 +21,7 @@ import {
 	getAllowedTemporalBucketUnits,
 	getTemporalSourceUnit,
 	groupTemporalFrequencyPoints,
-} from "./data-display-metadata-temporal-frequency-distribution.transformations";
+} from "./data-display-temporal-frequency-distribution.transformations.ts";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
 type FreqMlBlock = NonNullable<FreqMlResponse["Blocks"]>[number];
