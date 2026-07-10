@@ -264,6 +264,21 @@ function createQueryParams(
 			ml1ctx: "0~0 > 0",
 		};
 	}
+
+	if (type === "data-display-media-type") {
+		return {
+			...common,
+			fmaxitems: "5000",
+			fpage: "1",
+			group: "0",
+			showpoc: "1",
+			showreltt: "1",
+			showrel: "1",
+			freqlevel: "1",
+			ml1attr: "doc.mediatype",
+			ml1ctx: "0~0 > 0",
+		};
+	}
 	if (type === "data-display-regional-frequencies") {
 		return {
 			...common,
