@@ -170,6 +170,17 @@ export function getAllowedTemporalBucketUnits(sourceUnits: Array<TemporalUnit>) 
 	);
 }
 
+export function getAllowedTemporalBucketUnitsForMappings(
+	mappings: Array<Pick<CorpusMetadataMappingResponse, "parser" | "valueMap"> | null>,
+) {
+	return getAllowedTemporalBucketUnits(
+		mappings.flatMap((mapping) => {
+			if (!mapping || createTemporalFrequencyParser(mapping).error) return [];
+			return [getTemporalSourceUnit(mapping)];
+		}),
+	);
+}
+
 export function floorDateToUnit(value: Date, unit: TemporalUnit) {
 	const date = new Date(value);
 	date.setUTCHours(0, 0, 0, 0);

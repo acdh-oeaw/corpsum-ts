@@ -6,6 +6,7 @@ import {
 	formatTemporalFrequencyInterval,
 	formatTemporalTimestamp,
 	getAllowedTemporalBucketUnits,
+	getAllowedTemporalBucketUnitsForMappings,
 	groupTemporalFrequencyPoints,
 } from "@/components/data-display/data-display-temporal-frequency-distribution.transformations.ts";
 import {
@@ -110,6 +111,15 @@ test.describe("temporal metadata parsing", () => {
 		]);
 		expect(getAllowedTemporalBucketUnits(["year", "day"])).toStrictEqual(["year"]);
 		expect(getAllowedTemporalBucketUnits(["week"])).toStrictEqual(["week", "year"]);
+	});
+
+	test("ignores invalid mappings when finding shared bucket units", () => {
+		expect(
+			getAllowedTemporalBucketUnitsForMappings([
+				{ parser: { mode: "date", sourceUnit: "day" }, valueMap: {} },
+				{ parser: { mode: "regex", pattern: "[", sourceUnit: "year" }, valueMap: {} },
+			]),
+		).toStrictEqual(["day", "week", "month", "quarter", "year"]);
 	});
 });
 

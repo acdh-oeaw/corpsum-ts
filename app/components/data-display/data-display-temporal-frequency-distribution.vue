@@ -19,7 +19,7 @@ import {
 	createTemporalFrequencyParser,
 	formatTemporalFrequencyInterval,
 	formatTemporalTimestamp,
-	getAllowedTemporalBucketUnits,
+	getAllowedTemporalBucketUnitsForMappings,
 	getTemporalSourceUnit,
 	groupTemporalFrequencyPoints,
 } from "./data-display-temporal-frequency-distribution.transformations.ts";
@@ -117,9 +117,7 @@ watch([mode, bucketUnit, interval, reverse, expand, rangeStart, rangeEnd], () =>
 
 const mappings = computed(() => props.metadataMappings ?? []);
 const supportedBucketUnits = computed(() =>
-	getAllowedTemporalBucketUnits(
-		mappings.value.flatMap((mapping) => (mapping ? [getTemporalSourceUnit(mapping)] : [])),
-	),
+	getAllowedTemporalBucketUnitsForMappings(mappings.value),
 );
 const availableBucketUnits = computed(() => {
 	if (!selectedDateRange.value) return supportedBucketUnits.value;
