@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GroupedBar, StackedBar } from "@unovis/ts";
+import { GroupedBar, NestedDonut, StackedBar } from "@unovis/ts";
 import type { LengthUnit } from "@unovis/ts/types/misc";
 import {
 	VisAnnotations,
@@ -9,8 +9,11 @@ import {
 	VisGroupedBarSelectors,
 	VisLine,
 	VisLineSelectors,
+	VisNestedDonut,
+	VisNestedDonutSelectors,
 	VisScatter,
 	VisScatterSelectors,
+	VisSingleContainer,
 	VisStackedBar,
 	VisStackedBarSelectors,
 	VisTooltip,
@@ -46,18 +49,21 @@ type SeriesData = ChartConfig[string] & {
 const props = withDefaults(
 	defineProps<{
 		series: Array<SeriesData>;
-		chartType?: "bar" | "line" | "stack";
+		chartType?: "bar" | "line" | "stack" | "percent" | "donut";
 		title?: string;
 		xAxis?: string;
 		yAxis?: string;
 		orientation?: "horizontal" | "vertical";
 		height?: number;
+		fillPatterns?: boolean;
 	}>(),
 	{
 		chartType: "bar",
 		orientation: "vertical",
+		fillPatterns: false,
 	},
 );
+const percent = computed(() => props.chartType === "percent");
 const chartConfig = computed(() =>
 	Object.fromEntries(
 		props.series.map((entry) => [
@@ -68,8 +74,18 @@ const chartConfig = computed(() =>
 );
 const appContext = getCurrentInstance()?.appContext;
 
-function renderTooltipContent(data: Array<[string, number]>, x?: number) {
-	const vnode = h(ChartTooltipContent, { payload: data, config: chartConfig.value, x });
+function renderTooltipContent(
+	data: Array<[string, number]>,
+	x?: number,
+	config: ChartConfig = chartConfig.value,
+	isPercent: boolean = percent.value,
+) {
+	const vnode = h(ChartTooltipContent, {
+		payload: data,
+		config,
+		x,
+		percent: isPercent,
+	});
 	if (appContext) vnode.appContext = appContext;
 	const div = document.createElement("div");
 	render(vnode, div);
@@ -85,13 +101,84 @@ function zip(arrays: Array<Array<Datum>>) {
 		});
 	});
 }
-const chartData = computed(() => zip(props.series.map((e) => e.data)));
+const chartData = computed(() => {
+	const zipped = zip(props.series.map((e) => e.data));
+	if (!percent.value || !zipped) return zipped;
+	return zipped.map((row) => {
+		const total = row.reduce((sum, datum) => sum + (datum?.[1] ?? 0), 0);
+		return row.map((datum) =>
+			datum ? ([datum[0], total ? datum[1] / total : 0] as Datum) : datum,
+		);
+	});
+});
+type DonutDatum = { label: string; value: number; color?: string };
+const donutData = computed<Array<DonutDatum>>(() =>
+	props.series.map((s) => ({
+		label: String(s.label ?? s.name ?? ""),
+		value: s.data.reduce((sum, d) => sum + (d?.[1] ?? 0), 0),
+		color: s.color,
+	})),
+);
+const donutLayers = [(d: DonutDatum) => d.label];
+const currentLocale = useLocale();
+function donutSegmentLabel(segment: { data?: { values?: Array<DonutDatum> } }) {
+	const value = segment.data?.values?.[0]?.value;
+	return value != null
+		? value.toLocaleString(currentLocale.value, {
+				maximumFractionDigits: 2,
+			})
+		: "";
+}
 type Data = SeriesData["data"][number];
 const tickFormat = (tick: number) => {
 	return chartData.value?.[tick]?.[0]?.[0] ?? 0;
 };
+const yTickFormat = (tick: number) => {
+	if (percent.value && typeof tick === "number") return `${tick * 100}%`;
+	return tick;
+};
 const yAccessors = computed(() => props.series.map((_, i) => (d: Array<Data>) => d[i]?.[1] ?? 0));
 const color = computed(() => props.series.map((s) => s.color));
+const patternedColor = computed(() => props.series.map((_, i) => `var(--vis-color${i})`));
+const fillColor = computed(() => (props.fillPatterns ? patternedColor.value : color.value));
+const patternColorVars = computed(() =>
+	props.fillPatterns
+		? Object.fromEntries(
+				props.series.flatMap((s, i) => (s.color ? [[`--vis-color${i}`, s.color]] : [])),
+			)
+		: {},
+);
+const fillPatternCount = 6;
+function fillPatternMask(seriesIdx: number) {
+	return `var(--vis-pattern-fill${seriesIdx % fillPatternCount})`;
+}
+const groupedBarAttributes = computed(() =>
+	props.fillPatterns
+		? {
+				[VisGroupedBarSelectors.bar]: {
+					mask: (_d: unknown, i: number) => fillPatternMask(i % (props.series.length || 1)),
+				},
+			}
+		: {},
+);
+const stackedBarAttributes = computed(() =>
+	props.fillPatterns
+		? {
+				[VisStackedBarSelectors.bar]: {
+					mask: (d: { stackIndex?: number }) => fillPatternMask(d.stackIndex ?? 0),
+				},
+			}
+		: {},
+);
+const donutAttributes = computed(() =>
+	props.fillPatterns
+		? {
+				[VisNestedDonutSelectors.segmentArc]: {
+					mask: (d: { _index?: number }) => fillPatternMask(d._index ?? 0),
+				},
+			}
+		: {},
+);
 
 const titleAnnotation = computed(() => {
 	return props.title
@@ -207,8 +294,24 @@ function applyLineHoverOpacity(activeIdx: number | null) {
 	});
 }
 
+function applyDonutHoverOpacity(activeIdx: number | null) {
+	const svg = getChartSvg();
+	if (!svg) return;
+	svg
+		.querySelectorAll(
+			`.${VisNestedDonutSelectors.segmentArc}, .${VisNestedDonutSelectors.segmentLabel}`,
+		)
+		.forEach((el) => {
+			const svgEl = el as SVGElement;
+			const idx = (svgEl as unknown as { __data__?: { _index?: number } }).__data__?._index;
+			svgEl.style.transition = "opacity 50ms ease";
+			svgEl.style.opacity = activeIdx === null || activeIdx === idx ? "1" : "0.25";
+		});
+}
+
 function applySeriesHoverOpacity(activeIdx: number | null) {
 	if (props.chartType === "bar") applyBarHoverOpacity(activeIdx);
+	else if (props.chartType === "donut") applyDonutHoverOpacity(activeIdx);
 	else applyLineHoverOpacity(activeIdx);
 }
 
@@ -333,6 +436,32 @@ const triggers = computed(() => ({
 	},
 }));
 
+const donutEvents = {
+	[VisNestedDonutSelectors.segmentArc]: {
+		mouseover: (d: { _index?: number }, event: MouseEvent) => {
+			const target = event.target as SVGElement;
+			lastSvg = target.closest("svg");
+			applyDonutHoverOpacity(d?._index ?? null);
+		},
+		mouseleave: () => {
+			applyDonutHoverOpacity(null);
+		},
+	},
+};
+
+const donutTriggers = {
+	[NestedDonut.selectors.segmentArc]: (d: { data?: { values?: Array<DonutDatum> } }) => {
+		const datum = d?.data?.values?.[0];
+		if (!datum) return "";
+		return renderTooltipContent(
+			[[datum.label, datum.value]],
+			undefined,
+			{ segment: { label: datum.label, color: datum.color } },
+			false,
+		);
+	},
+};
+
 const minTicks = computed(() => {
 	return Math.min(15, chartData.value?.length ?? 0);
 });
@@ -353,7 +482,7 @@ const { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg } = useChartExpor
 	toRef(() => props.xAxis),
 );
 
-const attributes = {
+const axisAttributes = {
 	[VisAxisSelectors.grid]: {
 		"clip-path": "inset(50px 0 0 0)",
 	},
@@ -404,9 +533,15 @@ function updateKey() {
 			v-if="series.length > 0"
 			class="aspect-auto h-fit min-h-50 w-full [&:fullscreen]:bg-white"
 			:config="chartConfig"
+			:style="patternColorVars"
 			@fullscreenchange="updateKey"
 		>
-			<VisXYContainer :data="chartData" :height="height" :padding="{ top: 50 }">
+			<VisXYContainer
+				v-if="chartType !== 'donut'"
+				:data="chartData"
+				:height="height"
+				:padding="{ top: 50 }"
+			>
 				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
 				<VisAxis
 					:full-size="false"
@@ -423,15 +558,17 @@ function updateKey() {
 					:type="orientation === 'vertical' ? 'x' : 'y'"
 				></VisAxis>
 				<VisAxis
-					:attributes="orientation !== 'vertical' ? attributes : []"
+					:attributes="orientation !== 'vertical' ? axisAttributes : []"
 					:full-size="false"
 					:label="yAxis"
+					:tick-format="yTickFormat"
 					:type="orientation === 'vertical' ? 'y' : 'x'"
 				></VisAxis>
 				<VisGroupedBar
 					v-if="chartType === 'bar'"
+					:attributes="groupedBarAttributes"
 					:bar-padding="0.25"
-					:color="color"
+					:color="fillColor"
 					:events="barEvents"
 					:group-padding="0.2"
 					:orientation="orientation"
@@ -440,9 +577,10 @@ function updateKey() {
 					:y="yAccessors"
 				/>
 				<VisStackedBar
-					v-if="chartType === 'stack'"
+					v-if="chartType === 'stack' || chartType === 'percent'"
+					:attributes="stackedBarAttributes"
 					:bar-padding="0.25"
-					:color="color"
+					:color="fillColor"
 					:events="barEvents"
 					:group-padding="0.2"
 					:orientation="orientation"
@@ -468,6 +606,19 @@ function updateKey() {
 
 				<VisTooltip :follow-cursor="false" :triggers="triggers"></VisTooltip>
 			</VisXYContainer>
+			<VisSingleContainer v-else :data="donutData" :height="height" :padding="{ top: 50 }">
+				<VisAnnotations v-if="title" :items="titleAnnotation"></VisAnnotations>
+				<VisNestedDonut
+					:attributes="donutAttributes"
+					:events="donutEvents"
+					:layers="donutLayers"
+					:segment-color="fillColor"
+					:segment-label="donutSegmentLabel"
+					:value="(d: DonutDatum) => d.value"
+					:layerSettings="{ width: 40 }"
+				/>
+				<VisTooltip :follow-cursor="false" :triggers="donutTriggers"></VisTooltip>
+			</VisSingleContainer>
 			<ChartLegendContent
 				@series-hover="applySeriesHoverOpacity"
 				@series-leave="applySeriesHoverOpacity(null)"
@@ -498,7 +649,11 @@ function updateKey() {
 					transition: 'left 60ms ease, top 60ms ease',
 				}"
 			>
-				<ChartTooltipContent :config="chartConfig" :payload="snapTooltipPayload" />
+				<ChartTooltipContent
+					:config="chartConfig"
+					:payload="snapTooltipPayload"
+					:percent="props.chartType === 'percent'"
+				/>
 			</div>
 		</template>
 	</div>

@@ -2,7 +2,6 @@
 import { useQueries } from "@tanstack/vue-query";
 import { BarChart3, BarChart4, ChartBarStacked } from "lucide-vue-next";
 
-import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
@@ -11,7 +10,6 @@ const t = useTranslations();
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
 }>();
-
 const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const { client } = useNoskeClient(noskeId);
@@ -25,7 +23,7 @@ const sourceDistributionsLoading: Ref<Array<boolean>> = ref([]);
 const q = computed(() =>
 	queries.value.map((query, index) => {
 		const queryKey = [
-			"get-source-distribution",
+			"get-source-type-distribution",
 			noskeId.value,
 			query.corpus,
 			query.subCorpus,
@@ -51,7 +49,7 @@ const q = computed(() =>
 							showreltt: 1,
 							showrel: 1,
 							freqlevel: 1,
-							ml1attr: "doc.docsrc",
+							ml1attr: "doc.mediatype",
 							ml1ctx: "0~0 > 0",
 							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 						},
@@ -82,13 +80,28 @@ useQueries({ queries: q });
 
 const chartMode: Ref<"bar" | "stack" | "percent"> = ref("stack");
 
-const isStacked = computed(() => chartMode.value === "stack");
+const allMediaTypes = computed(() => {
+	const allMedia = sourceDistributions.value.flatMap((distribution) =>
+		distribution.map((item) => item.media),
+	);
+	return [...new Set(allMedia)];
+});
+
+const mediaTypeSeries = computed(() =>
+	queries.value.map((_, index) =>
+		(sourceDistributions.value[index] ?? []).map((item) => ({
+			label: item.media,
+			data: [[item.media, item[mode.value]] as [string, number]],
+			color: categoryColors[allMediaTypes.value.indexOf(item.media) % 5],
+		})),
+	),
+);
 </script>
 
 <template>
 	<Card>
 		<CardHeader>
-			<CardTitle>{{ t("mediaSources") }}</CardTitle>
+			<CardTitle>{{ t("mediaTypes") }}</CardTitle>
 			<CardDescription>{{ t("mediaSourcesDesc") }}</CardDescription>
 		</CardHeader>
 
@@ -147,11 +160,17 @@ const isStacked = computed(() => chartMode.value === "stack");
 					:mode="mode"
 					:queries="queries"
 					:source-distributions="sourceDistributions"
-					:stack="isStacked"
-					:height="1200"
 					:chart-mode="chartMode"
 				/>
 			</template>
+
+			<h4 class="mt-16 text-center font-semibold">{{ t("mediaTypeDistribution") }}</h4>
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<div v-for="(query, index) of queries" :key="query.id">
+					<QueryDisplay :query="query" class="justify-center" />
+					<Chart chart-type="donut" :series="mediaTypeSeries[index] ?? []" :height="150" />
+				</div>
+			</div>
 		</CardContent>
 
 		<Collapsible v-model:open="expand">

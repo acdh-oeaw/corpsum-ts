@@ -137,6 +137,19 @@ function parseMediaSources(query: PublishedQuerySnapshot) {
 		})) ?? []
 	);
 }
+function parseMediaTypes(query: PublishedQuerySnapshot) {
+	const data = findPanel("data-display-media-type", query.sourceQueryId)?.data as
+		| FreqMlResponse
+		| undefined;
+	console.log(data);
+	return (
+		data?.Blocks?.[0]?.Items?.map((item) => ({
+			media: item.Word?.[0]?.n ?? "",
+			absolute: item.frq ?? 0,
+			relative: item.reltt ?? 0,
+		})) ?? []
+	);
+}
 
 function parseRegionalFrequencies(query: PublishedQuerySnapshot) {
 	const data = findPanel("data-display-regional-frequencies", query.sourceQueryId)?.data as
@@ -250,6 +263,21 @@ function parseKwic(query: PublishedQuerySnapshot) {
 }
 
 const mediaSources = computed(() => props.snapshot.queries.map(parseMediaSources));
+const mediaTypes = computed(() => props.snapshot.queries.map(parseMediaTypes));
+const mediaTypeSeries = computed(() => {
+	const allMedia = mediaTypes.value.flatMap((distribution) =>
+		distribution.map((item) => item.media),
+	);
+	const allMediaSet = [...new Set(allMedia)];
+	return corpusQueries.value.map((_, index) =>
+		(mediaTypes.value[index] ?? []).map((item) => ({
+			label: item.media,
+			data: [[item.media, item[mode.value]] as [string, number]],
+			color: categoryColors[allMediaSet.indexOf(item.media) % 5],
+		})),
+	);
+});
+
 const regionalFrequencies = computed(() =>
 	props.snapshot.queries.map((query) => ({
 		query: query.id,
@@ -325,7 +353,25 @@ const yearlySeries = computed(() =>
 						:queries="corpusQueries"
 						:source-distributions="mediaSources"
 						:stack="true"
+						chart-mode="bar"
+						:height="1200"
 					/>
+				</template>
+				<template v-else-if="key === 'mediaTypes'">
+					<MediaStackedBarChart
+						:mode="mode"
+						:queries="corpusQueries"
+						:source-distributions="mediaTypes"
+						:stack="true"
+						chart-mode="bar"
+					/>
+					<h4 class="mt-16 text-center font-semibold">{{ t("mediaTypeDistribution") }}</h4>
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						<div v-for="(query, index) of corpusQueries" :key="query.id">
+							<QueryDisplay :query="query" class="justify-center" />
+							<Chart chart-type="donut" :series="mediaTypeSeries[index] ?? []" :height="150" />
+						</div>
+					</div>
 				</template>
 
 				<template v-else-if="key === 'regionalFrequencies'">

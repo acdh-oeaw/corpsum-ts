@@ -13,6 +13,7 @@ const props = withDefaults(
 		config?: ChartConfig;
 		class?: HTMLAttributes["class"];
 		x?: number | Date | string;
+		percent?: boolean;
 	}>(),
 	{
 		payload: () => [],
@@ -39,6 +40,9 @@ const rows = computed(() =>
 	}),
 );
 const currentLocale = useLocale();
+function asPercent(val: number) {
+	return `${(val * 100).toFixed(2)}%`;
+}
 </script>
 
 <template>
@@ -60,7 +64,7 @@ const currentLocale = useLocale();
 				<span class="size-2 shrink-0 rounded-full" :style="{ background: color }" />
 				<span class="text-muted-foreground">{{ label }}</span>
 				<span v-if="value != null" class="ml-auto pl-4 font-medium tabular-nums text-foreground">
-					{{ value.toLocaleString(currentLocale) }}
+					{{ props.percent ? asPercent(value!) : value.toLocaleString(currentLocale) }}
 				</span>
 			</div>
 		</div>

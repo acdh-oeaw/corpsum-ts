@@ -22,6 +22,12 @@ export const visualizationDefinitions = {
 		publishedPanel: true,
 		searchKey: "mediaSources",
 	},
+	"data-display-media-type": {
+		metadataSemantics: [],
+		noskeTargetPath: "/search/freqml",
+		publishedPanel: true,
+		searchKey: "mediaTypes",
+	},
 	"data-display-regional-frequencies": {
 		metadataSemantics: [],
 		noskeTargetPath: "/search/freqml",
