@@ -56,6 +56,44 @@ test.describe("temporal metadata parsing", () => {
 		expect(parser.parse("2020-01-01")).toBeNull();
 	});
 
+	test("requires regex mappings to match and uses their capture or matched value", () => {
+		const capturedDateParser = createTemporalFrequencyParser({
+			parser: { mode: "regex", pattern: "date=(\\d{4}-\\d{2}-\\d{2})", sourceUnit: "day" },
+			valueMap: {},
+		});
+		const matchedDateParser = createTemporalFrequencyParser({
+			parser: { mode: "regex", pattern: "\\d{4}-\\d{2}-\\d{2}", sourceUnit: "day" },
+			valueMap: {},
+		});
+
+		expect(capturedDateParser.parse("date=2020-05-12")?.toISOString()).toBe(
+			"2020-05-12T00:00:00.000Z",
+		);
+		expect(matchedDateParser.parse("record 2020-05-12")?.toISOString()).toBe(
+			"2020-05-12T00:00:00.000Z",
+		);
+		expect(capturedDateParser.parse("2020-05-12")).toBeNull();
+	});
+
+	test("rejects invalid calendar values without normalizing them", () => {
+		const dayParser = createTemporalFrequencyParser({
+			parser: { mode: "date", sourceUnit: "day" },
+			valueMap: {},
+		});
+		const weekParser = createTemporalFrequencyParser({
+			parser: { mode: "date", sourceUnit: "week" },
+			valueMap: {},
+		});
+		const historicalYearParser = createTemporalFrequencyParser({
+			parser: { mode: "year", sourceUnit: "year" },
+			valueMap: {},
+		});
+
+		expect(dayParser.parse("2020-02-30")).toBeNull();
+		expect(weekParser.parse("2021-W53")).toBeNull();
+		expect(historicalYearParser.parse("0001")?.toISOString()).toBe("0001-01-01T00:00:00.000Z");
+	});
+
 	test("only offers bucket units supported by every source", () => {
 		expect(getAllowedTemporalBucketUnits(["day"])).toStrictEqual([
 			"day",

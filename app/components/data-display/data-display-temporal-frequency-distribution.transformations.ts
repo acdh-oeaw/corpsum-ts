@@ -42,25 +42,32 @@ function isValidRegularExpression(pattern: string) {
 	}
 }
 
+function createUtcDate(year: number, month = 0, day = 1) {
+	const date = new Date(0);
+	date.setUTCFullYear(year, month, day);
+	date.setUTCHours(0, 0, 0, 0);
+	return date;
+}
+
 function parseYear(value: string) {
-	const year = Number(value);
-	return Number.isSafeInteger(year) ? new Date(Date.UTC(year, 0, 1)) : null;
+	if (!/^\d{4}$/u.test(value)) return null;
+	return createUtcDate(Number(value));
 }
 
 function parseQuarter(value: string) {
 	const match = /^(?<year>\d{4})-?Q(?<quarter>[1-4])$/u.exec(value);
 	if (!match?.groups) return null;
-	return new Date(Date.UTC(Number(match.groups.year), (Number(match.groups.quarter) - 1) * 3, 1));
+	return createUtcDate(Number(match.groups.year), (Number(match.groups.quarter) - 1) * 3);
 }
 
 function parseMonth(value: string) {
 	const match = /^(?<year>\d{4})-(?<month>0?[1-9]|1[0-2])$/u.exec(value);
 	if (!match?.groups) return null;
-	return new Date(Date.UTC(Number(match.groups.year), Number(match.groups.month) - 1, 1));
+	return createUtcDate(Number(match.groups.year), Number(match.groups.month) - 1);
 }
 
 function getIsoWeekStart(year: number, week: number) {
-	const fourthOfJanuary = new Date(Date.UTC(year, 0, 4));
+	const fourthOfJanuary = createUtcDate(year, 0, 4);
 	const day = fourthOfJanuary.getUTCDay() || 7;
 	const firstMonday = new Date(fourthOfJanuary);
 	firstMonday.setUTCDate(fourthOfJanuary.getUTCDate() - day + 1);
@@ -68,10 +75,39 @@ function getIsoWeekStart(year: number, week: number) {
 	return firstMonday;
 }
 
+function getIsoWeekParts(value: Date) {
+	const date = floorDateToUnit(value, "day");
+	date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+	const yearStart = createUtcDate(date.getUTCFullYear());
+	return {
+		year: date.getUTCFullYear(),
+		week: Math.ceil(((date.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7),
+	};
+}
+
 function parseWeek(value: string) {
 	const match = /^(?<year>\d{4})-?W(?<week>0?[1-9]|[1-4]\d|5[0-3])$/u.exec(value);
 	if (!match?.groups) return null;
-	return getIsoWeekStart(Number(match.groups.year), Number(match.groups.week));
+	const year = Number(match.groups.year);
+	const week = Number(match.groups.week);
+	const date = getIsoWeekStart(year, week);
+	const isoWeek = getIsoWeekParts(date);
+	return isoWeek.year === year && isoWeek.week === week ? date : null;
+}
+
+function parseIsoCalendarDate(value: string) {
+	const match = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})(?:T.*)?$/u.exec(value);
+	if (!match?.groups) return null;
+	const year = Number(match.groups.year);
+	const month = Number(match.groups.month);
+	const day = Number(match.groups.day);
+	if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+	const date = createUtcDate(year, month - 1, day);
+	return date.getUTCFullYear() === year &&
+		date.getUTCMonth() === month - 1 &&
+		date.getUTCDate() === day
+		? date
+		: null;
 }
 
 function parseDateAtSourcePrecision(value: string, sourceUnit: TemporalUnit) {
@@ -86,8 +122,8 @@ function parseDateAtSourcePrecision(value: string, sourceUnit: TemporalUnit) {
 						? parseWeek(value)
 						: null;
 	if (preciseDate) return preciseDate;
-	const date = new Date(value);
-	return Number.isNaN(date.getTime()) ? null : floorDateToUnit(date, sourceUnit);
+	const date = parseIsoCalendarDate(value);
+	return date ? floorDateToUnit(date, sourceUnit) : null;
 }
 
 export function createTemporalFrequencyParser(
@@ -110,7 +146,9 @@ export function createTemporalFrequencyParser(
 			if (normalized.trim() === "") return null;
 			if (mapping.parser.mode === "year") return parseYear(normalized);
 			const match = expression?.exec(normalized);
-			const captured = match?.[1] ?? match?.groups?.date ?? match?.groups?.year ?? normalized;
+			if (expression && !match) return null;
+			const captured =
+				match?.groups?.date ?? match?.groups?.year ?? match?.[1] ?? match?.[0] ?? normalized;
 			return parseDateAtSourcePrecision(captured, sourceUnit);
 		},
 		error: null,
@@ -210,16 +248,6 @@ export function groupTemporalFrequencyPoints(
 		};
 	});
 	return useReverseIntervals ? intervals.reverse() : intervals;
-}
-
-function getIsoWeekParts(value: Date) {
-	const date = floorDateToUnit(value, "day");
-	date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
-	const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-	return {
-		year: date.getUTCFullYear(),
-		week: Math.ceil(((date.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7),
-	};
 }
 
 export function formatTemporalTimestamp(timestamp: number, unit: TemporalUnit, locale?: string) {
