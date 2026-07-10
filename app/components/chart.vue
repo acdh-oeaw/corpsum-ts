@@ -21,6 +21,7 @@ import { computed, getCurrentInstance, h, ref, render, toRef } from "vue";
 
 import { useChartExport } from "@/composables/use-chart-export";
 import { useTranslations } from "@/composables/use-translations";
+import { alignChartSeriesData, type ChartDatum } from "@/utils/chart-data";
 
 import { Button } from "./ui/button";
 import {
@@ -37,7 +38,7 @@ import {
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-type Datum = [year: string | number, value: number];
+type Datum = ChartDatum;
 type SeriesData = ChartConfig[string] & {
 	data: Array<Datum>;
 	name?: string;
@@ -52,9 +53,12 @@ const props = withDefaults(
 		yAxis?: string;
 		orientation?: "horizontal" | "vertical";
 		height?: number;
+		domainType?: "categorical" | "temporal";
+		domainValueFormatter?: (value: string | number) => string;
 	}>(),
 	{
 		chartType: "bar",
+		domainType: "categorical",
 		orientation: "vertical",
 	},
 );
@@ -68,8 +72,17 @@ const chartConfig = computed(() =>
 );
 const appContext = getCurrentInstance()?.appContext;
 
-function renderTooltipContent(data: Array<[string, number]>, x?: number) {
-	const vnode = h(ChartTooltipContent, { payload: data, config: chartConfig.value, x });
+function formatDomainValue(value: string | number) {
+	return props.domainValueFormatter?.(value) ?? String(value);
+}
+
+function renderTooltipContent(data: Array<ChartDatum>, x?: number | Date) {
+	const domainValue = x instanceof Date ? x.getTime() : (x ?? data[0]?.[0] ?? "");
+	const vnode = h(ChartTooltipContent, {
+		payload: data,
+		config: chartConfig.value,
+		x: formatDomainValue(domainValue),
+	});
 	if (appContext) vnode.appContext = appContext;
 	const div = document.createElement("div");
 	render(vnode, div);
@@ -78,18 +91,17 @@ function renderTooltipContent(data: Array<[string, number]>, x?: number) {
 	return html;
 }
 
-function zip(arrays: Array<Array<Datum>>) {
-	return arrays[0]?.map((_, i) => {
-		return arrays.map((array) => {
-			return array[i];
-		});
-	});
-}
-const chartData = computed(() => zip(props.series.map((e) => e.data)));
+const chartData = computed(() => alignChartSeriesData(props.series.map((entry) => entry.data)));
 type Data = SeriesData["data"][number];
-const tickFormat = (tick: number) => {
-	return chartData.value?.[tick]?.[0]?.[0] ?? 0;
+const tickFormat = (tick: number | Date) => {
+	if (props.domainType === "temporal") {
+		return formatDomainValue(tick instanceof Date ? tick.getTime() : tick);
+	}
+	return formatDomainValue(chartData.value?.[Number(tick)]?.[0]?.[0] ?? "");
 };
+function getDomainPosition(data: Array<Data>, index: number) {
+	return props.domainType === "temporal" ? Number(data[0]?.[0] ?? 0) : index;
+}
 const yAccessors = computed(() => props.series.map((_, i) => (d: Array<Data>) => d[i]?.[1] ?? 0));
 const color = computed(() => props.series.map((s) => s.color));
 
@@ -176,8 +188,12 @@ function updateSnapPoint(event: MouseEvent, seriesIdx: number) {
 }
 
 const snapTooltipPayload = computed(() => {
-	if (!snapPoint.value) return [] as Array<[string, number]>;
-	return (chartData.value?.[snapPoint.value.dataIdx] ?? []) as Array<[string, number]>;
+	if (!snapPoint.value) return [] as Array<ChartDatum>;
+	return chartData.value?.[snapPoint.value.dataIdx] ?? [];
+});
+const snapTooltipTitle = computed(() => {
+	const domainValue = snapTooltipPayload.value[0]?.[0];
+	return domainValue === undefined ? "" : formatDomainValue(domainValue);
 });
 
 function applyBarHoverOpacity(activeIdx: number | null) {
@@ -322,19 +338,25 @@ const triggers = computed(() => ({
 	[GroupedBar.selectors.bar]: (_data: unknown, x: number) => {
 		const data = (
 			_data && typeof _data === "object" && "data" in _data ? _data.data : _data
-		) as Array<[string, number]>;
+		) as Array<ChartDatum>;
 		return renderTooltipContent(data, x);
 	},
 	[StackedBar.selectors.bar]: (_data: unknown, x: number) => {
 		const data = (
 			_data && typeof _data === "object" && "datum" in _data ? _data.datum : _data
-		) as Array<[string, number]>;
+		) as Array<ChartDatum>;
 		return renderTooltipContent(data, x);
 	},
 }));
 
 const minTicks = computed(() => {
 	return Math.min(15, chartData.value?.length ?? 0);
+});
+const axisTickValues = computed(() => {
+	if (minTicks.value > 3 && props.orientation !== "horizontal") return undefined;
+	return chartData.value.map((row, index) =>
+		props.domainType === "temporal" ? Number(row[0]?.[0] ?? 0) : index,
+	);
 });
 
 const t = useTranslations();
@@ -345,9 +367,14 @@ function openFullscreen() {
 }
 
 const seriesLabels = computed(() => props.series.map((s) => String(s.label ?? s.name ?? "")));
+const exportChartData = computed(() =>
+	chartData.value.map((row) =>
+		row.map(([domainValue, value]) => [formatDomainValue(domainValue), value] satisfies ChartDatum),
+	),
+);
 const { exportCsv, exportXlsx, exportSvg, exportPng, exportJpg } = useChartExport(
 	containerRef,
-	chartData,
+	exportChartData,
 	toRef(() => props.title),
 	seriesLabels,
 	toRef(() => props.xAxis),
@@ -415,11 +442,7 @@ function updateKey() {
 					:num-ticks="minTicks"
 					:tick-format="tickFormat"
 					:tick-text-hide-overlapping="orientation === 'vertical'"
-					:tick-values="
-						minTicks <= 3 || orientation === 'horizontal'
-							? chartData?.map((_, idx) => idx)
-							: undefined
-					"
+					:tick-values="axisTickValues"
 					:type="orientation === 'vertical' ? 'x' : 'y'"
 				></VisAxis>
 				<VisAxis
@@ -436,7 +459,7 @@ function updateKey() {
 					:group-padding="0.2"
 					:orientation="orientation"
 					:rounded-corners="3"
-					:x="(_d: Data[], idx: number) => idx"
+					:x="getDomainPosition"
 					:y="yAccessors"
 				/>
 				<VisStackedBar
@@ -447,21 +470,16 @@ function updateKey() {
 					:group-padding="0.2"
 					:orientation="orientation"
 					:rounded-corners="3"
-					:x="(_d: Data[], idx: number) => idx"
+					:x="getDomainPosition"
 					:y="yAccessors"
 				/>
 				<template v-if="chartType === 'line'">
-					<VisLine
-						:color="color"
-						:events="lineEvents"
-						:x="(_d: Data[], idx: number) => idx"
-						:y="yAccessors"
-					/>
+					<VisLine :color="color" :events="lineEvents" :x="getDomainPosition" :y="yAccessors" />
 					<VisScatter
 						:color="color"
 						:events="scatterEvents"
 						:size="8"
-						:x="(_d: Data[], idx: number) => idx"
+						:x="getDomainPosition"
 						:y="yAccessors"
 					/>
 				</template>
@@ -498,7 +516,11 @@ function updateKey() {
 					transition: 'left 60ms ease, top 60ms ease',
 				}"
 			>
-				<ChartTooltipContent :config="chartConfig" :payload="snapTooltipPayload" />
+				<ChartTooltipContent
+					:config="chartConfig"
+					:payload="snapTooltipPayload"
+					:x="snapTooltipTitle"
+				/>
 			</div>
 		</template>
 	</div>

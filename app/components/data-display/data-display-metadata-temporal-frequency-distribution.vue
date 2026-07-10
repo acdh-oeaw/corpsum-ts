@@ -2,29 +2,36 @@
 import {
 	type CorpusMetadataMappingResponse,
 	type TemporalFrequencyDistributionSettings,
+	type TemporalUnit,
 	defaultTemporalFrequencyDistributionSettings,
 	normalizeTemporalFrequencyDistributionSettings,
+	temporalIntervalOptions,
 } from "@/lib/visualization-types";
 import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
+
+import {
+	type TemporalFrequency,
+	type TemporalFrequencyParser,
+	type TemporalFrequencyPoint,
+	aggregateTemporalFrequencies,
+	createTemporalFrequencyParser,
+	formatTemporalFrequencyInterval,
+	formatTemporalTimestamp,
+	getAllowedTemporalBucketUnits,
+	getTemporalSourceUnit,
+	groupTemporalFrequencyPoints,
+} from "./data-display-metadata-temporal-frequency-distribution.transformations";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
 type FreqMlBlock = NonNullable<FreqMlResponse["Blocks"]>[number];
 type FreqMlItem = NonNullable<FreqMlBlock["Items"]>[number];
 
-interface YearlyFrequency {
-	year: number;
-	absolute: number;
-	relative: number;
-}
-
 type FrequencyMode = "absolute" | "relative";
-type FrequencyPoint = [year: number, value: number];
-type IntervalFrequencyPoint = [yearRange: string, value: number];
 
-interface YearlyFrequencySeries<TPoint extends FrequencyPoint | IntervalFrequencyPoint> {
+interface TemporalFrequencySeries {
 	name: string;
-	data: Array<TPoint>;
+	data: Array<TemporalFrequencyPoint>;
 	color: string;
 }
 
@@ -45,14 +52,16 @@ const emit = defineEmits<{
 }>();
 
 const t = useTranslations();
+const locale = useLocale();
 
 const activeQueries = computed(() => props.queries);
 const normalizedSettings = computed(() =>
 	normalizeTemporalFrequencyDistributionSettings(props.settings),
 );
 
-const intervalOptions = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+const intervalOptions = temporalIntervalOptions;
 const mode = ref<FrequencyMode>(normalizedSettings.value.mode);
+const bucketUnit = ref<TemporalUnit>(normalizedSettings.value.bucketUnit);
 const interval = ref(normalizedSettings.value.intervalSize);
 const reverse = ref(normalizedSettings.value.reverseIntervals);
 const expand = ref(normalizedSettings.value.sourceTableExpanded);
@@ -61,6 +70,7 @@ watch(
 	normalizedSettings,
 	(value) => {
 		mode.value = value.mode;
+		bucketUnit.value = value.bucketUnit;
 		interval.value = value.intervalSize;
 		reverse.value = value.reverseIntervals;
 		expand.value = value.sourceTableExpanded;
@@ -68,11 +78,12 @@ watch(
 	{ deep: true },
 );
 
-watch([mode, interval, reverse, expand], () => {
+watch([mode, bucketUnit, interval, reverse, expand], () => {
 	emit("update:settings", {
 		type: defaultTemporalFrequencyDistributionSettings.type,
 		mode: mode.value,
-		yearRange: normalizedSettings.value.yearRange,
+		bucketUnit: bucketUnit.value,
+		dateRange: normalizedSettings.value.dateRange,
 		intervalSize: interval.value,
 		reverseIntervals: reverse.value,
 		sourceTableExpanded: expand.value,
@@ -80,11 +91,35 @@ watch([mode, interval, reverse, expand], () => {
 });
 
 const mappings = computed(() => props.metadataMappings ?? []);
+const availableBucketUnits = computed(() =>
+	getAllowedTemporalBucketUnits(
+		mappings.value.flatMap((mapping) => (mapping ? [getTemporalSourceUnit(mapping)] : [])),
+	),
+);
+watchEffect(() => {
+	if (!availableBucketUnits.value.includes(bucketUnit.value)) {
+		bucketUnit.value = availableBucketUnits.value.at(-1) ?? "year";
+	}
+});
+const dateRange = computed(() => ({
+	start: new Date(normalizedSettings.value.dateRange.start),
+	end: new Date(normalizedSettings.value.dateRange.end),
+}));
 const missingMappingQueries = computed(() =>
 	activeQueries.value.filter((_, index) => !mappings.value[index]),
 );
-const canQuery = computed(
-	() => activeQueries.value.length > 0 && missingMappingQueries.value.length === 0,
+const temporalParsers = computed(() =>
+	mappings.value.map((mapping) => (mapping ? createTemporalFrequencyParser(mapping) : null)),
+);
+const invalidMappingQueries = computed(() =>
+	activeQueries.value.filter((_, index) => temporalParsers.value[index]?.error),
+);
+const queryableQueryCount = computed(
+	() =>
+		activeQueries.value.filter((_, index) => {
+			const parser = temporalParsers.value[index];
+			return parser && !parser.error;
+		}).length,
 );
 
 const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
@@ -101,7 +136,7 @@ const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
 		return {
 			queryKey,
 			noske: query.noske ?? "",
-			enabled: canQuery.value,
+			enabled: Boolean(mapping) && !temporalParsers.value[index]?.error,
 			params: {
 				corpname: query.corpus,
 				usesubcorp: query.subCorpus || undefined,
@@ -122,116 +157,68 @@ const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
 
 const queryResults = useNoskeFreqMlQueries(queryDescriptors);
 
-const yearlyFrequencies = computed(() =>
+const temporalFrequencies = computed(() =>
 	queryResults.value.map((result, index) => {
-		const mapping = mappings.value[index];
-		if (!mapping || !result.data) return [];
-		return appendMissingYearFrequencies(
-			parseYearlyFrequencies(result.data, mapping),
-			createYearRange(
-				normalizedSettings.value.yearRange.start,
-				normalizedSettings.value.yearRange.end,
-			),
+		const parser = temporalParsers.value[index];
+		if (!parser || parser.error || !result.data) return [];
+		return aggregateTemporalFrequencies(
+			parseTemporalFrequencies(result.data, parser),
+			dateRange.value,
+			bucketUnit.value,
 		);
 	}),
 );
 
-const yearlyFrequenciesLoading = computed(() =>
+const temporalFrequenciesLoading = computed(() =>
 	queryResults.value.map((result) => result.isFetching || result.isLoading),
+);
+const temporalFrequenciesErrors = computed(() =>
+	queryResults.value.map((result, index) => {
+		const parserError = temporalParsers.value[index]?.error;
+		if (parserError) return parserError;
+		return result.isError ? "The temporal frequency data could not be loaded." : null;
+	}),
 );
 
 const normalizationWarnings = computed(() =>
 	queryResults.value.map((result, index) => {
-		const mapping = mappings.value[index];
-		if (!mapping || !result.data) return 0;
-		return countUnparseableTemporalValues(result.data, mapping);
+		const parser = temporalParsers.value[index];
+		if (!parser || parser.error || !result.data) return 0;
+		return countUnparseableTemporalValues(result.data, parser);
 	}),
 );
 
-function parseYearlyFrequencies(
+function parseTemporalFrequencies(
 	data: FreqMlResponse,
-	mapping: CorpusMetadataMappingResponse,
-): Array<YearlyFrequency> {
-	return data.Blocks?.[0]?.Items?.flatMap((item) => parseYearlyFrequencyItem(item, mapping)) ?? [];
+	parser: TemporalFrequencyParser,
+): Array<TemporalFrequency> {
+	return data.Blocks?.[0]?.Items?.flatMap((item) => parseTemporalFrequencyItem(item, parser)) ?? [];
 }
 
-function parseYearlyFrequencyItem(
+function parseTemporalFrequencyItem(
 	item: FreqMlItem,
-	mapping: CorpusMetadataMappingResponse,
-): Array<YearlyFrequency> {
-	const year = parseTemporalYear(parseRawTemporalValue(item), mapping);
-	if (year === null) return [];
+	parser: TemporalFrequencyParser,
+): Array<TemporalFrequency> {
+	const date = parser.parse(parseRawTemporalValue(item));
+	if (date === null) return [];
 	return [
 		{
 			absolute: item.frq ?? 0,
 			relative: item.reltt ?? 0,
-			year,
+			date,
 		},
 	];
 }
 
-function countUnparseableTemporalValues(
-	data: FreqMlResponse,
-	mapping: CorpusMetadataMappingResponse,
-) {
+function countUnparseableTemporalValues(data: FreqMlResponse, parser: TemporalFrequencyParser) {
 	return (
-		data.Blocks?.[0]?.Items?.filter(
-			(item) => parseTemporalYear(parseRawTemporalValue(item), mapping) === null,
-		).length ?? 0
+		data.Blocks?.[0]?.Items?.filter((item) => parser.parse(parseRawTemporalValue(item)) === null)
+			.length ?? 0
 	);
 }
 
 function parseRawTemporalValue(item: FreqMlItem) {
 	return item.Word?.map(({ n }) => n ?? "").join("") ?? "";
-}
-
-function parseTemporalYear(
-	rawValue: string,
-	mapping: CorpusMetadataMappingResponse,
-): number | null {
-	const normalized = mapping.valueMap?.[rawValue] ?? rawValue;
-	if (mapping.parser.mode === "year") {
-		const year = Number(normalized);
-		return Number.isInteger(year) ? year : null;
-	}
-	if (mapping.parser.mode === "date") {
-		const date = new Date(normalized);
-		const year = date.getUTCFullYear();
-		return Number.isInteger(year) && !Number.isNaN(date.getTime()) ? year : null;
-	}
-	if (!mapping.parser.pattern) return null;
-	const match = new RegExp(mapping.parser.pattern, "u").exec(normalized);
-	const captured = match?.[1] ?? match?.groups?.year;
-	if (!captured) return null;
-	const year = Number(captured);
-	return Number.isInteger(year) ? year : null;
-}
-
-function createYearRange(firstYear: number, lastYear: number) {
-	return Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index);
-}
-
-function appendMissingYearFrequencies(
-	frequencies: Array<YearlyFrequency>,
-	years: Array<number>,
-): Array<YearlyFrequency> {
-	const totalsByYear = new Map<number, YearlyFrequency>();
-	for (const frequency of frequencies) {
-		const current = totalsByYear.get(frequency.year) ?? {
-			year: frequency.year,
-			absolute: 0,
-			relative: 0,
-		};
-		current.absolute += frequency.absolute;
-		current.relative += frequency.relative;
-		totalsByYear.set(frequency.year, current);
-	}
-	for (const year of years) {
-		if (!totalsByYear.has(year)) {
-			totalsByYear.set(year, { year, absolute: 0, relative: 0 });
-		}
-	}
-	return [...totalsByYear.values()];
 }
 
 function createSeriesName(query: CorpusQuery) {
@@ -240,32 +227,32 @@ function createSeriesName(query: CorpusQuery) {
 	}`;
 }
 
-function getFrequencyValue(frequency: YearlyFrequency, selectedMode: FrequencyMode) {
+function getFrequencyValue(frequency: TemporalFrequency, selectedMode: FrequencyMode) {
 	return selectedMode === "relative" ? frequency.relative : frequency.absolute;
 }
 
-function createSampleAdjustedYearlySeries(
+function createSampleAdjustedTemporalSeries(
 	query: CorpusQuery,
-	frequencies: Array<YearlyFrequency>,
+	frequencies: Array<TemporalFrequency>,
 	selectedMode: FrequencyMode,
-): YearlyFrequencySeries<FrequencyPoint> {
+): TemporalFrequencySeries {
 	return {
 		name: createSeriesName(query),
 		data: applySampleRatio(
-			createYearlyFrequencyPoints(frequencies, selectedMode),
+			createTemporalFrequencyPoints(frequencies, selectedMode),
 			query.SampleRatio,
 		),
 		color: query.color,
 	};
 }
 
-function createYearlyFrequencyPoints(
-	frequencies: Array<YearlyFrequency>,
+function createTemporalFrequencyPoints(
+	frequencies: Array<TemporalFrequency>,
 	selectedMode: FrequencyMode,
-): Array<FrequencyPoint> {
+): Array<TemporalFrequencyPoint> {
 	return [...frequencies]
-		.sort((a, b) => a.year - b.year)
-		.map((frequency) => [frequency.year, getFrequencyValue(frequency, selectedMode)]);
+		.sort((a, b) => a.date.getTime() - b.date.getTime())
+		.map((frequency) => [frequency.date.getTime(), getFrequencyValue(frequency, selectedMode)]);
 }
 
 function applySampleRatio<TYear extends string | number>(
@@ -275,53 +262,37 @@ function applySampleRatio<TYear extends string | number>(
 	return points.map(([year, value]) => [year, value * (sampleRatio / 100)]);
 }
 
-function groupFrequencyPointsIntoIntervals(
-	points: Array<FrequencyPoint>,
-	intervalSize: number,
-	useReverseIntervals: boolean,
-): Array<IntervalFrequencyPoint> {
-	const intervalSource = useReverseIntervals ? [...points].reverse() : points;
-	const fullIntervalCount = Math.floor(intervalSource.length / intervalSize);
-	const intervals = Array.from({ length: fullIntervalCount }, (_, intervalIndex) => {
-		const intervalPoints = intervalSource.slice(
-			intervalIndex * intervalSize,
-			(intervalIndex + 1) * intervalSize,
-		);
-
-		return createIntervalFrequencyPoint(intervalPoints);
-	});
-
-	return useReverseIntervals ? intervals.reverse() : intervals;
-}
-
-function createIntervalFrequencyPoint(points: Array<FrequencyPoint>): IntervalFrequencyPoint {
-	const orderedYears = points.map(([year]) => year).sort((a, b) => a - b);
-	const totalValue = points.reduce((sum, [, value]) => sum + value, 0);
-
-	return [`${orderedYears[0]}-${orderedYears.at(-1)}`, totalValue];
-}
-
 const series = computed(() =>
 	activeQueries.value.flatMap((query, index) => {
-		const frequencies = yearlyFrequencies.value[index];
-		if (!frequencies) return [];
+		const frequencies = temporalFrequencies.value[index];
+		const result = queryResults.value[index];
+		const parser = temporalParsers.value[index];
+		if (!frequencies || !result?.data || !parser || parser.error) return [];
 
-		return [createSampleAdjustedYearlySeries(query, frequencies, mode.value)];
+		return [createSampleAdjustedTemporalSeries(query, frequencies, mode.value)];
 	}),
 );
 
 const intervalseries = computed(() =>
 	series.value.map((querySeries) => ({
 		...querySeries,
-		data: groupFrequencyPointsIntoIntervals(querySeries.data, interval.value, reverse.value),
+		data: groupTemporalFrequencyPoints(querySeries.data, interval.value, reverse.value).map(
+			(item) => formatTemporalFrequencyInterval(item, bucketUnit.value, locale.value),
+		),
 	})),
 );
+
+function formatTemporalDomainValue(value: string | number) {
+	return typeof value === "number"
+		? formatTemporalTimestamp(value, bucketUnit.value, locale.value)
+		: value;
+}
 </script>
 
 <template>
 	<Card>
 		<CardHeader>
-			<CardTitle>{{ t("yearlyFrequencies") }}</CardTitle>
+			<CardTitle>Temporal frequencies</CardTitle>
 			<CardDescription>{{ t("yearlyFrequenciesDesc") }}</CardDescription>
 		</CardHeader>
 
@@ -338,17 +309,45 @@ const intervalseries = computed(() =>
 					</li>
 				</ul>
 			</div>
+			<div v-if="invalidMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
+				<p class="font-medium">Invalid temporal metadata mapping</p>
+				<p class="mt-1 text-muted-foreground">
+					Correct the regular expression for each affected corpus before loading its data.
+				</p>
+				<ul class="mt-3 list-disc pl-5">
+					<li v-for="query in invalidMappingQueries" :key="`${query.noske}-${query.corpus}`">
+						{{ query.corpus }} on {{ query.noske }}
+					</li>
+				</ul>
+			</div>
 
-			<template v-else>
-				<div class="flex max-w-7xl">
+			<template v-if="queryableQueryCount > 0">
+				<div class="flex max-w-7xl flex-wrap gap-3">
 					<ToggleGroup v-model="mode" class="flex w-full" type="single">
 						<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
 						<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
 					</ToggleGroup>
+					<div class="space-y-1">
+						<Label for="temporal-bucket-unit">Time unit</Label>
+						<Select v-model="bucketUnit">
+							<SelectTrigger id="temporal-bucket-unit" class="min-w-60">
+								<SelectValue placeholder="Time unit" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem v-for="unit of availableBucketUnits" :key="unit" :value="unit">
+									{{ unit }}
+								</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
 				</div>
-				<div v-for="(query, index) of activeQueries" :key="query.id">
+				<div
+					v-for="(query, index) of activeQueries"
+					v-show="temporalParsers[index] && !temporalParsers[index]?.error"
+					:key="query.id"
+				>
 					<QueryDisplay
-						:loading="yearlyFrequenciesLoading[index]"
+						:loading="temporalFrequenciesLoading[index]"
 						:query="query"
 						:query-key="queryDescriptors[index]?.queryKey"
 					/>
@@ -356,17 +355,28 @@ const intervalseries = computed(() =>
 						{{ normalizationWarnings[index] }} temporal value(s) could not be parsed and were
 						excluded.
 					</p>
+					<p
+						v-if="temporalFrequenciesErrors[index]"
+						class="mt-1 text-sm text-destructive"
+						role="alert"
+					>
+						{{ temporalFrequenciesErrors[index] }}
+					</p>
 				</div>
 				<Chart
 					chart-type="line"
 					class="h-96"
+					domain-type="temporal"
+					:domain-value-formatter="formatTemporalDomainValue"
 					:series="series"
 					:title="`${series.length} ${t('queries')}`"
 					:y-axis="t('sources')"
 				></Chart>
 
 				<CardHeader class="px-0">
-					<CardTitle>{{ `${t("yearlyFrequenciesPer")}${interval} years` }}</CardTitle>
+					<CardTitle>
+						{{ `Temporal frequencies per ${interval} ${bucketUnit}${interval === 1 ? "" : "s"}` }}
+					</CardTitle>
 					<CardDescription>{{ t("yearlyFrequenciesDesc") }}</CardDescription>
 				</CardHeader>
 
@@ -383,13 +393,13 @@ const intervalseries = computed(() =>
 									:key="intervalOption"
 									:value="intervalOption"
 								>
-									{{ intervalOption }} years
+									{{ intervalOption }} {{ bucketUnit }}s
 								</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
 					<div class="flex items-center gap-2">
-						<Checkbox id="temporal-reverse" v-model:checked="reverse" />
+						<Checkbox id="temporal-reverse" v-model="reverse" />
 						<Label for="temporal-reverse">Reverse</Label>
 					</div>
 				</div>
@@ -407,9 +417,9 @@ const intervalseries = computed(() =>
 		<Collapsible v-model:open="expand">
 			<CollapsibleContent class="px-6 pb-6">
 				<DataDisplaySourceTable
-					:data="yearlyFrequencies"
+					:data="temporalFrequencies"
 					datatype="yearlyFrequencies"
-					:loading="yearlyFrequenciesLoading"
+					:loading="temporalFrequenciesLoading"
 					:queries="activeQueries"
 				/>
 			</CollapsibleContent>
