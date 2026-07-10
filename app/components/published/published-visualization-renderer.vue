@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import {
-	type TemporalFrequency,
-	aggregateTemporalFrequencies,
-	createTemporalFrequencyParser,
-	formatTemporalFrequencyInterval,
-	formatTemporalTimestamp,
-	groupTemporalFrequencyPoints,
-} from "@/components/data-display/data-display-temporal-frequency-distribution.transformations.ts";
+import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import {
 	type CorpusMetadataMappingResponse,
 	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
-	normalizeTemporalFrequencyDistributionSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
 	visualizationDefinitions,
@@ -94,6 +86,9 @@ const renderItems = computed(() =>
 		key: visualizationDefinitions[normalizeVisualizationType(type)].searchKey,
 	})),
 );
+const hasNonTemporalVisualization = computed(() =>
+	renderItems.value.some(({ type }) => type !== temporalFrequencyDistributionType),
+);
 
 function findPanel(type: PublishedPanelSnapshot["type"], queryId: string) {
 	return props.snapshot.panels.find(
@@ -159,42 +154,6 @@ function parseRegionalFrequencies(query: PublishedQuerySnapshot) {
 	);
 }
 
-function parseTemporalFrequencies(query: PublishedQuerySnapshot) {
-	const panel = findPanel(temporalFrequencyDistributionType, query.sourceQueryId);
-	const data = panel?.data as FreqMlResponse | undefined;
-	const mapping = panel?.mapping;
-	const parser = mapping ? createTemporalFrequencyParser(mapping) : null;
-	if (parser?.error) return [];
-	const values =
-		data?.Blocks?.[0]?.Items?.flatMap((item) => {
-			const rawValue = item.Word?.map(({ n }) => n ?? "").join("") ?? "";
-			const date = parser?.parse(rawValue);
-			if (!date) return [];
-			return [
-				{
-					date,
-					absolute: item.frq ?? 0,
-					relative: item.reltt ?? 0,
-				} satisfies TemporalFrequency,
-			];
-		}) ?? [];
-	const settings = getTemporalSettings(panel);
-	return aggregateTemporalFrequencies(
-		values,
-		{
-			start: new Date(settings.dateRange.start),
-			end: new Date(settings.dateRange.end),
-		},
-		settings.bucketUnit,
-	);
-}
-
-function getTemporalSettings(
-	panel: PublishedPanelSnapshot | undefined,
-): TemporalFrequencyDistributionSettings {
-	return normalizeTemporalFrequencyDistributionSettings(panel?.settings);
-}
-
 function parseCollocations(query: PublishedQuerySnapshot) {
 	const data = findPanel("data-display-collocations", query.sourceQueryId)?.data as
 		| CollxResponse
@@ -243,202 +202,157 @@ const regionalFrequencies = computed(() =>
 		data: parseRegionalFrequencies(query),
 	})),
 );
-const invalidTemporalMappingQueries = computed(() =>
-	props.snapshot.queries.filter((query) => {
-		const mapping = findPanel(temporalFrequencyDistributionType, query.sourceQueryId)?.mapping;
-		return mapping ? createTemporalFrequencyParser(mapping).error : false;
-	}),
+const temporalPanels = computed(() =>
+	props.snapshot.queries.map((query) =>
+		findPanel(temporalFrequencyDistributionType, query.sourceQueryId),
+	),
 );
-const temporalSettings = computed(() => {
-	const panel = props.snapshot.panels.find(
-		(item) => normalizeVisualizationType(item.type) === temporalFrequencyDistributionType,
-	);
-	return getTemporalSettings(panel);
-});
-const temporalSeries = computed(() =>
-	props.snapshot.queries.flatMap((query) => {
-		if (invalidTemporalMappingQueries.value.includes(query)) return [];
-		return [
-			{
-				color: query.color,
-				name: `${query.type}: ${query.userInput} (${query.corpus}${
-					query.subCorpus ? ` / ${query.subCorpus})` : ")"
-				}`,
-				data: parseTemporalFrequencies(query).map(
-					(entry) =>
-						[entry.date.getTime(), mode.value === "relative" ? entry.relative : entry.absolute] as [
-							number,
-							number,
-						],
-				),
-			},
-		];
-	}),
+const temporalData = computed<Array<FreqMlResponse | null | undefined>>(() =>
+	temporalPanels.value.map((panel) => panel?.data as FreqMlResponse | undefined),
 );
-const temporalIntervalSeries = computed(() =>
-	temporalSeries.value.map((series) => ({
-		...series,
-		data: groupTemporalFrequencyPoints(
-			series.data,
-			temporalSettings.value.intervalSize,
-			temporalSettings.value.reverseIntervals,
-		).map((item) => formatTemporalFrequencyInterval(item, temporalSettings.value.bucketUnit)),
-	})),
+const temporalMappings = computed(() =>
+	temporalPanels.value.map((panel) => panel?.mapping ?? null),
 );
-function formatTemporalDomainValue(value: string | number) {
-	return typeof value === "number"
-		? formatTemporalTimestamp(value, temporalSettings.value.bucketUnit)
-		: value;
-}
+const temporalSettings = computed<Partial<TemporalFrequencyDistributionSettings> | undefined>(
+	() =>
+		temporalPanels.value.find(Boolean)?.settings as
+			| Partial<TemporalFrequencyDistributionSettings>
+			| undefined,
+);
 </script>
 
 <template>
 	<div class="grid gap-6">
-		<div v-if="!embed" class="flex flex-wrap items-center gap-3">
+		<div v-if="!embed && hasNonTemporalVisualization" class="flex flex-wrap items-center gap-3">
 			<ToggleGroup v-model="mode" class="flex" type="single">
 				<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
 				<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
 			</ToggleGroup>
 		</div>
 
-		<Card v-for="{ type, key } in renderItems" :key="type">
-			<CardHeader v-if="!embed">
-				<CardTitle>{{ t(key) }}</CardTitle>
-			</CardHeader>
-			<CardContent class="grid gap-4">
-				<template v-if="key === 'yearlyFrequencies'">
-					<p
-						v-if="invalidTemporalMappingQueries.length > 0"
-						class="text-sm text-destructive"
-						role="alert"
-					>
-						The temporal metadata mapping is invalid for
-						{{ invalidTemporalMappingQueries.map((query) => query.corpus).join(", ") }}.
-					</p>
-					<Chart
-						chart-type="line"
-						class="h-96"
-						domain-type="temporal"
-						:domain-value-formatter="formatTemporalDomainValue"
-						:series="temporalSeries"
-						:title="`${temporalSeries.length} ${t('queries')}`"
-						:y-axis="t('sources')"
-					/>
-					<Chart
-						chart-type="bar"
-						class="h-96"
-						:series="temporalIntervalSeries"
-						:title="`${temporalIntervalSeries.length} ${t('queries')}`"
-						:y-axis="t('sources')"
-					/>
-				</template>
+		<template v-for="{ type, key } in renderItems" :key="type">
+			<DataDisplayTemporalFrequencyDistribution
+				v-if="type === temporalFrequencyDistributionType"
+				:data="temporalData"
+				:interactive="!embed"
+				:metadata-mappings="temporalMappings"
+				:queries="corpusQueries"
+				:settings="temporalSettings"
+				:show-header="!embed"
+				:show-source-data="!embed"
+			/>
+			<Card v-else>
+				<CardHeader v-if="!embed">
+					<CardTitle>{{ t(key) }}</CardTitle>
+				</CardHeader>
+				<CardContent class="grid gap-4">
+					<template v-if="key === 'wordFormFrequencies'">
+						<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
+							<QueryDisplay :query="toCorpusQuery(query)" />
+							<Chart
+								chart-type="bar"
+								class="h-96"
+								orientation="horizontal"
+								:series="[
+									{
+										color: query.color,
+										name: query.userInput,
+										data: parseWordFormFrequencies(query).map((entry) => [
+											entry.word,
+											mode === 'relative' ? entry.relative : entry.absolute,
+										]),
+									},
+								]"
+								:title="query.userInput"
+							/>
+						</div>
+					</template>
 
-				<template v-else-if="key === 'wordFormFrequencies'">
-					<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
-						<QueryDisplay :query="toCorpusQuery(query)" />
-						<Chart
-							chart-type="bar"
-							class="h-96"
-							orientation="horizontal"
-							:series="[
-								{
-									color: query.color,
-									name: query.userInput,
-									data: parseWordFormFrequencies(query).map((entry) => [
-										entry.word,
-										mode === 'relative' ? entry.relative : entry.absolute,
-									]),
-								},
-							]"
-							:title="query.userInput"
-						/>
-					</div>
-				</template>
-
-				<template v-else-if="key === 'mediaSources'">
-					<MediaStackedBarChart
-						:mode="mode"
-						:queries="corpusQueries"
-						:source-distributions="mediaSources"
-						:stack="true"
-					/>
-				</template>
-
-				<template v-else-if="key === 'regionalFrequencies'">
-					<ClientOnly>
-						<CombinedMapChart
+					<template v-else-if="key === 'mediaSources'">
+						<MediaStackedBarChart
 							:mode="mode"
 							:queries="corpusQueries"
-							:resdata="regionalFrequencies"
+							:source-distributions="mediaSources"
+							:stack="true"
 						/>
-					</ClientOnly>
-				</template>
+					</template>
 
-				<template v-else-if="key === 'collocations'">
-					<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
-						<QueryDisplay :query="toCorpusQuery(query)" />
-						<WordCloudGraph
-							:color="query.color"
-							:query-label="query.userInput"
-							:title="query.userInput"
-							:words="parseCollocations(query)"
-						/>
-					</div>
-				</template>
+					<template v-else-if="key === 'regionalFrequencies'">
+						<ClientOnly>
+							<CombinedMapChart
+								:mode="mode"
+								:queries="corpusQueries"
+								:resdata="regionalFrequencies"
+							/>
+						</ClientOnly>
+					</template>
 
-				<template v-else-if="key === 'keywordInContext'">
-					<div v-for="query in snapshot.queries" :key="query.sourceQueryId" class="grid gap-2">
-						<QueryDisplay :query="toCorpusQuery(query)" />
+					<template v-else-if="key === 'collocations'">
+						<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
+							<QueryDisplay :query="toCorpusQuery(query)" />
+							<WordCloudGraph
+								:color="query.color"
+								:query-label="query.userInput"
+								:title="query.userInput"
+								:words="parseCollocations(query)"
+							/>
+						</div>
+					</template>
+
+					<template v-else-if="key === 'keywordInContext'">
+						<div v-for="query in snapshot.queries" :key="query.sourceQueryId" class="grid gap-2">
+							<QueryDisplay :query="toCorpusQuery(query)" />
+							<div class="overflow-x-auto rounded-md border">
+								<table class="w-full text-sm">
+									<thead>
+										<tr class="border-b bg-muted/40 text-left">
+											<th class="px-3 py-2">Date</th>
+											<th class="px-3 py-2">Source</th>
+											<th class="px-3 py-2">Left</th>
+											<th class="px-3 py-2">KWIC</th>
+											<th class="px-3 py-2">Right</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(line, index) in parseKwic(query)" :key="index" class="border-b">
+											<td class="px-3 py-2">{{ line.date }}</td>
+											<td class="px-3 py-2">{{ line.source }}</td>
+											<td class="px-3 py-2">{{ line.left }}</td>
+											<td class="px-3 py-2 font-semibold">{{ line.word }}</td>
+											<td class="px-3 py-2">{{ line.right }}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</template>
+
+					<template v-else>
 						<div class="overflow-x-auto rounded-md border">
 							<table class="w-full text-sm">
 								<thead>
 									<tr class="border-b bg-muted/40 text-left">
-										<th class="px-3 py-2">Date</th>
-										<th class="px-3 py-2">Source</th>
-										<th class="px-3 py-2">Left</th>
-										<th class="px-3 py-2">KWIC</th>
-										<th class="px-3 py-2">Right</th>
+										<th class="px-3 py-2">Query</th>
+										<th class="px-3 py-2">Corpus</th>
+										<th class="px-3 py-2">Subcorpus</th>
+										<th class="px-3 py-2">Type</th>
+										<th class="px-3 py-2">Input</th>
 									</tr>
 								</thead>
 								<tbody>
-									<tr v-for="(line, index) in parseKwic(query)" :key="index" class="border-b">
-										<td class="px-3 py-2">{{ line.date }}</td>
-										<td class="px-3 py-2">{{ line.source }}</td>
-										<td class="px-3 py-2">{{ line.left }}</td>
-										<td class="px-3 py-2 font-semibold">{{ line.word }}</td>
-										<td class="px-3 py-2">{{ line.right }}</td>
+									<tr v-for="query in snapshot.queries" :key="query.sourceQueryId" class="border-b">
+										<td class="px-3 py-2">{{ query.sourceQueryId }}</td>
+										<td class="px-3 py-2">{{ query.corpus }}</td>
+										<td class="px-3 py-2">{{ query.subCorpus }}</td>
+										<td class="px-3 py-2">{{ query.type }}</td>
+										<td class="px-3 py-2">{{ query.userInput }}</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
-					</div>
-				</template>
-
-				<template v-else>
-					<div class="overflow-x-auto rounded-md border">
-						<table class="w-full text-sm">
-							<thead>
-								<tr class="border-b bg-muted/40 text-left">
-									<th class="px-3 py-2">Query</th>
-									<th class="px-3 py-2">Corpus</th>
-									<th class="px-3 py-2">Subcorpus</th>
-									<th class="px-3 py-2">Type</th>
-									<th class="px-3 py-2">Input</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr v-for="query in snapshot.queries" :key="query.sourceQueryId" class="border-b">
-									<td class="px-3 py-2">{{ query.sourceQueryId }}</td>
-									<td class="px-3 py-2">{{ query.corpus }}</td>
-									<td class="px-3 py-2">{{ query.subCorpus }}</td>
-									<td class="px-3 py-2">{{ query.type }}</td>
-									<td class="px-3 py-2">{{ query.userInput }}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</template>
-			</CardContent>
-		</Card>
+					</template>
+				</CardContent>
+			</Card>
+		</template>
 	</div>
 </template>

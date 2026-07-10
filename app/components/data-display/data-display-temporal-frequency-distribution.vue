@@ -40,10 +40,18 @@ const props = withDefaults(
 		queries: Array<CorpusQuery>;
 		settings?: Partial<TemporalFrequencyDistributionSettings>;
 		metadataMappings?: Array<CorpusMetadataMappingResponse | null>;
+		data?: Array<FreqMlResponse | null | undefined>;
+		interactive?: boolean;
+		showHeader?: boolean;
+		showSourceData?: boolean;
 	}>(),
 	{
+		data: undefined,
+		interactive: true,
 		metadataMappings: undefined,
 		settings: undefined,
+		showHeader: true,
+		showSourceData: true,
 	},
 );
 
@@ -65,6 +73,19 @@ const bucketUnit = ref<TemporalUnit>(normalizedSettings.value.bucketUnit);
 const interval = ref(normalizedSettings.value.intervalSize);
 const reverse = ref(normalizedSettings.value.reverseIntervals);
 const expand = ref(normalizedSettings.value.sourceTableExpanded);
+const rangeStart = ref(normalizedSettings.value.dateRange.start.slice(0, 10));
+const rangeEnd = ref(normalizedSettings.value.dateRange.end.slice(0, 10));
+
+function createIsoDate(value: string) {
+	const date = new Date(`${value}T00:00:00.000Z`);
+	return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+const selectedDateRange = computed(() => {
+	const start = createIsoDate(rangeStart.value);
+	const end = createIsoDate(rangeEnd.value);
+	return start && end && start < end ? { start, end } : null;
+});
 
 watch(
 	normalizedSettings,
@@ -74,16 +95,19 @@ watch(
 		interval.value = value.intervalSize;
 		reverse.value = value.reverseIntervals;
 		expand.value = value.sourceTableExpanded;
+		rangeStart.value = value.dateRange.start.slice(0, 10);
+		rangeEnd.value = value.dateRange.end.slice(0, 10);
 	},
 	{ deep: true },
 );
 
-watch([mode, bucketUnit, interval, reverse, expand], () => {
+watch([mode, bucketUnit, interval, reverse, expand, rangeStart, rangeEnd], () => {
+	if (!selectedDateRange.value) return;
 	emit("update:settings", {
 		type: defaultTemporalFrequencyDistributionSettings.type,
 		mode: mode.value,
 		bucketUnit: bucketUnit.value,
-		dateRange: normalizedSettings.value.dateRange,
+		dateRange: selectedDateRange.value,
 		intervalSize: interval.value,
 		reverseIntervals: reverse.value,
 		sourceTableExpanded: expand.value,
@@ -96,14 +120,15 @@ const availableBucketUnits = computed(() =>
 		mappings.value.flatMap((mapping) => (mapping ? [getTemporalSourceUnit(mapping)] : [])),
 	),
 );
+const usesProvidedData = computed(() => props.data !== undefined);
 watchEffect(() => {
 	if (!availableBucketUnits.value.includes(bucketUnit.value)) {
 		bucketUnit.value = availableBucketUnits.value.at(-1) ?? "year";
 	}
 });
 const dateRange = computed(() => ({
-	start: new Date(normalizedSettings.value.dateRange.start),
-	end: new Date(normalizedSettings.value.dateRange.end),
+	start: new Date(selectedDateRange.value?.start ?? normalizedSettings.value.dateRange.start),
+	end: new Date(selectedDateRange.value?.end ?? normalizedSettings.value.dateRange.end),
 }));
 const missingMappingQueries = computed(() =>
 	activeQueries.value.filter((_, index) => !mappings.value[index]),
@@ -136,7 +161,7 @@ const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
 		return {
 			queryKey,
 			noske: query.noske ?? "",
-			enabled: Boolean(mapping) && !temporalParsers.value[index]?.error,
+			enabled: !usesProvidedData.value && Boolean(mapping) && !temporalParsers.value[index]?.error,
 			params: {
 				corpname: query.corpus,
 				usesubcorp: query.subCorpus || undefined,
@@ -156,13 +181,18 @@ const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
 );
 
 const queryResults = useNoskeFreqMlQueries(queryDescriptors);
+const frequencyData = computed(() =>
+	usesProvidedData.value
+		? activeQueries.value.map((_, index) => props.data?.[index])
+		: queryResults.value.map((result) => result.data),
+);
 
 const temporalFrequencies = computed(() =>
-	queryResults.value.map((result, index) => {
+	frequencyData.value.map((data, index) => {
 		const parser = temporalParsers.value[index];
-		if (!parser || parser.error || !result.data) return [];
+		if (!parser || parser.error || !data) return [];
 		return aggregateTemporalFrequencies(
-			parseTemporalFrequencies(result.data, parser),
+			parseTemporalFrequencies(data, parser),
 			dateRange.value,
 			bucketUnit.value,
 		);
@@ -170,21 +200,25 @@ const temporalFrequencies = computed(() =>
 );
 
 const temporalFrequenciesLoading = computed(() =>
-	queryResults.value.map((result) => result.isFetching || result.isLoading),
+	usesProvidedData.value
+		? activeQueries.value.map(() => false)
+		: queryResults.value.map((result) => result.isFetching || result.isLoading),
 );
 const temporalFrequenciesErrors = computed(() =>
-	queryResults.value.map((result, index) => {
+	activeQueries.value.map((_, index) => {
 		const parserError = temporalParsers.value[index]?.error;
 		if (parserError) return parserError;
-		return result.isError ? "The temporal frequency data could not be loaded." : null;
+		if (usesProvidedData.value) return null;
+		const result = queryResults.value[index];
+		return result?.isError ? "The temporal frequency data could not be loaded." : null;
 	}),
 );
 
 const normalizationWarnings = computed(() =>
-	queryResults.value.map((result, index) => {
+	frequencyData.value.map((data, index) => {
 		const parser = temporalParsers.value[index];
-		if (!parser || parser.error || !result.data) return 0;
-		return countUnparseableTemporalValues(result.data, parser);
+		if (!parser || parser.error || !data) return 0;
+		return countUnparseableTemporalValues(data, parser);
 	}),
 );
 
@@ -265,9 +299,9 @@ function applySampleRatio<TYear extends string | number>(
 const series = computed(() =>
 	activeQueries.value.flatMap((query, index) => {
 		const frequencies = temporalFrequencies.value[index];
-		const result = queryResults.value[index];
+		const data = frequencyData.value[index];
 		const parser = temporalParsers.value[index];
-		if (!frequencies || !result?.data || !parser || parser.error) return [];
+		if (!frequencies || !data || !parser || parser.error) return [];
 
 		return [createSampleAdjustedTemporalSeries(query, frequencies, mode.value)];
 	}),
@@ -291,7 +325,7 @@ function formatTemporalDomainValue(value: string | number) {
 
 <template>
 	<Card>
-		<CardHeader>
+		<CardHeader v-if="showHeader">
 			<CardTitle>Temporal frequencies</CardTitle>
 			<CardDescription>{{ t("yearlyFrequenciesDesc") }}</CardDescription>
 		</CardHeader>
@@ -322,7 +356,7 @@ function formatTemporalDomainValue(value: string | number) {
 			</div>
 
 			<template v-if="queryableQueryCount > 0">
-				<div class="flex max-w-7xl flex-wrap gap-3">
+				<div v-if="interactive" class="flex max-w-7xl flex-wrap gap-3">
 					<ToggleGroup v-model="mode" class="flex w-full" type="single">
 						<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
 						<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
@@ -340,6 +374,17 @@ function formatTemporalDomainValue(value: string | number) {
 							</SelectContent>
 						</Select>
 					</div>
+					<div class="space-y-1">
+						<Label for="temporal-range-start">Start date</Label>
+						<Input id="temporal-range-start" v-model="rangeStart" type="date" />
+					</div>
+					<div class="space-y-1">
+						<Label for="temporal-range-end">End date (exclusive)</Label>
+						<Input id="temporal-range-end" v-model="rangeEnd" type="date" />
+					</div>
+					<p v-if="!selectedDateRange" class="self-end text-sm text-destructive" role="alert">
+						The end date must be later than the start date.
+					</p>
 				</div>
 				<div
 					v-for="(query, index) of activeQueries"
@@ -380,7 +425,7 @@ function formatTemporalDomainValue(value: string | number) {
 					<CardDescription>{{ t("yearlyFrequenciesDesc") }}</CardDescription>
 				</CardHeader>
 
-				<div class="flex flex-wrap items-center gap-3">
+				<div v-if="interactive" class="flex flex-wrap items-center gap-3">
 					<div class="space-y-1">
 						<Label for="temporal-interval">Interval</Label>
 						<Select v-model="interval" :aria-label="t('interval')">
@@ -414,7 +459,7 @@ function formatTemporalDomainValue(value: string | number) {
 			</template>
 		</CardContent>
 
-		<Collapsible v-model:open="expand">
+		<Collapsible v-if="showSourceData" v-model:open="expand">
 			<CollapsibleContent class="px-6 pb-6">
 				<DataDisplaySourceTable
 					:data="temporalFrequencies"
@@ -425,10 +470,10 @@ function formatTemporalDomainValue(value: string | number) {
 			</CollapsibleContent>
 		</Collapsible>
 
-		<Separator />
+		<Separator v-if="showSourceData" />
 
-		<CardFooter>
-			<Button size="sm" variant="outline" @click="expand = !expand">
+		<CardFooter v-if="showSourceData">
+			<Button size="sm" type="button" variant="outline" @click="expand = !expand">
 				{{ !expand ? t("ShowData") : t("HideData") }}
 			</Button>
 		</CardFooter>

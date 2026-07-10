@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import {
 	type CorpusMetadataSemantic,
+	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
 	getEditableVisualizationMetadataSemantics,
 	getDefaultVisualizationSettings,
+	normalizeTemporalFrequencyDistributionSettings,
 	normalizeVisualizationSettings,
+	temporalFrequencyDistributionType,
 	visualizationTypes,
 } from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
@@ -96,9 +100,23 @@ const { buildCorpusQuery } = useCorpusQueryBuilder();
 const corpusQueries = computed(() =>
 	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
 );
+const { mappingsForQueries: temporalMetadataMappings, refreshMappings: refreshTemporalMappings } =
+	await useCorpusMetadataMappings(corpusQueries, "temporal");
 const editableMetadataSemantics = computed<Array<CorpusMetadataSemantic>>(() => [
 	...new Set(selectedVisualizations.value.flatMap(getEditableVisualizationMetadataSemantics)),
 ]);
+const temporalSettings = computed(() =>
+	normalizeTemporalFrequencyDistributionSettings(
+		settingsByType.value[temporalFrequencyDistributionType],
+	),
+);
+
+function updateTemporalSettings(settings: TemporalFrequencyDistributionSettings) {
+	settingsByType.value = {
+		...settingsByType.value,
+		[temporalFrequencyDistributionType]: settings,
+	};
+}
 
 const openDialog = () => {
 	tempSelectedQueries.value = [...selectedQueries.value];
@@ -351,6 +369,7 @@ function cancel() {
 							:key="semantic"
 							:queries="corpusQueries"
 							:semantic="semantic"
+							@updated="refreshTemporalMappings"
 						/>
 					</div>
 				</div>
@@ -363,5 +382,14 @@ function cancel() {
 				{{ formError }}
 			</p>
 		</form>
+
+		<DataDisplayTemporalFrequencyDistribution
+			v-if="selectedVisualizations.includes(temporalFrequencyDistributionType)"
+			class="mt-6"
+			:metadata-mappings="temporalMetadataMappings"
+			:queries="corpusQueries"
+			:settings="temporalSettings"
+			@update:settings="updateTemporalSettings"
+		/>
 	</MainContent>
 </template>
