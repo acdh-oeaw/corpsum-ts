@@ -13,7 +13,7 @@ import {
 	isTemporalBucketRangeSupported,
 	normalizeTemporalFrequencyDistributionSettings,
 } from "@/lib/visualization-types";
-import { alignChartSeriesData } from "@/utils/chart-data";
+import { alignChartSeriesData, getChartTooltipDomainValue } from "@/utils/chart-data";
 
 const utc = (value: string) => new Date(`${value}T00:00:00.000Z`);
 
@@ -231,6 +231,12 @@ test.describe("temporal visualization settings", () => {
 });
 
 test.describe("chart series alignment", () => {
+	test("uses categorical interval labels in tooltips instead of their x index", () => {
+		expect(getChartTooltipDomainValue([["Jan 2020–Feb 2020", 4]], "categorical", 0)).toBe(
+			"Jan 2020–Feb 2020",
+		);
+	});
+
 	test("aligns timestamp series by domain value when the first series is empty", () => {
 		const january = utc("2020-01-01").getTime();
 		const february = utc("2020-02-01").getTime();

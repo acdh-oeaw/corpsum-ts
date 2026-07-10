@@ -21,7 +21,11 @@ import { computed, getCurrentInstance, h, ref, render, toRef } from "vue";
 
 import { useChartExport } from "@/composables/use-chart-export";
 import { useTranslations } from "@/composables/use-translations";
-import { alignChartSeriesData, type ChartDatum } from "@/utils/chart-data";
+import {
+	alignChartSeriesData,
+	getChartTooltipDomainValue,
+	type ChartDatum,
+} from "@/utils/chart-data";
 
 import { Button } from "./ui/button";
 import {
@@ -78,7 +82,7 @@ function formatDomainValue(value: string | number) {
 }
 
 function renderTooltipContent(data: Array<ChartDatum>, x?: number | Date) {
-	const domainValue = x instanceof Date ? x.getTime() : (x ?? data[0]?.[0] ?? "");
+	const domainValue = getChartTooltipDomainValue(data, props.domainType, x);
 	const vnode = h(ChartTooltipContent, {
 		payload: data,
 		config: chartConfig.value,
