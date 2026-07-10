@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import {
+	type TemporalFrequency,
+	aggregateTemporalFrequencies,
+	createTemporalFrequencyParser,
+	formatTemporalFrequencyInterval,
+	formatTemporalTimestamp,
+	groupTemporalFrequencyPoints,
+} from "@/components/data-display/data-display-metadata-temporal-frequency-distribution.transformations";
+import {
 	type CorpusMetadataMappingResponse,
 	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
@@ -151,55 +159,34 @@ function parseRegionalFrequencies(query: PublishedQuerySnapshot) {
 	);
 }
 
-function parseYearlyFrequencies(query: PublishedQuerySnapshot) {
+function parseTemporalFrequencies(query: PublishedQuerySnapshot) {
 	const panel = findPanel(temporalFrequencyDistributionType, query.sourceQueryId);
 	const data = panel?.data as FreqMlResponse | undefined;
 	const mapping = panel?.mapping;
+	const parser = mapping ? createTemporalFrequencyParser(mapping) : null;
+	if (parser?.error) return [];
 	const values =
 		data?.Blocks?.[0]?.Items?.flatMap((item) => {
 			const rawValue = item.Word?.map(({ n }) => n ?? "").join("") ?? "";
-			const parsedYear = mapping ? parseTemporalYear(rawValue, mapping) : Number(rawValue);
-			if (!Number.isInteger(parsedYear)) return [];
-			const year = parsedYear as number;
+			const date = parser?.parse(rawValue);
+			if (!date) return [];
 			return [
 				{
-					year,
+					date,
 					absolute: item.frq ?? 0,
 					relative: item.reltt ?? 0,
-				},
+				} satisfies TemporalFrequency,
 			];
 		}) ?? [];
 	const settings = getTemporalSettings(panel);
-	const existing = new Set(values.map(({ year }) => year));
-	const missing = Array.from(
-		{ length: settings.yearRange.end - settings.yearRange.start + 1 },
-		(_, index) => settings.yearRange.start + index,
-	)
-		.filter((year) => !existing.has(year))
-		.map((year) => ({ year, absolute: 0, relative: 0 }));
-	return [...values, ...missing].sort((left, right) => left.year - right.year);
-}
-
-function parseTemporalYear(
-	rawValue: string,
-	mapping: CorpusMetadataMappingResponse,
-): number | null {
-	const normalized = mapping.valueMap?.[rawValue] ?? rawValue;
-	if (mapping.parser.mode === "year") {
-		const year = Number(normalized);
-		return Number.isInteger(year) ? year : null;
-	}
-	if (mapping.parser.mode === "date") {
-		const date = new Date(normalized);
-		const year = date.getUTCFullYear();
-		return Number.isInteger(year) && !Number.isNaN(date.getTime()) ? year : null;
-	}
-	if (!mapping.parser.pattern) return null;
-	const match = new RegExp(mapping.parser.pattern, "u").exec(normalized);
-	const captured = match?.[1] ?? match?.groups?.year;
-	if (!captured) return null;
-	const year = Number(captured);
-	return Number.isInteger(year) ? year : null;
+	return aggregateTemporalFrequencies(
+		values,
+		{
+			start: new Date(settings.dateRange.start),
+			end: new Date(settings.dateRange.end),
+		},
+		settings.bucketUnit,
+	);
 }
 
 function getTemporalSettings(
@@ -256,21 +243,53 @@ const regionalFrequencies = computed(() =>
 		data: parseRegionalFrequencies(query),
 	})),
 );
-const yearlySeries = computed(() =>
-	props.snapshot.queries.map((query) => ({
-		color: query.color,
-		name: `${query.type}: ${query.userInput} (${query.corpus}${
-			query.subCorpus ? ` / ${query.subCorpus})` : ")"
-		}`,
-		data: parseYearlyFrequencies(query).map(
-			(entry) =>
-				[entry.year, mode.value === "relative" ? entry.relative : entry.absolute] as [
-					number,
-					number,
-				],
-		),
+const invalidTemporalMappingQueries = computed(() =>
+	props.snapshot.queries.filter((query) => {
+		const mapping = findPanel(temporalFrequencyDistributionType, query.sourceQueryId)?.mapping;
+		return mapping ? createTemporalFrequencyParser(mapping).error : false;
+	}),
+);
+const temporalSettings = computed(() => {
+	const panel = props.snapshot.panels.find(
+		(item) => normalizeVisualizationType(item.type) === temporalFrequencyDistributionType,
+	);
+	return getTemporalSettings(panel);
+});
+const temporalSeries = computed(() =>
+	props.snapshot.queries.flatMap((query) => {
+		if (invalidTemporalMappingQueries.value.includes(query)) return [];
+		return [
+			{
+				color: query.color,
+				name: `${query.type}: ${query.userInput} (${query.corpus}${
+					query.subCorpus ? ` / ${query.subCorpus})` : ")"
+				}`,
+				data: parseTemporalFrequencies(query).map(
+					(entry) =>
+						[entry.date.getTime(), mode.value === "relative" ? entry.relative : entry.absolute] as [
+							number,
+							number,
+						],
+				),
+			},
+		];
+	}),
+);
+const temporalIntervalSeries = computed(() =>
+	temporalSeries.value.map((series) => ({
+		...series,
+		data: groupTemporalFrequencyPoints(
+			series.data,
+			temporalSettings.value.intervalSize,
+			temporalSettings.value.reverseIntervals,
+		).map((item) => formatTemporalFrequencyInterval(item, temporalSettings.value.bucketUnit)),
 	})),
 );
+function formatTemporalDomainValue(value: string | number) {
+	return typeof value === "number"
+		? formatTemporalTimestamp(value, temporalSettings.value.bucketUnit)
+		: value;
+}
 </script>
 
 <template>
@@ -288,11 +307,28 @@ const yearlySeries = computed(() =>
 			</CardHeader>
 			<CardContent class="grid gap-4">
 				<template v-if="key === 'yearlyFrequencies'">
+					<p
+						v-if="invalidTemporalMappingQueries.length > 0"
+						class="text-sm text-destructive"
+						role="alert"
+					>
+						The temporal metadata mapping is invalid for
+						{{ invalidTemporalMappingQueries.map((query) => query.corpus).join(", ") }}.
+					</p>
 					<Chart
 						chart-type="line"
 						class="h-96"
-						:series="yearlySeries"
-						:title="`${yearlySeries.length} ${t('queries')}`"
+						domain-type="temporal"
+						:domain-value-formatter="formatTemporalDomainValue"
+						:series="temporalSeries"
+						:title="`${temporalSeries.length} ${t('queries')}`"
+						:y-axis="t('sources')"
+					/>
+					<Chart
+						chart-type="bar"
+						class="h-96"
+						:series="temporalIntervalSeries"
+						:title="`${temporalIntervalSeries.length} ${t('queries')}`"
 						:y-axis="t('sources')"
 					/>
 				</template>

@@ -14,6 +14,12 @@ const parserSchema = new Schema(
 			enum: ["year", "date", "regex"],
 			required: true,
 		},
+		sourceUnit: {
+			type: String,
+			enum: ["day", "week", "month", "quarter", "year"],
+			default: "year",
+			required: true,
+		},
 		pattern: { type: String, required: false },
 	},
 	{ _id: false },

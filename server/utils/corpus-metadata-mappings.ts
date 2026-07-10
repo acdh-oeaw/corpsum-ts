@@ -1,16 +1,26 @@
 import type { Types } from "mongoose";
 
-import type {
-	CorpusMetadataMappingPayload,
-	CorpusMetadataMappingResponse,
-	CorpusMetadataMappingScope,
-	CorpusMetadataSemantic,
-	TemporalParserConfig,
+import {
+	type CorpusMetadataMappingPayload,
+	type CorpusMetadataMappingResponse,
+	type CorpusMetadataMappingScope,
+	type CorpusMetadataSemantic,
+	type TemporalParserConfig,
+	isTemporalUnit,
 } from "@/lib/visualization-types";
 import {
 	type CorpusMetadataMappingDocument,
 	CorpusMetadataMappingModel,
 } from "~/server/models/corpusmetadatamappings.schema";
+
+function isValidRegularExpression(pattern: string) {
+	try {
+		RegExp(pattern, "u");
+		return true;
+	} catch {
+		return false;
+	}
+}
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null;
@@ -19,7 +29,15 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 export function isTemporalParser(value: unknown): value is TemporalParserConfig {
 	if (!isRecord(value)) return false;
 	if (value.mode !== "year" && value.mode !== "date" && value.mode !== "regex") return false;
-	if (value.mode === "regex") return typeof value.pattern === "string" && value.pattern.length > 0;
+	if (!isTemporalUnit(value.sourceUnit)) return false;
+	if (value.mode === "year" && value.sourceUnit !== "year") return false;
+	if (value.mode === "regex") {
+		return (
+			typeof value.pattern === "string" &&
+			value.pattern.length > 0 &&
+			isValidRegularExpression(value.pattern)
+		);
+	}
 	return value.pattern === undefined || typeof value.pattern === "string";
 }
 
@@ -76,7 +94,10 @@ export function serializeCorpusMetadataMapping(
 		scope: record.scope,
 		owner: record.owner?.toString(),
 		attribute: record.attribute,
-		parser: record.parser,
+		parser: {
+			...record.parser,
+			sourceUnit: isTemporalUnit(record.parser.sourceUnit) ? record.parser.sourceUnit : "year",
+		},
 		valueMap: record.valueMap ?? {},
 		label: record.label,
 		description: record.description,
