@@ -6,18 +6,36 @@
 # build
 FROM node:24-slim AS base
 
-RUN corepack enable
+ENV COREPACK_HOME=/opt/corepack
+
+RUN corepack enable && mkdir "$COREPACK_HOME" && chown node:node "$COREPACK_HOME"
 
 RUN mkdir /app && chown -R node:node /app
 WORKDIR /app
 
 USER node
 
-COPY --chown=node:node .npmrc package.json pnpm-lock.yaml ./
+RUN corepack install --global pnpm@11.0.4
 
-RUN CI=true pnpm fetch
+COPY --chown=node:node .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Keep dependency lifecycle work cacheable independently of the application source.
+RUN --mount=type=cache,id=pnpm-store,target=/home/node/.local/share/pnpm/store,uid=1000,gid=1000 \
+	npm pkg delete scripts.preinstall scripts.postinstall scripts.prepare && \
+	CI=true pnpm install --frozen-lockfile
 
 COPY --chown=node:node ./ ./
+
+RUN CI=true pnpm run postinstall
+
+FROM base AS dev
+ENV NODE_ENV=development
+
+EXPOSE 3000
+
+CMD [ "pnpm", "run", "dev"]
+
+FROM base AS build
 
 ARG NUXT_PUBLIC_APP_BASE_URL
 ARG NUXT_PUBLIC_REDMINE_ID
@@ -26,18 +44,6 @@ ARG NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION
 ARG NUXT_PUBLIC_MATOMO_BASE_URL
 ARG NUXT_PUBLIC_MATOMO_ID
 ARG NUXT_OAUTH_GITHUB_CLIENT_ID
-
-FROM base AS dev
-ENV NODE_ENV development
-RUN CI=true pnpm install
-
-EXPOSE 3000
-
-CMD [ "pnpm", "run", "dev"]
-
-FROM base AS build
-
-RUN CI=true pnpm install --frozen-lockfile --offline
 
 ENV NODE_ENV=production
 
