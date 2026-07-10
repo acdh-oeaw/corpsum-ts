@@ -149,7 +149,7 @@ export const defaultTemporalFrequencyDistributionSettings = {
 } satisfies TemporalFrequencyDistributionSettings;
 
 export const temporalIntervalOptions = [2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
-const maximumTemporalBucketCount = 10_000;
+export const maximumTemporalBucketCount = 10_000;
 
 function isFiniteInteger(value: unknown): value is number {
 	return typeof value === "number" && Number.isSafeInteger(value);
@@ -161,7 +161,7 @@ function parseIsoDate(value: unknown) {
 	return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function estimateTemporalBucketCount(start: Date, end: Date, unit: TemporalUnit) {
+export function estimateTemporalBucketCount(start: Date, end: Date, unit: TemporalUnit) {
 	const milliseconds = end.getTime() - start.getTime();
 	if (unit === "day") return Math.ceil(milliseconds / 86_400_000);
 	if (unit === "week") return Math.ceil(milliseconds / 604_800_000);
@@ -170,6 +170,10 @@ function estimateTemporalBucketCount(start: Date, end: Date, unit: TemporalUnit)
 	if (unit === "month") return months + 1;
 	if (unit === "quarter") return Math.ceil((months + 1) / 3);
 	return end.getUTCFullYear() - start.getUTCFullYear() + 1;
+}
+
+export function isTemporalBucketRangeSupported(start: Date, end: Date, unit: TemporalUnit) {
+	return start < end && estimateTemporalBucketCount(start, end, unit) <= maximumTemporalBucketCount;
 }
 
 function normalizeLegacyYearRange(value: unknown) {
@@ -201,10 +205,7 @@ export function normalizeTemporalFrequencyDistributionSettings(
 	const start = parsedStart ?? legacyRange?.start ?? null;
 	const end = parsedEnd ?? legacyRange?.end ?? null;
 	const hasValidRange =
-		start !== null &&
-		end !== null &&
-		start < end &&
-		estimateTemporalBucketCount(start, end, bucketUnit) <= maximumTemporalBucketCount;
+		start !== null && end !== null && isTemporalBucketRangeSupported(start, end, bucketUnit);
 	const intervalSize = temporalIntervalOptions.includes(
 		record.intervalSize as (typeof temporalIntervalOptions)[number],
 	)

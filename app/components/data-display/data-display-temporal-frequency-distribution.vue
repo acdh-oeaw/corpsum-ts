@@ -4,6 +4,7 @@ import {
 	type TemporalFrequencyDistributionSettings,
 	type TemporalUnit,
 	defaultTemporalFrequencyDistributionSettings,
+	isTemporalBucketRangeSupported,
 	normalizeTemporalFrequencyDistributionSettings,
 	temporalIntervalOptions,
 } from "@/lib/visualization-types";
@@ -115,11 +116,18 @@ watch([mode, bucketUnit, interval, reverse, expand, rangeStart, rangeEnd], () =>
 });
 
 const mappings = computed(() => props.metadataMappings ?? []);
-const availableBucketUnits = computed(() =>
+const supportedBucketUnits = computed(() =>
 	getAllowedTemporalBucketUnits(
 		mappings.value.flatMap((mapping) => (mapping ? [getTemporalSourceUnit(mapping)] : [])),
 	),
 );
+const availableBucketUnits = computed(() => {
+	if (!selectedDateRange.value) return supportedBucketUnits.value;
+	const { start, end } = selectedDateRange.value;
+	return supportedBucketUnits.value.filter((unit) =>
+		isTemporalBucketRangeSupported(new Date(start), new Date(end), unit),
+	);
+});
 const usesProvidedData = computed(() => props.data !== undefined);
 watchEffect(() => {
 	if (!availableBucketUnits.value.includes(bucketUnit.value)) {

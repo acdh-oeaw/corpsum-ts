@@ -10,6 +10,7 @@ import {
 } from "@/components/data-display/data-display-temporal-frequency-distribution.transformations.ts";
 import {
 	defaultTemporalFrequencyDistributionSettings,
+	isTemporalBucketRangeSupported,
 	normalizeTemporalFrequencyDistributionSettings,
 } from "@/lib/visualization-types";
 import { alignChartSeriesData } from "@/utils/chart-data";
@@ -218,6 +219,14 @@ test.describe("temporal visualization settings", () => {
 			defaultTemporalFrequencyDistributionSettings.dateRange,
 		);
 		expect(settings.intervalSize).toBe(defaultTemporalFrequencyDistributionSettings.intervalSize);
+	});
+
+	test("limits each bucket unit to ten thousand generated buckets", () => {
+		const start = utc("2020-01-01");
+		const tenThousandDays = new Date(start.getTime() + 10_000 * 86_400_000);
+		const tenThousandAndOneDays = new Date(start.getTime() + 10_001 * 86_400_000);
+		expect(isTemporalBucketRangeSupported(start, tenThousandDays, "day")).toBe(true);
+		expect(isTemporalBucketRangeSupported(start, tenThousandAndOneDays, "day")).toBe(false);
 	});
 });
 

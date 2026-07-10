@@ -39,6 +39,7 @@ import {
 } from "./ui/dropdown-menu";
 
 type Datum = ChartDatum;
+const maximumScatterPointCount = 2_000;
 type SeriesData = ChartConfig[string] & {
 	data: Array<Datum>;
 	name?: string;
@@ -92,6 +93,9 @@ function renderTooltipContent(data: Array<ChartDatum>, x?: number | Date) {
 }
 
 const chartData = computed(() => alignChartSeriesData(props.series.map((entry) => entry.data)));
+const renderScatterPoints = computed(
+	() => chartData.value.length * props.series.length <= maximumScatterPointCount,
+);
 type Data = SeriesData["data"][number];
 const tickFormat = (tick: number | Date) => {
 	if (props.domainType === "temporal") {
@@ -476,6 +480,7 @@ function updateKey() {
 				<template v-if="chartType === 'line'">
 					<VisLine :color="color" :events="lineEvents" :x="getDomainPosition" :y="yAccessors" />
 					<VisScatter
+						v-if="renderScatterPoints"
 						:color="color"
 						:events="scatterEvents"
 						:size="8"
