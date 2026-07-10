@@ -108,6 +108,7 @@ test.describe("temporal metadata parsing", () => {
 			"year",
 		]);
 		expect(getAllowedTemporalBucketUnits(["year", "day"])).toStrictEqual(["year"]);
+		expect(getAllowedTemporalBucketUnits(["week"])).toStrictEqual(["week", "year"]);
 	});
 });
 
@@ -129,6 +130,17 @@ test.describe("temporal frequency aggregation", () => {
 			{ date: "2020-02-01T00:00:00.000Z", absolute: 0, relative: 0 },
 			{ date: "2020-03-01T00:00:00.000Z", absolute: 4, relative: 0.4 },
 		]);
+	});
+
+	test("uses ISO week-years when aggregating weekly data into years", () => {
+		expect(
+			aggregateTemporalFrequencies(
+				[{ date: utc("2019-12-30"), absolute: 3, relative: 0.3 }],
+				{ start: utc("2020-01-01"), end: utc("2021-01-01") },
+				"year",
+				"week",
+			).map(({ date, ...frequency }) => ({ date: date.toISOString(), ...frequency })),
+		).toStrictEqual([{ date: "2020-01-01T00:00:00.000Z", absolute: 3, relative: 0.3 }]);
 	});
 
 	test("keeps partial intervals at both boundaries", () => {

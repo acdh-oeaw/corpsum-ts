@@ -190,11 +190,13 @@ const frequencyData = computed(() =>
 const temporalFrequencies = computed(() =>
 	frequencyData.value.map((data, index) => {
 		const parser = temporalParsers.value[index];
+		const mapping = mappings.value[index];
 		if (!parser || parser.error || !data) return [];
 		return aggregateTemporalFrequencies(
 			parseTemporalFrequencies(data, parser),
 			dateRange.value,
 			bucketUnit.value,
+			mapping ? getTemporalSourceUnit(mapping) : undefined,
 		);
 	}),
 );

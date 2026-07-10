@@ -27,7 +27,7 @@ export interface TemporalFrequencyParser {
 
 const allowedBucketUnitsBySourceUnit = {
 	day: ["day", "week", "month", "quarter", "year"],
-	week: ["week", "month", "quarter", "year"],
+	week: ["week", "year"],
 	month: ["month", "quarter", "year"],
 	quarter: ["quarter", "year"],
 	year: ["year"],
@@ -203,11 +203,19 @@ export function aggregateTemporalFrequencies(
 	frequencies: Array<TemporalFrequency>,
 	dateRange: { start: Date; end: Date },
 	bucketUnit: TemporalUnit,
+	sourceUnit?: TemporalUnit,
 ): Array<TemporalFrequency> {
 	const totalsByTimestamp = new Map<number, TemporalFrequency>();
 	for (const frequency of frequencies) {
-		if (frequency.date < dateRange.start || frequency.date >= dateRange.end) continue;
-		const date = floorDateToUnit(frequency.date, bucketUnit);
+		const date = getTemporalBucketDate(frequency.date, sourceUnit, bucketUnit);
+		const isIsoWeekYear = sourceUnit === "week" && bucketUnit === "year";
+		if (
+			isIsoWeekYear
+				? date < floorDateToUnit(dateRange.start, bucketUnit) || date >= dateRange.end
+				: frequency.date < dateRange.start || frequency.date >= dateRange.end
+		) {
+			continue;
+		}
 		const timestamp = date.getTime();
 		const current = totalsByTimestamp.get(timestamp) ?? {
 			date,
@@ -228,6 +236,17 @@ export function aggregateTemporalFrequencies(
 		buckets.push(totalsByTimestamp.get(date.getTime()) ?? { date, absolute: 0, relative: 0 });
 	}
 	return buckets;
+}
+
+function getTemporalBucketDate(
+	value: Date,
+	sourceUnit: TemporalUnit | undefined,
+	bucketUnit: TemporalUnit,
+) {
+	if (sourceUnit === "week" && bucketUnit === "year") {
+		return createUtcDate(getIsoWeekParts(value).year);
+	}
+	return floorDateToUnit(value, bucketUnit);
 }
 
 export function groupTemporalFrequencyPoints(
