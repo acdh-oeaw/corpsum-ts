@@ -218,7 +218,7 @@ const temporalFrequenciesErrors = computed(() =>
 		if (parserError) return parserError;
 		if (usesProvidedData.value) return null;
 		const result = queryResults.value[index];
-		return result?.isError ? "The temporal frequency data could not be loaded." : null;
+		return result?.isError ? t("TemporalFrequencyDistribution.errors.loadFailed") : null;
 	}),
 );
 
@@ -329,71 +329,130 @@ function formatTemporalDomainValue(value: string | number) {
 		? formatTemporalTimestamp(value, bucketUnit.value, locale.value)
 		: value;
 }
+
+function formatTemporalUnit(unit: TemporalUnit, count: number) {
+	return t(`TemporalFrequencyDistribution.units.${unit}`, count);
+}
 </script>
 
 <template>
 	<Card>
 		<CardHeader v-if="showHeader">
-			<CardTitle>Temporal frequencies</CardTitle>
-			<CardDescription>{{ t("yearlyFrequenciesDesc") }}</CardDescription>
+			<CardTitle>{{ t("TemporalFrequencyDistribution.title") }}</CardTitle>
+			<CardDescription>{{ t("TemporalFrequencyDistribution.description") }}</CardDescription>
 		</CardHeader>
 
 		<CardContent class="space-y-6">
 			<div v-if="missingMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
-				<p class="font-medium">Temporal metadata mapping required</p>
+				<p class="font-medium">
+					{{ t("TemporalFrequencyDistribution.mapping.missingTitle") }}
+				</p>
 				<p class="mt-1 text-muted-foreground">
-					Create a temporal mapping for each corpus before this visualization can query NoSketch
-					metadata.
+					{{ t("TemporalFrequencyDistribution.mapping.missingDescription") }}
 				</p>
 				<ul class="mt-3 list-disc pl-5">
 					<li v-for="query in missingMappingQueries" :key="`${query.noske}-${query.corpus}`">
-						{{ query.corpus }} on {{ query.noske }}
+						{{
+							t("TemporalFrequencyDistribution.mapping.corpusOnNoske", {
+								corpus: query.corpus,
+								noske: query.noske,
+							})
+						}}
 					</li>
 				</ul>
 			</div>
 			<div v-if="invalidMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
-				<p class="font-medium">Invalid temporal metadata mapping</p>
+				<p class="font-medium">
+					{{ t("TemporalFrequencyDistribution.mapping.invalidTitle") }}
+				</p>
 				<p class="mt-1 text-muted-foreground">
-					Correct the regular expression for each affected corpus before loading its data.
+					{{ t("TemporalFrequencyDistribution.mapping.invalidDescription") }}
 				</p>
 				<ul class="mt-3 list-disc pl-5">
 					<li v-for="query in invalidMappingQueries" :key="`${query.noske}-${query.corpus}`">
-						{{ query.corpus }} on {{ query.noske }}
+						{{
+							t("TemporalFrequencyDistribution.mapping.corpusOnNoske", {
+								corpus: query.corpus,
+								noske: query.noske,
+							})
+						}}
 					</li>
 				</ul>
 			</div>
 
 			<template v-if="queryableQueryCount > 0">
-				<div v-if="interactive" class="flex max-w-7xl flex-wrap gap-3">
-					<ToggleGroup v-model="mode" class="flex w-full" type="single">
-						<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
-						<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
-					</ToggleGroup>
-					<div class="space-y-1">
-						<Label for="temporal-bucket-unit">Time unit</Label>
-						<Select v-model="bucketUnit">
-							<SelectTrigger id="temporal-bucket-unit" class="min-w-60">
-								<SelectValue placeholder="Time unit" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem v-for="unit of availableBucketUnits" :key="unit" :value="unit">
-									{{ unit }}
-								</SelectItem>
-							</SelectContent>
-						</Select>
+				<section
+					v-if="interactive"
+					class="space-y-4 rounded-md border p-4"
+					aria-labelledby="temporal-time-series-settings"
+				>
+					<div>
+						<h3 id="temporal-time-series-settings" class="font-medium">
+							{{ t("TemporalFrequencyDistribution.settings.timeSeriesTitle") }}
+						</h3>
+						<p class="text-sm text-muted-foreground">
+							{{ t("TemporalFrequencyDistribution.settings.timeSeriesDescription") }}
+						</p>
 					</div>
-					<div class="space-y-1">
-						<Label for="temporal-range-start">Start date</Label>
-						<Input id="temporal-range-start" v-model="rangeStart" type="date" />
+					<div class="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+						<div class="min-w-0 space-y-1">
+							<Label>{{ t("TemporalFrequencyDistribution.labels.frequencyMode") }}</Label>
+							<ToggleGroup
+								v-model="mode"
+								class="flex w-full justify-start"
+								type="single"
+								:aria-label="t('TemporalFrequencyDistribution.labels.frequencyMode')"
+							>
+								<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
+								<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
+							</ToggleGroup>
+						</div>
+						<div class="min-w-0 space-y-1">
+							<Label for="temporal-bucket-unit">{{
+								t("TemporalFrequencyDistribution.labels.timeUnit")
+							}}</Label>
+							<Select v-model="bucketUnit">
+								<SelectTrigger id="temporal-bucket-unit" class="w-full min-w-0">
+									<SelectValue :placeholder="t('TemporalFrequencyDistribution.labels.timeUnit')" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem v-for="unit of availableBucketUnits" :key="unit" :value="unit">
+										{{ formatTemporalUnit(unit, 1) }}
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+						<div class="min-w-0 space-y-1">
+							<Label for="temporal-range-start">{{
+								t("TemporalFrequencyDistribution.labels.startDate")
+							}}</Label>
+							<Input
+								id="temporal-range-start"
+								v-model="rangeStart"
+								class="w-full min-w-0"
+								type="date"
+							/>
+						</div>
+						<div class="min-w-0 space-y-1">
+							<Label for="temporal-range-end">{{
+								t("TemporalFrequencyDistribution.labels.endDate")
+							}}</Label>
+							<Input
+								id="temporal-range-end"
+								v-model="rangeEnd"
+								class="w-full min-w-0"
+								type="date"
+							/>
+						</div>
+						<p
+							v-if="!selectedDateRange"
+							class="text-sm text-destructive sm:col-span-2 lg:col-span-4"
+							role="alert"
+						>
+							{{ t("TemporalFrequencyDistribution.errors.invalidRange") }}
+						</p>
 					</div>
-					<div class="space-y-1">
-						<Label for="temporal-range-end">End date (exclusive)</Label>
-						<Input id="temporal-range-end" v-model="rangeEnd" type="date" />
-					</div>
-					<p v-if="!selectedDateRange" class="self-end text-sm text-destructive" role="alert">
-						The end date must be later than the start date.
-					</p>
-				</div>
+				</section>
 				<div
 					v-for="(query, index) of activeQueries"
 					v-show="temporalParsers[index] && !temporalParsers[index]?.error"
@@ -405,8 +464,12 @@ function formatTemporalDomainValue(value: string | number) {
 						:query-key="queryDescriptors[index]?.queryKey"
 					/>
 					<p v-if="normalizationWarnings[index]" class="mt-1 text-xs text-muted-foreground">
-						{{ normalizationWarnings[index] }} temporal value(s) could not be parsed and were
-						excluded.
+						{{
+							t(
+								"TemporalFrequencyDistribution.warnings.parseExcluded",
+								normalizationWarnings[index],
+							)
+						}}
 					</p>
 					<p
 						v-if="temporalFrequenciesErrors[index]"
@@ -428,34 +491,64 @@ function formatTemporalDomainValue(value: string | number) {
 
 				<CardHeader class="px-0">
 					<CardTitle>
-						{{ `Temporal frequencies per ${interval} ${bucketUnit}${interval === 1 ? "" : "s"}` }}
+						{{
+							t("TemporalFrequencyDistribution.intervalChart.title", {
+								count: interval,
+								unit: formatTemporalUnit(bucketUnit, interval),
+							})
+						}}
 					</CardTitle>
-					<CardDescription>{{ t("yearlyFrequenciesDesc") }}</CardDescription>
+					<CardDescription>{{
+						t("TemporalFrequencyDistribution.intervalChart.description")
+					}}</CardDescription>
 				</CardHeader>
 
-				<div v-if="interactive" class="flex flex-wrap items-center gap-3">
-					<div class="space-y-1">
-						<Label for="temporal-interval">Interval</Label>
-						<Select v-model="interval" :aria-label="t('interval')">
-							<SelectTrigger id="temporal-interval" class="min-w-60">
-								<SelectValue :placeholder="t('interval')" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem
-									v-for="intervalOption of intervalOptions"
-									:key="intervalOption"
-									:value="intervalOption"
-								>
-									{{ intervalOption }} {{ bucketUnit }}s
-								</SelectItem>
-							</SelectContent>
-						</Select>
+				<section
+					v-if="interactive"
+					class="space-y-4 rounded-md border p-4"
+					aria-labelledby="temporal-interval-settings"
+				>
+					<div>
+						<h3 id="temporal-interval-settings" class="font-medium">
+							{{ t("TemporalFrequencyDistribution.settings.intervalTitle") }}
+						</h3>
+						<p class="text-sm text-muted-foreground">
+							{{ t("TemporalFrequencyDistribution.settings.intervalDescription") }}
+						</p>
 					</div>
-					<div class="flex items-center gap-2">
-						<Checkbox id="temporal-reverse" v-model="reverse" />
-						<Label for="temporal-reverse">Reverse</Label>
+					<div class="grid min-w-0 gap-4 sm:grid-cols-2">
+						<div class="min-w-0 space-y-1">
+							<Label for="temporal-interval">{{
+								t("TemporalFrequencyDistribution.labels.intervalSize")
+							}}</Label>
+							<Select v-model="interval" :aria-label="t('interval')">
+								<SelectTrigger id="temporal-interval" class="w-full min-w-0">
+									<SelectValue :placeholder="t('interval')" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem
+										v-for="intervalOption of intervalOptions"
+										:key="intervalOption"
+										:value="intervalOption"
+									>
+										{{ intervalOption }} {{ formatTemporalUnit(bucketUnit, intervalOption) }}
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+						<div class="min-w-0 space-y-1">
+							<p class="text-sm font-medium">
+								{{ t("TemporalFrequencyDistribution.labels.groupingDirection") }}
+							</p>
+							<div class="flex items-center gap-2">
+								<Checkbox id="temporal-reverse" v-model="reverse" />
+								<Label for="temporal-reverse">{{
+									t("TemporalFrequencyDistribution.labels.groupFromEnd")
+								}}</Label>
+							</div>
+						</div>
 					</div>
-				</div>
+				</section>
 
 				<Chart
 					chart-type="bar"

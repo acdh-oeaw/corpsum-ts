@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "@playwright/experimental-ct-vue";
 
 import {
 	aggregateTemporalFrequencies,
@@ -9,14 +9,185 @@ import {
 	getAllowedTemporalBucketUnitsForMappings,
 	groupTemporalFrequencyPoints,
 } from "@/components/data-display/data-display-temporal-frequency-distribution.transformations.ts";
+import TemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import {
 	defaultTemporalFrequencyDistributionSettings,
 	isTemporalBucketRangeSupported,
 	normalizeTemporalFrequencyDistributionSettings,
+	temporalFrequencyDistributionType,
 } from "@/lib/visualization-types";
 import { alignChartSeriesData, getChartTooltipDomainValue } from "@/utils/chart-data";
 
 const utc = (value: string) => new Date(`${value}T00:00:00.000Z`);
+
+const query: CorpusQuery = {
+	id: 1,
+	noske: "demo-noske",
+	type: "word",
+	userInput: "example",
+	finalQuery: "example",
+	preparedQuery: "example",
+	color: "#ef4444",
+	showPicker: false,
+	corpus: "demo-corpus",
+	subCorpus: "",
+	concordance_query: { queryselector: "word", word: "example" },
+	KWICAttrsStructs: { attributes: [], structures: [] },
+	KWICAdditionalViewHeaders: [],
+	KWICAttrsStructsOptions: { attributes: [], structures: [] },
+	facettingValues: {},
+	SampleRatio: 100,
+	loading: {
+		yearlyFrequencies: false,
+		wordFormFrequencies: false,
+		regionalFrequencies: false,
+		keywordInContext: false,
+		mediaSources: false,
+		collocations: false,
+	},
+};
+const mapping = {
+	_id: "mapping-1",
+	createdAt: null,
+	updatedAt: null,
+	noske: "demo-noske",
+	corpus: "demo-corpus",
+	semantic: "temporal" as const,
+	scope: "default" as const,
+	attribute: "publication_date",
+	parser: { mode: "date" as const, sourceUnit: "day" as const },
+	valueMap: {},
+};
+const data = [{ Blocks: [{ Items: [{ Word: [{ n: "2020-01-02" }], frq: 3, reltt: 0.3 }] }] }];
+
+function componentProps(overrides = {}) {
+	return {
+		queries: [query],
+		metadataMappings: [mapping],
+		data,
+		settings: {
+			bucketUnit: "month" as const,
+			mode: "absolute" as const,
+			dateRange: {
+				start: "2020-01-01T00:00:00.000Z",
+				end: "2020-04-01T00:00:00.000Z",
+			},
+		},
+		...overrides,
+	};
+}
+
+test.describe("temporal visualization component", () => {
+	test("groups and names interactive controls", async ({ mount }) => {
+		const component = await mount(TemporalFrequencyDistribution, { props: componentProps() });
+		await expect(component.getByRole("heading", { name: "Time-series settings" })).toBeVisible();
+		await expect(component.getByRole("heading", { name: "Interval chart settings" })).toBeVisible();
+		for (const label of [
+			"Frequency mode",
+			"Time unit",
+			"Start date",
+			"End date (exclusive)",
+			"Interval size",
+		]) {
+			await expect(component.getByLabel(label)).toBeVisible();
+		}
+		await expect(
+			component.getByRole("checkbox", {
+				name: "Start grouping at the end of the date range",
+			}),
+		).toBeEnabled();
+		await expect(component.getByText("Start grouping at the end of the date range")).toBeVisible();
+	});
+
+	test("honors embedded presentation flags", async ({ mount }) => {
+		const component = await mount(TemporalFrequencyDistribution, {
+			props: componentProps({ interactive: false, showHeader: false, showSourceData: false }),
+		});
+		await expect(component.getByRole("heading", { name: "Time-series settings" })).toHaveCount(0);
+		await expect(component.getByRole("button", { name: "Show data" })).toHaveCount(0);
+		await expect(component.getByText("Temporal frequencies", { exact: true })).toHaveCount(0);
+	});
+
+	test("shows localized invalid range and mapping notices", async ({ mount }) => {
+		const component = await mount(TemporalFrequencyDistribution, { props: componentProps() });
+		await component.getByLabel("Start date").fill("2020-04-01");
+		await expect(component.getByRole("alert")).toHaveText(
+			"The exclusive end date must be later than the start date.",
+		);
+		await component.unmount();
+
+		const missing = await mount(TemporalFrequencyDistribution, {
+			props: { queries: [query], data: [null], metadataMappings: [null] },
+		});
+		await expect(missing.getByText("Temporal metadata mapping required")).toBeVisible();
+		await missing.unmount();
+
+		const invalid = await mount(TemporalFrequencyDistribution, {
+			props: componentProps({
+				metadataMappings: [
+					{ ...mapping, parser: { mode: "regex", sourceUnit: "day", pattern: "[" } },
+				],
+			}),
+		});
+		await expect(invalid.getByText("Invalid temporal metadata mapping")).toBeVisible();
+	});
+
+	test("renders German without missing message keys", async ({ mount, page }) => {
+		const missingKeys: Array<string> = [];
+		page.on("console", (message) => {
+			if (message.type() === "warn" && message.text().includes("Not found")) {
+				missingKeys.push(message.text());
+			}
+		});
+		const component = await mount(TemporalFrequencyDistribution, {
+			props: componentProps(),
+			hooksConfig: { locale: "de" },
+		});
+		await expect(component.getByRole("heading", { name: "Zeitreiheneinstellungen" })).toBeVisible();
+		await expect(component.getByLabel("Zeiteinheit")).toBeVisible();
+		expect(missingKeys).toStrictEqual([]);
+	});
+
+	test("does not overflow at a 320 CSS-pixel viewport", async ({ mount, page }) => {
+		await page.setViewportSize({ width: 320, height: 800 });
+		const component = await mount(TemporalFrequencyDistribution, { props: componentProps() });
+		expect(await component.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
+			true,
+		);
+	});
+
+	test("emits complete normalized settings after control changes", async ({ mount, page }) => {
+		const updates: Array<ReturnType<typeof normalizeTemporalFrequencyDistributionSettings>> = [];
+		const component = await mount(TemporalFrequencyDistribution, {
+			props: componentProps(),
+			on: { "update:settings": (settings) => updates.push(settings) },
+		});
+		await component.getByRole("button", { name: "Relative" }).click();
+		await component.getByLabel("Time unit").click();
+		await page.getByRole("option", { name: "day", exact: true }).click();
+		await component.getByLabel("Start date").fill("2020-01-02");
+		await component.getByLabel("End date (exclusive)").fill("2020-05-01");
+		await component.getByLabel("Interval size").click();
+		await page.getByRole("option", { name: "5 days", exact: true }).click();
+		await component
+			.getByText("Start grouping at the end of the date range", { exact: true })
+			.click();
+		await component.getByRole("button", { name: "Show data" }).click();
+		await expect.poll(() => updates.length).toBeGreaterThan(0);
+		expect(updates.at(-1)).toMatchObject({
+			type: temporalFrequencyDistributionType,
+			mode: "relative",
+			bucketUnit: "day",
+			dateRange: {
+				start: "2020-01-02T00:00:00.000Z",
+				end: "2020-05-01T00:00:00.000Z",
+			},
+			intervalSize: 5,
+			reverseIntervals: true,
+			sourceTableExpanded: true,
+		});
+	});
+});
 
 test.describe("temporal metadata parsing", () => {
 	test("returns dates at the declared source precision", () => {

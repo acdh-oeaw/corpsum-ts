@@ -366,6 +366,50 @@
 		"createdAt": "Erstellt",
 		"updatedAt": "Aktualisiert"
 	},
+	"TemporalFrequencyDistribution": {
+		"description": "Vergleicht die Abfragefrequenzen im Zeitverlauf.",
+		"errors": {
+			"invalidRange": "Das exklusive Enddatum muss nach dem Startdatum liegen.",
+			"loadFailed": "Die zeitlichen Frequenzdaten konnten nicht geladen werden."
+		},
+		"intervalChart": {
+			"description": "Vergleicht Frequenzen, die in aufeinanderfolgende Zeitintervalle gruppiert sind.",
+			"title": "Zeitliche Frequenzen pro {count} {unit}"
+		},
+		"labels": {
+			"endDate": "Enddatum (exklusiv)",
+			"frequencyMode": "Frequenzmodus",
+			"groupFromEnd": "Gruppierung am Ende des Datumsbereichs beginnen",
+			"groupingDirection": "Gruppierungsrichtung",
+			"intervalSize": "Intervallgröße",
+			"startDate": "Startdatum",
+			"timeUnit": "Zeiteinheit"
+		},
+		"mapping": {
+			"corpusOnNoske": "{corpus} auf {noske}",
+			"invalidDescription": "Korrigieren Sie den regulären Ausdruck für jedes betroffene Korpus, bevor dessen Daten geladen werden.",
+			"invalidTitle": "Ungültige zeitliche Metadatenzuordnung",
+			"missingDescription": "Erstellen Sie für jedes Korpus eine zeitliche Zuordnung, bevor diese Visualisierung NoSketch-Metadaten abfragen kann.",
+			"missingTitle": "Zeitliche Metadatenzuordnung erforderlich"
+		},
+		"settings": {
+			"intervalDescription": "Legen Sie die Größe der Intervalle fest und bestimmen Sie, ob die Gruppierung am Anfang oder Ende des Datumsbereichs beginnt.",
+			"intervalTitle": "Einstellungen des Intervalldiagramms",
+			"timeSeriesDescription": "Legen Sie fest, wie die Zeitreihe gemessen wird und welchen Datumsbereich sie abdeckt.",
+			"timeSeriesTitle": "Zeitreiheneinstellungen"
+		},
+		"title": "Zeitliche Frequenzen",
+		"units": {
+			"day": "Tag | Tage",
+			"month": "Monat | Monate",
+			"quarter": "Quartal | Quartale",
+			"week": "Woche | Wochen",
+			"year": "Jahr | Jahre"
+		},
+		"warnings": {
+			"parseExcluded": "Ein zeitlicher Wert konnte nicht interpretiert werden und wurde ausgeschlossen. | {count} zeitliche Werte konnten nicht interpretiert werden und wurden ausgeschlossen."
+		}
+	},
 	"email": "E-Mail",
 	"login": "Anmelden",
 	"password": "Passwort",
