@@ -148,6 +148,24 @@ function updateTemporalSettings(settings: TemporalFrequencyDistributionSettings)
 - Embedded published rendering uses captured data with non-interactive presentation. A normal
   published page may expose presentation controls only where they do not mutate the snapshot.
 
+### Toolbar controls and dynamic options
+
+- Interactive visualization controls **SHOULD** use the shared shadcn/Reka toolbar wrappers when
+  they form compact related chart controls.
+- Toolbar groups **MUST** have accessible names. Icon-only toolbar items **MUST** have localized
+  accessible names and localized tooltips.
+- Query-derived options are computed from aligned inputs such as `queries[index]`,
+  `metadataMappings[index]`, response capabilities, and validated date/range constraints. They are
+  not persisted separately.
+- Adjustable visualization properties that survive create/edit/detail/publish/embed round trips
+  **MUST** live in the settings type, defaults, and normalizer. The component **MUST** emit complete
+  normalized settings after changes.
+- Transient toolbar state such as tooltip visibility, popover open state, hover, loading, and local
+  focus **MUST NOT** be persisted.
+- If a query-derived option becomes unavailable, the component **MUST** normalize to a valid
+  persisted value or expose a localized invalid-state message. It **MUST NOT** silently emit an
+  unsupported value.
+
 ### Missing, invalid, partial, and empty input
 
 - Missing required mappings and invalid mappings are distinct configuration states and **SHOULD**
@@ -241,18 +259,19 @@ Use this recipe for one visualization per commit or PR. Before changing a public
 for the component name, visualization identifier, search key, settings type, and published-renderer
 branch to find every call site. If `rg` is unavailable, use an equivalent recursive search.
 
-| Step | Action                                                                                                                                                                                                         | Expected artifact                                        | Verification                                                                                                        |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| 1    | Inspect the target legacy component and its branch in `app/components/published/published-visualization-renderer.vue`. Record its live inputs, transformations, controls, errors, and publication differences. | filled specification based on the template below         | every claim points to a current file/call site                                                                      |
-| 2    | Define or extend the entry in `visualizationDefinitions`, including semantic dependencies, target path, published-panel decision, and stable search key.                                                       | typed registry entry in `app/lib/visualization-types.ts` | `pnpm types:check`; search for identifier/search-key consumers                                                      |
-| 3    | If controls are persisted, define the settings type, complete defaults, and a total normalizer beside the registry. Include supported legacy migration only when evidence exists.                              | settings type/default/normalizer and focused cases       | absent, valid, malformed, and legacy inputs return documented current shapes                                        |
-| 4    | Define component props/emits and generated raw-response type. Require `queries`; make result/mapping arrays explicitly query-aligned; emit complete settings.                                                  | reviewable TypeScript public contract                    | all call sites found in step 1 satisfy optionality and defaults                                                     |
-| 5    | Implement one live/supplied-data switch. Presence of `data` disables all network queries; map both sources by query index into one transformation path.                                                        | descriptors plus aligned result/loading/error arrays     | a component test proves supplied `[]`/`null` cannot invoke the live request path                                    |
-| 6    | Move deterministic parsing, normalization, aggregation, or geometry out of complex template expressions into an adjacent transformation module when it is substantial.                                         | typed pure functions                                     | focused tests cover malformed and boundary inputs without page setup                                                |
-| 7    | Wire create, edit, detail, `server/utils/published-visualizations.ts`, and the published renderer. Preserve visualization/query indexes and captured settings/mappings/data.                                   | one complete live-to-published vertical slice            | create/edit round trip and publication snapshot/render tests or an explicit manual proof                            |
-| 8    | Inventory every heading, label, description, warning, error, unit, and table header. Add English and German keys and accessible names.                                                                         | matching locale entries and labelled controls            | render both locales; query controls by accessible role/name; no missing-key warnings                                |
-| 9    | Add applicable transformation, component, live-boundary, supplied-data, settings, partial-error, invalid-config, accessibility, responsive, and publication tests.                                             | focused tests near existing Playwright CT/E2E suites     | run the scoped spec first; inspect snapshots only when intentionally changed                                        |
-| 10   | Run repository gates and review the diff for unrelated work.                                                                                                                                                   | a single-visualization commit/PR                         | `pnpm format:check`, `pnpm lint:check`, `pnpm types:check`, `pnpm test:ct`, `pnpm test:e2e`, and `git diff --check` |
+| Step | Action                                                                                                                                                                                                                      | Expected artifact                                        | Verification                                                                                                        |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 1    | Inspect the target legacy component and its branch in `app/components/published/published-visualization-renderer.vue`. Record its live inputs, transformations, controls, errors, and publication differences.              | filled specification based on the template below         | every claim points to a current file/call site                                                                      |
+| 2    | Define or extend the entry in `visualizationDefinitions`, including semantic dependencies, target path, published-panel decision, and stable search key.                                                                    | typed registry entry in `app/lib/visualization-types.ts` | `pnpm types:check`; search for identifier/search-key consumers                                                      |
+| 3    | If controls are persisted, define the settings type, complete defaults, and a total normalizer beside the registry. Include supported legacy migration only when evidence exists.                                           | settings type/default/normalizer and focused cases       | absent, valid, malformed, and legacy inputs return documented current shapes                                        |
+| 4    | Define component props/emits and generated raw-response type. Require `queries`; make result/mapping arrays explicitly query-aligned; emit complete settings.                                                               | reviewable TypeScript public contract                    | all call sites found in step 1 satisfy optionality and defaults                                                     |
+| 5    | Implement one live/supplied-data switch. Presence of `data` disables all network queries; map both sources by query index into one transformation path.                                                                     | descriptors plus aligned result/loading/error arrays     | a component test proves supplied `[]`/`null` cannot invoke the live request path                                    |
+| 6    | Move deterministic parsing, normalization, aggregation, or geometry out of complex template expressions into an adjacent transformation module when it is substantial.                                                      | typed pure functions                                     | focused tests cover malformed and boundary inputs without page setup                                                |
+| 7    | Wire create, edit, detail, `server/utils/published-visualizations.ts`, and the published renderer. Preserve visualization/query indexes and captured settings/mappings/data.                                                | one complete live-to-published vertical slice            | create/edit round trip and publication snapshot/render tests or an explicit manual proof                            |
+| 8    | Inventory toolbar controls. Classify each control as query-derived, persisted adjustable property, or transient state. Use toolbar wrappers where compact related controls are present and prove accessible names/tooltips. | toolbar-control inventory and implementation             | role/name toolbar assertions; localized tooltip checks; no transient persistence                                    |
+| 9    | Inventory every heading, label, description, warning, error, unit, and table header. Add English and German keys and accessible names.                                                                                      | matching locale entries and labelled controls            | render both locales; query controls by accessible role/name; no missing-key warnings                                |
+| 10   | Add applicable transformation, component, live-boundary, supplied-data, settings, partial-error, invalid-config, accessibility, responsive, and publication tests.                                                          | focused tests near existing Playwright CT/E2E suites     | run the scoped spec first; inspect snapshots only when intentionally changed                                        |
+| 11   | Run repository gates and review the diff for unrelated work.                                                                                                                                                                | a single-visualization commit/PR                         | `pnpm format:check`, `pnpm lint:check`, `pnpm types:check`, `pnpm test:ct`, `pnpm test:e2e`, and `git diff --check` |
 
 At every step, preserve the behavior described in the specification. Do not extract a shared base
 component while completing the first consumer. A small helper is acceptable only when its contract
@@ -287,6 +306,15 @@ sections that truly do not apply. Do not begin implementation while any required
 - Normalization: <REQUIRED> absent/malformed/current behavior
 - Legacy migration: <REQUIRED> supported legacy shapes with evidence, or explicit none
 - Transient controls excluded from persistence: <REQUIRED> list or explicit none
+
+## Toolbar controls
+
+- Toolbar groups and labels: <REQUIRED> group names, labels, and role expectations or explicit none
+- Icon/tooltip inventory: <REQUIRED> icons, localized accessible names, localized tooltips, or explicit none
+- Query-derived option sources: <REQUIRED> aligned inputs/capabilities/range constraints or explicit none
+- Persisted settings affected: <REQUIRED> settings fields changed by toolbar controls or explicit none
+- Transient state excluded from persistence: <REQUIRED> hover/open/focus/loading state or explicit none
+- Responsive behavior: <REQUIRED> narrow and wide toolbar wrapping/overflow expectations
 
 ## Metadata semantics and mappings
 
@@ -362,17 +390,18 @@ sections that truly do not apply. Do not begin implementation while any required
 Apply cases where the specification says the state exists; mark a case not applicable with a reason
 rather than silently omitting it.
 
-| Area                | Required cases                                                                                      | Evidence                                                             |
-| ------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| settings            | absent, valid current, supported legacy, malformed                                                  | normalizer tests and create/edit round trip                          |
-| alignment           | one query, multiple queries, repeated corpus, missing positional mapping, missing positional result | transformation/component tests prove labels and indexes do not shift |
-| live mode           | loading, success, per-query error, all-error                                                        | component or E2E test with observable request/result state           |
-| supplied mode       | success, `null`, missing index, empty response, empty array                                         | component test proves no request and stable output                   |
-| configuration       | valid mapping, missing mapping, invalid mapping/raw value                                           | localized notice and valid sibling behavior                          |
-| presentation        | interactive detail, non-interactive published/embed, header off, source table off                   | role-based component assertions                                      |
-| language and access | English, German, no missing keys, labelled controls/groups/alerts                                   | locale render and accessible-name queries                            |
-| responsive          | 320 CSS-pixel viewport and representative wide viewport                                             | no component overflow; controls remain operable                      |
-| publication         | live/cache identity to captured settings/mapping/data to published and embedded output              | publication round-trip integration evidence                          |
+| Area                | Required cases                                                                                        | Evidence                                                               |
+| ------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| settings            | absent, valid current, supported legacy, malformed                                                    | normalizer tests and create/edit round trip                            |
+| alignment           | one query, multiple queries, repeated corpus, missing positional mapping, missing positional result   | transformation/component tests prove labels and indexes do not shift   |
+| live mode           | loading, success, per-query error, all-error                                                          | component or E2E test with observable request/result state             |
+| supplied mode       | success, `null`, missing index, empty response, empty array                                           | component test proves no request and stable output                     |
+| configuration       | valid mapping, missing mapping, invalid mapping/raw value                                             | localized notice and valid sibling behavior                            |
+| presentation        | interactive detail, non-interactive published/embed, header off, source table off                     | role-based component assertions                                        |
+| toolbar controls    | named toolbar groups, icon-only tooltips, dynamic options, complete settings emission where persisted | role/name assertions, tooltip assertions, option assertions, emissions |
+| language and access | English, German, no missing keys, labelled controls/groups/alerts                                     | locale render and accessible-name queries                              |
+| responsive          | 320 CSS-pixel viewport and representative wide viewport                                               | no component overflow; controls remain operable                        |
+| publication         | live/cache identity to captured settings/mapping/data to published and embedded output                | publication round-trip integration evidence                            |
 
 Before declaring done:
 
@@ -382,6 +411,8 @@ Before declaring done:
 - [ ] Supplied data disables all live requests, including for empty/null entries.
 - [ ] Live and supplied responses share the transformation path.
 - [ ] Create, edit, detail, publication capture, published page, and embed are wired.
+- [ ] Toolbar controls are classified as query-derived, persisted, or transient; accessible names,
+      tooltips, and dynamic option sources are verified.
 - [ ] English/German text, accessible names, and narrow/wide layouts are verified.
 - [ ] Applicable rows in the verification matrix have evidence.
 - [ ] Scoped tests and all repository gates have been run; baseline failures are recorded without
@@ -399,7 +430,14 @@ Do not:
 - duplicate a usable generated NoSketch response type;
 - hide request/configuration errors by returning an indistinguishable empty series;
 - put deterministic domain parsing or aggregation into complex template expressions;
+- hard-code dynamic options in templates instead of deriving them from aligned inputs and
+  capabilities;
 - hard-code untranslated labels or provide visual labels without accessible names;
+- render icon-only controls without localized accessible names and localized tooltips;
+- persist transient toolbar state such as tooltip visibility, popover open state, hover, loading,
+  or local focus;
+- hide unsupported persisted values without normalization or a user-visible localized invalid
+  state;
 - change the publication schema, metadata semantics, and component contract as incidental work;
 - create a universal component/composable from one implementation.
 

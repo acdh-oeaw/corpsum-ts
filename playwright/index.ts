@@ -25,8 +25,15 @@ import SelectItem from "@/components/ui/select/SelectItem.vue";
 import SelectTrigger from "@/components/ui/select/SelectTrigger.vue";
 import SelectValue from "@/components/ui/select/SelectValue.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
-import ToggleGroup from "@/components/ui/toggle-group/ToggleGroup.vue";
-import ToggleGroupItem from "@/components/ui/toggle-group/ToggleGroupItem.vue";
+import Toolbar from "@/components/ui/toolbar/Toolbar.vue";
+import ToolbarButton from "@/components/ui/toolbar/ToolbarButton.vue";
+import ToolbarSeparator from "@/components/ui/toolbar/ToolbarSeparator.vue";
+import ToolbarToggleGroup from "@/components/ui/toolbar/ToolbarToggleGroup.vue";
+import ToolbarToggleItem from "@/components/ui/toolbar/ToolbarToggleItem.vue";
+import Tooltip from "@/components/ui/tooltip/Tooltip.vue";
+import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
+import TooltipProvider from "@/components/ui/tooltip/TooltipProvider.vue";
+import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
 import { useLocale } from "@/composables/use-locale";
 import { useNoskeFreqMlQueries } from "@/composables/use-noske-freqml-queries";
 import { useTranslations } from "@/composables/use-translations";
@@ -79,8 +86,15 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		SelectTrigger,
 		SelectValue,
 		Separator,
-		ToggleGroup,
-		ToggleGroupItem,
+		Toolbar,
+		ToolbarButton,
+		ToolbarSeparator,
+		ToolbarToggleGroup,
+		ToolbarToggleItem,
+		Tooltip,
+		TooltipContent,
+		TooltipProvider,
+		TooltipTrigger,
 	})) {
 		app.component(name, component);
 	}

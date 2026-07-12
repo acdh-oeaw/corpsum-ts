@@ -82,6 +82,11 @@ test.describe("temporal visualization component", () => {
 		const component = await mount(TemporalFrequencyDistribution, { props: componentProps() });
 		await expect(component.getByRole("heading", { name: "Time-series settings" })).toBeVisible();
 		await expect(component.getByRole("heading", { name: "Interval chart settings" })).toBeVisible();
+		await expect(component.getByRole("toolbar", { name: "Time-series controls" })).toBeVisible();
+		await expect(component.getByRole("toolbar", { name: "Interval chart controls" })).toBeVisible();
+		await expect(component.getByRole("toolbar", { name: "Source data controls" })).toBeVisible();
+		await expect(component.getByRole("button", { name: "Absolute" })).toBeVisible();
+		await expect(component.getByRole("button", { name: "Relative" })).toBeVisible();
 		for (const label of [
 			"Frequency mode",
 			"Time unit",
@@ -92,7 +97,7 @@ test.describe("temporal visualization component", () => {
 			await expect(component.getByLabel(label)).toBeVisible();
 		}
 		await expect(
-			component.getByRole("checkbox", {
+			component.getByRole("button", {
 				name: "Start grouping at the end of the date range",
 			}),
 		).toBeEnabled();
@@ -104,8 +109,25 @@ test.describe("temporal visualization component", () => {
 			props: componentProps({ interactive: false, showHeader: false, showSourceData: false }),
 		});
 		await expect(component.getByRole("heading", { name: "Time-series settings" })).toHaveCount(0);
+		await expect(component.getByRole("toolbar")).toHaveCount(0);
 		await expect(component.getByRole("button", { name: "Show data" })).toHaveCount(0);
 		await expect(component.getByText("Temporal frequencies", { exact: true })).toHaveCount(0);
+	});
+
+	test("hides source data controls in non-interactive source data mode", async ({ mount }) => {
+		const props = componentProps();
+		const component = await mount(TemporalFrequencyDistribution, {
+			props: {
+				...props,
+				interactive: false,
+				showHeader: false,
+				showSourceData: true,
+				settings: { ...props.settings, sourceTableExpanded: true },
+			},
+		});
+		await expect(component.getByRole("toolbar")).toHaveCount(0);
+		await expect(component.getByRole("button", { name: "Show data" })).toHaveCount(0);
+		await expect(component.getByRole("button", { name: "Hide data" })).toHaveCount(0);
 	});
 
 	test("shows localized invalid range and mapping notices", async ({ mount }) => {
@@ -145,6 +167,9 @@ test.describe("temporal visualization component", () => {
 		});
 		await expect(component.getByRole("heading", { name: "Zeitreiheneinstellungen" })).toBeVisible();
 		await expect(component.getByLabel("Zeiteinheit")).toBeVisible();
+		await expect(component.getByRole("toolbar", { name: "Steuerung der Zeitreihe" })).toBeVisible();
+		await component.getByRole("button", { name: "Relativ" }).hover();
+		await expect(page.getByText("Relative Frequenzen anzeigen.")).toBeVisible();
 		expect(missingKeys).toStrictEqual([]);
 	});
 
@@ -170,7 +195,7 @@ test.describe("temporal visualization component", () => {
 		await component.getByLabel("Interval size").click();
 		await page.getByRole("option", { name: "5 days", exact: true }).click();
 		await component
-			.getByText("Start grouping at the end of the date range", { exact: true })
+			.getByRole("button", { name: "Start grouping at the end of the date range" })
 			.click();
 		await component.getByRole("button", { name: "Show data" }).click();
 		await expect.poll(() => updates.length).toBeGreaterThan(0);
@@ -186,6 +211,36 @@ test.describe("temporal visualization component", () => {
 			reverseIntervals: true,
 			sourceTableExpanded: true,
 		});
+	});
+
+	test("populates time units from mapping precision and selected range", async ({
+		mount,
+		page,
+	}) => {
+		const component = await mount(TemporalFrequencyDistribution, { props: componentProps() });
+		await component.getByLabel("Time unit").click();
+		for (const unit of ["day", "week", "month", "quarter", "year"]) {
+			await expect(page.getByRole("option", { name: unit, exact: true })).toBeVisible();
+		}
+		await component.unmount();
+
+		const yearPrecision = await mount(TemporalFrequencyDistribution, {
+			props: componentProps({
+				metadataMappings: [
+					{ ...mapping, parser: { mode: "year" as const, sourceUnit: "year" as const } },
+				],
+				settings: {
+					bucketUnit: "year" as const,
+					dateRange: {
+						start: "2020-01-01T00:00:00.000Z",
+						end: "2024-01-01T00:00:00.000Z",
+					},
+				},
+			}),
+		});
+		await yearPrecision.getByLabel("Time unit").click();
+		await expect(page.getByRole("option", { name: "year", exact: true })).toBeVisible();
+		await expect(page.getByRole("option", { name: "day", exact: true })).toHaveCount(0);
 	});
 });
 
