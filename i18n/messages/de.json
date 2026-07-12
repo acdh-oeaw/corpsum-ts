@@ -398,6 +398,17 @@
 			"timeSeriesDescription": "Legen Sie fest, wie die Zeitreihe gemessen wird und welchen Datumsbereich sie abdeckt.",
 			"timeSeriesTitle": "Zeitreiheneinstellungen"
 		},
+		"toolbar": {
+			"interval": "Steuerung des Intervalldiagramms",
+			"sourceData": "Steuerung der Quelldaten",
+			"timeSeries": "Steuerung der Zeitreihe"
+		},
+		"tooltips": {
+			"absoluteMode": "Absolute Frequenzen anzeigen.",
+			"groupFromEnd": "Intervalle rückwärts ab dem Ende des gewählten Datumsbereichs gruppieren.",
+			"relativeMode": "Relative Frequenzen anzeigen.",
+			"sourceData": "Die Quelldatentabelle ein- oder ausblenden."
+		},
 		"title": "Zeitliche Frequenzen",
 		"units": {
 			"day": "Tag | Tage",

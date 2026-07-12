@@ -398,6 +398,17 @@
 			"timeSeriesDescription": "Choose how the temporal series is measured and which date range it covers.",
 			"timeSeriesTitle": "Time-series settings"
 		},
+		"toolbar": {
+			"interval": "Interval chart controls",
+			"sourceData": "Source data controls",
+			"timeSeries": "Time-series controls"
+		},
+		"tooltips": {
+			"absoluteMode": "Show absolute frequencies.",
+			"groupFromEnd": "Group intervals backward from the end of the selected date range.",
+			"relativeMode": "Show relative frequencies.",
+			"sourceData": "Show or hide the source data table."
+		},
 		"title": "Temporal frequencies",
 		"units": {
 			"day": "day | days",
