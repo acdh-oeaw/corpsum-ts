@@ -19,6 +19,9 @@ import Collapsible from "@/components/ui/collapsible/Collapsible.vue";
 import CollapsibleContent from "@/components/ui/collapsible/CollapsibleContent.vue";
 import Input from "@/components/ui/input/Input.vue";
 import Label from "@/components/ui/label/Label.vue";
+import Popover from "@/components/ui/popover/Popover.vue";
+import PopoverContent from "@/components/ui/popover/PopoverContent.vue";
+import PopoverTrigger from "@/components/ui/popover/PopoverTrigger.vue";
 import Select from "@/components/ui/select/Select.vue";
 import SelectContent from "@/components/ui/select/SelectContent.vue";
 import SelectItem from "@/components/ui/select/SelectItem.vue";
@@ -80,6 +83,9 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		CollapsibleContent,
 		Input,
 		Label,
+		Popover,
+		PopoverContent,
+		PopoverTrigger,
 		Select,
 		SelectContent,
 		SelectItem,
@@ -99,7 +105,9 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		app.component(name, component);
 	}
 	app.component("Chart", { template: "<div data-testid='chart' />" });
-	app.component("QueryDisplay", { template: "<div data-testid='query-display' />" });
+	app.component("QueryDisplay", {
+		template: "<div data-testid='query-display'>Query display</div>",
+	});
 	app.component("DataDisplaySourceTable", { template: "<div data-testid='source-table' />" });
 	app.provide("disablePortal", true);
 });

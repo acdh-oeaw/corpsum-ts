@@ -78,15 +78,42 @@ function componentProps(overrides = {}) {
 }
 
 test.describe("temporal visualization component", () => {
-	test("groups and names interactive controls", async ({ mount }) => {
+	test("groups and names interactive controls", async ({ mount, page }) => {
 		const component = await mount(TemporalFrequencyDistribution, { props: componentProps() });
-		await expect(component.getByRole("heading", { name: "Time-series settings" })).toBeVisible();
-		await expect(component.getByRole("heading", { name: "Interval chart settings" })).toBeVisible();
+		await expect(component.getByRole("heading", { name: "Time-series settings" })).toHaveCount(0);
+		await expect(component.getByRole("heading", { name: "Interval chart settings" })).toHaveCount(
+			0,
+		);
 		await expect(component.getByRole("toolbar", { name: "Time-series controls" })).toBeVisible();
+		await expect(component.getByRole("toolbar", { name: "Query controls" })).toHaveCount(0);
+		await expect(component.getByRole("button", { name: "Query details" })).toBeVisible();
+		await expect(component.getByRole("button", { name: "Query details" })).toHaveAttribute(
+			"title",
+			"Show query details and cache controls.",
+		);
+		await component.getByRole("button", { name: "Query details" }).click();
+		await expect(page.getByRole("dialog", { name: "Query details" })).toHaveAttribute(
+			"data-state",
+			"open",
+		);
+		await page.keyboard.press("Escape");
 		await expect(component.getByRole("toolbar", { name: "Interval chart controls" })).toBeVisible();
 		await expect(component.getByRole("toolbar", { name: "Source data controls" })).toBeVisible();
 		await expect(component.getByRole("button", { name: "Absolute" })).toBeVisible();
 		await expect(component.getByRole("button", { name: "Relative" })).toBeVisible();
+		await expect(component.getByRole("button", { name: "Absolute" })).toHaveAttribute(
+			"aria-pressed",
+			"true",
+		);
+		await expect(component.getByRole("button", { name: "Relative" })).toHaveAttribute(
+			"aria-pressed",
+			"false",
+		);
+		await component.getByRole("button", { name: "Absolute" }).click();
+		await expect(component.getByRole("button", { name: "Absolute" })).toHaveAttribute(
+			"aria-pressed",
+			"true",
+		);
 		for (const label of [
 			"Frequency mode",
 			"Time unit",
@@ -96,12 +123,62 @@ test.describe("temporal visualization component", () => {
 		]) {
 			await expect(component.getByLabel(label)).toBeVisible();
 		}
+		await expect(component.getByLabel("Time unit")).toHaveAttribute(
+			"title",
+			"Choose the time unit used to bucket the time-series chart.",
+		);
+		await expect(component.getByLabel("Start date")).toHaveAttribute(
+			"title",
+			"Set the first date included in the temporal frequency range.",
+		);
+		await expect(component.getByLabel("End date (exclusive)")).toHaveAttribute(
+			"title",
+			"Set the exclusive end date for the temporal frequency range.",
+		);
+		await expect(component.getByLabel("Interval size")).toHaveAttribute(
+			"title",
+			"Choose how many selected time units are combined into each interval.",
+		);
 		await expect(
 			component.getByRole("button", {
 				name: "Start grouping at the end of the date range",
 			}),
 		).toBeEnabled();
-		await expect(component.getByText("Start grouping at the end of the date range")).toBeVisible();
+		await expect(
+			component.getByRole("button", {
+				name: "Start grouping at the beginning of the date range",
+			}),
+		).toHaveAttribute("aria-pressed", "true");
+		await expect(
+			component.getByRole("button", {
+				name: "Start grouping at the end of the date range",
+			}),
+		).toHaveAttribute("aria-pressed", "false");
+		await component
+			.getByRole("button", { name: "Start grouping at the beginning of the date range" })
+			.click();
+		await expect(
+			component.getByRole("button", {
+				name: "Start grouping at the beginning of the date range",
+			}),
+		).toHaveAttribute("aria-pressed", "true");
+		await page.mouse.move(0, 0);
+		await component
+			.getByRole("button", { name: "Start grouping at the beginning of the date range" })
+			.hover();
+		await expect(
+			page.getByText("Group intervals forward from the beginning of the selected date range."),
+		).toBeVisible();
+		await page.mouse.move(0, 0);
+		await expect(
+			page.getByText("Group intervals forward from the beginning of the selected date range."),
+		).toHaveCount(0);
+		await component
+			.getByRole("button", { name: "Start grouping at the end of the date range" })
+			.hover();
+		await expect(
+			page.getByText("Group intervals backward from the end of the selected date range."),
+		).toBeVisible();
 	});
 
 	test("honors embedded presentation flags", async ({ mount }) => {
@@ -109,7 +186,13 @@ test.describe("temporal visualization component", () => {
 			props: componentProps({ interactive: false, showHeader: false, showSourceData: false }),
 		});
 		await expect(component.getByRole("heading", { name: "Time-series settings" })).toHaveCount(0);
-		await expect(component.getByRole("toolbar")).toHaveCount(0);
+		await expect(component.getByRole("toolbar", { name: "Query controls" })).toHaveCount(0);
+		await expect(component.getByRole("toolbar", { name: "Time-series controls" })).toHaveCount(1);
+		await expect(component.getByRole("button", { name: "Query details" })).toBeVisible();
+		await expect(component.getByLabel("Frequency mode")).toHaveCount(0);
+		await expect(component.getByRole("toolbar", { name: "Interval chart controls" })).toHaveCount(
+			0,
+		);
 		await expect(component.getByRole("button", { name: "Show data" })).toHaveCount(0);
 		await expect(component.getByText("Temporal frequencies", { exact: true })).toHaveCount(0);
 	});
@@ -125,7 +208,9 @@ test.describe("temporal visualization component", () => {
 				settings: { ...props.settings, sourceTableExpanded: true },
 			},
 		});
-		await expect(component.getByRole("toolbar")).toHaveCount(0);
+		await expect(component.getByRole("toolbar", { name: "Query controls" })).toHaveCount(0);
+		await expect(component.getByRole("button", { name: "Query details" })).toBeVisible();
+		await expect(component.getByRole("toolbar", { name: "Source data controls" })).toHaveCount(0);
 		await expect(component.getByRole("button", { name: "Show data" })).toHaveCount(0);
 		await expect(component.getByRole("button", { name: "Hide data" })).toHaveCount(0);
 	});
@@ -165,9 +250,13 @@ test.describe("temporal visualization component", () => {
 			props: componentProps(),
 			hooksConfig: { locale: "de" },
 		});
-		await expect(component.getByRole("heading", { name: "Zeitreiheneinstellungen" })).toBeVisible();
+		await expect(component.getByRole("heading", { name: "Zeitreiheneinstellungen" })).toHaveCount(
+			0,
+		);
 		await expect(component.getByLabel("Zeiteinheit")).toBeVisible();
 		await expect(component.getByRole("toolbar", { name: "Steuerung der Zeitreihe" })).toBeVisible();
+		await expect(component.getByRole("toolbar", { name: "Abfragesteuerung" })).toHaveCount(0);
+		await expect(component.getByRole("button", { name: "Abfragedetails" })).toBeVisible();
 		await component.getByRole("button", { name: "Relativ" }).hover();
 		await expect(page.getByText("Relative Frequenzen anzeigen.")).toBeVisible();
 		expect(missingKeys).toStrictEqual([]);
@@ -218,10 +307,12 @@ test.describe("temporal visualization component", () => {
 		page,
 	}) => {
 		const component = await mount(TemporalFrequencyDistribution, { props: componentProps() });
+		await expect(component.getByLabel("Time unit")).toBeEnabled();
 		await component.getByLabel("Time unit").click();
 		for (const unit of ["day", "week", "month", "quarter", "year"]) {
 			await expect(page.getByRole("option", { name: unit, exact: true })).toBeVisible();
 		}
+		await page.keyboard.press("Escape");
 		await component.unmount();
 
 		const yearPrecision = await mount(TemporalFrequencyDistribution, {
@@ -238,8 +329,8 @@ test.describe("temporal visualization component", () => {
 				},
 			}),
 		});
-		await yearPrecision.getByLabel("Time unit").click();
-		await expect(page.getByRole("option", { name: "year", exact: true })).toBeVisible();
+		await expect(yearPrecision.getByLabel("Time unit")).toBeDisabled();
+		await expect(yearPrecision.getByLabel("Time unit")).toHaveText("year");
 		await expect(page.getByRole("option", { name: "day", exact: true })).toHaveCount(0);
 	});
 });
