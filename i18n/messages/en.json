@@ -429,6 +429,25 @@
 			"parseExcluded": "{count} temporal value could not be parsed and was excluded. | {count} temporal values could not be parsed and were excluded."
 		}
 	},
+	"VisualizationToolbar": {
+		"barChartMode": "Bar chart mode",
+		"chartMode": "Chart mode",
+		"combinedMapChart": "Combined map chart",
+		"frequencyMode": "Frequency mode",
+		"mapMode": "Map mode",
+		"mediaSource": "Media source controls",
+		"mediaType": "Media type controls",
+		"queryDetails": "Query details",
+		"regional": "Regional controls",
+		"separateMapCharts": "Separate map charts",
+		"sourceData": "Source data controls",
+		"tooltips": {
+			"absoluteMode": "Show absolute frequencies.",
+			"queryDetails": "Show query details and cache controls.",
+			"relativeMode": "Show relative frequencies.",
+			"sourceData": "Show or hide the source data table."
+		}
+	},
 	"email": "Email",
 	"login": "Log in",
 	"password": "Password",
@@ -466,6 +485,7 @@
 	"mediaSources": "Media sources",
 	"mediaSourcesDesc": "Compare the distribution of results across media sources.",
 	"mediaTypes": "Media types",
+	"mediaTypesDesc": "Compare the distribution of results across media types.",
 	"mediaTypeDistribution": "Distribution of media types per query",
 	"separateBarChart": "Separate bar chart",
 	"stackedBarChart": "Stacked bar chart",

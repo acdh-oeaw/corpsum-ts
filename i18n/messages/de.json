@@ -429,6 +429,25 @@
 			"parseExcluded": "Ein zeitlicher Wert konnte nicht interpretiert werden und wurde ausgeschlossen. | {count} zeitliche Werte konnten nicht interpretiert werden und wurden ausgeschlossen."
 		}
 	},
+	"VisualizationToolbar": {
+		"barChartMode": "Balkendiagramm-Modus",
+		"chartMode": "Diagrammmodus",
+		"combinedMapChart": "Kombiniertes Kartendiagramm",
+		"frequencyMode": "Frequenzmodus",
+		"mapMode": "Kartenmodus",
+		"mediaSource": "Steuerung der Medienquellen",
+		"mediaType": "Steuerung der Medientypen",
+		"queryDetails": "Abfragedetails",
+		"regional": "Steuerung der regionalen Frequenzen",
+		"separateMapCharts": "Getrennte Kartendiagramme",
+		"sourceData": "Steuerung der Quelldaten",
+		"tooltips": {
+			"absoluteMode": "Absolute Frequenzen anzeigen.",
+			"queryDetails": "Abfragedetails und Cache-Steuerung anzeigen.",
+			"relativeMode": "Relative Frequenzen anzeigen.",
+			"sourceData": "Die Quelldatentabelle ein- oder ausblenden."
+		}
+	},
 	"email": "E-Mail",
 	"login": "Anmelden",
 	"password": "Passwort",
@@ -466,6 +485,7 @@
 	"mediaSources": "Medienquellen",
 	"mediaSourcesDesc": "Vergleicht die Verteilung der Treffer nach Medienquelle.",
 	"mediaTypes": "Medientypen",
+	"mediaTypesDesc": "Vergleicht die Verteilung der Treffer nach Medientyp.",
 	"mediaTypeDistribution": "Verteilung der Medientypen pro Abfrage",
 	"separateBarChart": "Getrenntes Balkendiagramm",
 	"stackedBarChart": "Gestapeltes Balkendiagramm",
