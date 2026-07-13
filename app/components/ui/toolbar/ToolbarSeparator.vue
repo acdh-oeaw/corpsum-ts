@@ -18,6 +18,6 @@ const forwardedProps = useForwardProps(delegatedProps);
 <template>
 	<ToolbarSeparator
 		v-bind="forwardedProps"
-		:class="cn('mx-1 h-6 w-px shrink-0 bg-border', props.class)"
+		:class="cn('mx-0.5 h-6 w-px shrink-0 bg-border', props.class)"
 	/>
 </template>

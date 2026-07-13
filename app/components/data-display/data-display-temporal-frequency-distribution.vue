@@ -140,6 +140,12 @@ const intervalSizeOptions = computed(() =>
 		label: `${value} ${formatTemporalUnit(bucketUnit.value, value)}`,
 	})),
 );
+const intervalDirection = computed({
+	get: () => (reverse.value ? "reverse" : "forward"),
+	set: (value?: string) => {
+		reverse.value = value === "reverse";
+	},
+});
 const usesProvidedData = computed(() => props.data !== undefined);
 watchEffect(() => {
 	if (!availableBucketUnits.value.includes(bucketUnit.value)) {
@@ -348,10 +354,6 @@ function formatTemporalUnit(unit: TemporalUnit, count: number) {
 	return t(`TemporalFrequencyDistribution.units.${unit}`, count);
 }
 
-function toggleReverseIntervals() {
-	reverse.value = !reverse.value;
-}
-
 function toggleSourceTable() {
 	expand.value = !expand.value;
 }
@@ -413,13 +415,14 @@ function toggleSourceTable() {
 						</p>
 					</div>
 					<Toolbar :aria-label="t('TemporalFrequencyDistribution.toolbar.timeSeries')">
-						<div class="min-w-0 flex-[1_1_12rem] space-y-1">
-							<Label class="text-xs">{{
+						<div class="inline-flex min-w-0 items-center gap-1.5">
+							<Label class="sr-only">{{
 								t("TemporalFrequencyDistribution.labels.frequencyMode")
 							}}</Label>
 							<ToolbarToggleGroup
 								v-model="mode"
-								class="flex w-full justify-start"
+								class="shrink-0"
+								size="sm"
 								type="single"
 								:aria-label="t('TemporalFrequencyDistribution.labels.frequencyMode')"
 							>
@@ -450,12 +453,13 @@ function toggleSourceTable() {
 							</ToolbarToggleGroup>
 						</div>
 						<ToolbarSeparator />
-						<div class="min-w-0 flex-[1_1_11rem] space-y-1">
-							<Label for="temporal-bucket-unit">{{
+						<div class="inline-flex min-w-0 items-center gap-1.5">
+							<CalendarDays class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+							<Label for="temporal-bucket-unit" class="sr-only">{{
 								t("TemporalFrequencyDistribution.labels.timeUnit")
 							}}</Label>
 							<Select v-model="bucketUnit">
-								<SelectTrigger id="temporal-bucket-unit" class="w-full min-w-0">
+								<SelectTrigger id="temporal-bucket-unit" class="h-8 w-[8.5rem] min-w-0">
 									<SelectValue :placeholder="t('TemporalFrequencyDistribution.labels.timeUnit')" />
 								</SelectTrigger>
 								<SelectContent>
@@ -469,25 +473,27 @@ function toggleSourceTable() {
 								</SelectContent>
 							</Select>
 						</div>
-						<div class="min-w-0 flex-[1_1_10rem] space-y-1">
-							<Label for="temporal-range-start">{{
+						<ToolbarSeparator />
+						<div class="inline-flex min-w-0 items-center gap-1.5">
+							<CalendarRange class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+							<Label for="temporal-range-start" class="sr-only">{{
 								t("TemporalFrequencyDistribution.labels.startDate")
 							}}</Label>
 							<Input
 								id="temporal-range-start"
 								v-model="rangeStart"
-								class="w-full min-w-0"
+								class="h-8 w-[9.25rem] min-w-0"
 								type="date"
 							/>
 						</div>
-						<div class="min-w-0 flex-[1_1_10rem] space-y-1">
-							<Label for="temporal-range-end">{{
+						<div class="inline-flex min-w-0 items-center gap-1.5">
+							<Label for="temporal-range-end" class="sr-only">{{
 								t("TemporalFrequencyDistribution.labels.endDate")
 							}}</Label>
 							<Input
 								id="temporal-range-end"
 								v-model="rangeEnd"
-								class="w-full min-w-0"
+								class="h-8 w-[9.25rem] min-w-0"
 								type="date"
 							/>
 						</div>
@@ -557,12 +563,12 @@ function toggleSourceTable() {
 					</div>
 					<Toolbar :aria-label="t('TemporalFrequencyDistribution.toolbar.interval')">
 						<CalendarRange class="mx-1 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-						<div class="min-w-0 flex-[1_1_12rem] space-y-1">
-							<Label for="temporal-interval">{{
+						<div class="inline-flex min-w-0 items-center gap-1.5">
+							<Label for="temporal-interval" class="sr-only">{{
 								t("TemporalFrequencyDistribution.labels.intervalSize")
 							}}</Label>
 							<Select v-model="interval" :aria-label="t('interval')">
-								<SelectTrigger id="temporal-interval" class="w-full min-w-0">
+								<SelectTrigger id="temporal-interval" class="h-8 w-[8.5rem] min-w-0">
 									<SelectValue :placeholder="t('interval')" />
 								</SelectTrigger>
 								<SelectContent>
@@ -580,15 +586,26 @@ function toggleSourceTable() {
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger as-child>
-									<ToolbarButton
-										:aria-label="t('TemporalFrequencyDistribution.labels.groupFromEnd')"
-										:aria-pressed="reverse"
-										type="button"
-										@click="toggleReverseIntervals"
+									<ToolbarToggleGroup
+										v-model="intervalDirection"
+										size="sm"
+										type="single"
+										:aria-label="t('TemporalFrequencyDistribution.labels.groupingDirection')"
 									>
-										<CalendarDays />
-										<span>{{ t("TemporalFrequencyDistribution.labels.groupFromEnd") }}</span>
-									</ToolbarButton>
+										<ToolbarToggleItem
+											value="forward"
+											:aria-label="t('TemporalFrequencyDistribution.labels.groupingDirection')"
+										>
+											<CalendarRange />
+										</ToolbarToggleItem>
+										<ToolbarToggleItem
+											value="reverse"
+											:aria-label="t('TemporalFrequencyDistribution.labels.groupFromEnd')"
+										>
+											<CalendarDays />
+											<span>{{ t("TemporalFrequencyDistribution.labels.groupFromEnd") }}</span>
+										</ToolbarToggleItem>
+									</ToolbarToggleGroup>
 								</TooltipTrigger>
 								<TooltipContent>
 									{{ t("TemporalFrequencyDistribution.tooltips.groupFromEnd") }}

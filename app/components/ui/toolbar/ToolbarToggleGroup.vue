@@ -36,7 +36,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
 	<ToolbarToggleGroup
 		v-slot="slotProps"
 		v-bind="forwarded"
-		:class="cn('flex items-center justify-center gap-1', props.class)"
+		:class="cn('inline-flex items-center justify-center gap-0.5 rounded-md', props.class)"
 	>
 		<slot v-bind="slotProps" />
 	</ToolbarToggleGroup>
