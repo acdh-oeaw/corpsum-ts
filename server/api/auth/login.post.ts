@@ -2,8 +2,7 @@ import bcrypt from "bcryptjs";
 
 import { UserModel } from "~/server/models/users.schema";
 import { setAuth } from "~/server/utils/auth";
-
-const { jwtExpiration } = useRuntimeConfig();
+import { getJwtExpirationMs } from "~/server/utils/jwt";
 
 const errorMessage = "username or password is wrong! please try again";
 
@@ -47,6 +46,6 @@ export default defineEventHandler(async (event) => {
 	return {
 		loggedIn: true,
 		user: user.username,
-		expires: Date.now() + parseInt(jwtExpiration),
+		expires: Date.now() + getJwtExpirationMs(),
 	};
 });

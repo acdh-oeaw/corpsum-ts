@@ -10,3 +10,4 @@ allowBuilds:
   simple-git-hooks: true
   unrs-resolver: true
   vue-demi: true
+minimumReleaseAge: 4320

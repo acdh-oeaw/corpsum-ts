@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 import type { ChartConfig } from ".";
 
-type DataPoint = [label: string, value: number];
+type DataPoint = [label: string | number, value: number];
 
 const props = withDefaults(
 	defineProps<{
@@ -26,7 +26,7 @@ const yearRange = computed(() => {
 	return Array.isArray(first) ? first[0] : "";
 });
 
-const title = computed(() => (typeof props.x === "string" ? props.x : yearRange.value));
+const title = computed(() => props.x ?? yearRange.value);
 
 const rows = computed(() =>
 	Object.entries(props.config).map(([, entry], i) => {

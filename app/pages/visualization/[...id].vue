@@ -3,8 +3,8 @@ import DataDisplayCollocations from "@/components/data-display/data-display-coll
 import DataDisplayKeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
-import DataDisplayMetadataTemporalFrequencyDistribution from "@/components/data-display/data-display-metadata-temporal-frequency-distribution.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
+import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import {
 	type VisualizationType,
@@ -57,7 +57,7 @@ const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-media-type": DataDisplayMediaType,
 	"data-display-regional-frequencies": DataDisplayRegionalFrequencies,
 	"data-display-word-form-frequencies": DataDisplayWordFormFrequencies,
-	[temporalFrequencyDistributionType]: DataDisplayMetadataTemporalFrequencyDistribution,
+	[temporalFrequencyDistributionType]: DataDisplayTemporalFrequencyDistribution,
 };
 
 const publishedLink = computed(() => {

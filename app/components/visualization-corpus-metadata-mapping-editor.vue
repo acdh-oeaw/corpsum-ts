@@ -47,7 +47,7 @@ function createMappingDraft(lookup: CorpusMetadataMappingLookupResponse | undefi
 			}
 		: {
 				attribute: "doc.year",
-				parser: { mode: "year" },
+				parser: { mode: "year", sourceUnit: "year" },
 				valueMap: {},
 				label: "Temporal distribution",
 				description: "",

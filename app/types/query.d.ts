@@ -9,6 +9,7 @@ type SearchFunctionKey =
 	| "collocations"
 	| "keywordInContext"
 	| "mediaSources"
+	| "mediaTypes"
 	| "regionalFrequencies"
 	| "wordFormFrequencies"
 	| "yearlyFrequencies";
@@ -32,6 +33,12 @@ interface QueryData {
 	}>;
 
 	mediaSources: Array<{
+		media: string;
+		absolute: number;
+		relative: number;
+	}>;
+
+	mediaTypes: Array<{
 		media: string;
 		absolute: number;
 		relative: number;

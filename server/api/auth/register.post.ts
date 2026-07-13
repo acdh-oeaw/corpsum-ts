@@ -7,8 +7,7 @@ import {
 } from "@/utils/auth-validation";
 import { UserModel } from "~/server/models/users.schema";
 import { setAuth } from "~/server/utils/auth";
-
-const { jwtExpiration } = useRuntimeConfig();
+import { getJwtExpirationMs } from "~/server/utils/jwt";
 
 export default defineEventHandler(async (event) => {
 	const payload = await readBody<unknown>(event);
@@ -60,7 +59,7 @@ export default defineEventHandler(async (event) => {
 	return {
 		registered: true,
 		user: values.username,
-		expires: Date.now() + parseInt(jwtExpiration),
+		expires: Date.now() + getJwtExpirationMs(),
 	};
 });
 

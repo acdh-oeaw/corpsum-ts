@@ -366,6 +366,88 @@
 		"createdAt": "Created",
 		"updatedAt": "Updated"
 	},
+	"TemporalFrequencyDistribution": {
+		"description": "Compare query frequencies over time.",
+		"errors": {
+			"invalidRange": "The exclusive end date must be later than the start date.",
+			"loadFailed": "The temporal frequency data could not be loaded."
+		},
+		"intervalChart": {
+			"description": "Compare frequencies grouped into consecutive time intervals.",
+			"title": "Temporal frequencies per {count} {unit}"
+		},
+		"labels": {
+			"endDate": "End date (exclusive)",
+			"frequencyMode": "Frequency mode",
+			"groupFromBeginning": "Start grouping at the beginning of the date range",
+			"groupFromEnd": "Start grouping at the end of the date range",
+			"groupingDirection": "Grouping direction",
+			"intervalSize": "Interval size",
+			"queryDetails": "Query details",
+			"startDate": "Start date",
+			"timeUnit": "Time unit"
+		},
+		"mapping": {
+			"corpusOnNoske": "{corpus} on {noske}",
+			"invalidDescription": "Correct the regular expression for each affected corpus before loading its data.",
+			"invalidTitle": "Invalid temporal metadata mapping",
+			"missingDescription": "Create a temporal mapping for each corpus before this visualization can query NoSketch metadata.",
+			"missingTitle": "Temporal metadata mapping required"
+		},
+		"settings": {
+			"intervalDescription": "Choose the size of each interval and whether grouping starts at the beginning or end of the date range.",
+			"intervalTitle": "Interval chart settings",
+			"timeSeriesDescription": "Choose how the temporal series is measured and which date range it covers.",
+			"timeSeriesTitle": "Time-series settings"
+		},
+		"toolbar": {
+			"interval": "Interval chart controls",
+			"sourceData": "Source data controls",
+			"timeSeries": "Time-series controls"
+		},
+		"tooltips": {
+			"absoluteMode": "Show absolute frequencies.",
+			"endDate": "Set the exclusive end date for the temporal frequency range.",
+			"fromBeginning": "Group intervals forward from the beginning of the selected date range.",
+			"fromEnd": "Group intervals backward from the end of the selected date range.",
+			"intervalSize": "Choose how many selected time units are combined into each interval.",
+			"queryDetails": "Show query details and cache controls.",
+			"relativeMode": "Show relative frequencies.",
+			"sourceData": "Show or hide the source data table.",
+			"startDate": "Set the first date included in the temporal frequency range.",
+			"timeUnit": "Choose the time unit used to bucket the time-series chart."
+		},
+		"title": "Temporal frequencies",
+		"units": {
+			"day": "day | days",
+			"month": "month | months",
+			"quarter": "quarter | quarters",
+			"week": "week | weeks",
+			"year": "year | years"
+		},
+		"warnings": {
+			"parseExcluded": "{count} temporal value could not be parsed and was excluded. | {count} temporal values could not be parsed and were excluded."
+		}
+	},
+	"VisualizationToolbar": {
+		"barChartMode": "Bar chart mode",
+		"chartMode": "Chart mode",
+		"combinedMapChart": "Combined map chart",
+		"frequencyMode": "Frequency mode",
+		"mapMode": "Map mode",
+		"mediaSource": "Media source controls",
+		"mediaType": "Media type controls",
+		"queryDetails": "Query details",
+		"regional": "Regional controls",
+		"separateMapCharts": "Separate map charts",
+		"sourceData": "Source data controls",
+		"tooltips": {
+			"absoluteMode": "Show absolute frequencies.",
+			"queryDetails": "Show query details and cache controls.",
+			"relativeMode": "Show relative frequencies.",
+			"sourceData": "Show or hide the source data table."
+		}
+	},
 	"email": "Email",
 	"login": "Log in",
 	"password": "Password",
@@ -403,6 +485,7 @@
 	"mediaSources": "Media sources",
 	"mediaSourcesDesc": "Compare the distribution of results across media sources.",
 	"mediaTypes": "Media types",
+	"mediaTypesDesc": "Compare the distribution of results across media types.",
 	"mediaTypeDistribution": "Distribution of media types per query",
 	"separateBarChart": "Separate bar chart",
 	"stackedBarChart": "Stacked bar chart",

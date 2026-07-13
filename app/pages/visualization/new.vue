@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import {
+	type CorpusMetadataSemantic,
+	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
+	getEditableVisualizationMetadataSemantics,
 	getDefaultVisualizationSettings,
+	normalizeTemporalFrequencyDistributionSettings,
+	normalizeVisualizationSettings,
+	temporalFrequencyDistributionType,
 	visualizationTypes,
 } from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
@@ -15,8 +22,13 @@ const queriesList = computed(() => queries.value ?? []);
 const name = ref("");
 const selectedQueries = ref<Array<string>>([]);
 const selectedVisualizations = ref<Array<VisualizationType>>([]);
+const settingsByType = ref<Partial<Record<VisualizationType, unknown>>>({});
 const settingsText = computed(() =>
-	JSON.stringify(selectedVisualizations.value.map((type) => getDefaultVisualizationSettings(type))),
+	JSON.stringify(
+		selectedVisualizations.value.map((type) =>
+			normalizeVisualizationSettings(type, settingsByType.value[type]),
+		),
+	),
 );
 const dataText = ref("[]");
 const formError = ref("");
@@ -34,6 +46,12 @@ const toggleVisualizationSelection = (
 		if (!items.includes(value)) {
 			items.push(value);
 		}
+		if (settingsByType.value[value] === undefined) {
+			settingsByType.value = {
+				...settingsByType.value,
+				[value]: getDefaultVisualizationSettings(value),
+			};
+		}
 		selectedVisualizations.value = items;
 		return;
 	}
@@ -47,6 +65,27 @@ const selectedQueryItems = computed(() =>
 const availableQueryItems = computed(() =>
 	queriesList.value.filter((query) => !selectedQueries.value.includes(query._id)),
 );
+const { buildCorpusQuery } = useCorpusQueryBuilder();
+const corpusQueries = computed(() =>
+	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
+);
+const { mappingsForQueries: temporalMetadataMappings, refreshMappings: refreshTemporalMappings } =
+	await useCorpusMetadataMappings(corpusQueries, "temporal");
+const editableMetadataSemantics = computed<Array<CorpusMetadataSemantic>>(() => [
+	...new Set(selectedVisualizations.value.flatMap(getEditableVisualizationMetadataSemantics)),
+]);
+const temporalSettings = computed(() =>
+	normalizeTemporalFrequencyDistributionSettings(
+		settingsByType.value[temporalFrequencyDistributionType],
+	),
+);
+
+function updateTemporalSettings(settings: TemporalFrequencyDistributionSettings) {
+	settingsByType.value = {
+		...settingsByType.value,
+		[temporalFrequencyDistributionType]: settings,
+	};
+}
 
 const openDialog = () => {
 	tempSelectedQueries.value = [...selectedQueries.value];
@@ -274,17 +313,28 @@ function cancel() {
 
 			<div class="grid gap-2">
 				<p class="text-sm font-medium">{{ t("VisualizationForm.labels.visualizations") }}</p>
-				<div class="space-y-2 rounded-md border p-3">
-					<div
-						v-for="visualization in visualizationTypes"
-						:key="visualization"
-						class="flex items-center gap-2"
-					>
-						<Checkbox
-							:model-value="selectedVisualizations.includes(visualization)"
-							@update:model-value="toggleVisualizationSelection(visualization, $event)"
+				<div class="grid gap-3 md:grid-cols-2">
+					<div class="space-y-2 rounded-md border p-3">
+						<div
+							v-for="visualization in visualizationTypes"
+							:key="visualization"
+							class="flex items-center gap-2"
+						>
+							<Checkbox
+								:model-value="selectedVisualizations.includes(visualization)"
+								@update:model-value="toggleVisualizationSelection(visualization, $event)"
+							/>
+							<span class="text-sm">{{ visualization }}</span>
+						</div>
+					</div>
+					<div v-if="editableMetadataSemantics.length > 0" class="grid gap-3">
+						<VisualizationCorpusMetadataMappingEditor
+							v-for="semantic in editableMetadataSemantics"
+							:key="semantic"
+							:queries="corpusQueries"
+							:semantic="semantic"
+							@updated="refreshTemporalMappings"
 						/>
-						<span class="text-sm">{{ visualization }}</span>
 					</div>
 				</div>
 			</div>
@@ -296,5 +346,14 @@ function cancel() {
 				{{ formError }}
 			</p>
 		</form>
+
+		<DataDisplayTemporalFrequencyDistribution
+			v-if="selectedVisualizations.includes(temporalFrequencyDistributionType)"
+			class="mt-6"
+			:metadata-mappings="temporalMetadataMappings"
+			:queries="corpusQueries"
+			:settings="temporalSettings"
+			@update:settings="updateTemporalSettings"
+		/>
 	</MainContent>
 </template>
