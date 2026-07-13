@@ -13,11 +13,15 @@ interface NoskeQueryOptions<TData> {
 	initialData?: TData;
 }
 
-export function useNoskeClient(id: MaybeRef<string | null>) {
+export function useNoskeClient(
+	id: MaybeRef<string | null>,
+	options: { enabled?: MaybeRef<boolean> } = {},
+) {
 	const resolvedId = computed(() => unref(id));
-	const { data: instanceResponse } = useGetNoskeinstances(resolvedId);
+	const enabled = computed(() => unref(options.enabled) ?? true);
+	const { data: instanceResponse } = useGetNoskeinstances(resolvedId, { enabled });
 	const instance = computed<PopulatedNoskeDocument | null>(() => {
-		if (!resolvedId.value || !instanceResponse.value) return null;
+		if (!enabled.value || !resolvedId.value || !instanceResponse.value) return null;
 		if (Array.isArray(instanceResponse.value)) {
 			return instanceResponse.value.find(({ _id }) => _id === resolvedId.value) ?? null;
 		}
@@ -25,6 +29,7 @@ export function useNoskeClient(id: MaybeRef<string | null>) {
 	});
 
 	const client = computed<NoskeClient | null>(() => {
+		if (!enabled.value) return null;
 		if (!instance.value) return null;
 		if (resolvedId.value && instance.value._id !== resolvedId.value) return null;
 		const noskeClient = createClient<paths>({
