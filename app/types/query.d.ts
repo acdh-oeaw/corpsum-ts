@@ -81,7 +81,7 @@ interface KWICAttrsStructsOptions {
 }
 
 type ConcordanceQuery = Record<"queryselector", CorpusQueryType> &
-	Record<CorpusQueryTypeValue, string>;
+	Partial<Record<CorpusQueryTypeValue, string>>;
 
 interface FacettingRegexSearch {
 	key: string;

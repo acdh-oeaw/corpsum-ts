@@ -15,6 +15,7 @@ import {
 	isTemporalBucketRangeSupported,
 	normalizeTemporalFrequencyDistributionSettings,
 	temporalFrequencyDistributionType,
+	type TemporalFrequencyDistributionSettings,
 } from "@/lib/visualization-types";
 import { alignChartSeriesData, getChartTooltipDomainValue } from "@/utils/chart-data";
 
@@ -23,7 +24,7 @@ const utc = (value: string) => new Date(`${value}T00:00:00.000Z`);
 const query: CorpusQuery = {
 	id: 1,
 	noske: "demo-noske",
-	type: "word",
+	type: "wordrow",
 	userInput: "example",
 	finalQuery: "example",
 	preparedQuery: "example",
@@ -31,7 +32,7 @@ const query: CorpusQuery = {
 	showPicker: false,
 	corpus: "demo-corpus",
 	subCorpus: "",
-	concordance_query: { queryselector: "word", word: "example" },
+	concordance_query: { queryselector: "wordrow", word: "example" },
 	KWICAttrsStructs: { attributes: [], structures: [] },
 	KWICAdditionalViewHeaders: [],
 	KWICAttrsStructsOptions: { attributes: [], structures: [] },
@@ -242,7 +243,7 @@ test.describe("temporal visualization component", () => {
 	test("renders German without missing message keys", async ({ mount, page }) => {
 		const missingKeys: Array<string> = [];
 		page.on("console", (message) => {
-			if (message.type() === "warn" && message.text().includes("Not found")) {
+			if (message.type() === "warning" && message.text().includes("Not found")) {
 				missingKeys.push(message.text());
 			}
 		});
@@ -274,7 +275,10 @@ test.describe("temporal visualization component", () => {
 		const updates: Array<ReturnType<typeof normalizeTemporalFrequencyDistributionSettings>> = [];
 		const component = await mount(TemporalFrequencyDistribution, {
 			props: componentProps(),
-			on: { "update:settings": (settings) => updates.push(settings) },
+			on: {
+				"update:settings": (settings: TemporalFrequencyDistributionSettings) =>
+					updates.push(settings),
+			},
 		});
 		await component.getByRole("button", { name: "Relative" }).click();
 		await component.getByLabel("Time unit").click();

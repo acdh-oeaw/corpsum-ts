@@ -7,7 +7,7 @@ import RegionalFrequencies from "@/components/data-display/data-display-regional
 const query: CorpusQuery = {
 	id: 1,
 	noske: "demo-noske",
-	type: "word",
+	type: "wordrow",
 	userInput: "example",
 	finalQuery: "example",
 	preparedQuery: "example",
@@ -15,7 +15,7 @@ const query: CorpusQuery = {
 	showPicker: false,
 	corpus: "demo-corpus",
 	subCorpus: "",
-	concordance_query: { queryselector: "word", word: "example" },
+	concordance_query: { queryselector: "wordrow", word: "example" },
 	KWICAttrsStructs: { attributes: [], structures: [] },
 	KWICAdditionalViewHeaders: [],
 	KWICAttrsStructsOptions: { attributes: [], structures: [] },
