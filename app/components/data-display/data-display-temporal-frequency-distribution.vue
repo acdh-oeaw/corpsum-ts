@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { CalendarDays, CalendarRange, Hash, Percent, Rows3 } from "lucide-vue-next";
+import { CalendarDays, CalendarRange, Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
 import {
 	type CorpusMetadataMappingResponse,
@@ -134,16 +134,20 @@ const bucketUnitOptions = computed(() =>
 		label: formatTemporalUnit(unit, 1),
 	})),
 );
+const hasMultipleBucketUnitOptions = computed(() => bucketUnitOptions.value.length > 1);
 const intervalSizeOptions = computed(() =>
 	intervalOptions.map((value) => ({
 		value,
 		label: `${value} ${formatTemporalUnit(bucketUnit.value, value)}`,
 	})),
 );
+function setMode(value: unknown) {
+	if (value === "absolute" || value === "relative") mode.value = value;
+}
 const intervalDirection = computed({
 	get: () => (reverse.value ? "reverse" : "forward"),
 	set: (value?: string) => {
-		reverse.value = value === "reverse";
+		if (value === "forward" || value === "reverse") reverse.value = value === "reverse";
 	},
 });
 const usesProvidedData = computed(() => props.data !== undefined);
@@ -405,128 +409,162 @@ function toggleSourceTable() {
 			</div>
 
 			<template v-if="queryableQueryCount > 0">
-				<div v-if="interactive" class="space-y-3" aria-labelledby="temporal-time-series-settings">
-					<div>
-						<h3 id="temporal-time-series-settings" class="font-medium">
-							{{ t("TemporalFrequencyDistribution.settings.timeSeriesTitle") }}
-						</h3>
-						<p class="text-sm text-muted-foreground">
-							{{ t("TemporalFrequencyDistribution.settings.timeSeriesDescription") }}
-						</p>
-					</div>
+				<div>
 					<Toolbar :aria-label="t('TemporalFrequencyDistribution.toolbar.timeSeries')">
-						<div class="inline-flex min-w-0 items-center gap-1.5">
-							<Label class="sr-only">{{
-								t("TemporalFrequencyDistribution.labels.frequencyMode")
-							}}</Label>
-							<ToolbarToggleGroup
-								v-model="mode"
-								class="shrink-0"
-								size="sm"
-								type="single"
-								:aria-label="t('TemporalFrequencyDistribution.labels.frequencyMode')"
-							>
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger as-child>
-											<ToolbarToggleItem value="absolute" :aria-label="t('absolute')">
-												<Hash />
-												<span>{{ t("absolute") }}</span>
-											</ToolbarToggleItem>
-										</TooltipTrigger>
-										<TooltipContent>
-											{{ t("TemporalFrequencyDistribution.tooltips.absoluteMode") }}
-										</TooltipContent>
-									</Tooltip>
-									<Tooltip>
-										<TooltipTrigger as-child>
-											<ToolbarToggleItem value="relative" :aria-label="t('relative')">
-												<Percent />
-												<span>{{ t("relative") }}</span>
-											</ToolbarToggleItem>
-										</TooltipTrigger>
-										<TooltipContent>
-											{{ t("TemporalFrequencyDistribution.tooltips.relativeMode") }}
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							</ToolbarToggleGroup>
-						</div>
-						<ToolbarSeparator />
-						<div class="inline-flex min-w-0 items-center gap-1.5">
-							<CalendarDays class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-							<Label for="temporal-bucket-unit" class="sr-only">{{
-								t("TemporalFrequencyDistribution.labels.timeUnit")
-							}}</Label>
-							<Select v-model="bucketUnit">
-								<SelectTrigger id="temporal-bucket-unit" class="h-8 w-[8.5rem] min-w-0">
-									<SelectValue :placeholder="t('TemporalFrequencyDistribution.labels.timeUnit')" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem
-										v-for="option of bucketUnitOptions"
-										:key="option.value"
-										:value="option.value"
+						<template v-if="interactive">
+							<div class="inline-flex min-w-0 items-center gap-1.5">
+								<Label class="sr-only">{{
+									t("TemporalFrequencyDistribution.labels.frequencyMode")
+								}}</Label>
+								<ToolbarToggleGroup
+									class="h-8 shrink-0 rounded-md border border-input bg-background p-0.5 shadow-sm"
+									:model-value="mode"
+									size="sm"
+									type="single"
+									:aria-label="t('TemporalFrequencyDistribution.labels.frequencyMode')"
+									@update:model-value="setMode"
+								>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<ToolbarToggleItem
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+													value="absolute"
+													:aria-label="t('absolute')"
+												>
+													<Hash />
+												</ToolbarToggleItem>
+											</TooltipTrigger>
+											<TooltipContent>
+												{{ t("TemporalFrequencyDistribution.tooltips.absoluteMode") }}
+											</TooltipContent>
+										</Tooltip>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<ToolbarToggleItem
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+													value="relative"
+													:aria-label="t('relative')"
+												>
+													<Percent />
+												</ToolbarToggleItem>
+											</TooltipTrigger>
+											<TooltipContent>
+												{{ t("TemporalFrequencyDistribution.tooltips.relativeMode") }}
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</ToolbarToggleGroup>
+							</div>
+							<ToolbarSeparator />
+							<div class="inline-flex min-w-0 items-center gap-1.5">
+								<CalendarDays class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+								<Label for="temporal-bucket-unit" class="sr-only">{{
+									t("TemporalFrequencyDistribution.labels.timeUnit")
+								}}</Label>
+								<Select v-model="bucketUnit">
+									<SelectTrigger
+										id="temporal-bucket-unit"
+										class="h-8 w-[8.5rem] min-w-0"
+										:disabled="!hasMultipleBucketUnitOptions"
+										:title="t('TemporalFrequencyDistribution.tooltips.timeUnit')"
 									>
-										{{ option.label }}
-									</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-						<ToolbarSeparator />
-						<div class="inline-flex min-w-0 items-center gap-1.5">
-							<CalendarRange class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-							<Label for="temporal-range-start" class="sr-only">{{
-								t("TemporalFrequencyDistribution.labels.startDate")
-							}}</Label>
-							<Input
-								id="temporal-range-start"
-								v-model="rangeStart"
-								class="h-8 w-[9.25rem] min-w-0"
-								type="date"
-							/>
-						</div>
-						<div class="inline-flex min-w-0 items-center gap-1.5">
-							<Label for="temporal-range-end" class="sr-only">{{
-								t("TemporalFrequencyDistribution.labels.endDate")
-							}}</Label>
-							<Input
-								id="temporal-range-end"
-								v-model="rangeEnd"
-								class="h-8 w-[9.25rem] min-w-0"
-								type="date"
-							/>
-						</div>
-						<p v-if="!selectedDateRange" class="basis-full text-sm text-destructive" role="alert">
+										<SelectValue
+											:placeholder="t('TemporalFrequencyDistribution.labels.timeUnit')"
+										/>
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem
+											v-for="option of bucketUnitOptions"
+											:key="option.value"
+											:value="option.value"
+										>
+											{{ option.label }}
+										</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+							<ToolbarSeparator />
+							<div class="inline-flex min-w-0 items-center gap-1.5">
+								<CalendarRange class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+								<Label for="temporal-range-start" class="sr-only">{{
+									t("TemporalFrequencyDistribution.labels.startDate")
+								}}</Label>
+								<Input
+									id="temporal-range-start"
+									v-model="rangeStart"
+									class="h-8 w-[9.25rem] min-w-0"
+									:title="t('TemporalFrequencyDistribution.tooltips.startDate')"
+									type="date"
+								/>
+							</div>
+							<div class="inline-flex min-w-0 items-center gap-1.5">
+								<Label for="temporal-range-end" class="sr-only">{{
+									t("TemporalFrequencyDistribution.labels.endDate")
+								}}</Label>
+								<Input
+									id="temporal-range-end"
+									v-model="rangeEnd"
+									class="h-8 w-[9.25rem] min-w-0"
+									:title="t('TemporalFrequencyDistribution.tooltips.endDate')"
+									type="date"
+								/>
+							</div>
+							<ToolbarSeparator />
+						</template>
+						<Popover>
+							<PopoverTrigger
+								class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
+								:aria-label="t('TemporalFrequencyDistribution.labels.queryDetails')"
+								:title="t('TemporalFrequencyDistribution.tooltips.queryDetails')"
+								type="button"
+							>
+								<Info />
+							</PopoverTrigger>
+							<PopoverContent align="end" class="w-80 p-2">
+								<div class="max-h-96 space-y-3 overflow-y-auto">
+									<div
+										v-for="(query, index) of activeQueries"
+										v-show="temporalParsers[index] && !temporalParsers[index]?.error"
+										:key="query.id"
+										class="min-w-0 rounded-md border p-2"
+									>
+										<QueryDisplay
+											class="my-0"
+											:loading="temporalFrequenciesLoading[index]"
+											:query="query"
+											:query-key="queryDescriptors[index]?.queryKey"
+										/>
+										<p
+											v-if="normalizationWarnings[index]"
+											class="mt-1 text-xs text-muted-foreground"
+										>
+											{{
+												t(
+													"TemporalFrequencyDistribution.warnings.parseExcluded",
+													normalizationWarnings[index],
+												)
+											}}
+										</p>
+										<p
+											v-if="temporalFrequenciesErrors[index]"
+											class="mt-1 text-sm text-destructive"
+											role="alert"
+										>
+											{{ temporalFrequenciesErrors[index] }}
+										</p>
+									</div>
+								</div>
+							</PopoverContent>
+						</Popover>
+						<p
+							v-if="interactive && !selectedDateRange"
+							class="basis-full text-sm text-destructive"
+							role="alert"
+						>
 							{{ t("TemporalFrequencyDistribution.errors.invalidRange") }}
 						</p>
 					</Toolbar>
-				</div>
-				<div
-					v-for="(query, index) of activeQueries"
-					v-show="temporalParsers[index] && !temporalParsers[index]?.error"
-					:key="query.id"
-				>
-					<QueryDisplay
-						:loading="temporalFrequenciesLoading[index]"
-						:query="query"
-						:query-key="queryDescriptors[index]?.queryKey"
-					/>
-					<p v-if="normalizationWarnings[index]" class="mt-1 text-xs text-muted-foreground">
-						{{
-							t(
-								"TemporalFrequencyDistribution.warnings.parseExcluded",
-								normalizationWarnings[index],
-							)
-						}}
-					</p>
-					<p
-						v-if="temporalFrequenciesErrors[index]"
-						class="mt-1 text-sm text-destructive"
-						role="alert"
-					>
-						{{ temporalFrequenciesErrors[index] }}
-					</p>
 				</div>
 				<Chart
 					chart-type="line"
@@ -552,15 +590,7 @@ function toggleSourceTable() {
 					}}</CardDescription>
 				</CardHeader>
 
-				<div v-if="interactive" class="space-y-3" aria-labelledby="temporal-interval-settings">
-					<div>
-						<h3 id="temporal-interval-settings" class="font-medium">
-							{{ t("TemporalFrequencyDistribution.settings.intervalTitle") }}
-						</h3>
-						<p class="text-sm text-muted-foreground">
-							{{ t("TemporalFrequencyDistribution.settings.intervalDescription") }}
-						</p>
-					</div>
+				<div v-if="interactive">
 					<Toolbar :aria-label="t('TemporalFrequencyDistribution.toolbar.interval')">
 						<CalendarRange class="mx-1 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
 						<div class="inline-flex min-w-0 items-center gap-1.5">
@@ -568,7 +598,11 @@ function toggleSourceTable() {
 								t("TemporalFrequencyDistribution.labels.intervalSize")
 							}}</Label>
 							<Select v-model="interval" :aria-label="t('interval')">
-								<SelectTrigger id="temporal-interval" class="h-8 w-[8.5rem] min-w-0">
+								<SelectTrigger
+									id="temporal-interval"
+									class="h-8 w-[8.5rem] min-w-0"
+									:title="t('TemporalFrequencyDistribution.tooltips.intervalSize')"
+								>
 									<SelectValue :placeholder="t('interval')" />
 								</SelectTrigger>
 								<SelectContent>
@@ -584,33 +618,42 @@ function toggleSourceTable() {
 						</div>
 						<ToolbarSeparator />
 						<TooltipProvider>
-							<Tooltip>
-								<TooltipTrigger as-child>
-									<ToolbarToggleGroup
-										v-model="intervalDirection"
-										size="sm"
-										type="single"
-										:aria-label="t('TemporalFrequencyDistribution.labels.groupingDirection')"
-									>
+							<ToolbarToggleGroup
+								v-model="intervalDirection"
+								class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
+								size="sm"
+								type="single"
+								:aria-label="t('TemporalFrequencyDistribution.labels.groupingDirection')"
+							>
+								<Tooltip>
+									<TooltipTrigger as-child>
 										<ToolbarToggleItem
+											class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 											value="forward"
-											:aria-label="t('TemporalFrequencyDistribution.labels.groupingDirection')"
+											:aria-label="t('TemporalFrequencyDistribution.labels.groupFromBeginning')"
 										>
 											<CalendarRange />
 										</ToolbarToggleItem>
+									</TooltipTrigger>
+									<TooltipContent>
+										{{ t("TemporalFrequencyDistribution.tooltips.fromBeginning") }}
+									</TooltipContent>
+								</Tooltip>
+								<Tooltip>
+									<TooltipTrigger as-child>
 										<ToolbarToggleItem
+											class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 											value="reverse"
 											:aria-label="t('TemporalFrequencyDistribution.labels.groupFromEnd')"
 										>
 											<CalendarDays />
-											<span>{{ t("TemporalFrequencyDistribution.labels.groupFromEnd") }}</span>
 										</ToolbarToggleItem>
-									</ToolbarToggleGroup>
-								</TooltipTrigger>
-								<TooltipContent>
-									{{ t("TemporalFrequencyDistribution.tooltips.groupFromEnd") }}
-								</TooltipContent>
-							</Tooltip>
+									</TooltipTrigger>
+									<TooltipContent>
+										{{ t("TemporalFrequencyDistribution.tooltips.fromEnd") }}
+									</TooltipContent>
+								</Tooltip>
+							</ToolbarToggleGroup>
 						</TooltipProvider>
 					</Toolbar>
 				</div>
@@ -651,7 +694,6 @@ function toggleSourceTable() {
 								@click="toggleSourceTable"
 							>
 								<Rows3 />
-								<span>{{ !expand ? t("ShowData") : t("HideData") }}</span>
 							</ToolbarButton>
 						</TooltipTrigger>
 						<TooltipContent>
