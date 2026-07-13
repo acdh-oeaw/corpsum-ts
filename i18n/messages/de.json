@@ -379,9 +379,11 @@
 		"labels": {
 			"endDate": "Enddatum (exklusiv)",
 			"frequencyMode": "Frequenzmodus",
+			"groupFromBeginning": "Gruppierung am Anfang des Datumsbereichs beginnen",
 			"groupFromEnd": "Gruppierung am Ende des Datumsbereichs beginnen",
 			"groupingDirection": "Gruppierungsrichtung",
 			"intervalSize": "Intervallgröße",
+			"queryDetails": "Abfragedetails",
 			"startDate": "Startdatum",
 			"timeUnit": "Zeiteinheit"
 		},
@@ -405,9 +407,15 @@
 		},
 		"tooltips": {
 			"absoluteMode": "Absolute Frequenzen anzeigen.",
-			"groupFromEnd": "Intervalle rückwärts ab dem Ende des gewählten Datumsbereichs gruppieren.",
+			"endDate": "Legt das exklusive Enddatum für den zeitlichen Frequenzbereich fest.",
+			"fromBeginning": "Intervalle vorwärts ab dem Anfang des gewählten Datumsbereichs gruppieren.",
+			"fromEnd": "Intervalle rückwärts ab dem Ende des gewählten Datumsbereichs gruppieren.",
+			"intervalSize": "Legt fest, wie viele ausgewählte Zeiteinheiten zu einem Intervall zusammengefasst werden.",
+			"queryDetails": "Abfragedetails und Cache-Steuerung anzeigen.",
 			"relativeMode": "Relative Frequenzen anzeigen.",
-			"sourceData": "Die Quelldatentabelle ein- oder ausblenden."
+			"sourceData": "Die Quelldatentabelle ein- oder ausblenden.",
+			"startDate": "Legt das erste Datum fest, das im zeitlichen Frequenzbereich enthalten ist.",
+			"timeUnit": "Legt die Zeiteinheit fest, nach der das Zeitreihendiagramm gruppiert wird."
 		},
 		"title": "Zeitliche Frequenzen",
 		"units": {

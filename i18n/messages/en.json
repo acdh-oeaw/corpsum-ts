@@ -379,9 +379,11 @@
 		"labels": {
 			"endDate": "End date (exclusive)",
 			"frequencyMode": "Frequency mode",
+			"groupFromBeginning": "Start grouping at the beginning of the date range",
 			"groupFromEnd": "Start grouping at the end of the date range",
 			"groupingDirection": "Grouping direction",
 			"intervalSize": "Interval size",
+			"queryDetails": "Query details",
 			"startDate": "Start date",
 			"timeUnit": "Time unit"
 		},
@@ -405,9 +407,15 @@
 		},
 		"tooltips": {
 			"absoluteMode": "Show absolute frequencies.",
-			"groupFromEnd": "Group intervals backward from the end of the selected date range.",
+			"endDate": "Set the exclusive end date for the temporal frequency range.",
+			"fromBeginning": "Group intervals forward from the beginning of the selected date range.",
+			"fromEnd": "Group intervals backward from the end of the selected date range.",
+			"intervalSize": "Choose how many selected time units are combined into each interval.",
+			"queryDetails": "Show query details and cache controls.",
 			"relativeMode": "Show relative frequencies.",
-			"sourceData": "Show or hide the source data table."
+			"sourceData": "Show or hide the source data table.",
+			"startDate": "Set the first date included in the temporal frequency range.",
+			"timeUnit": "Choose the time unit used to bucket the time-series chart."
 		},
 		"title": "Temporal frequencies",
 		"units": {
