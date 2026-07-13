@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
+import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
+import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import {
 	type CorpusMetadataMappingResponse,
@@ -86,8 +89,8 @@ const renderItems = computed(() =>
 		key: visualizationDefinitions[normalizeVisualizationType(type)].searchKey,
 	})),
 );
-const hasNonTemporalVisualization = computed(() =>
-	renderItems.value.some(({ type }) => type !== temporalFrequencyDistributionType),
+const hasGlobalFrequencyVisualization = computed(() =>
+	renderItems.value.some(({ key }) => key === "wordFormFrequencies"),
 );
 
 function findPanel(type: PublishedPanelSnapshot["type"], queryId: string) {
@@ -124,45 +127,6 @@ function parseWordFormFrequencies(query: PublishedQuerySnapshot) {
 			word: item.Word?.[0]?.n ?? "",
 			absolute: item.frq ?? 0,
 			relative: item.fpm ?? 0,
-		})) ?? []
-	);
-}
-
-function parseMediaSources(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-media-source", query.sourceQueryId)?.data as
-		| FreqMlResponse
-		| undefined;
-	return (
-		data?.Blocks?.[0]?.Items?.map((item) => ({
-			media: item.Word?.[0]?.n ?? "",
-			absolute: item.frq ?? 0,
-			relative: item.reltt ?? 0,
-		})) ?? []
-	);
-}
-function parseMediaTypes(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-media-type", query.sourceQueryId)?.data as
-		| FreqMlResponse
-		| undefined;
-	console.log(data);
-	return (
-		data?.Blocks?.[0]?.Items?.map((item) => ({
-			media: item.Word?.[0]?.n ?? "",
-			absolute: item.frq ?? 0,
-			relative: item.reltt ?? 0,
-		})) ?? []
-	);
-}
-
-function parseRegionalFrequencies(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-regional-frequencies", query.sourceQueryId)?.data as
-		| FreqMlResponse
-		| undefined;
-	return (
-		data?.Blocks?.[0]?.Items?.map((item) => ({
-			region: item.Word?.[0]?.n ?? "",
-			absolute: item.frq ?? 0,
-			relative: item.reltt ?? 0,
 		})) ?? []
 	);
 }
@@ -208,27 +172,27 @@ function parseKwic(query: PublishedQuerySnapshot) {
 	);
 }
 
-const mediaSources = computed(() => props.snapshot.queries.map(parseMediaSources));
-const mediaTypes = computed(() => props.snapshot.queries.map(parseMediaTypes));
-const mediaTypeSeries = computed(() => {
-	const allMedia = mediaTypes.value.flatMap((distribution) =>
-		distribution.map((item) => item.media),
-	);
-	const allMediaSet = [...new Set(allMedia)];
-	return corpusQueries.value.map((_, index) =>
-		(mediaTypes.value[index] ?? []).map((item) => ({
-			label: item.media,
-			data: [[item.media, item[mode.value]] as [string, number]],
-			color: categoryColors[allMediaSet.indexOf(item.media) % 5],
-		})),
-	);
-});
-
-const regionalFrequencies = computed(() =>
-	props.snapshot.queries.map((query) => ({
-		query: query.id,
-		data: parseRegionalFrequencies(query),
-	})),
+const mediaSourceData = computed<Array<FreqMlResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-media-source", query.sourceQueryId)?.data as
+				| FreqMlResponse
+				| undefined,
+	),
+);
+const mediaTypeData = computed<Array<FreqMlResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-media-type", query.sourceQueryId)?.data as FreqMlResponse | undefined,
+	),
+);
+const regionalData = computed<Array<FreqMlResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-regional-frequencies", query.sourceQueryId)?.data as
+				| FreqMlResponse
+				| undefined,
+	),
 );
 const temporalPanels = computed(() =>
 	props.snapshot.queries.map((query) =>
@@ -251,7 +215,7 @@ const temporalSettings = computed<Partial<TemporalFrequencyDistributionSettings>
 
 <template>
 	<div class="grid gap-6">
-		<div v-if="!embed && hasNonTemporalVisualization" class="flex flex-wrap items-center gap-3">
+		<div v-if="!embed && hasGlobalFrequencyVisualization" class="flex flex-wrap items-center gap-3">
 			<ToggleGroup v-model="mode" class="flex" type="single">
 				<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
 				<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
@@ -266,6 +230,30 @@ const temporalSettings = computed<Partial<TemporalFrequencyDistributionSettings>
 				:metadata-mappings="temporalMappings"
 				:queries="corpusQueries"
 				:settings="temporalSettings"
+				:show-header="!embed"
+				:show-source-data="!embed"
+			/>
+			<DataDisplayMediaSource
+				v-else-if="type === 'data-display-media-source'"
+				:data="mediaSourceData"
+				:interactive="!embed"
+				:queries="corpusQueries"
+				:show-header="!embed"
+				:show-source-data="!embed"
+			/>
+			<DataDisplayMediaType
+				v-else-if="type === 'data-display-media-type'"
+				:data="mediaTypeData"
+				:interactive="!embed"
+				:queries="corpusQueries"
+				:show-header="!embed"
+				:show-source-data="!embed"
+			/>
+			<DataDisplayRegionalFrequencies
+				v-else-if="type === 'data-display-regional-frequencies'"
+				:data="regionalData"
+				:interactive="!embed"
+				:queries="corpusQueries"
 				:show-header="!embed"
 				:show-source-data="!embed"
 			/>
@@ -294,43 +282,6 @@ const temporalSettings = computed<Partial<TemporalFrequencyDistributionSettings>
 								:title="query.userInput"
 							/>
 						</div>
-					</template>
-
-					<template v-else-if="key === 'mediaSources'">
-						<MediaStackedBarChart
-							:mode="mode"
-							:queries="corpusQueries"
-							:source-distributions="mediaSources"
-							:stack="true"
-							chart-mode="bar"
-							:height="1200"
-						/>
-					</template>
-					<template v-else-if="key === 'mediaTypes'">
-						<MediaStackedBarChart
-							:mode="mode"
-							:queries="corpusQueries"
-							:source-distributions="mediaTypes"
-							:stack="true"
-							chart-mode="bar"
-						/>
-						<h4 class="mt-16 text-center font-semibold">{{ t("mediaTypeDistribution") }}</h4>
-						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-							<div v-for="(query, index) of corpusQueries" :key="query.id">
-								<QueryDisplay :query="query" class="justify-center" />
-								<Chart chart-type="donut" :series="mediaTypeSeries[index] ?? []" :height="150" />
-							</div>
-						</div>
-					</template>
-
-					<template v-else-if="key === 'regionalFrequencies'">
-						<ClientOnly>
-							<CombinedMapChart
-								:mode="mode"
-								:queries="corpusQueries"
-								:resdata="regionalFrequencies"
-							/>
-						</ClientOnly>
 					</template>
 
 					<template v-else-if="key === 'collocations'">

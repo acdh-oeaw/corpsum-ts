@@ -1,28 +1,70 @@
 <script lang="ts" setup>
 import { useQueries } from "@tanstack/vue-query";
-import { BarChart3, BarChart4, ChartBarStacked } from "lucide-vue-next";
+import { BarChart3, BarChart4, ChartBarStacked, Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
 import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
+type FrequencyMode = "absolute" | "relative";
+type MediaChartMode = "bar" | "stack" | "percent";
+
+const props = withDefaults(
+	defineProps<{
+		queries: Array<CorpusQuery>;
+		data?: Array<FreqMlResponse | null | undefined>;
+		interactive?: boolean;
+		showHeader?: boolean;
+		showSourceData?: boolean;
+	}>(),
+	{
+		data: undefined,
+		interactive: true,
+		showHeader: true,
+		showSourceData: true,
+	},
+);
 
 const t = useTranslations();
-const props = defineProps<{
-	queries: Array<CorpusQuery>;
-}>();
-
 const queries = computed(() => props.queries);
 const noskeId = computed(() => queries.value[0]?.noske ?? null);
-const { client } = useNoskeClient(noskeId);
+const usesProvidedData = computed(() => props.data !== undefined);
+const { client } = useNoskeClient(noskeId, { enabled: computed(() => !usesProvidedData.value) });
 
-const mode: Ref<"absolute" | "relative"> = ref("relative");
+const mode = ref<FrequencyMode>("relative");
+const chartMode = ref<MediaChartMode>("stack");
 const expand = ref(false);
 
-const sourceDistributions: Ref<Array<Array<IsourceDistribution>>> = ref([]);
-const sourceDistributionsLoading: Ref<Array<boolean>> = ref([]);
+const sourceDistributions = ref<Array<Array<IsourceDistribution>>>([]);
+const sourceDistributionsLoading = ref<Array<boolean>>([]);
 
-const q = computed(() =>
+function setMode(value: unknown) {
+	if (value === "absolute" || value === "relative") mode.value = value;
+}
+
+function setChartMode(value: unknown) {
+	if (value === "bar" || value === "stack" || value === "percent") chartMode.value = value;
+}
+
+function parseMediaDistribution(data: FreqMlResponse | null | undefined) {
+	return (
+		data?.Blocks?.[0]?.Items?.map((item) => ({
+			absolute: item.frq ?? 0,
+			relative: item.reltt ?? 0,
+			media: item.Word?.[0]?.n ?? "",
+		})) ?? []
+	);
+}
+
+watchEffect(() => {
+	if (!usesProvidedData.value) return;
+	sourceDistributions.value = queries.value.map((_, index) =>
+		parseMediaDistribution(props.data?.[index]),
+	);
+	sourceDistributionsLoading.value = queries.value.map(() => false);
+});
+
+const queryDescriptors = computed(() =>
 	queries.value.map((query, index) => {
 		const queryKey = [
 			"get-source-distribution",
@@ -33,128 +75,188 @@ const q = computed(() =>
 		] as const;
 		return {
 			queryKey,
-			enabled: Boolean(client.value),
+			enabled: Boolean(client.value) && !usesProvidedData.value,
 			queryFn: async () => {
 				const activeClient = client.value;
 				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
 				sourceDistributionsLoading.value[index] = true;
-				const { data, error } = await activeClient.GET("/search/freqml", {
-					headers: createNoskeCacheHeaders(queryKey),
-					params: {
-						query: {
-							corpname: query.corpus,
-							usesubcorp: query.subCorpus || undefined,
-							fmaxitems: 5000,
-							fpage: 1,
-							group: 0,
-							showpoc: 1,
-							showreltt: 1,
-							showrel: 1,
-							freqlevel: 1,
-							ml1attr: "doc.docsrc",
-							ml1ctx: "0~0 > 0",
-							json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
+				try {
+					const { data, error } = await activeClient.GET("/search/freqml", {
+						headers: createNoskeCacheHeaders(queryKey),
+						params: {
+							query: {
+								corpname: query.corpus,
+								usesubcorp: query.subCorpus || undefined,
+								fmaxitems: 5000,
+								fpage: 1,
+								group: 0,
+								showpoc: 1,
+								showreltt: 1,
+								showrel: 1,
+								freqlevel: 1,
+								ml1attr: "doc.docsrc",
+								ml1ctx: "0~0 > 0",
+								json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
+							},
 						},
-					},
-				});
-				if (error) throw error;
-				return data;
+					});
+					if (error) throw error;
+					return data;
+				} finally {
+					sourceDistributionsLoading.value[index] = false;
+				}
 			},
 			select: (data: FreqMlResponse) => {
-				sourceDistributions.value[index] =
-					data.Blocks?.map(
-						(block) =>
-							block.Items?.map((item) => {
-								return {
-									absolute: item.frq!,
-									relative: item.reltt!,
-									media: item.Word?.[0]?.n ?? "",
-								};
-							}) ?? [],
-					)[0] ?? [];
-				sourceDistributionsLoading.value[index] = false;
+				sourceDistributions.value[index] = parseMediaDistribution(data);
+				return data;
 			},
 		};
 	}),
 );
 
-useQueries({ queries: q });
-
-const chartMode: Ref<"bar" | "stack" | "percent"> = ref("stack");
+useQueries({ queries: queryDescriptors });
 
 const isStacked = computed(() => chartMode.value === "stack");
 </script>
 
 <template>
 	<Card>
-		<CardHeader>
+		<CardHeader v-if="showHeader">
 			<CardTitle>{{ t("mediaSources") }}</CardTitle>
 			<CardDescription>{{ t("mediaSourcesDesc") }}</CardDescription>
 		</CardHeader>
 
 		<CardContent class="space-y-4">
-			<div class="flex flex-wrap items-center gap-3">
-				<ToggleGroup v-model="chartMode" class="flex" type="single">
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger as-child>
-								<div>
-									<ToggleGroupItem value="bar">
-										<BarChart4 class="mr-1 size-4" />
-									</ToggleGroupItem>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent>{{ t("separateBarChart") }}</TooltipContent>
-						</Tooltip>
-						<Tooltip>
-							<TooltipTrigger as-child>
-								<div>
-									<ToggleGroupItem value="stack">
-										<BarChart3 class="mr-1 size-4" />
-									</ToggleGroupItem>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent>{{ t("stackedBarChart") }}</TooltipContent>
-						</Tooltip>
-						<Tooltip>
-							<TooltipTrigger as-child>
-								<div>
-									<ToggleGroupItem value="percent">
-										<ChartBarStacked class="mr-1 size-4" />
-									</ToggleGroupItem>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent>{{ t("percentageBarChart") }}</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-				</ToggleGroup>
+			<Toolbar :aria-label="t('VisualizationToolbar.mediaSource')">
+				<template v-if="interactive">
+					<ToolbarToggleGroup
+						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
+						:model-value="chartMode"
+						size="sm"
+						type="single"
+						:aria-label="t('VisualizationToolbar.chartMode')"
+						@update:model-value="setChartMode"
+					>
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarToggleItem
+										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+										value="bar"
+										:aria-label="t('separateBarChart')"
+									>
+										<BarChart4 />
+									</ToolbarToggleItem>
+								</TooltipTrigger>
+								<TooltipContent>{{ t("separateBarChart") }}</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarToggleItem
+										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+										value="stack"
+										:aria-label="t('stackedBarChart')"
+									>
+										<BarChart3 />
+									</ToolbarToggleItem>
+								</TooltipTrigger>
+								<TooltipContent>{{ t("stackedBarChart") }}</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarToggleItem
+										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+										value="percent"
+										:aria-label="t('percentageBarChart')"
+									>
+										<ChartBarStacked />
+									</ToolbarToggleItem>
+								</TooltipTrigger>
+								<TooltipContent>{{ t("percentageBarChart") }}</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</ToolbarToggleGroup>
 
-				<ToggleGroup v-model="mode" class="flex" type="single">
-					<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
-					<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
-				</ToggleGroup>
-			</div>
-			<div v-for="(query, index) of queries" :key="query.id">
-				<QueryDisplay
-					:loading="sourceDistributionsLoading[index]"
-					:query="query"
-					:query-key="q[index]?.queryKey"
-				/>
-			</div>
+					<ToolbarSeparator />
 
-			<template v-if="sourceDistributions && queries">
-				<MediaStackedBarChart
-					:mode="mode"
-					:queries="queries"
-					:source-distributions="sourceDistributions"
-					:stack="isStacked"
-					:height="1200"
-					:chart-mode="chartMode"
-				/>
-			</template>
+					<ToolbarToggleGroup
+						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
+						:model-value="mode"
+						size="sm"
+						type="single"
+						:aria-label="t('VisualizationToolbar.frequencyMode')"
+						@update:model-value="setMode"
+					>
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarToggleItem
+										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+										value="absolute"
+										:aria-label="t('absolute')"
+									>
+										<Hash />
+									</ToolbarToggleItem>
+								</TooltipTrigger>
+								<TooltipContent>{{
+									t("VisualizationToolbar.tooltips.absoluteMode")
+								}}</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarToggleItem
+										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+										value="relative"
+										:aria-label="t('relative')"
+									>
+										<Percent />
+									</ToolbarToggleItem>
+								</TooltipTrigger>
+								<TooltipContent>{{
+									t("VisualizationToolbar.tooltips.relativeMode")
+								}}</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</ToolbarToggleGroup>
+
+					<ToolbarSeparator />
+				</template>
+
+				<Popover>
+					<PopoverTrigger
+						class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
+						:aria-label="t('VisualizationToolbar.queryDetails')"
+						:title="t('VisualizationToolbar.tooltips.queryDetails')"
+						type="button"
+					>
+						<Info />
+					</PopoverTrigger>
+					<PopoverContent align="end" class="w-80 p-2">
+						<div class="max-h-96 space-y-3 overflow-y-auto">
+							<QueryDisplay
+								v-for="(query, index) of queries"
+								:key="query.id"
+								class="my-0 rounded-md border p-2"
+								:loading="sourceDistributionsLoading[index]"
+								:query="query"
+								:query-key="queryDescriptors[index]?.queryKey"
+							/>
+						</div>
+					</PopoverContent>
+				</Popover>
+			</Toolbar>
+
+			<MediaStackedBarChart
+				:mode="mode"
+				:queries="queries"
+				:source-distributions="sourceDistributions"
+				:stack="isStacked"
+				:height="1200"
+				:chart-mode="chartMode"
+			/>
 		</CardContent>
 
-		<Collapsible v-model:open="expand">
+		<Collapsible v-if="showSourceData" v-model:open="expand">
 			<CollapsibleContent class="px-6 pb-6">
 				<DataDisplaySourceTable
 					:data="sourceDistributions"
@@ -165,12 +267,27 @@ const isStacked = computed(() => chartMode.value === "stack");
 			</CollapsibleContent>
 		</Collapsible>
 
-		<Separator />
+		<Separator v-if="showSourceData" />
 
-		<CardFooter>
-			<Button size="sm" variant="outline" @click="expand = !expand">
-				{{ !expand ? t("ShowData") : t("HideData") }}
-			</Button>
+		<CardFooter v-if="showSourceData && interactive">
+			<Toolbar :aria-label="t('VisualizationToolbar.sourceData')">
+				<TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger as-child>
+							<ToolbarButton
+								:aria-label="!expand ? t('ShowData') : t('HideData')"
+								:aria-pressed="expand"
+								type="button"
+								variant="outline"
+								@click="expand = !expand"
+							>
+								<Rows3 />
+							</ToolbarButton>
+						</TooltipTrigger>
+						<TooltipContent>{{ t("VisualizationToolbar.tooltips.sourceData") }}</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
+			</Toolbar>
 		</CardFooter>
 	</Card>
 </template>
