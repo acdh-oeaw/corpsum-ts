@@ -3,6 +3,7 @@ import DataDisplayMediaSource from "@/components/data-display/data-display-media
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
+import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import {
 	type CorpusMetadataMappingResponse,
 	type MediaSourceVisualizationSettings,
@@ -10,6 +11,7 @@ import {
 	type RegionalVisualizationSettings,
 	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
+	type WordFormFrequencyVisualizationSettings,
 	normalizeVisualizationSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
@@ -84,17 +86,12 @@ interface ConcordanceResponse {
 const props = defineProps<{ snapshot: PublishedVisualizationSnapshot; embed?: boolean }>();
 
 const t = useTranslations();
-const mode = ref<"relative" | "absolute">("relative");
-
 const corpusQueries = computed(() => props.snapshot.queries.map(toCorpusQuery));
 const renderItems = computed(() =>
 	props.snapshot.visualizations.map((type) => ({
 		type: normalizeVisualizationType(type),
 		key: visualizationDefinitions[normalizeVisualizationType(type)].searchKey,
 	})),
-);
-const hasGlobalFrequencyVisualization = computed(() =>
-	renderItems.value.some(({ key }) => key === "wordFormFrequencies"),
 );
 
 function findPanel(type: PublishedPanelSnapshot["type"], queryId: string) {
@@ -120,19 +117,6 @@ function toCorpusQuery(query: PublishedQuerySnapshot): CorpusQuery {
 			collocations: false,
 		},
 	};
-}
-
-function parseWordFormFrequencies(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-word-form-frequencies", query.sourceQueryId)?.data as
-		| FreqMlResponse
-		| undefined;
-	return (
-		data?.Blocks?.[0]?.Items?.map((item) => ({
-			word: item.Word?.[0]?.n ?? "",
-			absolute: item.frq ?? 0,
-			relative: item.fpm ?? 0,
-		})) ?? []
-	);
 }
 
 function parseCollocations(query: PublishedQuerySnapshot) {
@@ -198,6 +182,14 @@ const regionalData = computed<Array<FreqMlResponse | null | undefined>>(() =>
 				| undefined,
 	),
 );
+const wordFormFrequencyData = computed<Array<FreqMlResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-word-form-frequencies", query.sourceQueryId)?.data as
+				| FreqMlResponse
+				| undefined,
+	),
+);
 function findPanelSettings(type: VisualizationType) {
 	return props.snapshot.panels.find((panel) => normalizeVisualizationType(panel.type) === type)
 		?.settings;
@@ -221,6 +213,12 @@ const regionalSettings = computed<RegionalVisualizationSettings>(() =>
 		findPanelSettings("data-display-regional-frequencies"),
 	),
 );
+const wordFormFrequencySettings = computed<WordFormFrequencyVisualizationSettings>(() =>
+	normalizeVisualizationSettings(
+		"data-display-word-form-frequencies",
+		findPanelSettings("data-display-word-form-frequencies"),
+	),
+);
 const temporalPanels = computed(() =>
 	props.snapshot.queries.map((query) =>
 		findPanel(temporalFrequencyDistributionType, query.sourceQueryId),
@@ -242,13 +240,6 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 
 <template>
 	<div class="grid gap-6">
-		<div v-if="!embed && hasGlobalFrequencyVisualization" class="flex flex-wrap items-center gap-3">
-			<ToggleGroup v-model="mode" class="flex" type="single">
-				<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
-				<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
-			</ToggleGroup>
-		</div>
-
 		<template v-for="{ type, key } in renderItems" :key="type">
 			<DataDisplayTemporalFrequencyDistribution
 				v-if="type === temporalFrequencyDistributionType"
@@ -287,34 +278,21 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 				:show-header="!embed"
 				:show-source-data="!embed"
 			/>
+			<DataDisplayWordFormFrequencies
+				v-else-if="type === 'data-display-word-form-frequencies'"
+				:data="wordFormFrequencyData"
+				:interactive="!embed"
+				:queries="corpusQueries"
+				:settings="wordFormFrequencySettings"
+				:show-header="!embed"
+				:show-source-data="!embed"
+			/>
 			<Card v-else>
 				<CardHeader v-if="!embed">
 					<CardTitle>{{ t(key) }}</CardTitle>
 				</CardHeader>
 				<CardContent class="grid gap-4">
-					<template v-if="key === 'wordFormFrequencies'">
-						<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
-							<QueryDisplay :query="toCorpusQuery(query)" />
-							<Chart
-								chart-type="bar"
-								class="h-96"
-								orientation="horizontal"
-								:series="[
-									{
-										color: query.color,
-										name: query.userInput,
-										data: parseWordFormFrequencies(query).map((entry) => [
-											entry.word,
-											mode === 'relative' ? entry.relative : entry.absolute,
-										]),
-									},
-								]"
-								:title="query.userInput"
-							/>
-						</div>
-					</template>
-
-					<template v-else-if="key === 'collocations'">
+					<template v-if="key === 'collocations'">
 						<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
 							<QueryDisplay :query="toCorpusQuery(query)" />
 							<WordCloudGraph

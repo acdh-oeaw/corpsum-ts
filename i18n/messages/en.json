@@ -367,6 +367,10 @@
 		"updatedAt": "Updated"
 	},
 	"DataDisplayErrors": {
+		"wordFormFrequency": {
+			"loadFailed": "Word-form frequency data for this query could not be loaded.",
+			"refreshFailed": "Word-form frequency data for this query could not be refreshed. The displayed result may be out of date."
+		},
 		"mediaSource": {
 			"loadFailed": "Media source data for this query could not be loaded.",
 			"refreshFailed": "Media source data for this query could not be refreshed. The displayed result may be out of date."
@@ -455,6 +459,7 @@
 		"regional": "Regional controls",
 		"separateMapCharts": "Separate map charts",
 		"sourceData": "Source data controls",
+		"wordFormFrequency": "Word-form frequency controls",
 		"tooltips": {
 			"absoluteMode": "Show absolute frequencies.",
 			"queryDetails": "Show query details and cache controls.",

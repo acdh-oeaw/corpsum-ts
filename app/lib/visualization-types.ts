@@ -155,6 +155,12 @@ export interface RegionalVisualizationSettings {
 	sourceTableExpanded: boolean;
 }
 
+export interface WordFormFrequencyVisualizationSettings {
+	type: "data-display-word-form-frequencies";
+	mode: VisualizationFrequencyMode;
+	sourceTableExpanded: boolean;
+}
+
 export const defaultMediaSourceVisualizationSettings = Object.freeze({
 	type: "data-display-media-source",
 	mode: "relative",
@@ -176,6 +182,12 @@ export const defaultRegionalVisualizationSettings = Object.freeze({
 	barChartMode: "bar",
 	sourceTableExpanded: false,
 } satisfies RegionalVisualizationSettings);
+
+export const defaultWordFormFrequencyVisualizationSettings = Object.freeze({
+	type: "data-display-word-form-frequencies",
+	mode: "relative",
+	sourceTableExpanded: false,
+} satisfies WordFormFrequencyVisualizationSettings);
 
 function isVisualizationFrequencyMode(value: unknown): value is VisualizationFrequencyMode {
 	return value === "absolute" || value === "relative";
@@ -237,6 +249,19 @@ export function normalizeRegionalVisualizationSettings(
 		barChartMode: isMediaVisualizationChartMode(record.barChartMode)
 			? record.barChartMode
 			: defaultRegionalVisualizationSettings.barChartMode,
+		sourceTableExpanded: record.sourceTableExpanded === true,
+	};
+}
+
+export function normalizeWordFormFrequencyVisualizationSettings(
+	value: unknown,
+): WordFormFrequencyVisualizationSettings {
+	const record = asUnknownRecord(value);
+	return {
+		type: "data-display-word-form-frequencies",
+		mode: isVisualizationFrequencyMode(record.mode)
+			? record.mode
+			: defaultWordFormFrequencyVisualizationSettings.mode,
 		sourceTableExpanded: record.sourceTableExpanded === true,
 	};
 }
@@ -362,7 +387,7 @@ export interface VisualizationSettingsByType {
 	"data-display-media-source": MediaSourceVisualizationSettings;
 	"data-display-media-type": MediaTypeVisualizationSettings;
 	"data-display-regional-frequencies": RegionalVisualizationSettings;
-	"data-display-word-form-frequencies": EmptyVisualizationSettings;
+	"data-display-word-form-frequencies": WordFormFrequencyVisualizationSettings;
 	[temporalFrequencyDistributionType]: TemporalFrequencyDistributionSettings;
 }
 
@@ -407,9 +432,9 @@ export const visualizationSettingsCodecs = {
 		normalize: normalizeRegionalVisualizationSettings,
 	},
 	"data-display-word-form-frequencies": {
-		configurable: false,
-		defaults: emptyVisualizationSettings,
-		normalize: normalizeEmptyVisualizationSettings,
+		configurable: true,
+		defaults: defaultWordFormFrequencyVisualizationSettings,
+		normalize: normalizeWordFormFrequencyVisualizationSettings,
 	},
 	[temporalFrequencyDistributionType]: {
 		configurable: true,

@@ -367,6 +367,10 @@
 		"updatedAt": "Aktualisiert"
 	},
 	"DataDisplayErrors": {
+		"wordFormFrequency": {
+			"loadFailed": "Die Wortformenfrequenzdaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Wortformenfrequenzdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
 		"mediaSource": {
 			"loadFailed": "Die Medienquellendaten für diese Abfrage konnten nicht geladen werden.",
 			"refreshFailed": "Die Medienquellendaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
@@ -455,6 +459,7 @@
 		"regional": "Steuerung der regionalen Frequenzen",
 		"separateMapCharts": "Getrennte Kartendiagramme",
 		"sourceData": "Steuerung der Quelldaten",
+		"wordFormFrequency": "Steuerung der Wortformenfrequenzen",
 		"tooltips": {
 			"absoluteMode": "Absolute Frequenzen anzeigen.",
 			"queryDetails": "Abfragedetails und Cache-Steuerung anzeigen.",
