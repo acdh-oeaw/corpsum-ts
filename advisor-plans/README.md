@@ -28,7 +28,7 @@ pre-existing unrelated `plans/postgres-kysely-migration-plan.md` and no
 | 011  | DDR-03 | Render localized per-query data-display errors                  | P2       | M      | 009               | DONE   |
 | 012  | DDR-04 | Harden source-table columns and active-tab alignment            | P2       | S      | -                 | DONE   |
 | 013  | DDR-05 | Preserve regional result identity across query changes          | P2       | S      | 009               | DONE   |
-| 014  | DDR-06 | Unify non-metadata data-display contracts                       | P2       | L      | 009-012; 013 rec. | TODO   |
+| 014  | DDR-06 | Unify non-metadata data-display contracts                       | P2       | L      | 009-012; 013 rec. | DONE   |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) |
 REJECTED (with one-line rationale).
