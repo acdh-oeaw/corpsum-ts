@@ -366,6 +366,20 @@
 		"createdAt": "Erstellt",
 		"updatedAt": "Aktualisiert"
 	},
+	"DataDisplayErrors": {
+		"mediaSource": {
+			"loadFailed": "Die Medienquellendaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Medienquellendaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
+		"mediaType": {
+			"loadFailed": "Die Medientypdaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Medientypdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
+		"regionalFrequency": {
+			"loadFailed": "Die regionalen Frequenzdaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die regionalen Frequenzdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		}
+	},
 	"TemporalFrequencyDistribution": {
 		"description": "Vergleicht die Abfragefrequenzen im Zeitverlauf.",
 		"errors": {

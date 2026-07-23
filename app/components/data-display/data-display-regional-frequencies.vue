@@ -164,6 +164,16 @@ const regionalFrequenciesLoading = computed(() =>
 		? queries.value.map(() => false)
 		: queryResults.value.map((result) => result.isFetching || result.isLoading),
 );
+const regionalFrequencyErrors = computed(() =>
+	queries.value.map((_, index) => {
+		if (usesProvidedData.value) return null;
+		const result = queryResults.value[index];
+		if (!result?.isError) return null;
+		return result.data === undefined
+			? t("DataDisplayErrors.regionalFrequency.loadFailed")
+			: t("DataDisplayErrors.regionalFrequency.refreshFailed");
+	}),
+);
 
 const regionNames = Object.fromEntries(
 	mapAustria.features.map((f) => [String(f.properties["hc-key"]), String(f.properties["name"])]),
@@ -352,6 +362,20 @@ const regionalBarSeries = computed(() =>
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<div v-if="regionalFrequencyErrors.some(Boolean)" class="space-y-2">
+				<div
+					v-for="(query, index) of queries"
+					v-show="regionalFrequencyErrors[index]"
+					:key="query.id"
+					class="rounded-md border border-destructive/50 bg-destructive/5 p-3"
+				>
+					<QueryDisplay class="my-0" :query="query" />
+					<p class="mt-1 text-sm text-destructive" role="alert">
+						{{ regionalFrequencyErrors[index] }}
+					</p>
+				</div>
+			</div>
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<ClientOnly v-if="!regionalFrequenciesLoading[index] && regionalFrequencies[index]">

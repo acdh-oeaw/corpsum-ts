@@ -119,6 +119,27 @@ async function routeMixedInstanceResponses(page: Page) {
 	return requests;
 }
 
+async function routeMixedInstanceErrors(
+	page: Page,
+	failedNoskes: Array<keyof typeof mixedResponses>,
+) {
+	const requests: Array<string> = [];
+	await page.route("**/api/noske/**", async (route) => {
+		const request = route.request();
+		const noske = new URL(request.url()).pathname.split("/")[3] as keyof typeof mixedResponses;
+		requests.push(request.url());
+		if (failedNoskes.includes(noske)) {
+			await route.fulfill({
+				status: 503,
+				json: { error: "sensitive upstream failure detail" },
+			});
+			return;
+		}
+		await route.fulfill({ json: mixedResponses[noske] });
+	});
+	return requests;
+}
+
 function expectMixedInstanceIdentity(
 	requests: Array<RecordedRequest>,
 	attribute: "doc.docsrc" | "doc.mediatype" | "doc.region",
@@ -349,6 +370,106 @@ test.describe("categorical and regional visualization components", () => {
 		);
 	});
 
+	test("keeps a successful media-source sibling visible beside an initial failure", async ({
+		mount,
+		page,
+	}) => {
+		const requests = await routeMixedInstanceErrors(page, ["noske-b"]);
+		const component = await mount(MediaSourceDistribution, { props: { queries: mixedQueries } });
+
+		await expect.poll(() => requests.length).toBe(2);
+		await expect(component.getByRole("alert")).toHaveText(
+			"Media source data for this query could not be loaded.",
+		);
+		await expect(component.getByRole("alert")).not.toContainText("sensitive upstream");
+		await expect(component.getByTestId("media-stacked-bar-chart")).toHaveAttribute(
+			"data-source-distributions",
+			JSON.stringify([[{ absolute: 11, relative: 0.11, media: "AT-1" }], []]),
+		);
+	});
+
+	test("renders one accessible media-type notice for every failed query", async ({
+		mount,
+		page,
+	}) => {
+		await routeMixedInstanceErrors(page, ["noske-a", "noske-b"]);
+		const component = await mount(MediaTypeDistribution, { props: { queries: mixedQueries } });
+
+		await expect(component.getByRole("alert")).toHaveCount(2);
+		await expect(component.getByRole("alert")).toHaveText([
+			"Media type data for this query could not be loaded.",
+			"Media type data for this query could not be loaded.",
+		]);
+	});
+
+	test("identifies an initial regional-frequency failure", async ({ mount, page }) => {
+		await routeMixedInstanceErrors(page, ["noske-a"]);
+		const component = await mount(RegionalFrequencies, {
+			props: { queries: [mixedQueries[0]!] },
+		});
+
+		await expect(component.getByRole("alert")).toHaveText(
+			"Regional frequency data for this query could not be loaded.",
+		);
+	});
+
+	test("retains media-source data and warns when a refresh fails", async ({ mount, page }) => {
+		let requestCount = 0;
+		await page.route("**/api/noske/**", async (route) => {
+			requestCount += 1;
+			if (requestCount === 1) {
+				await route.fulfill({ json: mixedResponses["noske-a"] });
+				return;
+			}
+			await route.fulfill({ status: 503, json: { error: "refresh failed" } });
+		});
+		const component = await mount(MediaSourceDistribution, {
+			props: { queries: [mixedQueries[0]!] },
+		});
+		const expectedDistribution = JSON.stringify([
+			[{ absolute: 11, relative: 0.11, media: "AT-1" }],
+		]);
+
+		await expect(component.getByTestId("media-stacked-bar-chart")).toHaveAttribute(
+			"data-source-distributions",
+			expectedDistribution,
+		);
+		await page.evaluate(async () => {
+			const queryClient = (
+				globalThis as typeof globalThis & {
+					__componentTestQueryClient: { invalidateQueries(): Promise<void> };
+				}
+			).__componentTestQueryClient;
+			await queryClient.invalidateQueries();
+		});
+		await expect.poll(() => requestCount).toBe(2);
+		await expect(component.getByRole("alert")).toHaveText(
+			"Media source data for this query could not be refreshed. The displayed result may be out of date.",
+		);
+		await expect(component.getByTestId("media-stacked-bar-chart")).toHaveAttribute(
+			"data-source-distributions",
+			expectedDistribution,
+		);
+	});
+
+	test("does not report successful empty responses as live errors", async ({ mount, page }) => {
+		const requests: Array<string> = [];
+		await page.route("**/api/noske/**", async (route) => {
+			requests.push(route.request().url());
+			await route.fulfill({ json: { Blocks: [{ Items: [] }] } });
+		});
+		const component = await mount(RegionalFrequencies, {
+			props: { queries: [mixedQueries[0]!] },
+		});
+
+		await expect.poll(() => requests.length).toBe(1);
+		await expect(component.getByRole("alert")).toHaveCount(0);
+		await expect(component.getByTestId("combined-map-chart")).toHaveAttribute(
+			"data-regional-frequencies",
+			JSON.stringify([{ query: 11, data: [] }]),
+		);
+	});
+
 	test("does not issue live requests for defined supplied data", async ({ mount, page }) => {
 		const requests: Array<string> = [];
 		await page.route("**/api/noske/**", async (route) => {
@@ -356,15 +477,57 @@ test.describe("categorical and regional visualization components", () => {
 			await route.fulfill({ json: mixedResponses["noske-a"] });
 		});
 
-		await mount(MediaSourceDistribution, { props: { queries: mixedQueries, data: [] } });
-		await mount(MediaTypeDistribution, {
+		const mediaSource = await mount(MediaSourceDistribution, {
+			props: { queries: mixedQueries, data: [] },
+		});
+		const mediaType = await mount(MediaTypeDistribution, {
 			props: { queries: mixedQueries, data: [null, undefined] },
 		});
-		await mount(RegionalFrequencies, {
+		const regional = await mount(RegionalFrequencies, {
 			props: { queries: mixedQueries, data: new Array(2) },
 		});
 
 		expect(requests).toHaveLength(0);
+		await expect(mediaSource.getByRole("alert")).toHaveCount(0);
+		await expect(mediaType.getByRole("alert")).toHaveCount(0);
+		await expect(regional.getByRole("alert")).toHaveCount(0);
+	});
+
+	test("renders German live errors without missing message keys", async ({ mount, page }) => {
+		const missingKeys: Array<string> = [];
+		page.on("console", (message) => {
+			if (message.type() === "warning" && message.text().includes("Not found")) {
+				missingKeys.push(message.text());
+			}
+		});
+		await routeMixedInstanceErrors(page, ["noske-a"]);
+
+		const mediaSource = await mount(MediaSourceDistribution, {
+			props: { queries: [mixedQueries[0]!] },
+			hooksConfig: { locale: "de" },
+		});
+		await expect(mediaSource.getByRole("alert")).toHaveText(
+			"Die Medienquellendaten für diese Abfrage konnten nicht geladen werden.",
+		);
+		await mediaSource.unmount();
+
+		const mediaType = await mount(MediaTypeDistribution, {
+			props: { queries: [mixedQueries[0]!] },
+			hooksConfig: { locale: "de" },
+		});
+		await expect(mediaType.getByRole("alert")).toHaveText(
+			"Die Medientypdaten für diese Abfrage konnten nicht geladen werden.",
+		);
+		await mediaType.unmount();
+
+		const regional = await mount(RegionalFrequencies, {
+			props: { queries: [mixedQueries[0]!] },
+			hooksConfig: { locale: "de" },
+		});
+		await expect(regional.getByRole("alert")).toHaveText(
+			"Die regionalen Frequenzdaten für diese Abfrage konnten nicht geladen werden.",
+		);
+		expect(missingKeys).toStrictEqual([]);
 	});
 
 	test("renders media source controls as compact radio-like toolbar groups", async ({ mount }) => {
