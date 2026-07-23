@@ -93,6 +93,16 @@ const sourceDistributionsLoading = computed(() =>
 		? queries.value.map(() => false)
 		: queryResults.value.map((result) => result.isFetching || result.isLoading),
 );
+const sourceDistributionErrors = computed(() =>
+	queries.value.map((_, index) => {
+		if (usesProvidedData.value) return null;
+		const result = queryResults.value[index];
+		if (!result?.isError) return null;
+		return result.data === undefined
+			? t("DataDisplayErrors.mediaSource.loadFailed")
+			: t("DataDisplayErrors.mediaSource.refreshFailed");
+	}),
+);
 
 const isStacked = computed(() => chartMode.value === "stack");
 </script>
@@ -223,6 +233,20 @@ const isStacked = computed(() => chartMode.value === "stack");
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<div v-if="sourceDistributionErrors.some(Boolean)" class="space-y-2">
+				<div
+					v-for="(query, index) of queries"
+					v-show="sourceDistributionErrors[index]"
+					:key="query.id"
+					class="rounded-md border border-destructive/50 bg-destructive/5 p-3"
+				>
+					<QueryDisplay class="my-0" :query="query" />
+					<p class="mt-1 text-sm text-destructive" role="alert">
+						{{ sourceDistributionErrors[index] }}
+					</p>
+				</div>
+			</div>
 
 			<MediaStackedBarChart
 				:mode="mode"

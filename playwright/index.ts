@@ -80,6 +80,8 @@ Object.assign(globalThis, {
 
 beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 	const locale = hooksConfig?.locale ?? "en";
+	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+	Object.assign(globalThis, { __componentTestQueryClient: queryClient });
 	app.use(
 		createI18n({
 			legacy: false,
@@ -87,7 +89,7 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 			messages: { de, en },
 		}),
 	);
-	app.use(VueQueryPlugin, { queryClient: new QueryClient() });
+	app.use(VueQueryPlugin, { queryClient });
 	for (const [name, component] of Object.entries({
 		Button,
 		Card,

@@ -366,6 +366,20 @@
 		"createdAt": "Created",
 		"updatedAt": "Updated"
 	},
+	"DataDisplayErrors": {
+		"mediaSource": {
+			"loadFailed": "Media source data for this query could not be loaded.",
+			"refreshFailed": "Media source data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"mediaType": {
+			"loadFailed": "Media type data for this query could not be loaded.",
+			"refreshFailed": "Media type data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"regionalFrequency": {
+			"loadFailed": "Regional frequency data for this query could not be loaded.",
+			"refreshFailed": "Regional frequency data for this query could not be refreshed. The displayed result may be out of date."
+		}
+	},
 	"TemporalFrequencyDistribution": {
 		"description": "Compare query frequencies over time.",
 		"errors": {
