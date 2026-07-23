@@ -10,6 +10,12 @@ import type {
 	CollocationVisualizationSettings,
 	WordFormFrequencyVisualizationSettings,
 } from "@/lib/visualization-types";
+import {
+	createVisualizationSettingsState,
+	normalizeCollocationVisualizationSettings,
+	normalizeWordFormFrequencyVisualizationSettings,
+	serializeVisualizationSettingsState,
+} from "@/lib/visualization-types";
 
 const queries: Array<CorpusQuery> = [
 	{
@@ -252,6 +258,16 @@ test.describe("non-metadata visualization contracts", () => {
 				{ color: "#2563eb", name: "lemmarow: beta (corpus-b)", data: [] },
 			]),
 		);
+		await component.update({ props: { data: [] } });
+		await expect(component.getByTestId("chart")).toHaveAttribute(
+			"data-series",
+			JSON.stringify([
+				{ color: "#dc2626", name: "wordrow: alpha (corpus-a / sub-a)", data: [] },
+				{ color: "#2563eb", name: "lemmarow: beta (corpus-b)", data: [] },
+			]),
+		);
+		await component.update({ props: { data: [null, null] } });
+		expect(requests).toHaveLength(0);
 	});
 
 	test("emits complete word-form settings and synchronizes persisted input", async ({ mount }) => {
@@ -429,6 +445,10 @@ test.describe("non-metadata visualization contracts", () => {
 		await expect(component.getByRole("alert")).toHaveCount(0);
 		await expect(component.getByRole("toolbar", { name: "Source data controls" })).toHaveCount(0);
 		await expect(component.getByTestId("word-cloud")).toHaveCount(2);
+		await component.update({ props: { data: [] } });
+		await expect(component.getByTestId("word-cloud").nth(0)).toHaveAttribute("data-words", "[]");
+		await component.update({ props: { data: [null, null] } });
+		expect(requests).toHaveLength(0);
 	});
 
 	test("changes collocation cache identity with cattr and emits complete settings", async ({
@@ -605,6 +625,10 @@ test.describe("non-metadata visualization contracts", () => {
 		await expect(component.getByRole("alert")).toHaveCount(0);
 		await expect(component.getByText("Alpha hit", { exact: true })).toBeVisible();
 		await expect(component.getByText("No results.")).toBeVisible();
+		await component.update({ props: { data: [] } });
+		await expect(component.getByText("No results.")).toHaveCount(2);
+		await component.update({ props: { data: [null, null] } });
+		expect(requests).toHaveLength(0);
 	});
 
 	test("includes live-selected KWIC attributes and structures in cache identity", async ({
@@ -688,6 +712,60 @@ test.describe("non-metadata visualization contracts", () => {
 				allowed,
 			),
 		).toBeNull();
+	});
+
+	test("normalizes and round-trips non-metadata settings through the type-owned codecs", () => {
+		expect(
+			normalizeWordFormFrequencyVisualizationSettings({
+				mode: "absolute",
+				sourceTableExpanded: true,
+				extra: "ignored",
+			}),
+		).toStrictEqual({
+			type: "data-display-word-form-frequencies",
+			mode: "absolute",
+			sourceTableExpanded: true,
+		});
+		expect(
+			normalizeCollocationVisualizationSettings({
+				mode: "invalid",
+				cattr: "invalid",
+				sourceTableExpanded: 1,
+			}),
+		).toStrictEqual({
+			type: "data-display-collocations",
+			mode: "coll_freq",
+			cattr: "lemma",
+			sourceTableExpanded: false,
+		});
+
+		const types = [
+			"data-display-collocations",
+			"data-display-keyword-in-context",
+			"data-display-word-form-frequencies",
+		] as const;
+		const state = createVisualizationSettingsState(
+			[...types],
+			[
+				{ mode: "freq", cattr: "word", sourceTableExpanded: true },
+				{ transientPanelOpen: true },
+				{ mode: "absolute", sourceTableExpanded: true },
+			],
+		);
+		expect(serializeVisualizationSettingsState([...types], state)).toStrictEqual([
+			{
+				type: "data-display-collocations",
+				mode: "freq",
+				cattr: "word",
+				sourceTableExpanded: true,
+			},
+			{},
+			{
+				type: "data-display-word-form-frequencies",
+				mode: "absolute",
+				sourceTableExpanded: true,
+			},
+		]);
 	});
 
 	test("renders localized KWIC errors and published snapshots through the shared table", async ({

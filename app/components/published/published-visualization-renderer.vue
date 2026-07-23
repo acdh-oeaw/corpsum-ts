@@ -18,7 +18,6 @@ import {
 	normalizeVisualizationSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
-	visualizationDefinitions,
 } from "@/lib/visualization-types";
 import type { components } from "~/lib/noske-types";
 
@@ -53,30 +52,16 @@ interface PublishedVisualizationSnapshot {
 	panels: Array<PublishedPanelSnapshot>;
 }
 
-interface FreqMlItem {
-	Word?: Array<{ n?: string }>;
-	frq?: number;
-	fpm?: number;
-	reltt?: number;
-}
-
-interface FreqMlResponse {
-	Blocks?: Array<{ Items?: Array<FreqMlItem> }>;
-}
-
+type FreqMlResponse = components["schemas"]["11_freqml"];
 type CollxResponse = components["schemas"]["10_collx"];
 
 type ConcordanceResponse = components["schemas"]["06_concordance"];
 
 const props = defineProps<{ snapshot: PublishedVisualizationSnapshot; embed?: boolean }>();
 
-const t = useTranslations();
 const corpusQueries = computed(() => props.snapshot.queries.map(toCorpusQuery));
 const renderItems = computed(() =>
-	props.snapshot.visualizations.map((type) => ({
-		type: normalizeVisualizationType(type),
-		key: visualizationDefinitions[normalizeVisualizationType(type)].searchKey,
-	})),
+	props.snapshot.visualizations.map((type) => normalizeVisualizationType(type)),
 );
 
 function findPanel(type: PublishedPanelSnapshot["type"], queryId: string) {
@@ -206,11 +191,11 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 
 <template>
 	<div class="grid gap-6">
-		<template v-for="{ type, key } in renderItems" :key="type">
+		<template v-for="type in renderItems" :key="type">
 			<DataDisplayCollocations
 				v-if="type === 'data-display-collocations'"
 				:data="collocationData"
-				:interactive="!embed"
+				:interactive="false"
 				:queries="corpusQueries"
 				:settings="collocationSettings"
 				:show-header="!embed"
@@ -219,7 +204,7 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 			<DataDisplayKeywordInContext
 				v-else-if="type === 'data-display-keyword-in-context'"
 				:data="concordanceData"
-				:interactive="!embed"
+				:interactive="false"
 				:queries="corpusQueries"
 				:show-header="!embed"
 			/>
@@ -269,37 +254,6 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 				:show-header="!embed"
 				:show-source-data="!embed"
 			/>
-			<Card v-else>
-				<CardHeader v-if="!embed">
-					<CardTitle>{{ t(key) }}</CardTitle>
-				</CardHeader>
-				<CardContent class="grid gap-4">
-					<template v-if="key !== 'keywordInContext'">
-						<div class="overflow-x-auto rounded-md border">
-							<table class="w-full text-sm">
-								<thead>
-									<tr class="border-b bg-muted/40 text-left">
-										<th class="px-3 py-2">Query</th>
-										<th class="px-3 py-2">Corpus</th>
-										<th class="px-3 py-2">Subcorpus</th>
-										<th class="px-3 py-2">Type</th>
-										<th class="px-3 py-2">Input</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr v-for="query in snapshot.queries" :key="query.sourceQueryId" class="border-b">
-										<td class="px-3 py-2">{{ query.sourceQueryId }}</td>
-										<td class="px-3 py-2">{{ query.corpus }}</td>
-										<td class="px-3 py-2">{{ query.subCorpus }}</td>
-										<td class="px-3 py-2">{{ query.type }}</td>
-										<td class="px-3 py-2">{{ query.userInput }}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</template>
-				</CardContent>
-			</Card>
 		</template>
 	</div>
 </template>
