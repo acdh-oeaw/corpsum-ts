@@ -10,15 +10,22 @@ const props = defineProps<{
 
 const tab = ref<string>("");
 
-watchEffect(() => {
-	if (!tab.value && props.queries.length > 0) {
-		tab.value = String(props.queries[0]?.id ?? "");
-	}
-});
+const queryIds = computed(() => props.queries.map((query) => String(query.id)));
 
-const columns = computed(() => {
-	if (!props.data[0]?.[0]) return [];
-	return Object.keys(props.data[0][0]).map((key) => {
+watch(
+	queryIds,
+	(ids) => {
+		if (!ids.includes(tab.value)) {
+			tab.value = ids[0] ?? "";
+		}
+	},
+	{ flush: "sync", immediate: true },
+);
+
+function createColumns(row: LegalAny | undefined) {
+	if (row == null || typeof row !== "object") return [];
+
+	return Object.keys(row).map((key) => {
 		return {
 			accessorKey: key,
 			header: () => h("div", { class: "text-right" }, key),
@@ -29,6 +36,10 @@ const columns = computed(() => {
 			},
 		};
 	});
+}
+
+const columnsByQuery = computed(() => {
+	return props.queries.map((_, index) => createColumns(props.data[index]?.[0]));
 });
 </script>
 
@@ -48,7 +59,11 @@ const columns = computed(() => {
 					:value="String(query.id)"
 				>
 					<QueryDisplay :loading="loading[index]" :query="query" />
-					<CorpsumDataTable v-if="!loading[index]" :columns="columns" :data="data[index]!" />
+					<CorpsumDataTable
+						v-if="!loading[index]"
+						:columns="columnsByQuery[index] ?? []"
+						:data="data[index] ?? []"
+					/>
 				</TabsContent>
 			</CardContent>
 		</Tabs>
