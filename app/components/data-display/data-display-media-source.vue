@@ -1,43 +1,87 @@
 <script lang="ts" setup>
 import { BarChart3, BarChart4, ChartBarStacked, Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
+import {
+	type MediaSourceVisualizationSettings,
+	normalizeMediaSourceVisualizationSettings,
+} from "@/lib/visualization-types";
 import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
-type FrequencyMode = "absolute" | "relative";
-type MediaChartMode = "bar" | "stack" | "percent";
 
 const props = withDefaults(
 	defineProps<{
 		queries: Array<CorpusQuery>;
 		data?: Array<FreqMlResponse | null | undefined>;
 		interactive?: boolean;
+		settings?: Partial<MediaSourceVisualizationSettings>;
 		showHeader?: boolean;
 		showSourceData?: boolean;
 	}>(),
 	{
 		data: undefined,
 		interactive: true,
+		settings: undefined,
 		showHeader: true,
 		showSourceData: true,
 	},
 );
 
+const emit = defineEmits<{
+	"update:settings": [settings: MediaSourceVisualizationSettings];
+}>();
+
 const t = useTranslations();
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
+const normalizedSettings = computed(() =>
+	normalizeMediaSourceVisualizationSettings(props.settings),
+);
 
-const mode = ref<FrequencyMode>("relative");
-const chartMode = ref<MediaChartMode>("stack");
-const expand = ref(false);
+const mode = ref(normalizedSettings.value.mode);
+const chartMode = ref(normalizedSettings.value.chartMode);
+const expand = ref(normalizedSettings.value.sourceTableExpanded);
+
+watch(
+	normalizedSettings,
+	(value) => {
+		mode.value = value.mode;
+		chartMode.value = value.chartMode;
+		expand.value = value.sourceTableExpanded;
+	},
+	{ deep: true },
+);
+
+function emitSettings() {
+	emit(
+		"update:settings",
+		normalizeMediaSourceVisualizationSettings({
+			mode: mode.value,
+			chartMode: chartMode.value,
+			sourceTableExpanded: expand.value,
+		}),
+	);
+}
 
 function setMode(value: unknown) {
-	if (value === "absolute" || value === "relative") mode.value = value;
+	if ((value === "absolute" || value === "relative") && value !== mode.value) {
+		mode.value = value;
+		emitSettings();
+	}
 }
 
 function setChartMode(value: unknown) {
-	if (value === "bar" || value === "stack" || value === "percent") chartMode.value = value;
+	if ((value === "bar" || value === "stack" || value === "percent") && value !== chartMode.value) {
+		chartMode.value = value;
+		emitSettings();
+	}
+}
+
+function setSourceTableExpanded(value: boolean) {
+	if (value === expand.value) return;
+	expand.value = value;
+	emitSettings();
 }
 
 function parseMediaDistribution(data: FreqMlResponse | null | undefined) {
@@ -98,7 +142,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 </script>
 
 <template>
-	<Card>
+	<Card :data-chart-mode="chartMode" :data-frequency-mode="mode">
 		<CardHeader v-if="showHeader">
 			<CardTitle>{{ t("mediaSources") }}</CardTitle>
 			<CardDescription>{{ t("mediaSourcesDesc") }}</CardDescription>
@@ -234,7 +278,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 			/>
 		</CardContent>
 
-		<Collapsible v-if="showSourceData" v-model:open="expand">
+		<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
 			<CollapsibleContent class="px-6 pb-6">
 				<DataDisplaySourceTable
 					:data="sourceDistributions"
@@ -257,7 +301,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 								:aria-pressed="expand"
 								type="button"
 								variant="outline"
-								@click="expand = !expand"
+								@click="setSourceTableExpanded(!expand)"
 							>
 								<Rows3 />
 							</ToolbarButton>

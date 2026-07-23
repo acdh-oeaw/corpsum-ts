@@ -11,53 +11,102 @@ import {
 	Rows3,
 } from "lucide-vue-next";
 
+import {
+	type RegionalVisualizationSettings,
+	normalizeRegionalVisualizationSettings,
+} from "@/lib/visualization-types";
 import { getQueryWithFacetting } from "@/utils/corpus-query";
 import { mapAustria } from "@/utils/map-austria";
 import type { components } from "~/lib/noske-types";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
-type FrequencyMode = "absolute" | "relative";
-type RegionalMapMode = "combined" | "separate";
-type RegionalBarMode = "bar" | "stack" | "percent";
 
 const props = withDefaults(
 	defineProps<{
 		queries: Array<CorpusQuery>;
 		data?: Array<FreqMlResponse | null | undefined>;
 		interactive?: boolean;
+		settings?: Partial<RegionalVisualizationSettings>;
 		showHeader?: boolean;
 		showSourceData?: boolean;
 	}>(),
 	{
 		data: undefined,
 		interactive: true,
+		settings: undefined,
 		showHeader: true,
 		showSourceData: true,
 	},
 );
 
+const emit = defineEmits<{
+	"update:settings": [settings: RegionalVisualizationSettings];
+}>();
+
 const t = useTranslations();
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
+const normalizedSettings = computed(() => normalizeRegionalVisualizationSettings(props.settings));
 
-const chartMode = ref<RegionalMapMode>("combined");
-const mode = ref<FrequencyMode>("relative");
-const barChartMode = ref<RegionalBarMode>("bar");
-const expand = ref(false);
+const chartMode = ref(normalizedSettings.value.mapMode);
+const mode = ref(normalizedSettings.value.mode);
+const barChartMode = ref(normalizedSettings.value.barChartMode);
+const expand = ref(normalizedSettings.value.sourceTableExpanded);
+
+watch(
+	normalizedSettings,
+	(value) => {
+		chartMode.value = value.mapMode;
+		mode.value = value.mode;
+		barChartMode.value = value.barChartMode;
+		expand.value = value.sourceTableExpanded;
+	},
+	{ deep: true },
+);
+
+function emitSettings() {
+	emit(
+		"update:settings",
+		normalizeRegionalVisualizationSettings({
+			mode: mode.value,
+			mapMode: chartMode.value,
+			barChartMode: barChartMode.value,
+			sourceTableExpanded: expand.value,
+		}),
+	);
+}
 
 const isCombined = computed(() => chartMode.value === "combined");
 const loading = computed(() => regionalFrequenciesLoading.value.some(Boolean));
 
 function setMode(value: unknown) {
-	if (value === "absolute" || value === "relative") mode.value = value;
+	if ((value === "absolute" || value === "relative") && value !== mode.value) {
+		mode.value = value;
+		emitSettings();
+	}
 }
 
 function setChartMode(value: unknown) {
-	if (value === "combined" || value === "separate") chartMode.value = value;
+	if ((value === "combined" || value === "separate") && value !== chartMode.value) {
+		chartMode.value = value;
+		emitSettings();
+	}
 }
 
 function setBarChartMode(value: unknown) {
-	if (value === "bar" || value === "stack" || value === "percent") barChartMode.value = value;
+	if (
+		(value === "bar" || value === "stack" || value === "percent") &&
+		value !== barChartMode.value
+	) {
+		barChartMode.value = value;
+		emitSettings();
+	}
+}
+
+function setSourceTableExpanded(value: boolean) {
+	if (value === expand.value) return;
+	expand.value = value;
+	emitSettings();
 }
 
 function parseRegionalFrequency(query: CorpusQuery, data: FreqMlResponse | null | undefined) {
@@ -138,7 +187,7 @@ const regionalBarSeries = computed(() =>
 </script>
 
 <template>
-	<Card>
+	<Card :data-bar-chart-mode="barChartMode" :data-frequency-mode="mode" :data-map-mode="chartMode">
 		<CardHeader v-if="showHeader">
 			<CardTitle>{{ t("regionalFrequencies") }}</CardTitle>
 			<CardDescription>{{ t("regionalFrequenciesDesc") }}</CardDescription>
@@ -330,7 +379,7 @@ const regionalBarSeries = computed(() =>
 			/>
 		</CardContent>
 
-		<Collapsible v-if="showSourceData" v-model:open="expand">
+		<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
 			<CollapsibleContent class="px-6 pb-6">
 				<DataDisplaySourceTable
 					:data="regionalFrequencies.map((entry) => entry.data)"
@@ -353,7 +402,7 @@ const regionalBarSeries = computed(() =>
 								:aria-pressed="expand"
 								type="button"
 								variant="outline"
-								@click="expand = !expand"
+								@click="setSourceTableExpanded(!expand)"
 							>
 								<Rows3 />
 							</ToolbarButton>
