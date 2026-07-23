@@ -367,6 +367,10 @@
 		"updatedAt": "Updated"
 	},
 	"DataDisplayErrors": {
+		"keywordInContext": {
+			"loadFailed": "Keyword-in-context data for this query could not be loaded.",
+			"refreshFailed": "Keyword-in-context data for this query could not be refreshed. The displayed result may be out of date."
+		},
 		"collocations": {
 			"loadFailed": "Collocation data for this query could not be loaded.",
 			"refreshFailed": "Collocation data for this query could not be refreshed. The displayed result may be out of date."

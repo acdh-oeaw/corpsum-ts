@@ -1,6 +1,7 @@
 import { defineEventHandler, getRouterParam, type H3Event, readBody } from "h3";
 import mongoose from "mongoose";
 
+import { parseKwicQueryOptionsOverrides } from "@/lib/kwic-query-options";
 import { normalizeVisualizationType } from "@/lib/visualization-types";
 import {
 	PublishedVisualizationModel,
@@ -106,12 +107,20 @@ export default defineEventHandler(async (event) => {
 	if (!title) {
 		throw createError({ statusCode: 400, statusMessage: "invalid title" });
 	}
+	const kwicQueryOptions = parseKwicQueryOptionsOverrides(
+		payload.kwicQueryOptions,
+		new Set(visualization.queries.map((queryId) => queryId.toString())),
+	);
+	if (!kwicQueryOptions) {
+		throw createError({ statusCode: 400, statusMessage: "invalid kwic query options" });
+	}
 
 	const snapshot = await createPublishedSnapshot({
 		visualization,
 		publisher: user as typeof user & { _id: mongoose.Types.ObjectId; username: string },
 		title,
 		description,
+		kwicQueryOptions,
 	});
 
 	if (snapshot.missing.length > 0) {

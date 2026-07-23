@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { type Types } from "mongoose";
 
+import type { KwicQueryOptions, KwicQueryOptionsById } from "@/lib/kwic-query-options";
 import {
 	type VisualizationType,
 	getVisualizationSettingsForType,
@@ -77,10 +78,13 @@ export async function createPublishedSnapshot(input: {
 	publisher: UserDocument & { _id: Types.ObjectId; username: string };
 	title: string;
 	description: string;
+	kwicQueryOptions?: KwicQueryOptionsById;
 }) {
 	const queries = await loadVisualizationQueries(input.visualization);
 	const noskeById = await loadNoskeInstances(queries);
-	const querySnapshots = queries.map(createQuerySnapshot);
+	const querySnapshots = queries.map((query, index) =>
+		createQuerySnapshot(query, index, input.kwicQueryOptions?.[query._id.toString()]),
+	);
 	const missing: Array<MissingPublishedCacheEntry> = [];
 	const panels: Array<PublishedPanelSnapshot> = [];
 
@@ -91,6 +95,7 @@ export async function createPublishedSnapshot(input: {
 			const noske = noskeById.get(query.noske.toString());
 			if (!noske) continue;
 			const settings = getVisualizationSettings(input.visualization, type);
+			const kwicQueryOptions = input.kwicQueryOptions?.[query._id.toString()];
 			const mapping = await getPanelMapping(type, query, input.publisher._id.toString());
 			if (type === temporalFrequencyDistributionType && !mapping) {
 				missing.push({
@@ -108,6 +113,7 @@ export async function createPublishedSnapshot(input: {
 				input.publisher._id.toString(),
 				mapping,
 				settings,
+				kwicQueryOptions,
 			);
 			const cached = await NoskeQueryCacheModel.findOne({
 				user: input.publisher._id,
@@ -140,7 +146,11 @@ export async function createPublishedSnapshot(input: {
 	return { missing, panels, queries: querySnapshots };
 }
 
-function createQuerySnapshot(query: QueryDocument, index: number): PublishedQuerySnapshot {
+function createQuerySnapshot(
+	query: QueryDocument,
+	index: number,
+	kwicQueryOptions?: KwicQueryOptions,
+): PublishedQuerySnapshot {
 	const finalQuery = buildFinalQuery(query.type, query.userInput);
 	const concordanceKey = getConcordanceInputKey(query.type);
 	return {
@@ -160,8 +170,8 @@ function createQuerySnapshot(query: QueryDocument, index: number): PublishedQuer
 		},
 		facettingValues: query.facettingValues,
 		KWICAttrsStructs: {
-			attributes: [],
-			structures: [...fixedKWICStructures],
+			attributes: [...(kwicQueryOptions?.attributes ?? [])],
+			structures: [...(kwicQueryOptions?.structures ?? fixedKWICStructures)],
 		},
 		SampleRatio: 100,
 	};
@@ -205,10 +215,11 @@ function createPanelRequest(
 	userId: string,
 	mapping?: { attribute: string } | null,
 	settings?: unknown,
+	kwicQueryOptions?: KwicQueryOptions,
 ) {
 	const targetPath = createTargetPath(type);
 	const upstreamPath = resolveNoskeTargetPath(noske.version, targetPath);
-	const params = createQueryParams(type, query, mapping, settings);
+	const params = createQueryParams(type, query, mapping, settings, kwicQueryOptions);
 	return createNoskeCacheIdentity({
 		userId,
 		noskeId: query.noske.toString(),
@@ -232,6 +243,7 @@ function createQueryParams(
 	query: QueryDocument,
 	mapping?: { attribute: string } | null,
 	settings?: unknown,
+	kwicQueryOptions?: KwicQueryOptions,
 ) {
 	const common = {
 		corpname: query.corpus,
@@ -239,13 +251,15 @@ function createQueryParams(
 		json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 	};
 	if (type === "data-display-keyword-in-context") {
+		const attributes = kwicQueryOptions?.attributes ?? [];
+		const structures = kwicQueryOptions?.structures ?? fixedKWICStructures;
 		return {
 			corpname: query.corpus,
 			usesubcorp: query.subCorpus || undefined,
 			viewmode: "kwic",
-			attrs: "",
-			structs: fixedKWICStructures.join(","),
-			refs: fixedKWICStructures.map((structure) => `=${structure}`).join(","),
+			attrs: attributes.join(","),
+			structs: structures.join(","),
+			refs: structures.map((structure) => `=${structure}`).join(","),
 			pagesize: "1000",
 			json: common.json,
 			format: "json",

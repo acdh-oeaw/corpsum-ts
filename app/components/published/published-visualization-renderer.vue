@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
+import DataDisplayKeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
@@ -65,17 +66,7 @@ interface FreqMlResponse {
 
 type CollxResponse = components["schemas"]["10_collx"];
 
-interface ConcordanceLine {
-	Tbl_refs?: Array<string>;
-	Left?: Array<{ str?: string; strc?: string }>;
-	Kwic?: Array<{ str?: string }>;
-	Right?: Array<{ str?: string }>;
-	toknum?: number;
-}
-
-interface ConcordanceResponse {
-	Lines?: Array<ConcordanceLine>;
-}
+type ConcordanceResponse = components["schemas"]["06_concordance"];
 
 const props = defineProps<{ snapshot: PublishedVisualizationSnapshot; embed?: boolean }>();
 
@@ -113,25 +104,6 @@ function toCorpusQuery(query: PublishedQuerySnapshot): CorpusQuery {
 	};
 }
 
-function parseKwic(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-keyword-in-context", query.sourceQueryId)?.data as
-		| ConcordanceResponse
-		| undefined;
-	return (
-		data?.Lines?.map((line) => ({
-			refs: line.Tbl_refs ?? [],
-			date: line.Tbl_refs?.[1] ?? "",
-			source: line.Tbl_refs?.[3] ?? "",
-			region: line.Tbl_refs?.[2] ?? "",
-			left: line.Left?.map((entry) => entry.str ?? entry.strc ?? "").join(" ") ?? "",
-			word: line.Kwic?.map((entry) => entry.str ?? "").join(" ") ?? "",
-			right: line.Right?.map((entry) => entry.str ?? "").join(" ") ?? "",
-			docid: line.Tbl_refs?.[0] ?? "",
-			toknum: line.toknum ?? 0,
-		})) ?? []
-	);
-}
-
 const mediaSourceData = computed<Array<FreqMlResponse | null | undefined>>(() =>
 	props.snapshot.queries.map(
 		(query) =>
@@ -167,6 +139,14 @@ const collocationData = computed<Array<CollxResponse | null | undefined>>(() =>
 		(query) =>
 			findPanel("data-display-collocations", query.sourceQueryId)?.data as
 				| CollxResponse
+				| undefined,
+	),
+);
+const concordanceData = computed<Array<ConcordanceResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-keyword-in-context", query.sourceQueryId)?.data as
+				| ConcordanceResponse
 				| undefined,
 	),
 );
@@ -236,6 +216,13 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 				:show-header="!embed"
 				:show-source-data="!embed"
 			/>
+			<DataDisplayKeywordInContext
+				v-else-if="type === 'data-display-keyword-in-context'"
+				:data="concordanceData"
+				:interactive="!embed"
+				:queries="corpusQueries"
+				:show-header="!embed"
+			/>
 			<DataDisplayTemporalFrequencyDistribution
 				v-else-if="type === temporalFrequencyDistributionType"
 				:data="temporalData"
@@ -287,35 +274,7 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 					<CardTitle>{{ t(key) }}</CardTitle>
 				</CardHeader>
 				<CardContent class="grid gap-4">
-					<template v-if="key === 'keywordInContext'">
-						<div v-for="query in snapshot.queries" :key="query.sourceQueryId" class="grid gap-2">
-							<QueryDisplay :query="toCorpusQuery(query)" />
-							<div class="overflow-x-auto rounded-md border">
-								<table class="w-full text-sm">
-									<thead>
-										<tr class="border-b bg-muted/40 text-left">
-											<th class="px-3 py-2">Date</th>
-											<th class="px-3 py-2">Source</th>
-											<th class="px-3 py-2">Left</th>
-											<th class="px-3 py-2">KWIC</th>
-											<th class="px-3 py-2">Right</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr v-for="(line, index) in parseKwic(query)" :key="index" class="border-b">
-											<td class="px-3 py-2">{{ line.date }}</td>
-											<td class="px-3 py-2">{{ line.source }}</td>
-											<td class="px-3 py-2">{{ line.left }}</td>
-											<td class="px-3 py-2 font-semibold">{{ line.word }}</td>
-											<td class="px-3 py-2">{{ line.right }}</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</template>
-
-					<template v-else>
+					<template v-if="key !== 'keywordInContext'">
 						<div class="overflow-x-auto rounded-md border">
 							<table class="w-full text-sm">
 								<thead>

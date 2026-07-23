@@ -367,6 +367,10 @@
 		"updatedAt": "Aktualisiert"
 	},
 	"DataDisplayErrors": {
+		"keywordInContext": {
+			"loadFailed": "Die Keyword-im-Kontext-Daten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Keyword-im-Kontext-Daten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
 		"collocations": {
 			"loadFailed": "Die Kollokationsdaten für diese Abfrage konnten nicht geladen werden.",
 			"refreshFailed": "Die Kollokationsdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."

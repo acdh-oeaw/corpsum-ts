@@ -2,8 +2,10 @@ import { expect, test } from "@playwright/experimental-ct-vue";
 import type { Page } from "@playwright/test";
 
 import Collocations from "@/components/data-display/data-display-collocations.vue";
+import KeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import WordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import PublishedVisualizationRenderer from "@/components/published/published-visualization-renderer.vue";
+import { parseKwicQueryOptionsOverrides } from "@/lib/kwic-query-options";
 import type {
 	CollocationVisualizationSettings,
 	WordFormFrequencyVisualizationSettings,
@@ -93,6 +95,43 @@ const collocationResponses = {
 	},
 };
 
+const concordanceResponses = {
+	"noske-a": {
+		Lines: [
+			{
+				Tbl_refs: ["doc-a", "2026-01-01", "east", "source-a"],
+				Left: [{ strc: "left alpha" }],
+				Kwic: [{ str: "Alpha hit" }],
+				Right: [{ str: "right alpha" }],
+				toknum: 101,
+			},
+		],
+	},
+	"noske-b": {
+		Lines: [
+			{
+				Tbl_refs: ["doc-b", "2026-02-02", "west", "source-b"],
+				Left: [{ strc: "left beta" }],
+				Kwic: [{ str: "Beta hit" }],
+				Right: [{ str: "right beta" }],
+				toknum: 202,
+			},
+		],
+	},
+};
+
+const kwicQueries: Array<CorpusQuery> = queries.map((query) => ({
+	...query,
+	KWICAttrsStructs: {
+		attributes: [],
+		structures: ["doc.id", "doc.datum", "doc.region", "doc.docsrc"],
+	},
+	KWICAttrsStructsOptions: {
+		attributes: [{ name: "lemma", label: "Lemma", dynamic: "", fromattr: "" }],
+		structures: [{ name: "doc.genre", label: "Genre", attributes: [] }],
+	},
+}));
+
 async function routeWordResponses(page: Page, failedNoskes: Array<string> = []) {
 	const requests: Array<{ headers: Record<string, string>; url: string }> = [];
 	await page.route("**/api/noske/**", async (route) => {
@@ -121,6 +160,23 @@ async function routeCollocationResponses(page: Page, failedNoskes: Array<string>
 			return;
 		}
 		await route.fulfill({ json: collocationResponses[noske] });
+	});
+	return requests;
+}
+
+async function routeConcordanceResponses(page: Page, failedNoskes: Array<string> = []) {
+	const requests: Array<{ headers: Record<string, string>; url: string }> = [];
+	await page.route("**/api/noske/**", async (route) => {
+		const request = route.request();
+		const noske = new URL(request.url()).pathname.split(
+			"/",
+		)[3] as keyof typeof concordanceResponses;
+		requests.push({ headers: request.headers(), url: request.url() });
+		if (failedNoskes.includes(noske)) {
+			await route.fulfill({ status: 503, json: { error: "private concordance failure" } });
+			return;
+		}
+		await route.fulfill({ json: concordanceResponses[noske] });
 	});
 	return requests;
 }
@@ -481,6 +537,213 @@ test.describe("non-metadata visualization contracts", () => {
 					color: "#dc2626",
 				},
 			]),
+		);
+	});
+
+	test("routes concordance requests per query and keeps a partial failure aligned", async ({
+		mount,
+		page,
+	}) => {
+		const requests = await routeConcordanceResponses(page, ["noske-b"]);
+		const component = await mount(KeywordInContext, { props: { queries: kwicQueries } });
+
+		await expect.poll(() => requests.length).toBe(2);
+		for (const [index, expected] of [
+			[0, { noske: "noske-a", corpus: "corpus-a", subcorpus: "sub-a", facet: "east" }],
+			[1, { noske: "noske-b", corpus: "corpus-b", subcorpus: null, facet: "west" }],
+		] as const) {
+			const request = requests[index];
+			expect(request).toBeDefined();
+			const url = new URL(request.url);
+			expect(url.pathname).toBe(`/api/noske/${expected.noske}/search/concordance`);
+			expect(url.searchParams.get("corpname")).toBe(expected.corpus);
+			expect(url.searchParams.get("usesubcorp")).toBe(expected.subcorpus);
+			expect(url.searchParams.get("viewmode")).toBe("kwic");
+			expect(url.searchParams.get("attrs")).toBe("");
+			expect(url.searchParams.get("structs")).toBe("doc.id,doc.datum,doc.region,doc.docsrc");
+			expect(url.searchParams.get("refs")).toBe("=doc.id,=doc.datum,=doc.region,=doc.docsrc");
+			expect(url.searchParams.get("pagesize")).toBe("1000");
+			expect(url.searchParams.get("format")).toBe("json");
+			expect(JSON.parse(url.searchParams.get("json") ?? "{}")).toMatchObject({
+				concordance_query: { sca_region: [expected.facet] },
+			});
+			const cacheKey = JSON.parse(request.headers["x-corpsum-client-query-key"] ?? "[]");
+			expect(cacheKey[1]).toBe(expected.noske);
+			expect(cacheKey[2]).toBe(expected.corpus);
+			expect(cacheKey[4]).toMatchObject({
+				attrs: "",
+				structs: "doc.id,doc.datum,doc.region,doc.docsrc",
+				pagesize: 1000,
+			});
+		}
+
+		await expect(component.getByRole("alert")).toHaveText(
+			"Keyword-in-context data for this query could not be loaded.",
+		);
+		await expect(component.getByRole("alert")).not.toContainText("private concordance");
+		await expect(component.getByText("Alpha hit", { exact: true })).toBeVisible();
+		await expect(component.getByText("Beta hit", { exact: true })).toHaveCount(0);
+	});
+
+	test("uses defined sparse concordance snapshots without network fallback", async ({
+		mount,
+		page,
+	}) => {
+		const requests = await routeConcordanceResponses(page);
+		const component = await mount(KeywordInContext, {
+			props: {
+				queries: kwicQueries,
+				data: [concordanceResponses["noske-a"], undefined],
+				interactive: false,
+				showHeader: false,
+			},
+		});
+
+		expect(requests).toHaveLength(0);
+		await expect(component.getByText("Keyword in context", { exact: true })).toHaveCount(0);
+		await expect(component.getByRole("checkbox", { name: "View options" })).toHaveCount(0);
+		await expect(component.getByRole("alert")).toHaveCount(0);
+		await expect(component.getByText("Alpha hit", { exact: true })).toBeVisible();
+		await expect(component.getByText("No results.")).toBeVisible();
+	});
+
+	test("includes live-selected KWIC attributes and structures in cache identity", async ({
+		mount,
+		page,
+	}) => {
+		const requests = await routeConcordanceResponses(page);
+		const initialQuery = {
+			...kwicQueries[0]!,
+			KWICAttrsStructs: {
+				attributes: [...kwicQueries[0]!.KWICAttrsStructs.attributes],
+				structures: [...kwicQueries[0]!.KWICAttrsStructs.structures],
+			},
+		};
+		const component = await mount(KeywordInContext, {
+			props: { queries: [initialQuery] },
+		});
+
+		await expect.poll(() => requests.length).toBe(1);
+		await component.update({
+			props: {
+				queries: [
+					{
+						...initialQuery,
+						KWICAttrsStructs: {
+							attributes: ["lemma"],
+							structures: [...initialQuery.KWICAttrsStructs.structures, "doc.genre"],
+						},
+					},
+				],
+			},
+		});
+		await expect.poll(() => requests.length).toBeGreaterThanOrEqual(2);
+
+		const finalRequest = requests.at(-1);
+		expect(finalRequest).toBeDefined();
+		const url = new URL(finalRequest.url);
+		expect(url.searchParams.get("attrs")).toBe("lemma");
+		expect(url.searchParams.get("structs")).toBe(
+			"doc.id,doc.datum,doc.region,doc.docsrc,doc.genre",
+		);
+		expect(url.searchParams.get("refs")).toBe(
+			"=doc.id,=doc.datum,=doc.region,=doc.docsrc,=doc.genre",
+		);
+		const cacheKey = JSON.parse(finalRequest.headers["x-corpsum-client-query-key"] ?? "[]");
+		expect(cacheKey[4]).toMatchObject({
+			attrs: "lemma",
+			structs: "doc.id,doc.datum,doc.region,doc.docsrc,doc.genre",
+			refs: "=doc.id,=doc.datum,=doc.region,=doc.docsrc,=doc.genre",
+		});
+	});
+
+	test("validates keyed KWIC publication overrides against selected query IDs", () => {
+		const allowed = new Set(["query-a", "query-b"]);
+		expect(parseKwicQueryOptionsOverrides(undefined, allowed)).toStrictEqual({});
+		expect(
+			parseKwicQueryOptionsOverrides(
+				{
+					"query-a": {
+						attributes: ["lemma"],
+						structures: ["doc.id", "doc.genre"],
+					},
+				},
+				allowed,
+			),
+		).toStrictEqual({
+			"query-a": { attributes: ["lemma"], structures: ["doc.id", "doc.genre"] },
+		});
+		expect(
+			parseKwicQueryOptionsOverrides({ unknown: { attributes: [], structures: [] } }, allowed),
+		).toBeNull();
+		expect(
+			parseKwicQueryOptionsOverrides(
+				{ "query-a": { attributes: "lemma", structures: [] } },
+				allowed,
+			),
+		).toBeNull();
+		expect(
+			parseKwicQueryOptionsOverrides(
+				{ "query-a": { attributes: [], structures: [], extra: true } },
+				allowed,
+			),
+		).toBeNull();
+	});
+
+	test("renders localized KWIC errors and published snapshots through the shared table", async ({
+		mount,
+		page,
+	}) => {
+		await routeConcordanceResponses(page, ["noske-a"]);
+		const live = await mount(KeywordInContext, {
+			props: { queries: [kwicQueries[0]!] },
+			hooksConfig: { locale: "de" },
+		});
+		await expect(live.getByRole("alert")).toHaveText(
+			"Die Keyword-im-Kontext-Daten für diese Abfrage konnten nicht geladen werden.",
+		);
+
+		const snapshotQuery = {
+			...kwicQueries[0]!,
+			sourceQueryId: "query-a",
+			KWICAttrsStructs: {
+				attributes: ["lemma"],
+				structures: ["doc.id", "doc.datum", "doc.region", "doc.docsrc", "doc.genre"],
+			},
+		};
+		const published = await mount(PublishedVisualizationRenderer, {
+			props: {
+				embed: true,
+				snapshot: {
+					queries: [snapshotQuery],
+					visualizations: ["data-display-keyword-in-context"],
+					panels: [
+						{
+							type: "data-display-keyword-in-context",
+							queryId: "query-a",
+							data: concordanceResponses["noske-a"],
+						},
+					],
+				},
+			},
+			hooksConfig: { locale: "de" },
+		});
+
+		await expect(published.getByRole("checkbox", { name: "Ansichtsoptionen" })).toHaveCount(0);
+		await expect(published.getByRole("columnheader", { name: "Quelle" })).toBeVisible();
+		await expect(published.getByRole("columnheader", { name: "Wort" })).toBeVisible();
+		await expect(published.getByText("Alpha hit", { exact: true })).toBeVisible();
+		await expect(published.getByTestId("query-display")).toHaveAttribute(
+			"data-query",
+			JSON.stringify({
+				...snapshotQuery,
+				concordance_query: snapshotQuery.concordance_query,
+				facettingValues: snapshotQuery.facettingValues,
+				showPicker: false,
+				KWICAttrsStructsOptions: { attributes: [], structures: [] },
+				KWICAdditionalViewHeaders: [],
+				loading: snapshotQuery.loading,
+			}),
 		);
 	});
 });

@@ -9,6 +9,9 @@ import type { PropType } from "vue";
 import { createI18n, useI18n } from "vue-i18n";
 
 import CorpsumDataTable from "@/components/corpsum-data-table.vue";
+import KwicAttributeSelect from "@/components/kwic-attribute-select.vue";
+import KwicDetailDialog from "@/components/kwic-detail-dialog.vue";
+import KwicQueryDisplay from "@/components/kwic-query-display.vue";
 import Button from "@/components/ui/button/Button.vue";
 import Card from "@/components/ui/card/Card.vue";
 import CardContent from "@/components/ui/card/CardContent.vue";
@@ -55,6 +58,7 @@ import {
 	recordNoskeCacheMetadataFromResponse,
 } from "@/composables/use-noske-cache-metadata";
 import { useNoskeCollxQueries } from "@/composables/use-noske-collx-queries";
+import { useNoskeConcordanceQueries } from "@/composables/use-noske-concordance-queries";
 import { useNoskeFreqMlQueries } from "@/composables/use-noske-freqml-queries";
 import { useTranslations } from "@/composables/use-translations";
 import { categoryColors } from "@/utils/colors";
@@ -85,6 +89,7 @@ Object.assign(globalThis, {
 	useI18n,
 	useNoskeClient: () => ({ client: computed(() => null) }),
 	useNoskeCollxQueries,
+	useNoskeConcordanceQueries,
 	useNoskeFreqMlQueries,
 	useState: useComponentTestState,
 	useTranslations,
@@ -117,6 +122,9 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		CollapsibleContent,
 		CorpsumDataTable,
 		Input,
+		KwicAttributeSelect,
+		KwicDetailDialog,
+		KwicQueryDisplay,
 		Label,
 		Popover,
 		PopoverContent,

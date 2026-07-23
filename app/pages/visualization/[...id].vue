@@ -120,6 +120,15 @@ async function publishVisualization() {
 				body: {
 					title: publishTitle.value.trim() || visualization.value.name,
 					description: publishDescription.value,
+					kwicQueryOptions: Object.fromEntries(
+						selectedQueryItems.value.map((query, index) => [
+							query._id,
+							{
+								attributes: [...(corpusQueries.value[index]?.KWICAttrsStructs.attributes ?? [])],
+								structures: [...(corpusQueries.value[index]?.KWICAttrsStructs.structures ?? [])],
+							},
+						]),
+					),
 				},
 			},
 		);
