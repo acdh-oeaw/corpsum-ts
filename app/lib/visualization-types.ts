@@ -132,6 +132,15 @@ export type VisualizationFrequencyMode = "absolute" | "relative";
 export type MediaVisualizationChartMode = "bar" | "stack" | "percent";
 export type RegionalVisualizationMapMode = "combined" | "separate";
 export type RegionalVisualizationBarMode = "bar" | "stack" | "percent";
+export type CollocationVisualizationMode = "coll_freq" | "freq";
+export type CollocationAttribute = "lemma" | "word" | "lempos";
+
+export interface CollocationVisualizationSettings {
+	type: "data-display-collocations";
+	mode: CollocationVisualizationMode;
+	cattr: CollocationAttribute;
+	sourceTableExpanded: boolean;
+}
 
 export interface MediaSourceVisualizationSettings {
 	type: "data-display-media-source";
@@ -168,6 +177,13 @@ export const defaultMediaSourceVisualizationSettings = Object.freeze({
 	sourceTableExpanded: false,
 } satisfies MediaSourceVisualizationSettings);
 
+export const defaultCollocationVisualizationSettings = Object.freeze({
+	type: "data-display-collocations",
+	mode: "coll_freq",
+	cattr: "lemma",
+	sourceTableExpanded: false,
+} satisfies CollocationVisualizationSettings);
+
 export const defaultMediaTypeVisualizationSettings = Object.freeze({
 	type: "data-display-media-type",
 	mode: "relative",
@@ -197,6 +213,10 @@ function isMediaVisualizationChartMode(value: unknown): value is MediaVisualizat
 	return value === "bar" || value === "stack" || value === "percent";
 }
 
+function isCollocationAttribute(value: unknown): value is CollocationAttribute {
+	return value === "lemma" || value === "word" || value === "lempos";
+}
+
 function asUnknownRecord(value: unknown): Record<string, unknown> {
 	return typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {};
 }
@@ -213,6 +233,20 @@ export function normalizeMediaSourceVisualizationSettings(
 		chartMode: isMediaVisualizationChartMode(record.chartMode)
 			? record.chartMode
 			: defaultMediaSourceVisualizationSettings.chartMode,
+		sourceTableExpanded: record.sourceTableExpanded === true,
+	};
+}
+
+export function normalizeCollocationVisualizationSettings(
+	value: unknown,
+): CollocationVisualizationSettings {
+	const record = asUnknownRecord(value);
+	return {
+		type: "data-display-collocations",
+		mode: record.mode === "freq" ? "freq" : defaultCollocationVisualizationSettings.mode,
+		cattr: isCollocationAttribute(record.cattr)
+			? record.cattr
+			: defaultCollocationVisualizationSettings.cattr,
 		sourceTableExpanded: record.sourceTableExpanded === true,
 	};
 }
@@ -382,7 +416,7 @@ export function normalizeTemporalFrequencyDistributionSettings(
 type EmptyVisualizationSettings = Record<string, never>;
 
 export interface VisualizationSettingsByType {
-	"data-display-collocations": EmptyVisualizationSettings;
+	"data-display-collocations": CollocationVisualizationSettings;
 	"data-display-keyword-in-context": EmptyVisualizationSettings;
 	"data-display-media-source": MediaSourceVisualizationSettings;
 	"data-display-media-type": MediaTypeVisualizationSettings;
@@ -407,9 +441,9 @@ function normalizeEmptyVisualizationSettings(): EmptyVisualizationSettings {
 
 export const visualizationSettingsCodecs = {
 	"data-display-collocations": {
-		configurable: false,
-		defaults: emptyVisualizationSettings,
-		normalize: normalizeEmptyVisualizationSettings,
+		configurable: true,
+		defaults: defaultCollocationVisualizationSettings,
+		normalize: normalizeCollocationVisualizationSettings,
 	},
 	"data-display-keyword-in-context": {
 		configurable: false,

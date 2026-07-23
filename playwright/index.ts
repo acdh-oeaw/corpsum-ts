@@ -54,6 +54,7 @@ import {
 	createNoskeCacheHeaders,
 	recordNoskeCacheMetadataFromResponse,
 } from "@/composables/use-noske-cache-metadata";
+import { useNoskeCollxQueries } from "@/composables/use-noske-collx-queries";
 import { useNoskeFreqMlQueries } from "@/composables/use-noske-freqml-queries";
 import { useTranslations } from "@/composables/use-translations";
 import { categoryColors } from "@/utils/colors";
@@ -83,6 +84,7 @@ Object.assign(globalThis, {
 	useLocale,
 	useI18n,
 	useNoskeClient: () => ({ client: computed(() => null) }),
+	useNoskeCollxQueries,
 	useNoskeFreqMlQueries,
 	useState: useComponentTestState,
 	useTranslations,
@@ -270,6 +272,25 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 						"data-mode": props.mode,
 						"data-query-colors": JSON.stringify(props.queries.map((query) => query.color)),
 						"data-source-distributions": JSON.stringify(props.sourceDistributions),
+					});
+			},
+		}),
+	);
+	app.component(
+		"WordCloudGraph",
+		defineComponent({
+			props: {
+				color: { type: String, required: true },
+				queryLabel: { type: String, required: true },
+				words: { type: Array, required: true },
+			},
+			setup(props) {
+				return () =>
+					h("div", {
+						"data-testid": "word-cloud",
+						"data-color": props.color,
+						"data-query-label": props.queryLabel,
+						"data-words": JSON.stringify(props.words),
 					});
 			},
 		}),

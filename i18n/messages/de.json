@@ -367,6 +367,10 @@
 		"updatedAt": "Aktualisiert"
 	},
 	"DataDisplayErrors": {
+		"collocations": {
+			"loadFailed": "Die Kollokationsdaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Kollokationsdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
 		"wordFormFrequency": {
 			"loadFailed": "Die Wortformenfrequenzdaten für diese Abfrage konnten nicht geladen werden.",
 			"refreshFailed": "Die Wortformenfrequenzdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
@@ -450,6 +454,7 @@
 	"VisualizationToolbar": {
 		"barChartMode": "Balkendiagramm-Modus",
 		"chartMode": "Diagrammmodus",
+		"collocations": "Steuerung der Kollokationen",
 		"combinedMapChart": "Kombiniertes Kartendiagramm",
 		"frequencyMode": "Frequenzmodus",
 		"mapMode": "Kartenmodus",

@@ -367,6 +367,10 @@
 		"updatedAt": "Updated"
 	},
 	"DataDisplayErrors": {
+		"collocations": {
+			"loadFailed": "Collocation data for this query could not be loaded.",
+			"refreshFailed": "Collocation data for this query could not be refreshed. The displayed result may be out of date."
+		},
 		"wordFormFrequency": {
 			"loadFailed": "Word-form frequency data for this query could not be loaded.",
 			"refreshFailed": "Word-form frequency data for this query could not be refreshed. The displayed result may be out of date."
@@ -450,6 +454,7 @@
 	"VisualizationToolbar": {
 		"barChartMode": "Bar chart mode",
 		"chartMode": "Chart mode",
+		"collocations": "Collocation controls",
 		"combinedMapChart": "Combined map chart",
 		"frequencyMode": "Frequency mode",
 		"mapMode": "Map mode",

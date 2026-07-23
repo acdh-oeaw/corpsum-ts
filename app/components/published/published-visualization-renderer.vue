@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
@@ -6,6 +7,7 @@ import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import {
 	type CorpusMetadataMappingResponse,
+	type CollocationVisualizationSettings,
 	type MediaSourceVisualizationSettings,
 	type MediaTypeVisualizationSettings,
 	type RegionalVisualizationSettings,
@@ -17,6 +19,7 @@ import {
 	temporalFrequencyDistributionType,
 	visualizationDefinitions,
 } from "@/lib/visualization-types";
+import type { components } from "~/lib/noske-types";
 
 interface PublishedQuerySnapshot {
 	id: number;
@@ -60,16 +63,7 @@ interface FreqMlResponse {
 	Blocks?: Array<{ Items?: Array<FreqMlItem> }>;
 }
 
-interface CollxItem {
-	str?: string;
-	freq?: number;
-	coll_freq?: number;
-	Stats?: Array<{ n?: string; s?: string }>;
-}
-
-interface CollxResponse {
-	Items?: Array<CollxItem>;
-}
+type CollxResponse = components["schemas"]["10_collx"];
 
 interface ConcordanceLine {
 	Tbl_refs?: Array<string>;
@@ -117,28 +111,6 @@ function toCorpusQuery(query: PublishedQuerySnapshot): CorpusQuery {
 			collocations: false,
 		},
 	};
-}
-
-function parseCollocations(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-collocations", query.sourceQueryId)?.data as
-		| CollxResponse
-		| undefined;
-	return (
-		data?.Items?.map((item) => {
-			const d = item.Stats?.find(({ n }) => n === "d");
-			const m = item.Stats?.find(({ n }) => n === "m");
-			const tStat = item.Stats?.find(({ n }) => n === "t");
-			return {
-				word: item.str ?? "",
-				freq: item.freq ?? 0,
-				coll_freq: item.coll_freq ?? 0,
-				d: d?.s ? Number(d.s) : -1,
-				m: m?.s ? Number(m.s) : -1,
-				t: tStat?.s ? Number(tStat.s) : -1,
-				weight: item.coll_freq ?? 0,
-			};
-		}) ?? []
-	);
 }
 
 function parseKwic(query: PublishedQuerySnapshot) {
@@ -190,6 +162,14 @@ const wordFormFrequencyData = computed<Array<FreqMlResponse | null | undefined>>
 				| undefined,
 	),
 );
+const collocationData = computed<Array<CollxResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-collocations", query.sourceQueryId)?.data as
+				| CollxResponse
+				| undefined,
+	),
+);
 function findPanelSettings(type: VisualizationType) {
 	return props.snapshot.panels.find((panel) => normalizeVisualizationType(panel.type) === type)
 		?.settings;
@@ -219,6 +199,12 @@ const wordFormFrequencySettings = computed<WordFormFrequencyVisualizationSetting
 		findPanelSettings("data-display-word-form-frequencies"),
 	),
 );
+const collocationSettings = computed<CollocationVisualizationSettings>(() =>
+	normalizeVisualizationSettings(
+		"data-display-collocations",
+		findPanelSettings("data-display-collocations"),
+	),
+);
 const temporalPanels = computed(() =>
 	props.snapshot.queries.map((query) =>
 		findPanel(temporalFrequencyDistributionType, query.sourceQueryId),
@@ -241,8 +227,17 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 <template>
 	<div class="grid gap-6">
 		<template v-for="{ type, key } in renderItems" :key="type">
+			<DataDisplayCollocations
+				v-if="type === 'data-display-collocations'"
+				:data="collocationData"
+				:interactive="!embed"
+				:queries="corpusQueries"
+				:settings="collocationSettings"
+				:show-header="!embed"
+				:show-source-data="!embed"
+			/>
 			<DataDisplayTemporalFrequencyDistribution
-				v-if="type === temporalFrequencyDistributionType"
+				v-else-if="type === temporalFrequencyDistributionType"
 				:data="temporalData"
 				:interactive="!embed"
 				:metadata-mappings="temporalMappings"
@@ -292,19 +287,7 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 					<CardTitle>{{ t(key) }}</CardTitle>
 				</CardHeader>
 				<CardContent class="grid gap-4">
-					<template v-if="key === 'collocations'">
-						<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
-							<QueryDisplay :query="toCorpusQuery(query)" />
-							<WordCloudGraph
-								:color="query.color"
-								:query-label="query.userInput"
-								:title="query.userInput"
-								:words="parseCollocations(query)"
-							/>
-						</div>
-					</template>
-
-					<template v-else-if="key === 'keywordInContext'">
+					<template v-if="key === 'keywordInContext'">
 						<div v-for="query in snapshot.queries" :key="query.sourceQueryId" class="grid gap-2">
 							<QueryDisplay :query="toCorpusQuery(query)" />
 							<div class="overflow-x-auto rounded-md border">

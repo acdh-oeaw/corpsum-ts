@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
@@ -360,6 +361,13 @@ function cancel() {
 			:queries="corpusQueries"
 			:settings="getSettings(temporalFrequencyDistributionType)"
 			@update:settings="updateVisualizationSettings(temporalFrequencyDistributionType, $event)"
+		/>
+		<DataDisplayCollocations
+			v-if="selectedVisualizations.includes('data-display-collocations')"
+			class="mt-6"
+			:queries="corpusQueries"
+			:settings="getSettings('data-display-collocations')"
+			@update:settings="updateVisualizationSettings('data-display-collocations', $event)"
 		/>
 		<DataDisplayMediaSource
 			v-if="selectedVisualizations.includes('data-display-media-source')"

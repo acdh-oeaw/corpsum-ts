@@ -5,6 +5,7 @@ import { type Types } from "mongoose";
 import {
 	type VisualizationType,
 	getVisualizationSettingsForType,
+	normalizeCollocationVisualizationSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
 	visualizationDefinitions,
@@ -106,6 +107,7 @@ export async function createPublishedSnapshot(input: {
 				noske,
 				input.publisher._id.toString(),
 				mapping,
+				settings,
 			);
 			const cached = await NoskeQueryCacheModel.findOne({
 				user: input.publisher._id,
@@ -202,10 +204,11 @@ function createPanelRequest(
 	noske: NoskeDocument,
 	userId: string,
 	mapping?: { attribute: string } | null,
+	settings?: unknown,
 ) {
 	const targetPath = createTargetPath(type);
 	const upstreamPath = resolveNoskeTargetPath(noske.version, targetPath);
-	const params = createQueryParams(type, query, mapping);
+	const params = createQueryParams(type, query, mapping, settings);
 	return createNoskeCacheIdentity({
 		userId,
 		noskeId: query.noske.toString(),
@@ -228,6 +231,7 @@ function createQueryParams(
 	type: VisualizationType,
 	query: QueryDocument,
 	mapping?: { attribute: string } | null,
+	settings?: unknown,
 ) {
 	const common = {
 		corpname: query.corpus,
@@ -303,9 +307,10 @@ function createQueryParams(
 			ml1ctx: "0~0 > 0",
 		};
 	}
+	const collocationSettings = normalizeCollocationVisualizationSettings(settings);
 	return {
 		...common,
-		cattr: "lemma",
+		cattr: collocationSettings.cattr,
 		ctow: "3",
 		cminfreq: "9",
 		cminbgr: "9",

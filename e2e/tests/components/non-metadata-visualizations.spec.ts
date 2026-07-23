@@ -1,9 +1,13 @@
 import { expect, test } from "@playwright/experimental-ct-vue";
 import type { Page } from "@playwright/test";
 
+import Collocations from "@/components/data-display/data-display-collocations.vue";
 import WordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import PublishedVisualizationRenderer from "@/components/published/published-visualization-renderer.vue";
-import type { WordFormFrequencyVisualizationSettings } from "@/lib/visualization-types";
+import type {
+	CollocationVisualizationSettings,
+	WordFormFrequencyVisualizationSettings,
+} from "@/lib/visualization-types";
 
 const queries: Array<CorpusQuery> = [
 	{
@@ -69,6 +73,26 @@ const wordResponses = {
 	},
 };
 
+const collocationResponses = {
+	"noske-a": {
+		Items: [
+			{
+				str: "Alpha collocate",
+				freq: 30,
+				coll_freq: 12,
+				Stats: [
+					{ n: "d", s: "4.5" },
+					{ n: "m", s: "3.5" },
+					{ n: "t", s: "2.5" },
+				],
+			},
+		],
+	},
+	"noske-b": {
+		Items: [{ str: "Beta collocate", freq: 40, coll_freq: 22, Stats: [] }],
+	},
+};
+
 async function routeWordResponses(page: Page, failedNoskes: Array<string> = []) {
 	const requests: Array<{ headers: Record<string, string>; url: string }> = [];
 	await page.route("**/api/noske/**", async (route) => {
@@ -80,6 +104,23 @@ async function routeWordResponses(page: Page, failedNoskes: Array<string> = []) 
 			return;
 		}
 		await route.fulfill({ json: wordResponses[noske] });
+	});
+	return requests;
+}
+
+async function routeCollocationResponses(page: Page, failedNoskes: Array<string> = []) {
+	const requests: Array<{ headers: Record<string, string>; url: string }> = [];
+	await page.route("**/api/noske/**", async (route) => {
+		const request = route.request();
+		const noske = new URL(request.url()).pathname.split(
+			"/",
+		)[3] as keyof typeof collocationResponses;
+		requests.push({ headers: request.headers(), url: request.url() });
+		if (failedNoskes.includes(noske)) {
+			await route.fulfill({ status: 503, json: { error: "private collx failure" } });
+			return;
+		}
+		await route.fulfill({ json: collocationResponses[noske] });
 	});
 	return requests;
 }
@@ -253,6 +294,192 @@ test.describe("non-metadata visualization contracts", () => {
 					data: [["Alpha", 10]],
 				},
 				{ color: "#2563eb", name: "lemmarow: beta (corpus-b)", data: [] },
+			]),
+		);
+	});
+
+	test("routes collocation requests per query and keeps a partial failure aligned", async ({
+		mount,
+		page,
+	}) => {
+		const requests = await routeCollocationResponses(page, ["noske-b"]);
+		const component = await mount(Collocations, { props: { queries } });
+
+		await expect.poll(() => requests.length).toBe(2);
+		for (const [index, expected] of [
+			[0, { noske: "noske-a", corpus: "corpus-a", subcorpus: "sub-a", facet: "east" }],
+			[1, { noske: "noske-b", corpus: "corpus-b", subcorpus: null, facet: "west" }],
+		] as const) {
+			const request = requests[index];
+			expect(request).toBeDefined();
+			const url = new URL(request.url);
+			expect(url.pathname).toBe(`/api/noske/${expected.noske}/search/collx`);
+			expect(url.searchParams.get("corpname")).toBe(expected.corpus);
+			expect(url.searchParams.get("usesubcorp")).toBe(expected.subcorpus);
+			expect(url.searchParams.get("cattr")).toBe("lemma");
+			expect(url.searchParams.get("ctow")).toBe("3");
+			expect(url.searchParams.get("cminfreq")).toBe("9");
+			expect(url.searchParams.get("cminbgr")).toBe("9");
+			expect(url.searchParams.get("cbgrfns")).toBe("dmt");
+			expect(url.searchParams.get("csortfn")).toBe("d");
+			expect(url.searchParams.get("citemsperpage")).toBe("10");
+			expect(JSON.parse(url.searchParams.get("json") ?? "{}")).toMatchObject({
+				concordance_query: { sca_region: [expected.facet] },
+			});
+			const cacheKey = JSON.parse(request.headers["x-corpsum-client-query-key"] ?? "[]");
+			expect(cacheKey[1]).toBe(expected.noske);
+			expect(cacheKey[2]).toBe(expected.corpus);
+			expect(cacheKey[4]).toMatchObject({ cattr: "lemma", citemsperpage: 10 });
+		}
+
+		await expect(component.getByRole("alert")).toHaveText(
+			"Collocation data for this query could not be loaded.",
+		);
+		await expect(component.getByRole("alert")).not.toContainText("private collx");
+		const clouds = component.getByTestId("word-cloud");
+		await expect(clouds).toHaveCount(2);
+		await expect(clouds.nth(0)).toHaveAttribute(
+			"data-words",
+			JSON.stringify([
+				{
+					word: "Alpha collocate",
+					freq: 30,
+					coll_freq: 12,
+					d: 4.5,
+					m: 3.5,
+					t: 2.5,
+					name: "Alpha collocate",
+					weight: 12,
+					color: "#dc2626",
+				},
+			]),
+		);
+		await expect(clouds.nth(1)).toHaveAttribute("data-words", "[]");
+	});
+
+	test("uses defined collocation snapshots without network fallback", async ({ mount, page }) => {
+		const requests = await routeCollocationResponses(page);
+		const component = await mount(Collocations, {
+			props: {
+				queries,
+				data: [collocationResponses["noske-a"], undefined],
+				showHeader: false,
+				showSourceData: false,
+			},
+		});
+
+		expect(requests).toHaveLength(0);
+		await expect(component.getByText("Collocations", { exact: true })).toHaveCount(0);
+		await expect(component.getByRole("alert")).toHaveCount(0);
+		await expect(component.getByRole("toolbar", { name: "Source data controls" })).toHaveCount(0);
+		await expect(component.getByTestId("word-cloud")).toHaveCount(2);
+	});
+
+	test("changes collocation cache identity with cattr and emits complete settings", async ({
+		mount,
+		page,
+	}) => {
+		const requests = await routeCollocationResponses(page);
+		const updates: Array<CollocationVisualizationSettings> = [];
+		const component = await mount(Collocations, {
+			props: { queries: [queries[0]!] },
+			on: {
+				"update:settings": (settings: CollocationVisualizationSettings) => updates.push(settings),
+			},
+		});
+
+		await expect.poll(() => requests.length).toBe(1);
+		await component.getByRole("button", { name: "Frequency", exact: true }).click();
+		await component.getByRole("combobox").click();
+		await page.getByRole("option", { name: "word", exact: true }).click();
+		await expect.poll(() => requests.length).toBe(2);
+		const secondUrl = new URL(requests[1]!.url);
+		expect(secondUrl.searchParams.get("cattr")).toBe("word");
+		const secondKey = JSON.parse(requests[1]!.headers["x-corpsum-client-query-key"] ?? "[]");
+		expect(secondKey[4]).toMatchObject({ cattr: "word" });
+		await component.getByRole("button", { name: "Show data" }).click();
+		expect(updates.at(-1)).toStrictEqual({
+			type: "data-display-collocations",
+			mode: "freq",
+			cattr: "word",
+			sourceTableExpanded: true,
+		});
+		await expect(component.getByTestId("word-cloud")).toHaveAttribute(
+			"data-words",
+			JSON.stringify([
+				{
+					word: "Alpha collocate",
+					freq: 30,
+					coll_freq: 12,
+					d: 4.5,
+					m: 3.5,
+					t: 2.5,
+					name: "Alpha collocate",
+					weight: 30,
+					color: "#dc2626",
+				},
+			]),
+		);
+	});
+
+	test("renders German collocation errors in a wrapping 320-pixel toolbar", async ({
+		mount,
+		page,
+	}) => {
+		await page.setViewportSize({ width: 320, height: 800 });
+		await routeCollocationResponses(page, ["noske-a"]);
+		const component = await mount(Collocations, {
+			props: { queries: [queries[0]!] },
+			hooksConfig: { locale: "de" },
+		});
+
+		await expect(component.getByRole("alert")).toHaveText(
+			"Die Kollokationsdaten für diese Abfrage konnten nicht geladen werden.",
+		);
+		const box = await component
+			.getByRole("toolbar", { name: "Steuerung der Kollokationen" })
+			.boundingBox();
+		expect(box?.width).toBeLessThanOrEqual(320);
+	});
+
+	test("reconstructs collocation snapshots and settings through the published component", async ({
+		mount,
+	}) => {
+		const component = await mount(PublishedVisualizationRenderer, {
+			props: {
+				embed: true,
+				snapshot: {
+					queries: queries.map((query, index) => ({
+						...query,
+						sourceQueryId: `query-${index}`,
+					})),
+					visualizations: ["data-display-collocations"],
+					panels: queries.map((_, index) => ({
+						type: "data-display-collocations",
+						queryId: `query-${index}`,
+						data: index === 0 ? collocationResponses["noske-a"] : null,
+						settings: { mode: "freq", cattr: "word", sourceTableExpanded: true },
+					})),
+				},
+			},
+		});
+
+		await expect(component.getByRole("button", { name: "Frequency", exact: true })).toHaveCount(0);
+		await expect(component.getByRole("combobox")).toHaveCount(0);
+		await expect(component.getByTestId("word-cloud").nth(0)).toHaveAttribute(
+			"data-words",
+			JSON.stringify([
+				{
+					word: "Alpha collocate",
+					freq: 30,
+					coll_freq: 12,
+					d: 4.5,
+					m: 3.5,
+					t: 2.5,
+					name: "Alpha collocate",
+					weight: 30,
+					color: "#dc2626",
+				},
 			]),
 		);
 	});
