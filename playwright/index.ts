@@ -4,9 +4,10 @@ import "@/styles/index.css";
 
 import { beforeMount } from "@playwright/experimental-ct-vue/hooks";
 import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, h, ref, watch, watchEffect } from "vue";
 import { createI18n, useI18n } from "vue-i18n";
 
+import CorpsumDataTable from "@/components/corpsum-data-table.vue";
 import Button from "@/components/ui/button/Button.vue";
 import Card from "@/components/ui/card/Card.vue";
 import CardContent from "@/components/ui/card/CardContent.vue";
@@ -28,6 +29,16 @@ import SelectItem from "@/components/ui/select/SelectItem.vue";
 import SelectTrigger from "@/components/ui/select/SelectTrigger.vue";
 import SelectValue from "@/components/ui/select/SelectValue.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
+import Table from "@/components/ui/table/Table.vue";
+import TableBody from "@/components/ui/table/TableBody.vue";
+import TableCell from "@/components/ui/table/TableCell.vue";
+import TableHead from "@/components/ui/table/TableHead.vue";
+import TableHeader from "@/components/ui/table/TableHeader.vue";
+import TableRow from "@/components/ui/table/TableRow.vue";
+import Tabs from "@/components/ui/tabs/Tabs.vue";
+import TabsContent from "@/components/ui/tabs/TabsContent.vue";
+import TabsList from "@/components/ui/tabs/TabsList.vue";
+import TabsTrigger from "@/components/ui/tabs/TabsTrigger.vue";
 import Toolbar from "@/components/ui/toolbar/Toolbar.vue";
 import ToolbarButton from "@/components/ui/toolbar/ToolbarButton.vue";
 import ToolbarSeparator from "@/components/ui/toolbar/ToolbarSeparator.vue";
@@ -55,6 +66,7 @@ Object.assign(globalThis, {
 	computed,
 	createNoskeCacheHeaders,
 	categoryColors,
+	h,
 	ref,
 	useLocale,
 	useI18n,
@@ -86,6 +98,7 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		Checkbox,
 		Collapsible,
 		CollapsibleContent,
+		CorpsumDataTable,
 		Input,
 		Label,
 		Popover,
@@ -97,6 +110,16 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		SelectTrigger,
 		SelectValue,
 		Separator,
+		Table,
+		TableBody,
+		TableCell,
+		TableHead,
+		TableHeader,
+		TableRow,
+		Tabs,
+		TabsContent,
+		TabsList,
+		TabsTrigger,
 		Toolbar,
 		ToolbarButton,
 		ToolbarSeparator,
