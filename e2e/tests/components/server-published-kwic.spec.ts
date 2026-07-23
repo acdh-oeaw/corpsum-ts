@@ -233,7 +233,11 @@ test.describe("published KWIC server boundary", () => {
 	});
 
 	for (const accessCase of [
-		{ name: "public instance", noske: makeNoske({ public: true }), publisher: makePublisher() },
+		{
+			name: "public instance",
+			noske: makeNoske({ public: true }),
+			publisher: makePublisher({ id: ids.otherUser }),
+		},
 		{
 			name: "private owned instance",
 			noske: makeNoske({ public: false }),
