@@ -147,8 +147,29 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 	})) {
 		app.component(name, component);
 	}
-	app.component("Chart", { template: "<div data-testid='chart' />" });
-	app.component("ClientOnly", { template: "<slot />" });
+	app.component(
+		"Chart",
+		defineComponent({
+			props: {
+				series: { type: Array, default: () => [] },
+			},
+			setup(props) {
+				return () =>
+					h("div", {
+						"data-testid": "chart",
+						"data-series": JSON.stringify(props.series),
+					});
+			},
+		}),
+	);
+	app.component(
+		"ClientOnly",
+		defineComponent({
+			setup(_, { slots }) {
+				return () => slots.default?.();
+			},
+		}),
+	);
 	app.component(
 		"CombinedMapChart",
 		defineComponent({
@@ -168,14 +189,67 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 			},
 		}),
 	);
-	app.component("QueryDisplay", {
-		template: "<div data-testid='query-display'>Query display</div>",
-	});
-	app.component("DataDisplaySourceTable", { template: "<div data-testid='source-table' />" });
-	app.component("MapChart", {
-		props: ["mode"],
-		template: "<div data-testid='map-chart' :data-mode='mode' />",
-	});
+	app.component(
+		"QueryDisplay",
+		defineComponent({
+			props: {
+				loading: { type: Boolean, default: false },
+				query: { type: Object as PropType<CorpusQuery>, required: true },
+				queryKey: { type: Array as PropType<ReadonlyArray<unknown>>, default: undefined },
+			},
+			setup(props) {
+				return () =>
+					h(
+						"div",
+						{
+							"data-testid": "query-display",
+							"data-loading": String(props.loading),
+							"data-query": JSON.stringify(props.query),
+							"data-query-key": JSON.stringify(props.queryKey),
+						},
+						"Query display",
+					);
+			},
+		}),
+	);
+	app.component(
+		"DataDisplaySourceTable",
+		defineComponent({
+			props: {
+				data: { type: Array, required: true },
+				loading: { type: Array as PropType<Array<boolean>>, required: true },
+				queries: { type: Array as PropType<Array<CorpusQuery>>, required: true },
+			},
+			setup(props) {
+				return () =>
+					h("div", {
+						"data-testid": "source-table",
+						"data-loading": JSON.stringify(props.loading),
+						"data-queries": JSON.stringify(props.queries),
+						"data-source-data": JSON.stringify(props.data),
+					});
+			},
+		}),
+	);
+	app.component(
+		"MapChart",
+		defineComponent({
+			props: {
+				mode: { type: String, required: true },
+				query: { type: Object as PropType<CorpusQuery>, required: true },
+				resdata: { type: Array as PropType<Array<RegionalFreqData>>, required: true },
+			},
+			setup(props) {
+				return () =>
+					h("div", {
+						"data-testid": "map-chart",
+						"data-mode": props.mode,
+						"data-query": JSON.stringify(props.query),
+						"data-regional-frequency": JSON.stringify(props.resdata),
+					});
+			},
+		}),
+	);
 	app.component(
 		"MediaStackedBarChart",
 		defineComponent({

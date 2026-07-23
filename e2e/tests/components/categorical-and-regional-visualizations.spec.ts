@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/experimental-ct-vue";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 import MediaSourceDistribution from "@/components/data-display/data-display-media-source.vue";
 import MediaTypeDistribution from "@/components/data-display/data-display-media-type.vue";
@@ -99,6 +99,107 @@ const mixedResponses = {
 		Blocks: [{ Items: [{ Word: [{ n: "AT-2" }], frq: 22, reltt: 0.22 }] }],
 	},
 };
+
+const repeatedRegionalQueries: Array<CorpusQuery> = [
+	{
+		...query,
+		id: 101,
+		noske: "shared-noske",
+		userInput: "repeated query",
+		finalQuery: "repeated query",
+		preparedQuery: "repeated query",
+		color: "#b91c1c",
+		corpus: "shared-corpus",
+		concordance_query: { queryselector: "wordrow", word: "repeated query" },
+		facettingValues: { region: ["east"] },
+	},
+	{
+		...query,
+		id: 202,
+		noske: "shared-noske",
+		userInput: "repeated query",
+		finalQuery: "repeated query",
+		preparedQuery: "repeated query",
+		color: "#1d4ed8",
+		corpus: "shared-corpus",
+		concordance_query: { queryselector: "wordrow", word: "repeated query" },
+		facettingValues: { region: ["west"] },
+	},
+];
+
+function regionalResponse(region: string, absolute: number, relative: number) {
+	return {
+		Blocks: [{ Items: [{ Word: [{ n: region }], frq: absolute, reltt: relative }] }],
+	};
+}
+
+const suppliedRegionalResponses = [
+	regionalResponse("AT-1", 101, 0.101),
+	regionalResponse("AT-2", 202, 0.202),
+];
+
+function parsedRegionalFrequencies(
+	queries: Array<CorpusQuery>,
+	responses: Array<ReturnType<typeof regionalResponse>>,
+) {
+	return queries.map((currentQuery, index) => ({
+		query: currentQuery.id,
+		data:
+			responses[index]?.Blocks[0]?.Items.map((item) => ({
+				region: item.Word[0]?.n ?? "",
+				absolute: item.frq,
+				relative: item.reltt,
+			})) ?? [],
+	}));
+}
+
+async function expectRegionalConsumers(
+	component: Locator,
+	queries: Array<CorpusQuery>,
+	responses: Array<ReturnType<typeof regionalResponse>>,
+) {
+	const parsed = parsedRegionalFrequencies(queries, responses);
+	await expect(component.getByTestId("combined-map-chart")).toHaveAttribute(
+		"data-query-colors",
+		JSON.stringify(queries.map((currentQuery) => currentQuery.color)),
+	);
+	await expect(component.getByTestId("combined-map-chart")).toHaveAttribute(
+		"data-regional-frequencies",
+		JSON.stringify(parsed),
+	);
+	await expect(component.getByTestId("chart")).toHaveAttribute(
+		"data-series",
+		JSON.stringify(
+			queries.map((currentQuery, index) => ({
+				color: currentQuery.color,
+				name: `${currentQuery.type}: ${currentQuery.userInput} (${currentQuery.corpus})`,
+				data: parsed[index]?.data.map((item) => [item.region, item.relative]) ?? [],
+			})),
+		),
+	);
+	await expect(component.getByTestId("source-table")).toHaveAttribute(
+		"data-source-data",
+		JSON.stringify(parsed.map((entry) => entry.data)),
+	);
+	await expect(component.getByTestId("source-table")).toHaveAttribute(
+		"data-queries",
+		JSON.stringify(queries),
+	);
+	await expect(component.getByTestId("source-table")).toHaveAttribute(
+		"data-loading",
+		JSON.stringify(queries.map(() => false)),
+	);
+
+	const queryDisplays = component.getByTestId("query-display");
+	await expect(queryDisplays).toHaveCount(queries.length);
+	for (const [index, currentQuery] of queries.entries()) {
+		await expect(queryDisplays.nth(index)).toHaveAttribute(
+			"data-query",
+			JSON.stringify(currentQuery),
+		);
+		await expect(queryDisplays.nth(index)).toHaveAttribute("data-loading", "false");
+	}
+}
 
 interface RecordedRequest {
 	url: string;
@@ -467,6 +568,104 @@ test.describe("categorical and regional visualization components", () => {
 		await expect(component.getByTestId("combined-map-chart")).toHaveAttribute(
 			"data-regional-frequencies",
 			JSON.stringify([{ query: 11, data: [] }]),
+		);
+	});
+
+	test("keeps every regional consumer aligned through supplied-data query changes", async ({
+		mount,
+	}) => {
+		const [queryA, queryB] = repeatedRegionalQueries;
+		const [responseA, responseB] = suppliedRegionalResponses;
+		expect(queryA).toBeDefined();
+		expect(queryB).toBeDefined();
+		expect(responseA).toBeDefined();
+		expect(responseB).toBeDefined();
+
+		const component = await mount(RegionalFrequencies, {
+			props: { queries: [queryA, queryB], data: [responseA, responseB] },
+		});
+		await component.getByRole("button", { name: "Show data" }).click();
+		await component.getByRole("button", { name: "Query details" }).click();
+		await expectRegionalConsumers(component, [queryA, queryB], [responseA, responseB]);
+
+		await component.update({
+			props: { queries: [queryB, queryA], data: [responseB, responseA] },
+		});
+		await expectRegionalConsumers(component, [queryB, queryA], [responseB, responseA]);
+
+		await component.update({ props: { queries: [queryA], data: [responseA] } });
+		await expectRegionalConsumers(component, [queryA], [responseA]);
+
+		await component.update({
+			props: { queries: [queryA, queryB], data: [responseA, responseB] },
+		});
+		await expectRegionalConsumers(component, [queryA, queryB], [responseA, responseB]);
+
+		const replacementResponses = [
+			regionalResponse("AT-3", 303, 0.303),
+			regionalResponse("AT-4", 404, 0.404),
+		];
+		await component.update({ props: { data: replacementResponses } });
+		await expectRegionalConsumers(component, [queryA, queryB], replacementResponses);
+
+		await component.getByRole("button", { name: "Separate map charts" }).click();
+		const mapCharts = component.getByTestId("map-chart");
+		await expect(mapCharts).toHaveCount(2);
+		for (const [index, currentQuery] of [queryA, queryB].entries()) {
+			await expect(mapCharts.nth(index)).toHaveAttribute(
+				"data-query",
+				JSON.stringify(currentQuery),
+			);
+			await expect(mapCharts.nth(index)).toHaveAttribute(
+				"data-regional-frequency",
+				JSON.stringify(
+					parsedRegionalFrequencies([queryA, queryB], replacementResponses)[index]?.data,
+				),
+			);
+		}
+	});
+
+	test("keeps live regional identities when repeated-corpus requests resolve in reverse", async ({
+		mount,
+		page,
+	}) => {
+		const releases = new Map<string, () => void>();
+		const completionOrder: Array<string> = [];
+		const liveResponses = {
+			east: regionalResponse("AT-1", 101, 0.101),
+			west: regionalResponse("AT-2", 202, 0.202),
+		};
+
+		await page.route("**/api/noske/**", async (route) => {
+			const url = new URL(route.request().url());
+			const requestBody = JSON.parse(url.searchParams.get("json") ?? "{}");
+			const region = requestBody.concordance_query?.sca_region?.[0] as keyof typeof liveResponses;
+			await new Promise<void>((resolve) => releases.set(region, resolve));
+			await route.fulfill({ json: liveResponses[region] });
+			completionOrder.push(region);
+		});
+
+		const component = await mount(RegionalFrequencies, {
+			props: { queries: repeatedRegionalQueries },
+		});
+		await expect.poll(() => releases.size).toBe(2);
+		releases.get("west")?.();
+		await expect.poll(() => completionOrder).toStrictEqual(["west"]);
+		releases.get("east")?.();
+		await expect.poll(() => completionOrder).toStrictEqual(["west", "east"]);
+
+		await expect(component.getByTestId("combined-map-chart")).toHaveAttribute(
+			"data-query-colors",
+			JSON.stringify(repeatedRegionalQueries.map((currentQuery) => currentQuery.color)),
+		);
+		await expect(component.getByTestId("combined-map-chart")).toHaveAttribute(
+			"data-regional-frequencies",
+			JSON.stringify(
+				parsedRegionalFrequencies(repeatedRegionalQueries, [
+					liveResponses.east,
+					liveResponses.west,
+				]),
+			),
 		);
 	});
 
