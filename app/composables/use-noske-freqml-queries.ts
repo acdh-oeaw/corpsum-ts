@@ -13,6 +13,8 @@ export interface NoskeFreqMlQueryDescriptor {
 	params: {
 		corpname: string;
 		usesubcorp?: string;
+		fmaxitems?: number;
+		fpage?: number;
 		group?: 0 | 1;
 		showpoc?: 0 | 1;
 		showreltt?: 0 | 1;
