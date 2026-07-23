@@ -1,4 +1,4 @@
-export const fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc"];
+export { fixedKWICStructures } from "@/lib/kwic-query-options";
 
 export function buildFinalQuery(type: CorpusQueryType, userInput: string) {
 	switch (type) {
@@ -13,13 +13,6 @@ export function buildFinalQuery(type: CorpusQueryType, userInput: string) {
 		case "phraserow":
 			return `[word="${userInput}"]`;
 	}
-}
-
-export function getKWICqueryAttrStrcs(query: CorpusQuery) {
-	return {
-		attrs: query.KWICAttrsStructs.attributes.join(","),
-		structs: query.KWICAttrsStructs.structures.join(","),
-	};
 }
 
 export function getQueryWithFacetting(query: CorpusQuery) {

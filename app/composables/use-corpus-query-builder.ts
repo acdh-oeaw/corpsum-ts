@@ -1,3 +1,5 @@
+import { reactive } from "vue";
+
 import { colors } from "@/utils/colors";
 import { getConcordanceInputKey } from "@/utils/concordance-query";
 import {
@@ -15,7 +17,7 @@ export function useCorpusQueryBuilder() {
 			[getConcordanceInputKey(item.type)]: item.userInput,
 		} as ConcordanceQuery;
 
-		return {
+		return reactive({
 			id: index,
 			noske: item.noske,
 			type: item.type,
@@ -46,7 +48,7 @@ export function useCorpusQueryBuilder() {
 				mediaSources: false,
 				collocations: false,
 			},
-		};
+		});
 	}
 
 	return {

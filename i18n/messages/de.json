@@ -504,6 +504,8 @@
 	"close": "Schließen",
 	"coll_freq": "Kollokationsfrequenz",
 	"collocations": "Kollokationen",
+	"collocationsDesc": "Zeigt Wörter, die häufig im Umfeld der Abfrage vorkommen.",
+	"collocationsTitle": "{mode} für {query}",
 	"freq": "Frequenz",
 	"interval": "Intervall",
 	"keywordInContext": "Keyword im Kontext",

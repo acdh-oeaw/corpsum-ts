@@ -57,8 +57,8 @@ const toggleSelection = (
 					>
 						<Checkbox
 							:aria-label="attribute"
-							:checked="currentQuery.KWICAttrsStructs.attributes.includes(attribute)"
-							@update:checked="
+							:model-value="currentQuery.KWICAttrsStructs.attributes.includes(attribute)"
+							@update:model-value="
 								toggleSelection(currentQuery.KWICAttrsStructs.attributes, attribute, $event)
 							"
 						/>
@@ -78,9 +78,9 @@ const toggleSelection = (
 					>
 						<Checkbox
 							:aria-label="structure"
-							:checked="currentQuery.KWICAttrsStructs.structures.includes(structure)"
-							:disabled="fixedKWICStructures.includes(structure)"
-							@update:checked="
+							:model-value="currentQuery.KWICAttrsStructs.structures.includes(structure)"
+							:disabled="fixedKWICStructures.some((fixed) => fixed === structure)"
+							@update:model-value="
 								toggleSelection(currentQuery.KWICAttrsStructs.structures, structure, $event)
 							"
 						/>

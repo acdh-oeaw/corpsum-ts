@@ -191,7 +191,7 @@ const wordClouds = computed(() =>
 	<Card :data-collocation-attribute="cattr" :data-collocation-mode="mode">
 		<CardHeader v-if="showHeader">
 			<CardTitle>{{ t("collocations") }}</CardTitle>
-			<CardDescription>{{ t("yearlyFrequenciesDesc") }}</CardDescription>
+			<CardDescription>{{ t("collocationsDesc") }}</CardDescription>
 		</CardHeader>
 
 		<CardContent class="space-y-4">
@@ -265,7 +265,7 @@ const wordClouds = computed(() =>
 					v-if="!collocationsLoading[index]"
 					:color="query.color"
 					:query-label="query.userInput"
-					:title="`${t(mode)} for ${query.userInput}`"
+					:title="t('collocationsTitle', { mode: t(mode), query: query.userInput })"
 					:words="wordClouds[index] ?? []"
 				/>
 			</div>

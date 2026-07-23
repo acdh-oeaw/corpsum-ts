@@ -22,6 +22,7 @@ const props = withDefaults(
 );
 
 const showViewOptionsMode = ref(false);
+const viewOptionsId = computed(() => `kwic-view-options-${props.query.id}`);
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 const t = useTranslations();
 
@@ -52,7 +53,7 @@ const columns = computed(() =>
 		t as unknown as (key: string) => string,
 		open,
 		props.query.KWICAttrsStructs.structures,
-		fixedKWICStructures,
+		[...fixedKWICStructures],
 	),
 );
 </script>
@@ -60,8 +61,12 @@ const columns = computed(() =>
 <template>
 	<div>
 		<div v-if="interactive" class="flex items-center gap-2">
-			<Checkbox id="kwic-view-options" v-model="showViewOptionsMode" />
-			<Label for="kwic-view-options">{{ t("viewOptions") }}</Label>
+			<Checkbox
+				:id="viewOptionsId"
+				:model-value="showViewOptionsMode"
+				@update:model-value="showViewOptionsMode = $event === true"
+			/>
+			<Label :for="viewOptionsId">{{ t("viewOptions") }}</Label>
 		</div>
 		<KwicAttributeSelect v-if="interactive && showViewOptionsMode" class="mt-4" :query="query" />
 		<div class="mt-4">

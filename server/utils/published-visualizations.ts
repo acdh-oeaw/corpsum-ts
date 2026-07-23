@@ -2,7 +2,15 @@ import { randomUUID } from "node:crypto";
 
 import { type Types } from "mongoose";
 
-import type { KwicQueryOptions, KwicQueryOptionsById } from "@/lib/kwic-query-options";
+import {
+	type KwicAuthoritativeOptions,
+	type KwicQueryOptions,
+	type KwicQueryOptionsById,
+	createKwicRequestOptionParams,
+	fixedKWICStructures,
+	getKwicAuthoritativeOptions,
+	resolveValidatedKwicQueryOptions,
+} from "@/lib/kwic-query-options";
 import {
 	type VisualizationType,
 	getVisualizationSettingsForType,
@@ -14,6 +22,7 @@ import {
 import type { CorpusMetadataMappingResponse } from "@/lib/visualization-types";
 import { colors } from "@/utils/colors";
 import { getConcordanceInputKey } from "@/utils/concordance-query";
+import type { components } from "~/lib/noske-types";
 import { type NoskeDocument, NoskeModel } from "~/server/models/noskeinstances.schema";
 import { NoskeQueryCacheModel } from "~/server/models/noskequerycache.schema";
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
@@ -23,6 +32,7 @@ import {
 	resolveCorpusMetadataMapping,
 	serializeCorpusMetadataMapping,
 } from "~/server/utils/corpus-metadata-mappings";
+import { decryptCredentialPassword } from "~/server/utils/credentials";
 import { resolveNoskeTargetPath } from "~/server/utils/noske-path";
 import { createNoskeCacheIdentity } from "~/server/utils/noske-query-cache";
 
@@ -67,7 +77,17 @@ export interface MissingPublishedCacheEntry {
 	cacheKey: string;
 }
 
-const fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc"];
+type CorpusInfoResponse = components["schemas"]["01_corp_info"];
+
+interface PublishedCorpusInfoRequest {
+	noske: NoskeDocument;
+	corpus: string;
+	publisher: UserDocument;
+}
+
+export type PublishedCorpusInfoFetcher = (
+	input: PublishedCorpusInfoRequest,
+) => Promise<CorpusInfoResponse>;
 
 export function generatePublishedVisualizationUid() {
 	return randomUUID().toLowerCase();
@@ -79,11 +99,20 @@ export async function createPublishedSnapshot(input: {
 	title: string;
 	description: string;
 	kwicQueryOptions?: KwicQueryOptionsById;
+	fetchCorpusInfo?: PublishedCorpusInfoFetcher;
 }) {
 	const queries = await loadVisualizationQueries(input.visualization);
 	const noskeById = await loadNoskeInstances(queries);
+	const resolvedKwicQueryOptions = await resolvePublishedKwicQueryOptions({
+		visualization: input.visualization,
+		queries,
+		noskeById,
+		overrides: input.kwicQueryOptions ?? {},
+		publisher: input.publisher,
+		fetchCorpusInfo: input.fetchCorpusInfo ?? fetchPublishedCorpusInfo,
+	});
 	const querySnapshots = queries.map((query, index) =>
-		createQuerySnapshot(query, index, input.kwicQueryOptions?.[query._id.toString()]),
+		createQuerySnapshot(query, index, resolvedKwicQueryOptions[query._id.toString()]),
 	);
 	const missing: Array<MissingPublishedCacheEntry> = [];
 	const panels: Array<PublishedPanelSnapshot> = [];
@@ -95,7 +124,7 @@ export async function createPublishedSnapshot(input: {
 			const noske = noskeById.get(query.noske.toString());
 			if (!noske) continue;
 			const settings = getVisualizationSettings(input.visualization, type);
-			const kwicQueryOptions = input.kwicQueryOptions?.[query._id.toString()];
+			const kwicQueryOptions = resolvedKwicQueryOptions[query._id.toString()];
 			const mapping = await getPanelMapping(type, query, input.publisher._id.toString());
 			if (type === temporalFrequencyDistributionType && !mapping) {
 				missing.push({
@@ -144,6 +173,90 @@ export async function createPublishedSnapshot(input: {
 	}
 
 	return { missing, panels, queries: querySnapshots };
+}
+
+async function resolvePublishedKwicQueryOptions(input: {
+	visualization: VisualizationDocument;
+	queries: Array<QueryDocument>;
+	noskeById: Map<string, NoskeDocument>;
+	overrides: KwicQueryOptionsById;
+	publisher: UserDocument;
+	fetchCorpusInfo: PublishedCorpusInfoFetcher;
+}) {
+	const queryIds = input.queries.map((query) => query._id.toString());
+	const hasKwic = input.visualization.visualizations.some(
+		(type) => normalizeVisualizationType(type) === "data-display-keyword-in-context",
+	);
+	if (!hasKwic) {
+		return Object.fromEntries(
+			queryIds.map((queryId) => [
+				queryId,
+				{ attributes: [], structures: [...fixedKWICStructures] },
+			]),
+		) satisfies KwicQueryOptionsById;
+	}
+
+	const authorityByCorpus = new Map<string, Promise<KwicAuthoritativeOptions>>();
+	const authoritativeByQueryId: Record<string, KwicAuthoritativeOptions> = {};
+	for (const query of input.queries) {
+		const noskeId = query.noske.toString();
+		const noske = input.noskeById.get(noskeId);
+		if (!noske) {
+			throw createError({ statusCode: 404, statusMessage: "NoSketch instance not found" });
+		}
+		if (
+			!(noske.public satisfies boolean) &&
+			noske.owner.toString() !== input.publisher._id.toString() &&
+			(input.publisher.accounttype satisfies string) !== "admin"
+		) {
+			throw createError({ statusCode: 403, statusMessage: "forbidden" });
+		}
+
+		const authorityKey = JSON.stringify([noskeId, query.corpus]);
+		let authority = authorityByCorpus.get(authorityKey);
+		if (!authority) {
+			authority = input
+				.fetchCorpusInfo({ noske, corpus: query.corpus, publisher: input.publisher })
+				.then(getKwicAuthoritativeOptions);
+			authorityByCorpus.set(authorityKey, authority);
+		}
+		authoritativeByQueryId[query._id.toString()] = await authority;
+	}
+
+	const resolved = resolveValidatedKwicQueryOptions({
+		overrides: input.overrides,
+		queryIds,
+		authoritativeByQueryId,
+	});
+	if (!resolved) {
+		throw createError({ statusCode: 400, statusMessage: "invalid kwic query options" });
+	}
+	return resolved;
+}
+
+async function fetchPublishedCorpusInfo({ noske, corpus, publisher }: PublishedCorpusInfoRequest) {
+	const headers: Record<string, string> = {};
+	if (noske.authentication === "basic") {
+		const credentials = publisher.credentials.find(
+			(credential) => credential.noskeinstance.toString() === noske._id.toString(),
+		);
+		if (!credentials) {
+			throw createError({
+				statusCode: 401,
+				statusMessage: "No credentials configured for this NoSketch instance",
+			});
+		}
+		const password = decryptCredentialPassword(credentials.password);
+		headers.Authorization = `Basic ${btoa(`${credentials.username}:${password}`)}`;
+	}
+
+	const upstreamPath = resolveNoskeTargetPath(noske.version, "/search/corp_info");
+	return await $fetch<CorpusInfoResponse>(upstreamPath, {
+		baseURL: noske.base,
+		method: "GET",
+		headers,
+		params: { corpname: corpus },
+	});
 }
 
 function createQuerySnapshot(
@@ -251,15 +364,14 @@ function createQueryParams(
 		json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 	};
 	if (type === "data-display-keyword-in-context") {
-		const attributes = kwicQueryOptions?.attributes ?? [];
-		const structures = kwicQueryOptions?.structures ?? fixedKWICStructures;
+		const optionParams = createKwicRequestOptionParams(
+			kwicQueryOptions ?? { attributes: [], structures: [...fixedKWICStructures] },
+		);
 		return {
 			corpname: query.corpus,
 			usesubcorp: query.subCorpus || undefined,
 			viewmode: "kwic",
-			attrs: attributes.join(","),
-			structs: structures.join(","),
-			refs: structures.map((structure) => `=${structure}`).join(","),
+			...optionParams,
 			pagesize: "1000",
 			json: common.json,
 			format: "json",

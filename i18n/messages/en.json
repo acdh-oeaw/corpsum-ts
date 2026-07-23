@@ -504,6 +504,8 @@
 	"close": "Close",
 	"coll_freq": "Collocational frequency",
 	"collocations": "Collocations",
+	"collocationsDesc": "Explore words that frequently occur near each query.",
+	"collocationsTitle": "{mode} for {query}",
 	"freq": "Frequency",
 	"interval": "Interval",
 	"keywordInContext": "Keyword in context",

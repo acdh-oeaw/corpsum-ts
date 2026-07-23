@@ -6,6 +6,7 @@ import DataDisplayMediaType from "@/components/data-display/data-display-media-t
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
+import { getKwicAttrsStructsOptions } from "@/lib/kwic-query-options";
 import {
 	type VisualizationType,
 	getVisualizationMetadataSemantics,
@@ -45,6 +46,31 @@ const selectedQueryItems = computed(() => {
 const { buildCorpusQuery } = useCorpusQueryBuilder();
 const corpusQueries = computed(() =>
 	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
+);
+const hasKeywordInContext = computed(() =>
+	visualization.value?.visualizations.includes("data-display-keyword-in-context"),
+);
+const corpusInfoDescriptors = computed<Array<NoskeCorpusInfoQueryDescriptor>>(() =>
+	hasKeywordInContext.value
+		? selectedQueryItems.value.map((query) => ({
+				queryKey: ["get-corp-info", query.noske, query.corpus],
+				noske: query.noske,
+				corpus: query.corpus,
+			}))
+		: [],
+);
+const corpusInfoResults = useNoskeCorpusInfoQueries(corpusInfoDescriptors);
+watch(
+	[corpusQueries, corpusInfoResults],
+	([currentQueries, currentResults]) => {
+		currentQueries.forEach((query, index) => {
+			const options = getKwicAttrsStructsOptions(currentResults[index]?.data);
+			if (JSON.stringify(query.KWICAttrsStructsOptions) !== JSON.stringify(options)) {
+				query.KWICAttrsStructsOptions = options;
+			}
+		});
+	},
+	{ deep: true, immediate: true },
 );
 const { mappingsForQueries: temporalMetadataMappings } = await useCorpusMetadataMappings(
 	corpusQueries,

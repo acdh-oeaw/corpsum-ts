@@ -22,6 +22,13 @@ import CardTitle from "@/components/ui/card/CardTitle.vue";
 import Checkbox from "@/components/ui/checkbox/Checkbox.vue";
 import Collapsible from "@/components/ui/collapsible/Collapsible.vue";
 import CollapsibleContent from "@/components/ui/collapsible/CollapsibleContent.vue";
+import Dialog from "@/components/ui/dialog/Dialog.vue";
+import DialogContent from "@/components/ui/dialog/DialogContent.vue";
+import DialogDescription from "@/components/ui/dialog/DialogDescription.vue";
+import DialogFooter from "@/components/ui/dialog/DialogFooter.vue";
+import DialogHeader from "@/components/ui/dialog/DialogHeader.vue";
+import DialogTitle from "@/components/ui/dialog/DialogTitle.vue";
+import DialogTrigger from "@/components/ui/dialog/DialogTrigger.vue";
 import Input from "@/components/ui/input/Input.vue";
 import Label from "@/components/ui/label/Label.vue";
 import Popover from "@/components/ui/popover/Popover.vue";
@@ -52,6 +59,7 @@ import Tooltip from "@/components/ui/tooltip/Tooltip.vue";
 import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
 import TooltipProvider from "@/components/ui/tooltip/TooltipProvider.vue";
 import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
+import { useCorpusQueryBuilder } from "@/composables/use-corpus-query-builder";
 import { useLocale } from "@/composables/use-locale";
 import {
 	createNoskeCacheHeaders,
@@ -59,6 +67,7 @@ import {
 } from "@/composables/use-noske-cache-metadata";
 import { useNoskeCollxQueries } from "@/composables/use-noske-collx-queries";
 import { useNoskeConcordanceQueries } from "@/composables/use-noske-concordance-queries";
+import { useNoskeCorpusInfoQueries } from "@/composables/use-noske-corp-info-queries";
 import { useNoskeFreqMlQueries } from "@/composables/use-noske-freqml-queries";
 import { useTranslations } from "@/composables/use-translations";
 import { categoryColors } from "@/utils/colors";
@@ -67,6 +76,10 @@ import en from "~/i18n/messages/en.json";
 
 interface HooksConfig {
 	locale?: "de" | "en";
+	visualizationPage?: {
+		visualization: Record<string, unknown>;
+		queries: Array<Record<string, unknown>>;
+	};
 }
 
 const componentTestState = new Map<string, ReturnType<typeof ref>>();
@@ -90,7 +103,9 @@ Object.assign(globalThis, {
 	useNoskeClient: () => ({ client: computed(() => null) }),
 	useNoskeCollxQueries,
 	useNoskeConcordanceQueries,
+	useNoskeCorpusInfoQueries,
 	useNoskeFreqMlQueries,
+	useCorpusQueryBuilder,
 	useState: useComponentTestState,
 	useTranslations,
 	watch,
@@ -101,6 +116,26 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 	const locale = hooksConfig?.locale ?? "en";
 	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 	Object.assign(globalThis, { __componentTestQueryClient: queryClient });
+	if (hooksConfig?.visualizationPage) {
+		const fixture = hooksConfig.visualizationPage;
+		const publishRequests: Array<{ url: string; options: Record<string, unknown> }> = [];
+		Object.assign(globalThis, {
+			__componentTestPublishRequests: publishRequests,
+			$fetch: async (url: string, options: Record<string, unknown>) => {
+				publishRequests.push({ url, options });
+				return { uid: "published-uid" };
+			},
+			useCorpusMetadataMappings: async () => ({ mappingsForQueries: ref([]) }),
+			useFetch: async (url: string | (() => string)) => {
+				const resolved = typeof url === "function" ? url() : url;
+				return {
+					data: ref(resolved === "/api/queries" ? fixture.queries : fixture.visualization),
+				};
+			},
+			useRoute: () => ({ params: { id: [String(fixture.visualization._id)] } }),
+			useRuntimeConfig: () => ({ public: { appBaseUrl: "https://example.test" } }),
+		});
+	}
 	app.use(
 		createI18n({
 			legacy: false,
@@ -121,6 +156,13 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		Collapsible,
 		CollapsibleContent,
 		CorpsumDataTable,
+		Dialog,
+		DialogContent,
+		DialogDescription,
+		DialogFooter,
+		DialogHeader,
+		DialogTitle,
+		DialogTrigger,
 		Input,
 		KwicAttributeSelect,
 		KwicDetailDialog,
@@ -290,6 +332,7 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 			props: {
 				color: { type: String, required: true },
 				queryLabel: { type: String, required: true },
+				title: { type: String, required: true },
 				words: { type: Array, required: true },
 			},
 			setup(props) {
@@ -298,6 +341,7 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 						"data-testid": "word-cloud",
 						"data-color": props.color,
 						"data-query-label": props.queryLabel,
+						"data-title": props.title,
 						"data-words": JSON.stringify(props.words),
 					});
 			},

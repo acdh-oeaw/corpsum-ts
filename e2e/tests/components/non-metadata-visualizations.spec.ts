@@ -5,7 +5,12 @@ import Collocations from "@/components/data-display/data-display-collocations.vu
 import KeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import WordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import PublishedVisualizationRenderer from "@/components/published/published-visualization-renderer.vue";
-import { parseKwicQueryOptionsOverrides } from "@/lib/kwic-query-options";
+import {
+	createKwicRequestOptionParams,
+	getKwicAuthoritativeOptions,
+	parseKwicQueryOptionsOverrides,
+	resolveValidatedKwicQueryOptions,
+} from "@/lib/kwic-query-options";
 import type {
 	CollocationVisualizationSettings,
 	WordFormFrequencyVisualizationSettings,
@@ -16,6 +21,7 @@ import {
 	normalizeWordFormFrequencyVisualizationSettings,
 	serializeVisualizationSettingsState,
 } from "@/lib/visualization-types";
+import VisualizationDetailPage from "~/e2e/fixtures/visualization-detail-page.vue";
 
 const queries: Array<CorpusQuery> = [
 	{
@@ -124,6 +130,14 @@ const concordanceResponses = {
 			},
 		],
 	},
+};
+
+const corpusInfoResponse = {
+	attributes: [
+		{ name: "word", label: "Word" },
+		{ name: "lemma", label: "Lemma" },
+	],
+	structs: ["doc.id", "doc.datum", "doc.region", "doc.docsrc", "doc.genre"],
 };
 
 const kwicQueries: Array<CorpusQuery> = queries.map((query) => ({
@@ -496,6 +510,13 @@ test.describe("non-metadata visualization contracts", () => {
 				},
 			]),
 		);
+		await expect(component.getByTestId("word-cloud")).toHaveAttribute(
+			"data-title",
+			"Frequency for alpha",
+		);
+		await expect(
+			component.getByText("Explore words that frequently occur near each query."),
+		).toBeVisible();
 	});
 
 	test("renders German collocation errors in a wrapping 320-pixel toolbar", async ({
@@ -511,6 +532,13 @@ test.describe("non-metadata visualization contracts", () => {
 
 		await expect(component.getByRole("alert")).toHaveText(
 			"Die Kollokationsdaten für diese Abfrage konnten nicht geladen werden.",
+		);
+		await expect(
+			component.getByText("Zeigt Wörter, die häufig im Umfeld der Abfrage vorkommen."),
+		).toBeVisible();
+		await expect(component.getByTestId("word-cloud")).toHaveAttribute(
+			"data-title",
+			"Kollokationsfrequenz für alpha",
 		);
 		const box = await component
 			.getByRole("toolbar", { name: "Steuerung der Kollokationen" })
@@ -681,7 +709,23 @@ test.describe("non-metadata visualization contracts", () => {
 		});
 	});
 
-	test("validates keyed KWIC publication overrides against selected query IDs", () => {
+	test("uses stable unique KWIC view-option controls for two queries", async ({ mount }) => {
+		const component = await mount(KeywordInContext, {
+			props: { queries: kwicQueries, data: [null, null] },
+		});
+		const controls = component.getByRole("checkbox", { name: "View options" });
+		await expect(controls).toHaveCount(2);
+		await expect(controls.nth(0)).toHaveAttribute("id", "kwic-view-options-11");
+		await expect(controls.nth(1)).toHaveAttribute("id", "kwic-view-options-22");
+		const labels = component.getByText("View options", { exact: true });
+		await expect(labels).toHaveCount(2);
+		await labels.nth(0).click();
+		await expect(controls.nth(0)).toHaveAttribute("aria-checked", "true");
+		await expect(controls.nth(1)).toHaveAttribute("aria-checked", "false");
+		await expect(component.getByRole("checkbox", { name: "lemma" })).toHaveCount(1);
+	});
+
+	test("rejects invalid keyed KWIC publication payloads before cache lookup", () => {
 		const allowed = new Set(["query-a", "query-b"]);
 		expect(parseKwicQueryOptionsOverrides(undefined, allowed)).toStrictEqual({});
 		expect(
@@ -689,13 +733,16 @@ test.describe("non-metadata visualization contracts", () => {
 				{
 					"query-a": {
 						attributes: ["lemma"],
-						structures: ["doc.id", "doc.genre"],
+						structures: ["doc.id", "doc.datum", "doc.region", "doc.docsrc", "doc.genre"],
 					},
 				},
 				allowed,
 			),
 		).toStrictEqual({
-			"query-a": { attributes: ["lemma"], structures: ["doc.id", "doc.genre"] },
+			"query-a": {
+				attributes: ["lemma"],
+				structures: ["doc.id", "doc.datum", "doc.region", "doc.docsrc", "doc.genre"],
+			},
 		});
 		expect(
 			parseKwicQueryOptionsOverrides({ unknown: { attributes: [], structures: [] } }, allowed),
@@ -712,6 +759,144 @@ test.describe("non-metadata visualization contracts", () => {
 				allowed,
 			),
 		).toBeNull();
+		for (const invalid of [
+			{ attributes: ["lemma", "lemma"], structures: corpusInfoResponse.structs },
+			{ attributes: ["lemma,bad"], structures: corpusInfoResponse.structs },
+			{ attributes: ["lemma=bad"], structures: corpusInfoResponse.structs },
+			{ attributes: [], structures: ["doc.datum", "doc.id", "doc.region", "doc.docsrc"] },
+			{ attributes: [], structures: ["doc.id", "doc.datum", "doc.region"] },
+		]) {
+			expect(parseKwicQueryOptionsOverrides({ "query-a": invalid }, allowed)).toBeNull();
+		}
+
+		const authoritative = getKwicAuthoritativeOptions(corpusInfoResponse);
+		expect(
+			resolveValidatedKwicQueryOptions({
+				overrides: {
+					"query-a": {
+						attributes: ["lemma"],
+						structures: [...corpusInfoResponse.structs],
+					},
+				},
+				queryIds: ["query-a", "query-b"],
+				authoritativeByQueryId: { "query-a": authoritative, "query-b": authoritative },
+			}),
+		).toStrictEqual({
+			"query-a": { attributes: ["lemma"], structures: corpusInfoResponse.structs },
+			"query-b": {
+				attributes: [],
+				structures: ["doc.id", "doc.datum", "doc.region", "doc.docsrc"],
+			},
+		});
+		for (const invalid of [
+			{ attributes: ["unoffered"], structures: corpusInfoResponse.structs },
+			{
+				attributes: [],
+				structures: [...corpusInfoResponse.structs, "doc.unoffered"],
+			},
+		]) {
+			expect(
+				resolveValidatedKwicQueryOptions({
+					overrides: { "query-a": invalid },
+					queryIds: ["query-a"],
+					authoritativeByQueryId: { "query-a": authoritative },
+				}),
+			).toBeNull();
+		}
+	});
+
+	test("hydrates page KWIC choices before exact cache warm and publication", async ({
+		mount,
+		page,
+	}) => {
+		const concordanceRequests: Array<{ headers: Record<string, string>; url: string }> = [];
+		await page.route("**/api/noske/noske-a/search/**", async (route) => {
+			const request = route.request();
+			if (new URL(request.url()).pathname.endsWith("/corp_info")) {
+				await route.fulfill({ json: corpusInfoResponse });
+				return;
+			}
+			concordanceRequests.push({ headers: request.headers(), url: request.url() });
+			await route.fulfill({ json: concordanceResponses["noske-a"] });
+		});
+
+		const component = await mount(VisualizationDetailPage, {
+			hooksConfig: {
+				visualizationPage: {
+					visualization: {
+						_id: "visualization-a",
+						name: "KWIC publication",
+						queries: ["query-a"],
+						visualizations: ["data-display-keyword-in-context"],
+						settings: [{}],
+						data: [],
+					},
+					queries: [
+						{
+							_id: "query-a",
+							name: "Alpha query",
+							owner: [],
+							noske: "noske-a",
+							corpus: "corpus-a",
+							subCorpus: "sub-a",
+							type: "wordrow",
+							userInput: "alpha",
+							facettingValues: { region: ["east"] },
+							updatedAt: "2026-01-01T00:00:00.000Z",
+						},
+					],
+				},
+			},
+		});
+		await component
+			.getByRole("checkbox", { name: "View options" })
+			.evaluate((element: HTMLElement) => element.click());
+		await expect(component.getByRole("checkbox", { name: "lemma" })).toHaveCount(1);
+		await component
+			.getByRole("checkbox", { name: "lemma" })
+			.evaluate((element: HTMLElement) => element.click());
+		await expect(component.getByRole("checkbox", { name: "lemma" })).toHaveAttribute(
+			"aria-checked",
+			"true",
+		);
+		await component
+			.getByRole("checkbox", { name: "doc.genre" })
+			.evaluate((element: HTMLElement) => element.click());
+		await expect(component.getByRole("checkbox", { name: "doc.genre" })).toHaveAttribute(
+			"aria-checked",
+			"true",
+		);
+		await expect.poll(() => concordanceRequests.length).toBeGreaterThanOrEqual(2);
+
+		const warmed = concordanceRequests.at(-1)!;
+		const warmedUrl = new URL(warmed.url);
+		const expectedOptions = {
+			attributes: ["lemma"],
+			structures: ["doc.id", "doc.datum", "doc.region", "doc.docsrc", "doc.genre"],
+		};
+		const expectedParams = createKwicRequestOptionParams(expectedOptions);
+		expect(
+			Object.fromEntries(
+				Object.keys(expectedParams).map((key) => [key, warmedUrl.searchParams.get(key)]),
+			),
+		).toStrictEqual(expectedParams);
+		const warmedKey = JSON.parse(warmed.headers["x-corpsum-client-query-key"] ?? "[]");
+		expect(warmedKey[4]).toMatchObject(expectedParams);
+
+		await component.getByRole("button", { name: "Publish", exact: true }).click();
+		await page.getByRole("dialog").getByRole("button", { name: "Publish" }).click();
+		const publishRequests = await page.evaluate(
+			() =>
+				(
+					globalThis as typeof globalThis & {
+						__componentTestPublishRequests: Array<{ options: { body: unknown } }>;
+					}
+				).__componentTestPublishRequests,
+		);
+		expect(publishRequests).toHaveLength(1);
+		expect(publishRequests[0]?.options.body).toMatchObject({
+			kwicQueryOptions: { "query-a": expectedOptions },
+		});
 	});
 
 	test("normalizes and round-trips non-metadata settings through the type-owned codecs", () => {

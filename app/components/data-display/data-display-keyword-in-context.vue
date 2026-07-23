@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { getKWICqueryAttrStrcs, getQueryWithFacetting } from "@/utils/corpus-query";
+import { createKwicRequestOptionParams } from "@/lib/kwic-query-options";
+import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
 
 type ConcordanceResponse = components["schemas"]["06_concordance"];
@@ -23,14 +24,11 @@ const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const queryDescriptors = computed<Array<NoskeConcordanceQueryDescriptor>>(() =>
 	queries.value.map((query) => {
-		const attrsAndStructures = getKWICqueryAttrStrcs(query);
-		const refs = query.KWICAttrsStructs.structures.map((structure) => `=${structure}`).join(",");
+		const attrsAndStructures = createKwicRequestOptionParams(query.KWICAttrsStructs);
 		const facetedQuery = getQueryWithFacetting(query);
 		const params = {
 			viewmode: "kwic" as const,
-			attrs: attrsAndStructures.attrs,
-			structs: attrsAndStructures.structs,
-			refs,
+			...attrsAndStructures,
 			pagesize: 1000,
 			format: "json" as const,
 		};
