@@ -9,6 +9,9 @@ import type { PropType } from "vue";
 import { createI18n, useI18n } from "vue-i18n";
 
 import CorpsumDataTable from "@/components/corpsum-data-table.vue";
+import KwicAttributeSelect from "@/components/kwic-attribute-select.vue";
+import KwicDetailDialog from "@/components/kwic-detail-dialog.vue";
+import KwicQueryDisplay from "@/components/kwic-query-display.vue";
 import Button from "@/components/ui/button/Button.vue";
 import Card from "@/components/ui/card/Card.vue";
 import CardContent from "@/components/ui/card/CardContent.vue";
@@ -19,6 +22,13 @@ import CardTitle from "@/components/ui/card/CardTitle.vue";
 import Checkbox from "@/components/ui/checkbox/Checkbox.vue";
 import Collapsible from "@/components/ui/collapsible/Collapsible.vue";
 import CollapsibleContent from "@/components/ui/collapsible/CollapsibleContent.vue";
+import Dialog from "@/components/ui/dialog/Dialog.vue";
+import DialogContent from "@/components/ui/dialog/DialogContent.vue";
+import DialogDescription from "@/components/ui/dialog/DialogDescription.vue";
+import DialogFooter from "@/components/ui/dialog/DialogFooter.vue";
+import DialogHeader from "@/components/ui/dialog/DialogHeader.vue";
+import DialogTitle from "@/components/ui/dialog/DialogTitle.vue";
+import DialogTrigger from "@/components/ui/dialog/DialogTrigger.vue";
 import Input from "@/components/ui/input/Input.vue";
 import Label from "@/components/ui/label/Label.vue";
 import Popover from "@/components/ui/popover/Popover.vue";
@@ -49,11 +59,15 @@ import Tooltip from "@/components/ui/tooltip/Tooltip.vue";
 import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
 import TooltipProvider from "@/components/ui/tooltip/TooltipProvider.vue";
 import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
+import { useCorpusQueryBuilder } from "@/composables/use-corpus-query-builder";
 import { useLocale } from "@/composables/use-locale";
 import {
 	createNoskeCacheHeaders,
 	recordNoskeCacheMetadataFromResponse,
 } from "@/composables/use-noske-cache-metadata";
+import { useNoskeCollxQueries } from "@/composables/use-noske-collx-queries";
+import { useNoskeConcordanceQueries } from "@/composables/use-noske-concordance-queries";
+import { useNoskeCorpusInfoQueries } from "@/composables/use-noske-corp-info-queries";
 import { useNoskeFreqMlQueries } from "@/composables/use-noske-freqml-queries";
 import { useTranslations } from "@/composables/use-translations";
 import { categoryColors } from "@/utils/colors";
@@ -62,6 +76,10 @@ import en from "~/i18n/messages/en.json";
 
 interface HooksConfig {
 	locale?: "de" | "en";
+	visualizationPage?: {
+		visualization: Record<string, unknown>;
+		queries: Array<Record<string, unknown>>;
+	};
 }
 
 const componentTestState = new Map<string, ReturnType<typeof ref>>();
@@ -83,7 +101,11 @@ Object.assign(globalThis, {
 	useLocale,
 	useI18n,
 	useNoskeClient: () => ({ client: computed(() => null) }),
+	useNoskeCollxQueries,
+	useNoskeConcordanceQueries,
+	useNoskeCorpusInfoQueries,
 	useNoskeFreqMlQueries,
+	useCorpusQueryBuilder,
 	useState: useComponentTestState,
 	useTranslations,
 	watch,
@@ -94,6 +116,26 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 	const locale = hooksConfig?.locale ?? "en";
 	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 	Object.assign(globalThis, { __componentTestQueryClient: queryClient });
+	if (hooksConfig?.visualizationPage) {
+		const fixture = hooksConfig.visualizationPage;
+		const publishRequests: Array<{ url: string; options: Record<string, unknown> }> = [];
+		Object.assign(globalThis, {
+			__componentTestPublishRequests: publishRequests,
+			$fetch: async (url: string, options: Record<string, unknown>) => {
+				publishRequests.push({ url, options });
+				return { uid: "published-uid" };
+			},
+			useCorpusMetadataMappings: async () => ({ mappingsForQueries: ref([]) }),
+			useFetch: async (url: string | (() => string)) => {
+				const resolved = typeof url === "function" ? url() : url;
+				return {
+					data: ref(resolved === "/api/queries" ? fixture.queries : fixture.visualization),
+				};
+			},
+			useRoute: () => ({ params: { id: [String(fixture.visualization._id)] } }),
+			useRuntimeConfig: () => ({ public: { appBaseUrl: "https://example.test" } }),
+		});
+	}
 	app.use(
 		createI18n({
 			legacy: false,
@@ -114,7 +156,17 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		Collapsible,
 		CollapsibleContent,
 		CorpsumDataTable,
+		Dialog,
+		DialogContent,
+		DialogDescription,
+		DialogFooter,
+		DialogHeader,
+		DialogTitle,
+		DialogTrigger,
 		Input,
+		KwicAttributeSelect,
+		KwicDetailDialog,
+		KwicQueryDisplay,
 		Label,
 		Popover,
 		PopoverContent,
@@ -147,8 +199,29 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 	})) {
 		app.component(name, component);
 	}
-	app.component("Chart", { template: "<div data-testid='chart' />" });
-	app.component("ClientOnly", { template: "<slot />" });
+	app.component(
+		"Chart",
+		defineComponent({
+			props: {
+				series: { type: Array, default: () => [] },
+			},
+			setup(props) {
+				return () =>
+					h("div", {
+						"data-testid": "chart",
+						"data-series": JSON.stringify(props.series),
+					});
+			},
+		}),
+	);
+	app.component(
+		"ClientOnly",
+		defineComponent({
+			setup(_, { slots }) {
+				return () => slots.default?.();
+			},
+		}),
+	);
 	app.component(
 		"CombinedMapChart",
 		defineComponent({
@@ -168,14 +241,67 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 			},
 		}),
 	);
-	app.component("QueryDisplay", {
-		template: "<div data-testid='query-display'>Query display</div>",
-	});
-	app.component("DataDisplaySourceTable", { template: "<div data-testid='source-table' />" });
-	app.component("MapChart", {
-		props: ["mode"],
-		template: "<div data-testid='map-chart' :data-mode='mode' />",
-	});
+	app.component(
+		"QueryDisplay",
+		defineComponent({
+			props: {
+				loading: { type: Boolean, default: false },
+				query: { type: Object as PropType<CorpusQuery>, required: true },
+				queryKey: { type: Array as PropType<ReadonlyArray<unknown>>, default: undefined },
+			},
+			setup(props) {
+				return () =>
+					h(
+						"div",
+						{
+							"data-testid": "query-display",
+							"data-loading": String(props.loading),
+							"data-query": JSON.stringify(props.query),
+							"data-query-key": JSON.stringify(props.queryKey),
+						},
+						"Query display",
+					);
+			},
+		}),
+	);
+	app.component(
+		"DataDisplaySourceTable",
+		defineComponent({
+			props: {
+				data: { type: Array, required: true },
+				loading: { type: Array as PropType<Array<boolean>>, required: true },
+				queries: { type: Array as PropType<Array<CorpusQuery>>, required: true },
+			},
+			setup(props) {
+				return () =>
+					h("div", {
+						"data-testid": "source-table",
+						"data-loading": JSON.stringify(props.loading),
+						"data-queries": JSON.stringify(props.queries),
+						"data-source-data": JSON.stringify(props.data),
+					});
+			},
+		}),
+	);
+	app.component(
+		"MapChart",
+		defineComponent({
+			props: {
+				mode: { type: String, required: true },
+				query: { type: Object as PropType<CorpusQuery>, required: true },
+				resdata: { type: Array as PropType<Array<RegionalFreqData>>, required: true },
+			},
+			setup(props) {
+				return () =>
+					h("div", {
+						"data-testid": "map-chart",
+						"data-mode": props.mode,
+						"data-query": JSON.stringify(props.query),
+						"data-regional-frequency": JSON.stringify(props.resdata),
+					});
+			},
+		}),
+	);
 	app.component(
 		"MediaStackedBarChart",
 		defineComponent({
@@ -196,6 +322,27 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 						"data-mode": props.mode,
 						"data-query-colors": JSON.stringify(props.queries.map((query) => query.color)),
 						"data-source-distributions": JSON.stringify(props.sourceDistributions),
+					});
+			},
+		}),
+	);
+	app.component(
+		"WordCloudGraph",
+		defineComponent({
+			props: {
+				color: { type: String, required: true },
+				queryLabel: { type: String, required: true },
+				title: { type: String, required: true },
+				words: { type: Array, required: true },
+			},
+			setup(props) {
+				return () =>
+					h("div", {
+						"data-testid": "word-cloud",
+						"data-color": props.color,
+						"data-query-label": props.queryLabel,
+						"data-title": props.title,
+						"data-words": JSON.stringify(props.words),
 					});
 			},
 		}),
