@@ -128,6 +128,119 @@ export function getEditableVisualizationMetadataSemantics(
 
 export type TemporalFrequencyMode = "absolute" | "relative";
 
+export type VisualizationFrequencyMode = "absolute" | "relative";
+export type MediaVisualizationChartMode = "bar" | "stack" | "percent";
+export type RegionalVisualizationMapMode = "combined" | "separate";
+export type RegionalVisualizationBarMode = "bar" | "stack" | "percent";
+
+export interface MediaSourceVisualizationSettings {
+	type: "data-display-media-source";
+	mode: VisualizationFrequencyMode;
+	chartMode: MediaVisualizationChartMode;
+	sourceTableExpanded: boolean;
+}
+
+export interface MediaTypeVisualizationSettings {
+	type: "data-display-media-type";
+	mode: VisualizationFrequencyMode;
+	chartMode: MediaVisualizationChartMode;
+	sourceTableExpanded: boolean;
+}
+
+export interface RegionalVisualizationSettings {
+	type: "data-display-regional-frequencies";
+	mode: VisualizationFrequencyMode;
+	mapMode: RegionalVisualizationMapMode;
+	barChartMode: RegionalVisualizationBarMode;
+	sourceTableExpanded: boolean;
+}
+
+export const defaultMediaSourceVisualizationSettings = Object.freeze({
+	type: "data-display-media-source",
+	mode: "relative",
+	chartMode: "stack",
+	sourceTableExpanded: false,
+} satisfies MediaSourceVisualizationSettings);
+
+export const defaultMediaTypeVisualizationSettings = Object.freeze({
+	type: "data-display-media-type",
+	mode: "relative",
+	chartMode: "stack",
+	sourceTableExpanded: false,
+} satisfies MediaTypeVisualizationSettings);
+
+export const defaultRegionalVisualizationSettings = Object.freeze({
+	type: "data-display-regional-frequencies",
+	mode: "relative",
+	mapMode: "combined",
+	barChartMode: "bar",
+	sourceTableExpanded: false,
+} satisfies RegionalVisualizationSettings);
+
+function isVisualizationFrequencyMode(value: unknown): value is VisualizationFrequencyMode {
+	return value === "absolute" || value === "relative";
+}
+
+function isMediaVisualizationChartMode(value: unknown): value is MediaVisualizationChartMode {
+	return value === "bar" || value === "stack" || value === "percent";
+}
+
+function asUnknownRecord(value: unknown): Record<string, unknown> {
+	return typeof value === "object" && value !== null ? (value as Record<string, unknown>) : {};
+}
+
+export function normalizeMediaSourceVisualizationSettings(
+	value: unknown,
+): MediaSourceVisualizationSettings {
+	const record = asUnknownRecord(value);
+	return {
+		type: "data-display-media-source",
+		mode: isVisualizationFrequencyMode(record.mode)
+			? record.mode
+			: defaultMediaSourceVisualizationSettings.mode,
+		chartMode: isMediaVisualizationChartMode(record.chartMode)
+			? record.chartMode
+			: defaultMediaSourceVisualizationSettings.chartMode,
+		sourceTableExpanded: record.sourceTableExpanded === true,
+	};
+}
+
+export function normalizeMediaTypeVisualizationSettings(
+	value: unknown,
+): MediaTypeVisualizationSettings {
+	const record = asUnknownRecord(value);
+	return {
+		type: "data-display-media-type",
+		mode: isVisualizationFrequencyMode(record.mode)
+			? record.mode
+			: defaultMediaTypeVisualizationSettings.mode,
+		chartMode: isMediaVisualizationChartMode(record.chartMode)
+			? record.chartMode
+			: defaultMediaTypeVisualizationSettings.chartMode,
+		sourceTableExpanded: record.sourceTableExpanded === true,
+	};
+}
+
+export function normalizeRegionalVisualizationSettings(
+	value: unknown,
+): RegionalVisualizationSettings {
+	const record = asUnknownRecord(value);
+	return {
+		type: "data-display-regional-frequencies",
+		mode: isVisualizationFrequencyMode(record.mode)
+			? record.mode
+			: defaultRegionalVisualizationSettings.mode,
+		mapMode:
+			record.mapMode === "combined" || record.mapMode === "separate"
+				? record.mapMode
+				: defaultRegionalVisualizationSettings.mapMode,
+		barChartMode: isMediaVisualizationChartMode(record.barChartMode)
+			? record.barChartMode
+			: defaultRegionalVisualizationSettings.barChartMode,
+		sourceTableExpanded: record.sourceTableExpanded === true,
+	};
+}
+
 export interface TemporalFrequencyDistributionSettings {
 	type: typeof temporalFrequencyDistributionType;
 	mode: TemporalFrequencyMode;
@@ -197,7 +310,10 @@ export function normalizeTemporalFrequencyDistributionSettings(
 	value: unknown,
 ): TemporalFrequencyDistributionSettings {
 	if (typeof value !== "object" || value === null) {
-		return { ...defaultTemporalFrequencyDistributionSettings };
+		return {
+			...defaultTemporalFrequencyDistributionSettings,
+			dateRange: { ...defaultTemporalFrequencyDistributionSettings.dateRange },
+		};
 	}
 
 	const record = value as Record<string, unknown>;
@@ -238,15 +354,119 @@ export function normalizeTemporalFrequencyDistributionSettings(
 	};
 }
 
-export function getDefaultVisualizationSettings(type: VisualizationType): unknown {
-	if (type === temporalFrequencyDistributionType)
-		return defaultTemporalFrequencyDistributionSettings;
+type EmptyVisualizationSettings = Record<string, never>;
+
+export interface VisualizationSettingsByType {
+	"data-display-collocations": EmptyVisualizationSettings;
+	"data-display-keyword-in-context": EmptyVisualizationSettings;
+	"data-display-media-source": MediaSourceVisualizationSettings;
+	"data-display-media-type": MediaTypeVisualizationSettings;
+	"data-display-regional-frequencies": RegionalVisualizationSettings;
+	"data-display-word-form-frequencies": EmptyVisualizationSettings;
+	[temporalFrequencyDistributionType]: TemporalFrequencyDistributionSettings;
+}
+
+export type VisualizationSettings = VisualizationSettingsByType[VisualizationType];
+
+interface VisualizationSettingsCodec<TSettings> {
+	configurable: boolean;
+	defaults: Readonly<TSettings>;
+	normalize: (value: unknown) => TSettings;
+}
+
+const emptyVisualizationSettings = Object.freeze({});
+
+function normalizeEmptyVisualizationSettings(): EmptyVisualizationSettings {
 	return {};
 }
 
-export function normalizeVisualizationSettings(type: VisualizationType, value: unknown): unknown {
-	if (type === temporalFrequencyDistributionType) {
-		return normalizeTemporalFrequencyDistributionSettings(value);
-	}
-	return value ?? {};
+export const visualizationSettingsCodecs = {
+	"data-display-collocations": {
+		configurable: false,
+		defaults: emptyVisualizationSettings,
+		normalize: normalizeEmptyVisualizationSettings,
+	},
+	"data-display-keyword-in-context": {
+		configurable: false,
+		defaults: emptyVisualizationSettings,
+		normalize: normalizeEmptyVisualizationSettings,
+	},
+	"data-display-media-source": {
+		configurable: true,
+		defaults: defaultMediaSourceVisualizationSettings,
+		normalize: normalizeMediaSourceVisualizationSettings,
+	},
+	"data-display-media-type": {
+		configurable: true,
+		defaults: defaultMediaTypeVisualizationSettings,
+		normalize: normalizeMediaTypeVisualizationSettings,
+	},
+	"data-display-regional-frequencies": {
+		configurable: true,
+		defaults: defaultRegionalVisualizationSettings,
+		normalize: normalizeRegionalVisualizationSettings,
+	},
+	"data-display-word-form-frequencies": {
+		configurable: false,
+		defaults: emptyVisualizationSettings,
+		normalize: normalizeEmptyVisualizationSettings,
+	},
+	[temporalFrequencyDistributionType]: {
+		configurable: true,
+		defaults: defaultTemporalFrequencyDistributionSettings,
+		normalize: normalizeTemporalFrequencyDistributionSettings,
+	},
+} satisfies {
+	[TType in VisualizationType]: VisualizationSettingsCodec<VisualizationSettingsByType[TType]>;
+};
+
+function getVisualizationSettingsCodec<TType extends VisualizationType>(type: TType) {
+	return visualizationSettingsCodecs[type] as VisualizationSettingsCodec<
+		VisualizationSettingsByType[TType]
+	>;
+}
+
+export function getDefaultVisualizationSettings<TType extends VisualizationType>(
+	type: TType,
+): VisualizationSettingsByType[TType] {
+	return getVisualizationSettingsCodec(type).normalize(undefined);
+}
+
+export function normalizeVisualizationSettings<TType extends VisualizationType>(
+	type: TType,
+	value: unknown,
+): VisualizationSettingsByType[TType] {
+	return getVisualizationSettingsCodec(type).normalize(value);
+}
+
+export function hasConfigurableVisualizationSettings(type: VisualizationType) {
+	return visualizationSettingsCodecs[type].configurable;
+}
+
+export type VisualizationSettingsState = Partial<Record<VisualizationType, unknown>>;
+
+export function createVisualizationSettingsState(
+	types: Array<VisualizationType>,
+	values: Array<unknown>,
+): VisualizationSettingsState {
+	return types.reduce<VisualizationSettingsState>((state, type, index) => {
+		state[type] = normalizeVisualizationSettings(type, values[index]);
+		return state;
+	}, {});
+}
+
+export function serializeVisualizationSettingsState(
+	types: Array<VisualizationType>,
+	state: VisualizationSettingsState,
+): Array<VisualizationSettings> {
+	return types.map((type) => normalizeVisualizationSettings(type, state[type]));
+}
+
+export function getVisualizationSettingsForType<TType extends VisualizationType>(
+	types: Array<VisualizationType>,
+	values: Array<unknown>,
+	type: TType,
+): VisualizationSettingsByType[TType] {
+	const index = types.findIndex((value) => normalizeVisualizationType(value) === type);
+	return normalizeVisualizationSettings(type, index >= 0 ? values[index] : undefined);
 }

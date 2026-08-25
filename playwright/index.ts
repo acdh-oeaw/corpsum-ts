@@ -128,6 +128,7 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		"CombinedMapChart",
 		defineComponent({
 			props: {
+				mode: { type: String, required: true },
 				queries: { type: Array as PropType<Array<CorpusQuery>>, required: true },
 				resdata: { type: Array as PropType<Array<RegionalFrequency>>, required: true },
 			},
@@ -135,6 +136,7 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 				return () =>
 					h("div", {
 						"data-testid": "combined-map-chart",
+						"data-mode": props.mode,
 						"data-query-colors": JSON.stringify(props.queries.map((query) => query.color)),
 						"data-regional-frequencies": JSON.stringify(props.resdata),
 					});
@@ -145,11 +147,16 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 		template: "<div data-testid='query-display'>Query display</div>",
 	});
 	app.component("DataDisplaySourceTable", { template: "<div data-testid='source-table' />" });
-	app.component("MapChart", { template: "<div data-testid='map-chart' />" });
+	app.component("MapChart", {
+		props: ["mode"],
+		template: "<div data-testid='map-chart' :data-mode='mode' />",
+	});
 	app.component(
 		"MediaStackedBarChart",
 		defineComponent({
 			props: {
+				chartMode: { type: String, required: true },
+				mode: { type: String, required: true },
 				queries: { type: Array as PropType<Array<CorpusQuery>>, required: true },
 				sourceDistributions: {
 					type: Array as PropType<Array<Array<IsourceDistribution>>>,
@@ -160,6 +167,8 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 				return () =>
 					h("div", {
 						"data-testid": "media-stacked-bar-chart",
+						"data-chart-mode": props.chartMode,
+						"data-mode": props.mode,
 						"data-query-colors": JSON.stringify(props.queries.map((query) => query.color)),
 						"data-source-distributions": JSON.stringify(props.sourceDistributions),
 					});

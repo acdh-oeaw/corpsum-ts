@@ -5,8 +5,12 @@ import DataDisplayRegionalFrequencies from "@/components/data-display/data-displ
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import {
 	type CorpusMetadataMappingResponse,
+	type MediaSourceVisualizationSettings,
+	type MediaTypeVisualizationSettings,
+	type RegionalVisualizationSettings,
 	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
+	normalizeVisualizationSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
 	visualizationDefinitions,
@@ -194,6 +198,29 @@ const regionalData = computed<Array<FreqMlResponse | null | undefined>>(() =>
 				| undefined,
 	),
 );
+function findPanelSettings(type: VisualizationType) {
+	return props.snapshot.panels.find((panel) => normalizeVisualizationType(panel.type) === type)
+		?.settings;
+}
+
+const mediaSourceSettings = computed<MediaSourceVisualizationSettings>(() =>
+	normalizeVisualizationSettings(
+		"data-display-media-source",
+		findPanelSettings("data-display-media-source"),
+	),
+);
+const mediaTypeSettings = computed<MediaTypeVisualizationSettings>(() =>
+	normalizeVisualizationSettings(
+		"data-display-media-type",
+		findPanelSettings("data-display-media-type"),
+	),
+);
+const regionalSettings = computed<RegionalVisualizationSettings>(() =>
+	normalizeVisualizationSettings(
+		"data-display-regional-frequencies",
+		findPanelSettings("data-display-regional-frequencies"),
+	),
+);
 const temporalPanels = computed(() =>
 	props.snapshot.queries.map((query) =>
 		findPanel(temporalFrequencyDistributionType, query.sourceQueryId),
@@ -205,11 +232,11 @@ const temporalData = computed<Array<FreqMlResponse | null | undefined>>(() =>
 const temporalMappings = computed(() =>
 	temporalPanels.value.map((panel) => panel?.mapping ?? null),
 );
-const temporalSettings = computed<Partial<TemporalFrequencyDistributionSettings> | undefined>(
-	() =>
-		temporalPanels.value.find(Boolean)?.settings as
-			| Partial<TemporalFrequencyDistributionSettings>
-			| undefined,
+const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
+	normalizeVisualizationSettings(
+		temporalFrequencyDistributionType,
+		findPanelSettings(temporalFrequencyDistributionType),
+	),
 );
 </script>
 
@@ -238,6 +265,7 @@ const temporalSettings = computed<Partial<TemporalFrequencyDistributionSettings>
 				:data="mediaSourceData"
 				:interactive="!embed"
 				:queries="corpusQueries"
+				:settings="mediaSourceSettings"
 				:show-header="!embed"
 				:show-source-data="!embed"
 			/>
@@ -246,6 +274,7 @@ const temporalSettings = computed<Partial<TemporalFrequencyDistributionSettings>
 				:data="mediaTypeData"
 				:interactive="!embed"
 				:queries="corpusQueries"
+				:settings="mediaTypeSettings"
 				:show-header="!embed"
 				:show-source-data="!embed"
 			/>
@@ -254,6 +283,7 @@ const temporalSettings = computed<Partial<TemporalFrequencyDistributionSettings>
 				:data="regionalData"
 				:interactive="!embed"
 				:queries="corpusQueries"
+				:settings="regionalSettings"
 				:show-header="!embed"
 				:show-source-data="!embed"
 			/>

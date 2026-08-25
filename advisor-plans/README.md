@@ -24,7 +24,7 @@ pre-existing unrelated `plans/postgres-kysely-migration-plan.md` and no
 | 007  | -      | Document visualization component contract                       | P1       | M      | 006               | DONE   |
 | 008  | -      | Add visualization toolbar pattern                               | P1       | M      | 006, 007          | DONE   |
 | 009  | DDR-01 | Route each data-display query through its own NoSketch instance | P1       | M      | -                 | DONE   |
-| 010  | DDR-02 | Persist extensible per-visualization analysis settings          | P1       | L      | 009               | TODO   |
+| 010  | DDR-02 | Persist extensible per-visualization analysis settings          | P1       | L      | 009               | DONE   |
 | 011  | DDR-03 | Render localized per-query data-display errors                  | P2       | M      | 009               | TODO   |
 | 012  | DDR-04 | Harden source-table columns and active-tab alignment            | P2       | S      | -                 | TODO   |
 | 013  | DDR-05 | Preserve regional result identity across query changes          | P2       | S      | 009               | TODO   |

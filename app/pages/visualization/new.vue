@@ -1,13 +1,18 @@
 <script setup lang="ts">
+import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
+import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
+import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import {
 	type CorpusMetadataSemantic,
-	type TemporalFrequencyDistributionSettings,
+	type VisualizationSettingsByType,
+	type VisualizationSettingsState,
 	type VisualizationType,
+	createVisualizationSettingsState,
 	getEditableVisualizationMetadataSemantics,
 	getDefaultVisualizationSettings,
-	normalizeTemporalFrequencyDistributionSettings,
 	normalizeVisualizationSettings,
+	serializeVisualizationSettingsState,
 	temporalFrequencyDistributionType,
 	visualizationTypes,
 } from "@/lib/visualization-types";
@@ -22,12 +27,10 @@ const queriesList = computed(() => queries.value ?? []);
 const name = ref("");
 const selectedQueries = ref<Array<string>>([]);
 const selectedVisualizations = ref<Array<VisualizationType>>([]);
-const settingsByType = ref<Partial<Record<VisualizationType, unknown>>>({});
+const settingsByType = ref<VisualizationSettingsState>(createVisualizationSettingsState([], []));
 const settingsText = computed(() =>
 	JSON.stringify(
-		selectedVisualizations.value.map((type) =>
-			normalizeVisualizationSettings(type, settingsByType.value[type]),
-		),
+		serializeVisualizationSettingsState(selectedVisualizations.value, settingsByType.value),
 	),
 );
 const dataText = ref("[]");
@@ -74,16 +77,18 @@ const { mappingsForQueries: temporalMetadataMappings, refreshMappings: refreshTe
 const editableMetadataSemantics = computed<Array<CorpusMetadataSemantic>>(() => [
 	...new Set(selectedVisualizations.value.flatMap(getEditableVisualizationMetadataSemantics)),
 ]);
-const temporalSettings = computed(() =>
-	normalizeTemporalFrequencyDistributionSettings(
-		settingsByType.value[temporalFrequencyDistributionType],
-	),
-);
 
-function updateTemporalSettings(settings: TemporalFrequencyDistributionSettings) {
+function getSettings<TType extends VisualizationType>(type: TType) {
+	return normalizeVisualizationSettings(type, settingsByType.value[type]);
+}
+
+function updateVisualizationSettings<TType extends VisualizationType>(
+	type: TType,
+	settings: VisualizationSettingsByType[TType],
+) {
 	settingsByType.value = {
 		...settingsByType.value,
-		[temporalFrequencyDistributionType]: settings,
+		[type]: normalizeVisualizationSettings(type, settings),
 	};
 }
 
@@ -352,8 +357,29 @@ function cancel() {
 			class="mt-6"
 			:metadata-mappings="temporalMetadataMappings"
 			:queries="corpusQueries"
-			:settings="temporalSettings"
-			@update:settings="updateTemporalSettings"
+			:settings="getSettings(temporalFrequencyDistributionType)"
+			@update:settings="updateVisualizationSettings(temporalFrequencyDistributionType, $event)"
+		/>
+		<DataDisplayMediaSource
+			v-if="selectedVisualizations.includes('data-display-media-source')"
+			class="mt-6"
+			:queries="corpusQueries"
+			:settings="getSettings('data-display-media-source')"
+			@update:settings="updateVisualizationSettings('data-display-media-source', $event)"
+		/>
+		<DataDisplayMediaType
+			v-if="selectedVisualizations.includes('data-display-media-type')"
+			class="mt-6"
+			:queries="corpusQueries"
+			:settings="getSettings('data-display-media-type')"
+			@update:settings="updateVisualizationSettings('data-display-media-type', $event)"
+		/>
+		<DataDisplayRegionalFrequencies
+			v-if="selectedVisualizations.includes('data-display-regional-frequencies')"
+			class="mt-6"
+			:queries="corpusQueries"
+			:settings="getSettings('data-display-regional-frequencies')"
+			@update:settings="updateVisualizationSettings('data-display-regional-frequencies', $event)"
 		/>
 	</MainContent>
 </template>

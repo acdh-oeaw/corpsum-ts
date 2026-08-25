@@ -9,6 +9,7 @@ import DataDisplayWordFormFrequencies from "@/components/data-display/data-displ
 import {
 	type VisualizationType,
 	getVisualizationMetadataSemantics,
+	hasConfigurableVisualizationSettings,
 	normalizeVisualizationSettings,
 	temporalFrequencyDistributionType,
 } from "@/lib/visualization-types";
@@ -84,6 +85,10 @@ const embedSnippet = computed(() => {
 
 function getVisualizationSettings(index: number, type: VisualizationType) {
 	return normalizeVisualizationSettings(type, visualization.value?.settings[index]);
+}
+
+function getVisualizationPresentationProps(type: VisualizationType) {
+	return hasConfigurableVisualizationSettings(type) ? { interactive: false } : {};
 }
 
 function getVisualizationMetadataMappings(type: VisualizationType) {
@@ -243,6 +248,7 @@ async function publishVisualization() {
 						:is="visualizationComponents[item]"
 						v-for="(item, index) in visualization.visualizations"
 						:key="`${item}-${index}`"
+						v-bind="getVisualizationPresentationProps(item)"
 						:metadata-mappings="getVisualizationMetadataMappings(item)"
 						:queries="corpusQueries"
 						:settings="getVisualizationSettings(index, item)"

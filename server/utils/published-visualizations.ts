@@ -4,8 +4,8 @@ import { type Types } from "mongoose";
 
 import {
 	type VisualizationType,
+	getVisualizationSettingsForType,
 	normalizeVisualizationType,
-	normalizeVisualizationSettings,
 	temporalFrequencyDistributionType,
 	visualizationDefinitions,
 } from "@/lib/visualization-types";
@@ -319,13 +319,10 @@ function getVisualizationSettings(
 	visualization: VisualizationDocument,
 	type: VisualizationType,
 ): unknown {
-	if (type !== temporalFrequencyDistributionType) return undefined;
-	const index = visualization.visualizations.findIndex(
-		(value) => normalizeVisualizationType(value) === type,
-	);
-	return normalizeVisualizationSettings(
+	return getVisualizationSettingsForType(
+		visualization.visualizations.map(normalizeVisualizationType),
+		visualization.settings,
 		type,
-		index >= 0 ? visualization.settings[index] : undefined,
 	);
 }
 
