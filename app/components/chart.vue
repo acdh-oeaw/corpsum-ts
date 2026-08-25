@@ -87,11 +87,16 @@ function formatDomainValue(value: string | number) {
 	return props.domainValueFormatter?.(value) ?? String(value);
 }
 
-function renderTooltipContent(data: Array<ChartDatum>, x?: number | Date) {
-	const domainValue = getChartTooltipDomainValue(data, props.domainType, x);
+function renderTooltipContent(
+	data: Array<ChartDatum>,
+	x?: number | Date | string,
+	config = chartConfig.value,
+) {
+	const domainValue =
+		typeof x === "string" ? x : getChartTooltipDomainValue(data, props.domainType, x);
 	const vnode = h(ChartTooltipContent, {
 		payload: data,
-		config: chartConfig.value,
+		config,
 		x: formatDomainValue(domainValue),
 	});
 	if (appContext) vnode.appContext = appContext;
@@ -466,12 +471,13 @@ const donutTriggers = {
 	[NestedDonut.selectors.segmentArc]: (d: { data?: { values?: Array<DonutDatum> } }) => {
 		const datum = d?.data?.values?.[0];
 		if (!datum) return "";
-		return renderTooltipContent(
-			[[datum.label, datum.value]],
-			undefined,
-			{ segment: { label: datum.label, color: datum.color } },
-			false,
-		);
+		return renderTooltipContent([[datum.label, datum.value]], datum.label, {
+			[datum.label]: {
+				label: datum.label,
+				color: datum.color,
+				data: [[datum.label, datum.value]],
+			},
+		});
 	},
 };
 

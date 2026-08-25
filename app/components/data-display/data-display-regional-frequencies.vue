@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useQueries } from "@tanstack/vue-query";
 import {
 	BarChart3,
 	BarChart4,
@@ -39,12 +38,8 @@ const props = withDefaults(
 
 const t = useTranslations();
 const queries = computed(() => props.queries);
-const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const usesProvidedData = computed(() => props.data !== undefined);
-const { client } = useNoskeClient(noskeId, { enabled: computed(() => !usesProvidedData.value) });
 
-const regionalFrequencies = ref<Array<RegionalFrequency>>([]);
-const regionalFrequenciesLoading = ref<Array<boolean>>([]);
 const chartMode = ref<RegionalMapMode>("combined");
 const mode = ref<FrequencyMode>("relative");
 const barChartMode = ref<RegionalBarMode>("bar");
@@ -77,75 +72,49 @@ function parseRegionalFrequency(query: CorpusQuery, data: FreqMlResponse | null 
 	};
 }
 
-watchEffect(() => {
-	if (!usesProvidedData.value) return;
-	regionalFrequencies.value = queries.value.map((query, index) =>
-		parseRegionalFrequency(query, props.data?.[index]),
-	);
-	regionalFrequenciesLoading.value = queries.value.map(() => false);
-});
-
-const queryDescriptors = computed(() =>
-	queries.value.map((query, index) => {
+const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
+	queries.value.map((query) => {
 		const queryKey = [
 			"get-regional-frequencies",
-			noskeId.value,
+			query.noske,
 			query.corpus,
 			query.subCorpus,
 			JSON.stringify(getQueryWithFacetting(query)),
 		] as const;
 		return {
 			queryKey,
-			enabled: Boolean(client.value) && !usesProvidedData.value,
-			queryFn: async () => {
-				const activeClient = client.value;
-				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
-				regionalFrequenciesLoading.value[index] = true;
-				try {
-					const { data, error } = await activeClient.GET("/search/freqml", {
-						headers: createNoskeCacheHeaders(queryKey),
-						params: {
-							query: {
-								corpname: query.corpus,
-								usesubcorp: query.subCorpus || undefined,
-								group: 0,
-								showpoc: 1,
-								showreltt: 1,
-								showrel: 1,
-								freqlevel: 1,
-								ml1attr: "doc.region",
-								ml1ctx: "0~0 > 0",
-								json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
-							},
-						},
-					});
-					if (error) throw error;
-					return data;
-				} finally {
-					regionalFrequenciesLoading.value[index] = false;
-				}
-			},
-			select: (data: FreqMlResponse) => {
-				regionalFrequencies.value[index] = parseRegionalFrequency(query, data);
-				return data;
+			noske: query.noske ?? "",
+			enabled: !usesProvidedData.value && Boolean(query.noske),
+			params: {
+				corpname: query.corpus,
+				usesubcorp: query.subCorpus || undefined,
+				group: 0,
+				showpoc: 1,
+				showreltt: 1,
+				showrel: 1,
+				freqlevel: 1,
+				ml1attr: "doc.region",
+				ml1ctx: "0~0 > 0",
+				json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 			},
 		};
 	}),
 );
 
-useQueries({ queries: queryDescriptors });
-
-watch(queries, () => {
-	if (usesProvidedData.value) return;
-	const queryIds = queries.value.map(({ id }) => id);
-	regionalFrequencies.value = regionalFrequencies.value.filter(({ query }) =>
-		queryIds.includes(query),
-	);
-	regionalFrequencies.value = regionalFrequencies.value.filter(
-		(entry, idx) =>
-			regionalFrequencies.value.findIndex((item) => item.query === entry.query) === idx,
-	);
-});
+const queryResults = useNoskeFreqMlQueries(queryDescriptors);
+const frequencyData = computed(() =>
+	usesProvidedData.value
+		? queries.value.map((_, index) => props.data?.[index])
+		: queryResults.value.map((result) => result.data),
+);
+const regionalFrequencies = computed(() =>
+	queries.value.map((query, index) => parseRegionalFrequency(query, frequencyData.value[index])),
+);
+const regionalFrequenciesLoading = computed(() =>
+	usesProvidedData.value
+		? queries.value.map(() => false)
+		: queryResults.value.map((result) => result.isFetching || result.isLoading),
+);
 
 const regionNames = Object.fromEntries(
 	mapAustria.features.map((f) => [String(f.properties["hc-key"]), String(f.properties["name"])]),

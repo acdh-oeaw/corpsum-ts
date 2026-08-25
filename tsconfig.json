@@ -15,6 +15,7 @@
 		"oxfmt.config.ts",
 		"oxlint.config.ts",
 		"playwright.config.ts",
+		"playwright/index.ts",
 		"scripts/**/*.ts",
 		"tailwind.config.ts",
 		"types/**/*.d.ts"

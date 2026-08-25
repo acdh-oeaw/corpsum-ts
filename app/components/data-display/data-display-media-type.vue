@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useQueries } from "@tanstack/vue-query";
 import { BarChart3, BarChart4, ChartBarStacked, Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
 import { getQueryWithFacetting } from "@/utils/corpus-query";
@@ -27,16 +26,11 @@ const props = withDefaults(
 
 const t = useTranslations();
 const queries = computed(() => props.queries);
-const noskeId = computed(() => queries.value[0]?.noske ?? null);
 const usesProvidedData = computed(() => props.data !== undefined);
-const { client } = useNoskeClient(noskeId, { enabled: computed(() => !usesProvidedData.value) });
 
 const mode = ref<FrequencyMode>("relative");
 const chartMode = ref<MediaChartMode>("stack");
 const expand = ref(false);
-
-const sourceDistributions = ref<Array<Array<IsourceDistribution>>>([]);
-const sourceDistributionsLoading = ref<Array<boolean>>([]);
 
 function setMode(value: unknown) {
 	if (value === "absolute" || value === "relative") mode.value = value;
@@ -56,65 +50,49 @@ function parseMediaDistribution(data: FreqMlResponse | null | undefined) {
 	);
 }
 
-watchEffect(() => {
-	if (!usesProvidedData.value) return;
-	sourceDistributions.value = queries.value.map((_, index) =>
-		parseMediaDistribution(props.data?.[index]),
-	);
-	sourceDistributionsLoading.value = queries.value.map(() => false);
-});
-
-const queryDescriptors = computed(() =>
-	queries.value.map((query, index) => {
+const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
+	queries.value.map((query) => {
 		const queryKey = [
 			"get-source-type-distribution",
-			noskeId.value,
+			query.noske,
 			query.corpus,
 			query.subCorpus,
 			JSON.stringify(getQueryWithFacetting(query)),
 		] as const;
 		return {
 			queryKey,
-			enabled: Boolean(client.value) && !usesProvidedData.value,
-			queryFn: async () => {
-				const activeClient = client.value;
-				if (!activeClient) throw new Error("NoSketch client is not ready yet.");
-				sourceDistributionsLoading.value[index] = true;
-				try {
-					const { data, error } = await activeClient.GET("/search/freqml", {
-						headers: createNoskeCacheHeaders(queryKey),
-						params: {
-							query: {
-								corpname: query.corpus,
-								usesubcorp: query.subCorpus || undefined,
-								fmaxitems: 5000,
-								fpage: 1,
-								group: 0,
-								showpoc: 1,
-								showreltt: 1,
-								showrel: 1,
-								freqlevel: 1,
-								ml1attr: "doc.mediatype",
-								ml1ctx: "0~0 > 0",
-								json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
-							},
-						},
-					});
-					if (error) throw error;
-					return data;
-				} finally {
-					sourceDistributionsLoading.value[index] = false;
-				}
-			},
-			select: (data: FreqMlResponse) => {
-				sourceDistributions.value[index] = parseMediaDistribution(data);
-				return data;
+			noske: query.noske ?? "",
+			enabled: !usesProvidedData.value && Boolean(query.noske),
+			params: {
+				corpname: query.corpus,
+				usesubcorp: query.subCorpus || undefined,
+				fmaxitems: 5000,
+				fpage: 1,
+				group: 0,
+				showpoc: 1,
+				showreltt: 1,
+				showrel: 1,
+				freqlevel: 1,
+				ml1attr: "doc.mediatype",
+				ml1ctx: "0~0 > 0",
+				json: JSON.stringify({ concordance_query: getQueryWithFacetting(query) }),
 			},
 		};
 	}),
 );
 
-useQueries({ queries: queryDescriptors });
+const queryResults = useNoskeFreqMlQueries(queryDescriptors);
+const frequencyData = computed(() =>
+	usesProvidedData.value
+		? queries.value.map((_, index) => props.data?.[index])
+		: queryResults.value.map((result) => result.data),
+);
+const sourceDistributions = computed(() => frequencyData.value.map(parseMediaDistribution));
+const sourceDistributionsLoading = computed(() =>
+	usesProvidedData.value
+		? queries.value.map(() => false)
+		: queryResults.value.map((result) => result.isFetching || result.isLoading),
+);
 
 const allMediaTypes = computed(() => {
 	const allMedia = sourceDistributions.value.flatMap((distribution) =>

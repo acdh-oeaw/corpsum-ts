@@ -8,6 +8,6 @@
 		},
 		"types": ["node", "@playwright/test"]
 	},
-	"include": ["./**/*.ts"],
+	"include": ["./**/*.ts", "../app/types/**/*.d.ts", "../types/**/*.d.ts"],
 	"exclude": ["../node_modules/**", "../.output/**"]
 }

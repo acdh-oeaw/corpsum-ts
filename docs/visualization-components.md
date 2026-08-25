@@ -119,6 +119,12 @@ function updateTemporalSettings(settings: TemporalFrequencyDistributionSettings)
 }
 ```
 
+The same live/snapshot boundary now applies to the media source, media type, and regional frequency
+components. They expose `queries`, optional raw `data`, `interactive`, `showHeader`, and
+`showSourceData` props, parse live and supplied `FreqMlResponse` values through the same component
+path, and keep their chart controls local to a compact toolbar. Coding agents extending another
+visualization should first match this prop boundary before adding visualization-specific settings.
+
 ## Behavioral boundaries
 
 ### Live fetching and supplied snapshots
@@ -466,3 +472,10 @@ rendering, whose map-specific behavior should remain explicit.
 Shared code extraction is intentionally deferred until duplication is proven in at least two
 migrated consumers. Until then, the candidate convention is a common protocol and similarly shaped
 props—not a base Vue component, universal settings type, or universal transformation composable.
+
+Temporal range inputs currently normalize to full ISO start/end dates even when the selected
+bucket unit is coarser than a day. A future temporal-specific follow-up may render unit-aware
+range controls—year picker for yearly buckets, month input for monthly buckets, week input for
+weekly buckets, and explicit quarter controls—while preserving the existing inclusive start /
+exclusive end ISO settings contract. Do not generalize this into the shared visualization protocol
+until another visualization needs comparable unit-aware range semantics.
