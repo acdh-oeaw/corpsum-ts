@@ -56,8 +56,9 @@ const toggleSelection = (
 						class="flex items-center gap-2"
 					>
 						<Checkbox
-							:checked="currentQuery.KWICAttrsStructs.attributes.includes(attribute)"
-							@update:checked="
+							:aria-label="attribute"
+							:model-value="currentQuery.KWICAttrsStructs.attributes.includes(attribute)"
+							@update:model-value="
 								toggleSelection(currentQuery.KWICAttrsStructs.attributes, attribute, $event)
 							"
 						/>
@@ -76,9 +77,10 @@ const toggleSelection = (
 						:class="{ 'pl-4': structure.includes('.') }"
 					>
 						<Checkbox
-							:checked="currentQuery.KWICAttrsStructs.structures.includes(structure)"
-							:disabled="fixedKWICStructures.includes(structure)"
-							@update:checked="
+							:aria-label="structure"
+							:model-value="currentQuery.KWICAttrsStructs.structures.includes(structure)"
+							:disabled="fixedKWICStructures.some((fixed) => fixed === structure)"
+							@update:model-value="
 								toggleSelection(currentQuery.KWICAttrsStructs.structures, structure, $event)
 							"
 						/>

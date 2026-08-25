@@ -125,6 +125,29 @@ components. They expose `queries`, optional raw `data`, `interactive`, `showHead
 path, and keep their chart controls local to a compact toolbar. Coding agents extending another
 visualization should first match this prop boundary before adding visualization-specific settings.
 
+Word-form frequencies, collocations, and keyword-in-context use the same public boundary without
+becoming metadata-driven. They never receive `metadataMappings`; each owns its generated response
+type, descriptor builder, request parameters, cache identity, transformation, and missing/error
+behavior:
+
+| Analysis              | Generated response | Endpoint              | Response-changing identity                                                                                       | Persisted settings                          |
+| --------------------- | ------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| word-form frequencies | `11_freqml`        | `/search/freqml`      | NoSketch, corpus/subcorpus, faceted query JSON, `ml1attr=word`, `ml1ctx=0<0~0>0`                                 | frequency mode, source-table expansion      |
+| collocations          | `10_collx`         | `/search/collx`       | NoSketch, corpus/subcorpus, faceted query JSON, `cattr`, window, thresholds, statistics, sort, and item count    | frequency/weight mode, `cattr`, table state |
+| keyword-in-context    | `06_concordance`   | `/search/concordance` | NoSketch, corpus/subcorpus, faceted query JSON, query-owned attributes/structures, refs, page size, mode, format | none; view-options disclosure is transient  |
+
+For collocations, publication normalizes the captured settings before reproducing `cattr` in the
+server cache identity. For KWIC, the detail page submits current attributes and structures keyed by
+saved query id when publishing. The server rejects unknown ids or invalid shapes, preserves those
+values in the existing query snapshot, and uses them for Concordance cache lookup. Fixed structures
+remain query-owned defaults; no QueryDocument field, metadata mapping, or published schema version
+is introduced.
+
+Published snapshots pass raw query-aligned arrays back to the same components. Controls that would
+change a captured upstream response (`cattr` and KWIC attributes/structures) stay non-interactive in
+published output. Word-form frequency mode remains an ordinary presentation control on the public
+page and uses captured settings in embeds.
+
 ## Behavioral boundaries
 
 ### Live fetching and supplied snapshots

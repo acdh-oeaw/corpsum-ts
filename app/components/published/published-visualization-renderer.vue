@@ -1,20 +1,25 @@
 <script setup lang="ts">
+import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
+import DataDisplayKeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
+import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import {
 	type CorpusMetadataMappingResponse,
+	type CollocationVisualizationSettings,
 	type MediaSourceVisualizationSettings,
 	type MediaTypeVisualizationSettings,
 	type RegionalVisualizationSettings,
 	type TemporalFrequencyDistributionSettings,
 	type VisualizationType,
+	type WordFormFrequencyVisualizationSettings,
 	normalizeVisualizationSettings,
 	normalizeVisualizationType,
 	temporalFrequencyDistributionType,
-	visualizationDefinitions,
 } from "@/lib/visualization-types";
+import type { components } from "~/lib/noske-types";
 
 interface PublishedQuerySnapshot {
 	id: number;
@@ -47,54 +52,16 @@ interface PublishedVisualizationSnapshot {
 	panels: Array<PublishedPanelSnapshot>;
 }
 
-interface FreqMlItem {
-	Word?: Array<{ n?: string }>;
-	frq?: number;
-	fpm?: number;
-	reltt?: number;
-}
+type FreqMlResponse = components["schemas"]["11_freqml"];
+type CollxResponse = components["schemas"]["10_collx"];
 
-interface FreqMlResponse {
-	Blocks?: Array<{ Items?: Array<FreqMlItem> }>;
-}
-
-interface CollxItem {
-	str?: string;
-	freq?: number;
-	coll_freq?: number;
-	Stats?: Array<{ n?: string; s?: string }>;
-}
-
-interface CollxResponse {
-	Items?: Array<CollxItem>;
-}
-
-interface ConcordanceLine {
-	Tbl_refs?: Array<string>;
-	Left?: Array<{ str?: string; strc?: string }>;
-	Kwic?: Array<{ str?: string }>;
-	Right?: Array<{ str?: string }>;
-	toknum?: number;
-}
-
-interface ConcordanceResponse {
-	Lines?: Array<ConcordanceLine>;
-}
+type ConcordanceResponse = components["schemas"]["06_concordance"];
 
 const props = defineProps<{ snapshot: PublishedVisualizationSnapshot; embed?: boolean }>();
 
-const t = useTranslations();
-const mode = ref<"relative" | "absolute">("relative");
-
 const corpusQueries = computed(() => props.snapshot.queries.map(toCorpusQuery));
 const renderItems = computed(() =>
-	props.snapshot.visualizations.map((type) => ({
-		type: normalizeVisualizationType(type),
-		key: visualizationDefinitions[normalizeVisualizationType(type)].searchKey,
-	})),
-);
-const hasGlobalFrequencyVisualization = computed(() =>
-	renderItems.value.some(({ key }) => key === "wordFormFrequencies"),
+	props.snapshot.visualizations.map((type) => normalizeVisualizationType(type)),
 );
 
 function findPanel(type: PublishedPanelSnapshot["type"], queryId: string) {
@@ -122,60 +89,6 @@ function toCorpusQuery(query: PublishedQuerySnapshot): CorpusQuery {
 	};
 }
 
-function parseWordFormFrequencies(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-word-form-frequencies", query.sourceQueryId)?.data as
-		| FreqMlResponse
-		| undefined;
-	return (
-		data?.Blocks?.[0]?.Items?.map((item) => ({
-			word: item.Word?.[0]?.n ?? "",
-			absolute: item.frq ?? 0,
-			relative: item.fpm ?? 0,
-		})) ?? []
-	);
-}
-
-function parseCollocations(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-collocations", query.sourceQueryId)?.data as
-		| CollxResponse
-		| undefined;
-	return (
-		data?.Items?.map((item) => {
-			const d = item.Stats?.find(({ n }) => n === "d");
-			const m = item.Stats?.find(({ n }) => n === "m");
-			const tStat = item.Stats?.find(({ n }) => n === "t");
-			return {
-				word: item.str ?? "",
-				freq: item.freq ?? 0,
-				coll_freq: item.coll_freq ?? 0,
-				d: d?.s ? Number(d.s) : -1,
-				m: m?.s ? Number(m.s) : -1,
-				t: tStat?.s ? Number(tStat.s) : -1,
-				weight: item.coll_freq ?? 0,
-			};
-		}) ?? []
-	);
-}
-
-function parseKwic(query: PublishedQuerySnapshot) {
-	const data = findPanel("data-display-keyword-in-context", query.sourceQueryId)?.data as
-		| ConcordanceResponse
-		| undefined;
-	return (
-		data?.Lines?.map((line) => ({
-			refs: line.Tbl_refs ?? [],
-			date: line.Tbl_refs?.[1] ?? "",
-			source: line.Tbl_refs?.[3] ?? "",
-			region: line.Tbl_refs?.[2] ?? "",
-			left: line.Left?.map((entry) => entry.str ?? entry.strc ?? "").join(" ") ?? "",
-			word: line.Kwic?.map((entry) => entry.str ?? "").join(" ") ?? "",
-			right: line.Right?.map((entry) => entry.str ?? "").join(" ") ?? "",
-			docid: line.Tbl_refs?.[0] ?? "",
-			toknum: line.toknum ?? 0,
-		})) ?? []
-	);
-}
-
 const mediaSourceData = computed<Array<FreqMlResponse | null | undefined>>(() =>
 	props.snapshot.queries.map(
 		(query) =>
@@ -195,6 +108,30 @@ const regionalData = computed<Array<FreqMlResponse | null | undefined>>(() =>
 		(query) =>
 			findPanel("data-display-regional-frequencies", query.sourceQueryId)?.data as
 				| FreqMlResponse
+				| undefined,
+	),
+);
+const wordFormFrequencyData = computed<Array<FreqMlResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-word-form-frequencies", query.sourceQueryId)?.data as
+				| FreqMlResponse
+				| undefined,
+	),
+);
+const collocationData = computed<Array<CollxResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-collocations", query.sourceQueryId)?.data as
+				| CollxResponse
+				| undefined,
+	),
+);
+const concordanceData = computed<Array<ConcordanceResponse | null | undefined>>(() =>
+	props.snapshot.queries.map(
+		(query) =>
+			findPanel("data-display-keyword-in-context", query.sourceQueryId)?.data as
+				| ConcordanceResponse
 				| undefined,
 	),
 );
@@ -221,6 +158,18 @@ const regionalSettings = computed<RegionalVisualizationSettings>(() =>
 		findPanelSettings("data-display-regional-frequencies"),
 	),
 );
+const wordFormFrequencySettings = computed<WordFormFrequencyVisualizationSettings>(() =>
+	normalizeVisualizationSettings(
+		"data-display-word-form-frequencies",
+		findPanelSettings("data-display-word-form-frequencies"),
+	),
+);
+const collocationSettings = computed<CollocationVisualizationSettings>(() =>
+	normalizeVisualizationSettings(
+		"data-display-collocations",
+		findPanelSettings("data-display-collocations"),
+	),
+);
 const temporalPanels = computed(() =>
 	props.snapshot.queries.map((query) =>
 		findPanel(temporalFrequencyDistributionType, query.sourceQueryId),
@@ -242,16 +191,25 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 
 <template>
 	<div class="grid gap-6">
-		<div v-if="!embed && hasGlobalFrequencyVisualization" class="flex flex-wrap items-center gap-3">
-			<ToggleGroup v-model="mode" class="flex" type="single">
-				<ToggleGroupItem value="absolute">{{ t("absolute") }}</ToggleGroupItem>
-				<ToggleGroupItem value="relative">{{ t("relative") }}</ToggleGroupItem>
-			</ToggleGroup>
-		</div>
-
-		<template v-for="{ type, key } in renderItems" :key="type">
+		<template v-for="type in renderItems" :key="type">
+			<DataDisplayCollocations
+				v-if="type === 'data-display-collocations'"
+				:data="collocationData"
+				:interactive="false"
+				:queries="corpusQueries"
+				:settings="collocationSettings"
+				:show-header="!embed"
+				:show-source-data="!embed"
+			/>
+			<DataDisplayKeywordInContext
+				v-else-if="type === 'data-display-keyword-in-context'"
+				:data="concordanceData"
+				:interactive="false"
+				:queries="corpusQueries"
+				:show-header="!embed"
+			/>
 			<DataDisplayTemporalFrequencyDistribution
-				v-if="type === temporalFrequencyDistributionType"
+				v-else-if="type === temporalFrequencyDistributionType"
 				:data="temporalData"
 				:interactive="!embed"
 				:metadata-mappings="temporalMappings"
@@ -287,99 +245,15 @@ const temporalSettings = computed<TemporalFrequencyDistributionSettings>(() =>
 				:show-header="!embed"
 				:show-source-data="!embed"
 			/>
-			<Card v-else>
-				<CardHeader v-if="!embed">
-					<CardTitle>{{ t(key) }}</CardTitle>
-				</CardHeader>
-				<CardContent class="grid gap-4">
-					<template v-if="key === 'wordFormFrequencies'">
-						<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
-							<QueryDisplay :query="toCorpusQuery(query)" />
-							<Chart
-								chart-type="bar"
-								class="h-96"
-								orientation="horizontal"
-								:series="[
-									{
-										color: query.color,
-										name: query.userInput,
-										data: parseWordFormFrequencies(query).map((entry) => [
-											entry.word,
-											mode === 'relative' ? entry.relative : entry.absolute,
-										]),
-									},
-								]"
-								:title="query.userInput"
-							/>
-						</div>
-					</template>
-
-					<template v-else-if="key === 'collocations'">
-						<div v-for="query in snapshot.queries" :key="query.sourceQueryId">
-							<QueryDisplay :query="toCorpusQuery(query)" />
-							<WordCloudGraph
-								:color="query.color"
-								:query-label="query.userInput"
-								:title="query.userInput"
-								:words="parseCollocations(query)"
-							/>
-						</div>
-					</template>
-
-					<template v-else-if="key === 'keywordInContext'">
-						<div v-for="query in snapshot.queries" :key="query.sourceQueryId" class="grid gap-2">
-							<QueryDisplay :query="toCorpusQuery(query)" />
-							<div class="overflow-x-auto rounded-md border">
-								<table class="w-full text-sm">
-									<thead>
-										<tr class="border-b bg-muted/40 text-left">
-											<th class="px-3 py-2">Date</th>
-											<th class="px-3 py-2">Source</th>
-											<th class="px-3 py-2">Left</th>
-											<th class="px-3 py-2">KWIC</th>
-											<th class="px-3 py-2">Right</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr v-for="(line, index) in parseKwic(query)" :key="index" class="border-b">
-											<td class="px-3 py-2">{{ line.date }}</td>
-											<td class="px-3 py-2">{{ line.source }}</td>
-											<td class="px-3 py-2">{{ line.left }}</td>
-											<td class="px-3 py-2 font-semibold">{{ line.word }}</td>
-											<td class="px-3 py-2">{{ line.right }}</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</template>
-
-					<template v-else>
-						<div class="overflow-x-auto rounded-md border">
-							<table class="w-full text-sm">
-								<thead>
-									<tr class="border-b bg-muted/40 text-left">
-										<th class="px-3 py-2">Query</th>
-										<th class="px-3 py-2">Corpus</th>
-										<th class="px-3 py-2">Subcorpus</th>
-										<th class="px-3 py-2">Type</th>
-										<th class="px-3 py-2">Input</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr v-for="query in snapshot.queries" :key="query.sourceQueryId" class="border-b">
-										<td class="px-3 py-2">{{ query.sourceQueryId }}</td>
-										<td class="px-3 py-2">{{ query.corpus }}</td>
-										<td class="px-3 py-2">{{ query.subCorpus }}</td>
-										<td class="px-3 py-2">{{ query.type }}</td>
-										<td class="px-3 py-2">{{ query.userInput }}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</template>
-				</CardContent>
-			</Card>
+			<DataDisplayWordFormFrequencies
+				v-else-if="type === 'data-display-word-form-frequencies'"
+				:data="wordFormFrequencyData"
+				:interactive="!embed"
+				:queries="corpusQueries"
+				:settings="wordFormFrequencySettings"
+				:show-header="!embed"
+				:show-source-data="!embed"
+			/>
 		</template>
 	</div>
 </template>

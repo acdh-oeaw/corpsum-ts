@@ -367,6 +367,18 @@
 		"updatedAt": "Updated"
 	},
 	"DataDisplayErrors": {
+		"keywordInContext": {
+			"loadFailed": "Keyword-in-context data for this query could not be loaded.",
+			"refreshFailed": "Keyword-in-context data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"collocations": {
+			"loadFailed": "Collocation data for this query could not be loaded.",
+			"refreshFailed": "Collocation data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"wordFormFrequency": {
+			"loadFailed": "Word-form frequency data for this query could not be loaded.",
+			"refreshFailed": "Word-form frequency data for this query could not be refreshed. The displayed result may be out of date."
+		},
 		"mediaSource": {
 			"loadFailed": "Media source data for this query could not be loaded.",
 			"refreshFailed": "Media source data for this query could not be refreshed. The displayed result may be out of date."
@@ -446,6 +458,7 @@
 	"VisualizationToolbar": {
 		"barChartMode": "Bar chart mode",
 		"chartMode": "Chart mode",
+		"collocations": "Collocation controls",
 		"combinedMapChart": "Combined map chart",
 		"frequencyMode": "Frequency mode",
 		"mapMode": "Map mode",
@@ -455,6 +468,7 @@
 		"regional": "Regional controls",
 		"separateMapCharts": "Separate map charts",
 		"sourceData": "Source data controls",
+		"wordFormFrequency": "Word-form frequency controls",
 		"tooltips": {
 			"absoluteMode": "Show absolute frequencies.",
 			"queryDetails": "Show query details and cache controls.",
@@ -490,6 +504,8 @@
 	"close": "Close",
 	"coll_freq": "Collocational frequency",
 	"collocations": "Collocations",
+	"collocationsDesc": "Explore words that frequently occur near each query.",
+	"collocationsTitle": "{mode} for {query}",
 	"freq": "Frequency",
 	"interval": "Interval",
 	"keywordInContext": "Keyword in context",

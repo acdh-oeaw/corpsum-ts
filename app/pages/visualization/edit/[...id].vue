@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
+import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import {
 	type CorpusMetadataSemantic,
 	type VisualizationSettingsByType,
@@ -390,6 +392,13 @@ function cancel() {
 			:settings="getSettings(temporalFrequencyDistributionType)"
 			@update:settings="updateVisualizationSettings(temporalFrequencyDistributionType, $event)"
 		/>
+		<DataDisplayCollocations
+			v-if="selectedVisualizations.includes('data-display-collocations')"
+			class="mt-6"
+			:queries="corpusQueries"
+			:settings="getSettings('data-display-collocations')"
+			@update:settings="updateVisualizationSettings('data-display-collocations', $event)"
+		/>
 		<DataDisplayMediaSource
 			v-if="selectedVisualizations.includes('data-display-media-source')"
 			class="mt-6"
@@ -410,6 +419,13 @@ function cancel() {
 			:queries="corpusQueries"
 			:settings="getSettings('data-display-regional-frequencies')"
 			@update:settings="updateVisualizationSettings('data-display-regional-frequencies', $event)"
+		/>
+		<DataDisplayWordFormFrequencies
+			v-if="selectedVisualizations.includes('data-display-word-form-frequencies')"
+			class="mt-6"
+			:queries="corpusQueries"
+			:settings="getSettings('data-display-word-form-frequencies')"
+			@update:settings="updateVisualizationSettings('data-display-word-form-frequencies', $event)"
 		/>
 	</MainContent>
 </template>

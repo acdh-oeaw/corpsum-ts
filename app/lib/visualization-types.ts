@@ -132,6 +132,15 @@ export type VisualizationFrequencyMode = "absolute" | "relative";
 export type MediaVisualizationChartMode = "bar" | "stack" | "percent";
 export type RegionalVisualizationMapMode = "combined" | "separate";
 export type RegionalVisualizationBarMode = "bar" | "stack" | "percent";
+export type CollocationVisualizationMode = "coll_freq" | "freq";
+export type CollocationAttribute = "lemma" | "word" | "lempos";
+
+export interface CollocationVisualizationSettings {
+	type: "data-display-collocations";
+	mode: CollocationVisualizationMode;
+	cattr: CollocationAttribute;
+	sourceTableExpanded: boolean;
+}
 
 export interface MediaSourceVisualizationSettings {
 	type: "data-display-media-source";
@@ -155,12 +164,25 @@ export interface RegionalVisualizationSettings {
 	sourceTableExpanded: boolean;
 }
 
+export interface WordFormFrequencyVisualizationSettings {
+	type: "data-display-word-form-frequencies";
+	mode: VisualizationFrequencyMode;
+	sourceTableExpanded: boolean;
+}
+
 export const defaultMediaSourceVisualizationSettings = Object.freeze({
 	type: "data-display-media-source",
 	mode: "relative",
 	chartMode: "stack",
 	sourceTableExpanded: false,
 } satisfies MediaSourceVisualizationSettings);
+
+export const defaultCollocationVisualizationSettings = Object.freeze({
+	type: "data-display-collocations",
+	mode: "coll_freq",
+	cattr: "lemma",
+	sourceTableExpanded: false,
+} satisfies CollocationVisualizationSettings);
 
 export const defaultMediaTypeVisualizationSettings = Object.freeze({
 	type: "data-display-media-type",
@@ -177,12 +199,22 @@ export const defaultRegionalVisualizationSettings = Object.freeze({
 	sourceTableExpanded: false,
 } satisfies RegionalVisualizationSettings);
 
+export const defaultWordFormFrequencyVisualizationSettings = Object.freeze({
+	type: "data-display-word-form-frequencies",
+	mode: "relative",
+	sourceTableExpanded: false,
+} satisfies WordFormFrequencyVisualizationSettings);
+
 function isVisualizationFrequencyMode(value: unknown): value is VisualizationFrequencyMode {
 	return value === "absolute" || value === "relative";
 }
 
 function isMediaVisualizationChartMode(value: unknown): value is MediaVisualizationChartMode {
 	return value === "bar" || value === "stack" || value === "percent";
+}
+
+function isCollocationAttribute(value: unknown): value is CollocationAttribute {
+	return value === "lemma" || value === "word" || value === "lempos";
 }
 
 function asUnknownRecord(value: unknown): Record<string, unknown> {
@@ -201,6 +233,20 @@ export function normalizeMediaSourceVisualizationSettings(
 		chartMode: isMediaVisualizationChartMode(record.chartMode)
 			? record.chartMode
 			: defaultMediaSourceVisualizationSettings.chartMode,
+		sourceTableExpanded: record.sourceTableExpanded === true,
+	};
+}
+
+export function normalizeCollocationVisualizationSettings(
+	value: unknown,
+): CollocationVisualizationSettings {
+	const record = asUnknownRecord(value);
+	return {
+		type: "data-display-collocations",
+		mode: record.mode === "freq" ? "freq" : defaultCollocationVisualizationSettings.mode,
+		cattr: isCollocationAttribute(record.cattr)
+			? record.cattr
+			: defaultCollocationVisualizationSettings.cattr,
 		sourceTableExpanded: record.sourceTableExpanded === true,
 	};
 }
@@ -237,6 +283,19 @@ export function normalizeRegionalVisualizationSettings(
 		barChartMode: isMediaVisualizationChartMode(record.barChartMode)
 			? record.barChartMode
 			: defaultRegionalVisualizationSettings.barChartMode,
+		sourceTableExpanded: record.sourceTableExpanded === true,
+	};
+}
+
+export function normalizeWordFormFrequencyVisualizationSettings(
+	value: unknown,
+): WordFormFrequencyVisualizationSettings {
+	const record = asUnknownRecord(value);
+	return {
+		type: "data-display-word-form-frequencies",
+		mode: isVisualizationFrequencyMode(record.mode)
+			? record.mode
+			: defaultWordFormFrequencyVisualizationSettings.mode,
 		sourceTableExpanded: record.sourceTableExpanded === true,
 	};
 }
@@ -357,12 +416,12 @@ export function normalizeTemporalFrequencyDistributionSettings(
 type EmptyVisualizationSettings = Record<string, never>;
 
 export interface VisualizationSettingsByType {
-	"data-display-collocations": EmptyVisualizationSettings;
+	"data-display-collocations": CollocationVisualizationSettings;
 	"data-display-keyword-in-context": EmptyVisualizationSettings;
 	"data-display-media-source": MediaSourceVisualizationSettings;
 	"data-display-media-type": MediaTypeVisualizationSettings;
 	"data-display-regional-frequencies": RegionalVisualizationSettings;
-	"data-display-word-form-frequencies": EmptyVisualizationSettings;
+	"data-display-word-form-frequencies": WordFormFrequencyVisualizationSettings;
 	[temporalFrequencyDistributionType]: TemporalFrequencyDistributionSettings;
 }
 
@@ -382,9 +441,9 @@ function normalizeEmptyVisualizationSettings(): EmptyVisualizationSettings {
 
 export const visualizationSettingsCodecs = {
 	"data-display-collocations": {
-		configurable: false,
-		defaults: emptyVisualizationSettings,
-		normalize: normalizeEmptyVisualizationSettings,
+		configurable: true,
+		defaults: defaultCollocationVisualizationSettings,
+		normalize: normalizeCollocationVisualizationSettings,
 	},
 	"data-display-keyword-in-context": {
 		configurable: false,
@@ -407,9 +466,9 @@ export const visualizationSettingsCodecs = {
 		normalize: normalizeRegionalVisualizationSettings,
 	},
 	"data-display-word-form-frequencies": {
-		configurable: false,
-		defaults: emptyVisualizationSettings,
-		normalize: normalizeEmptyVisualizationSettings,
+		configurable: true,
+		defaults: defaultWordFormFrequencyVisualizationSettings,
+		normalize: normalizeWordFormFrequencyVisualizationSettings,
 	},
 	[temporalFrequencyDistributionType]: {
 		configurable: true,
