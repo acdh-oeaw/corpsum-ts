@@ -10,21 +10,17 @@ const { queries } = storeToRefs(queryStore);
 
 const api = useApiClient();
 
-type Mode = "coll_freq" | "freq";
+type Mode = "logDice" | "freq";
 
-const mode: Ref<Mode> = ref("coll_freq");
+const mode: Ref<Mode> = ref("logDice");
 const cattr: Ref<string> = ref("lemma");
 
 const expand = ref(false);
-// const collocations: Ref<Array<Array<ICollocations>>> = ref([]);
 interface CollocationEntry {
 	word: string;
 	freq: number;
 	coll_freq: number;
-	// todo: do this properly once it is known what is wanted
-	d: number;
-	m: number;
-	t: number;
+	logDice: number;
 	name: string;
 	weight: number;
 	color: string;
@@ -32,8 +28,8 @@ interface CollocationEntry {
 
 const collocations: Ref<Array<Array<CollocationEntry>>> = ref([]);
 const collocationsLoading: Ref<Array<boolean>> = ref([]);
-// defines methods of data collocations
-const cbgrfns = "dmt";
+const associationMeasure = "d";
+const contextWindow = { from: -5, to: 5 } as const;
 const q = computed(() =>
 	queries.value.map((query, index) => {
 		return {
@@ -43,7 +39,9 @@ const q = computed(() =>
 				query.subCorpus,
 				query.id,
 				cattr.value,
-				cbgrfns,
+				associationMeasure,
+				contextWindow.from,
+				contextWindow.to,
 				"joooooo",
 				JSON.stringify(queryStore.getQueryWithFacetting(query)),
 			] as const,
@@ -53,10 +51,11 @@ const q = computed(() =>
 					corpname: query.corpus,
 					usesubcorp: query.subCorpus,
 					cattr: cattr.value,
-					ctow: 3,
+					cfromw: contextWindow.from,
+					ctow: contextWindow.to,
 					cminfreq: 9,
 					cminbgr: 9,
-					cbgrfns,
+					cbgrfns: associationMeasure,
 					csortfn: "d",
 					citemsperpage: 10,
 					// @ts-expect-error descrtiption wrong
@@ -67,24 +66,19 @@ const q = computed(() =>
 			select: (data: Type10Collx) => {
 				collocations.value[index] =
 					data.Items?.map((item) => {
-						const d = item.Stats?.find(({ n }) => n === "d");
-						const m = item.Stats?.find(({ n }) => n === "m");
-						const t = item.Stats?.find(({ n }) => n === "t");
+						const logDice = Number(item.Stats?.find(({ n }) => n === "d")?.s ?? -1);
 
 						return {
 							word: item.str!,
 							freq: item.freq!,
 							coll_freq: item.coll_freq!,
-							d: d?.s ?? -1,
-							m: m?.s ?? -1,
-							t: t?.s ?? -1,
-							// stats: item.Stats,
+							logDice,
 
 							// for highCharts
 							name: item.str!,
-							weight: item.coll_freq!,
+							weight: logDice,
 							color: query.color,
-						} as unknown as CollocationEntry;
+						};
 					}) ?? [];
 				collocationsLoading.value[index] = false;
 			},
@@ -101,7 +95,7 @@ const sortedCollocations = computed(() =>
 const loading = ref(false);
 
 watch(mode, () => {
-	if (!(mode.value as unknown)) mode.value = "coll_freq";
+	if (!(mode.value as unknown)) mode.value = "logDice";
 	loading.value = true;
 	setTimeout(() => {
 		loading.value = false;
@@ -148,17 +142,9 @@ function pointFormatter() {
 		// @ts-expect-error this is used inside the table rendering.
 		this.coll_freq +
 		"<br/>" +
-		"D: " +
+		"logDice: " +
 		// @ts-expect-error this is used inside the table rendering.
-		this.d +
-		"<br/>" +
-		"M: " +
-		// @ts-expect-error this is used inside the table rendering.
-		this.m +
-		"<br/>" +
-		"T: " +
-		// @ts-expect-error this is used inside the table rendering.
-		this.t
+		this.logDice
 	);
 }
 </script>
@@ -173,7 +159,7 @@ function pointFormatter() {
 
 		<VCardText class="py-0">
 			<VBtnToggle v-model="mode" density="compact" mandatory>
-				<VBtn value="coll_freq" variant="outlined">
+				<VBtn value="logDice" variant="outlined">
 					{{ t("coll_freq") }}
 				</VBtn>
 				<VBtn value="freq" variant="outlined">{{ t("freq") }}</VBtn>
