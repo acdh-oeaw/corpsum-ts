@@ -93,6 +93,7 @@ const sortedCollocations = computed(() =>
 );
 
 const loading = ref(false);
+const modeLabel = computed(() => t(mode.value === "logDice" ? "coll_freq" : "freq"));
 
 watch(mode, () => {
 	if (!(mode.value as unknown)) mode.value = "logDice";
@@ -112,7 +113,7 @@ const series = computed(() =>
 					...a,
 					weight: a[mode.value],
 				})),
-				name: t(mode.value),
+				name: modeLabel.value,
 				rotation: {
 					from: 0,
 					to: 0,
@@ -178,7 +179,7 @@ function pointFormatter() {
 					:options="{
 						series: series[index],
 						title: {
-							text: `${t(mode)} for ${query.userInput}`,
+							text: `${modeLabel} for ${query.userInput}`,
 							align: 'center',
 						},
 					}"
