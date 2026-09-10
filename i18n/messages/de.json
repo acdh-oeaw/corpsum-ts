@@ -507,6 +507,7 @@
 	"collocationsDesc": "Zeigt Wörter, die häufig im Umfeld der Abfrage vorkommen.",
 	"collocationsTitle": "{mode} für {query}",
 	"freq": "Frequenz",
+	"log_dice": "logDice",
 	"interval": "Intervall",
 	"keywordInContext": "Keyword im Kontext",
 	"keywordInContextDesc": "Zeigt die Treffer im umgebenden Kontext an.",

@@ -437,7 +437,8 @@ function createQueryParams(
 	return {
 		...common,
 		cattr: collocationSettings.cattr,
-		ctow: "3",
+		cfromw: "-5",
+		ctow: "5",
 		cminfreq: "9",
 		cminbgr: "9",
 		cbgrfns: "dmt",

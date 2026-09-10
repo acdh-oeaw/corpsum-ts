@@ -132,7 +132,7 @@ export type VisualizationFrequencyMode = "absolute" | "relative";
 export type MediaVisualizationChartMode = "bar" | "stack" | "percent";
 export type RegionalVisualizationMapMode = "combined" | "separate";
 export type RegionalVisualizationBarMode = "bar" | "stack" | "percent";
-export type CollocationVisualizationMode = "coll_freq" | "freq";
+export type CollocationVisualizationMode = "log_dice" | "coll_freq";
 export type CollocationAttribute = "lemma" | "word" | "lempos";
 
 export interface CollocationVisualizationSettings {
@@ -179,7 +179,7 @@ export const defaultMediaSourceVisualizationSettings = Object.freeze({
 
 export const defaultCollocationVisualizationSettings = Object.freeze({
 	type: "data-display-collocations",
-	mode: "coll_freq",
+	mode: "log_dice",
 	cattr: "lemma",
 	sourceTableExpanded: false,
 } satisfies CollocationVisualizationSettings);
@@ -243,7 +243,7 @@ export function normalizeCollocationVisualizationSettings(
 	const record = asUnknownRecord(value);
 	return {
 		type: "data-display-collocations",
-		mode: record.mode === "freq" ? "freq" : defaultCollocationVisualizationSettings.mode,
+		mode: record.mode === "coll_freq" ? "coll_freq" : defaultCollocationVisualizationSettings.mode,
 		cattr: isCollocationAttribute(record.cattr)
 			? record.cattr
 			: defaultCollocationVisualizationSettings.cattr,

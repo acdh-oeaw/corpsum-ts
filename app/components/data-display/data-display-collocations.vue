@@ -76,7 +76,7 @@ function emitSettings() {
 }
 
 function setMode(value: unknown) {
-	if ((value === "coll_freq" || value === "freq") && value !== mode.value) {
+	if ((value === "log_dice" || value === "coll_freq") && value !== mode.value) {
 		mode.value = value;
 		emitSettings();
 	}
@@ -104,24 +104,33 @@ function parseCollocations(
 			const d = item.Stats?.find(({ n }) => n === "d");
 			const m = item.Stats?.find(({ n }) => n === "m");
 			const tStat = item.Stats?.find(({ n }) => n === "t");
+			const logDice = d?.s ? Number(d.s) : -1;
 			return {
 				word: item.str ?? "",
 				freq: item.freq ?? 0,
 				coll_freq: item.coll_freq ?? 0,
-				d: d?.s ? Number(d.s) : -1,
+				d: logDice,
 				m: m?.s ? Number(m.s) : -1,
 				t: tStat?.s ? Number(tStat.s) : -1,
 				name: item.str ?? "",
-				weight: item.coll_freq ?? 0,
+				weight: logDice,
 				color: query.color,
 			};
 		}) ?? []
 	);
 }
 
+function getCollocationWeight(
+	entry: CollocationEntry,
+	selectedMode: CollocationVisualizationSettings["mode"],
+) {
+	return selectedMode === "log_dice" ? entry.d : entry.coll_freq;
+}
+
 const collocationParams = computed(() => ({
 	cattr: cattr.value,
-	ctow: 3,
+	cfromw: -5,
+	ctow: 5,
 	cminfreq: 9,
 	cminbgr: 9,
 	cbgrfns: "dmt",
@@ -163,7 +172,11 @@ const collocations = computed(() =>
 	queries.value.map((query, index) => parseCollocations(query, rawData.value[index])),
 );
 const sortedCollocations = computed(() =>
-	collocations.value.map((entries) => [...entries].sort((a, b) => b[mode.value] - a[mode.value])),
+	collocations.value.map((entries) =>
+		[...entries].sort(
+			(a, b) => getCollocationWeight(b, mode.value) - getCollocationWeight(a, mode.value),
+		),
+	),
 );
 const collocationsLoading = computed(() =>
 	usesProvidedData.value
@@ -182,7 +195,7 @@ const collocationErrors = computed(() =>
 );
 const wordClouds = computed(() =>
 	collocations.value.map((entries) =>
-		entries.map((entry) => ({ ...entry, weight: entry[mode.value] })),
+		entries.map((entry) => ({ ...entry, weight: getCollocationWeight(entry, mode.value) })),
 	),
 );
 </script>
@@ -205,10 +218,10 @@ const wordClouds = computed(() =>
 						:aria-label="t('VisualizationToolbar.frequencyMode')"
 						@update:model-value="setMode"
 					>
-						<ToolbarToggleItem value="coll_freq" :aria-label="t('coll_freq')">
+						<ToolbarToggleItem value="log_dice" :aria-label="t('log_dice')">
 							<Weight />
 						</ToolbarToggleItem>
-						<ToolbarToggleItem value="freq" :aria-label="t('freq')">
+						<ToolbarToggleItem value="coll_freq" :aria-label="t('coll_freq')">
 							<Hash />
 						</ToolbarToggleItem>
 					</ToolbarToggleGroup>

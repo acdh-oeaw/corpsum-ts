@@ -58,9 +58,7 @@ function scaleValue(value: number, min: number, max: number, outMin: number, out
 }
 
 const wordsWithWeight = computed(() =>
-	props.words
-		.filter((word) => Number.isFinite(word.weight) && word.weight > 0)
-		.sort((a, b) => b.weight - a.weight),
+	props.words.filter((word) => Number.isFinite(word.weight)).sort((a, b) => b.weight - a.weight),
 );
 
 const weightRange = computed(() => {

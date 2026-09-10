@@ -507,6 +507,7 @@
 	"collocationsDesc": "Explore words that frequently occur near each query.",
 	"collocationsTitle": "{mode} for {query}",
 	"freq": "Frequency",
+	"log_dice": "logDice",
 	"interval": "Interval",
 	"keywordInContext": "Keyword in context",
 	"keywordInContextDesc": "Inspect the query results in their surrounding context.",

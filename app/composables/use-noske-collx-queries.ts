@@ -13,6 +13,7 @@ export interface NoskeCollxQueryDescriptor {
 		corpname: string;
 		usesubcorp?: string;
 		cattr: string;
+		cfromw: number;
 		ctow: number;
 		cminfreq: number;
 		cminbgr: number;

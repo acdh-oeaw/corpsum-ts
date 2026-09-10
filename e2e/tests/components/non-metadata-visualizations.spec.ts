@@ -403,7 +403,8 @@ test.describe("non-metadata visualization contracts", () => {
 			expect(url.searchParams.get("corpname")).toBe(expected.corpus);
 			expect(url.searchParams.get("usesubcorp")).toBe(expected.subcorpus);
 			expect(url.searchParams.get("cattr")).toBe("lemma");
-			expect(url.searchParams.get("ctow")).toBe("3");
+			expect(url.searchParams.get("cfromw")).toBe("-5");
+			expect(url.searchParams.get("ctow")).toBe("5");
 			expect(url.searchParams.get("cminfreq")).toBe("9");
 			expect(url.searchParams.get("cminbgr")).toBe("9");
 			expect(url.searchParams.get("cbgrfns")).toBe("dmt");
@@ -435,7 +436,7 @@ test.describe("non-metadata visualization contracts", () => {
 					m: 3.5,
 					t: 2.5,
 					name: "Alpha collocate",
-					weight: 12,
+					weight: 4.5,
 					color: "#dc2626",
 				},
 			]),
@@ -479,7 +480,7 @@ test.describe("non-metadata visualization contracts", () => {
 		});
 
 		await expect.poll(() => requests.length).toBe(1);
-		await component.getByRole("button", { name: "Frequency", exact: true }).click();
+		await component.getByRole("button", { name: "Collocational frequency", exact: true }).click();
 		await component.getByRole("combobox").click();
 		await page.getByRole("option", { name: "word", exact: true }).click();
 		await expect.poll(() => requests.length).toBe(2);
@@ -490,7 +491,7 @@ test.describe("non-metadata visualization contracts", () => {
 		await component.getByRole("button", { name: "Show data" }).click();
 		expect(updates.at(-1)).toStrictEqual({
 			type: "data-display-collocations",
-			mode: "freq",
+			mode: "coll_freq",
 			cattr: "word",
 			sourceTableExpanded: true,
 		});
@@ -505,14 +506,14 @@ test.describe("non-metadata visualization contracts", () => {
 					m: 3.5,
 					t: 2.5,
 					name: "Alpha collocate",
-					weight: 30,
+					weight: 12,
 					color: "#dc2626",
 				},
 			]),
 		);
 		await expect(component.getByTestId("word-cloud")).toHaveAttribute(
 			"data-title",
-			"Frequency for alpha",
+			"Collocational frequency for alpha",
 		);
 		await expect(
 			component.getByText("Explore words that frequently occur near each query."),
@@ -538,7 +539,7 @@ test.describe("non-metadata visualization contracts", () => {
 		).toBeVisible();
 		await expect(component.getByTestId("word-cloud")).toHaveAttribute(
 			"data-title",
-			"Kollokationsfrequenz für alpha",
+			"logDice für alpha",
 		);
 		const box = await component
 			.getByRole("toolbar", { name: "Steuerung der Kollokationen" })
@@ -562,13 +563,13 @@ test.describe("non-metadata visualization contracts", () => {
 						type: "data-display-collocations",
 						queryId: `query-${index}`,
 						data: index === 0 ? collocationResponses["noske-a"] : null,
-						settings: { mode: "freq", cattr: "word", sourceTableExpanded: true },
+						settings: { mode: "coll_freq", cattr: "word", sourceTableExpanded: true },
 					})),
 				},
 			},
 		});
 
-		await expect(component.getByRole("button", { name: "Frequency", exact: true })).toHaveCount(0);
+		await expect(component.getByRole("button", { name: "logDice", exact: true })).toHaveCount(0);
 		await expect(component.getByRole("combobox")).toHaveCount(0);
 		await expect(component.getByTestId("word-cloud").nth(0)).toHaveAttribute(
 			"data-words",
@@ -581,7 +582,7 @@ test.describe("non-metadata visualization contracts", () => {
 					m: 3.5,
 					t: 2.5,
 					name: "Alpha collocate",
-					weight: 30,
+					weight: 12,
 					color: "#dc2626",
 				},
 			]),
@@ -919,7 +920,7 @@ test.describe("non-metadata visualization contracts", () => {
 			}),
 		).toStrictEqual({
 			type: "data-display-collocations",
-			mode: "coll_freq",
+			mode: "log_dice",
 			cattr: "lemma",
 			sourceTableExpanded: false,
 		});
@@ -932,7 +933,7 @@ test.describe("non-metadata visualization contracts", () => {
 		const state = createVisualizationSettingsState(
 			[...types],
 			[
-				{ mode: "freq", cattr: "word", sourceTableExpanded: true },
+				{ mode: "coll_freq", cattr: "word", sourceTableExpanded: true },
 				{ transientPanelOpen: true },
 				{ mode: "absolute", sourceTableExpanded: true },
 			],
@@ -940,7 +941,7 @@ test.describe("non-metadata visualization contracts", () => {
 		expect(serializeVisualizationSettingsState([...types], state)).toStrictEqual([
 			{
 				type: "data-display-collocations",
-				mode: "freq",
+				mode: "coll_freq",
 				cattr: "word",
 				sourceTableExpanded: true,
 			},
