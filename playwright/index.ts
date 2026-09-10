@@ -4,7 +4,7 @@ import "@/styles/index.css";
 
 import { beforeMount } from "@playwright/experimental-ct-vue/hooks";
 import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query";
-import { computed, defineComponent, h, ref, watch, watchEffect } from "vue";
+import { computed, defineComponent, h, reactive, ref, watch, watchEffect } from "vue";
 import type { PropType } from "vue";
 import { createI18n, useI18n } from "vue-i18n";
 
@@ -59,6 +59,7 @@ import Tooltip from "@/components/ui/tooltip/Tooltip.vue";
 import TooltipContent from "@/components/ui/tooltip/TooltipContent.vue";
 import TooltipProvider from "@/components/ui/tooltip/TooltipProvider.vue";
 import TooltipTrigger from "@/components/ui/tooltip/TooltipTrigger.vue";
+import { useAuth } from "@/composables/use-auth";
 import { useCorpusQueryBuilder } from "@/composables/use-corpus-query-builder";
 import { useLocale } from "@/composables/use-locale";
 import {
@@ -76,6 +77,11 @@ import en from "~/i18n/messages/en.json";
 
 interface HooksConfig {
 	locale?: "de" | "en";
+	authUser?: {
+		accounttype?: string;
+		email?: string;
+		username: string;
+	};
 	visualizationPage?: {
 		visualization: Record<string, unknown>;
 		queries: Array<Record<string, unknown>>;
@@ -89,13 +95,27 @@ function useComponentTestState<T>(key: string, init: () => T) {
 	return componentTestState.get(key)!;
 }
 
+async function componentFetch<T>(url: string, options: Record<string, unknown> = {}): Promise<T> {
+	const response = await fetch(url, {
+		body: options.body === undefined ? undefined : JSON.stringify(options.body),
+		headers: options.body === undefined ? undefined : { "Content-Type": "application/json" },
+		method: String(options.method ?? "GET"),
+	});
+	const data = await response.json();
+	if (!response.ok) throw Object.assign(new Error(response.statusText), { data });
+	return data as T;
+}
+
 // Playwright CT runs plain Vite rather than Nuxt, so expose the auto-imports
 // used by components under test.
 Object.assign(globalThis, {
+	$fetch: componentFetch,
 	computed,
 	createNoskeCacheHeaders,
 	categoryColors,
 	h,
+	navigateTo: async (route: unknown) => route,
+	reactive,
 	ref,
 	recordNoskeCacheMetadataFromResponse,
 	useLocale,
@@ -106,6 +126,9 @@ Object.assign(globalThis, {
 	useNoskeCorpusInfoQueries,
 	useNoskeFreqMlQueries,
 	useCorpusQueryBuilder,
+	useAuth,
+	useCorpusMetadataMappings: async () => ({ mappingsForQueries: ref([]) }),
+	useLocaleRoute: () => (route: unknown) => route,
 	useState: useComponentTestState,
 	useTranslations,
 	watch,
@@ -115,7 +138,12 @@ Object.assign(globalThis, {
 beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 	const locale = hooksConfig?.locale ?? "en";
 	const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-	Object.assign(globalThis, { __componentTestQueryClient: queryClient });
+	componentTestState.set("auth:user", ref(hooksConfig?.authUser ?? null));
+	Object.assign(globalThis, {
+		__componentTestQueryClient: queryClient,
+		$fetch: componentFetch,
+		useCorpusMetadataMappings: async () => ({ mappingsForQueries: ref([]) }),
+	});
 	if (hooksConfig?.visualizationPage) {
 		const fixture = hooksConfig.visualizationPage;
 		const publishRequests: Array<{ url: string; options: Record<string, unknown> }> = [];
