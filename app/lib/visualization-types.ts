@@ -127,6 +127,7 @@ export function getEditableVisualizationMetadataSemantics(
 }
 
 export type TemporalFrequencyMode = "absolute" | "relative";
+export type TemporalRangeMode = "auto" | "custom";
 
 export type VisualizationFrequencyMode = "absolute" | "relative";
 export type MediaVisualizationChartMode = "bar" | "stack" | "percent";
@@ -303,6 +304,7 @@ export function normalizeWordFormFrequencyVisualizationSettings(
 export interface TemporalFrequencyDistributionSettings {
 	type: typeof temporalFrequencyDistributionType;
 	mode: TemporalFrequencyMode;
+	rangeMode: TemporalRangeMode;
 	bucketUnit: TemporalUnit;
 	dateRange: {
 		start: string;
@@ -316,6 +318,7 @@ export interface TemporalFrequencyDistributionSettings {
 export const defaultTemporalFrequencyDistributionSettings = {
 	type: temporalFrequencyDistributionType,
 	mode: "relative",
+	rangeMode: "custom",
 	bucketUnit: "year",
 	dateRange: {
 		start: "1986-01-01T00:00:00.000Z",
@@ -396,6 +399,7 @@ export function normalizeTemporalFrequencyDistributionSettings(
 	return {
 		type: temporalFrequencyDistributionType,
 		mode: record.mode === "absolute" ? "absolute" : "relative",
+		rangeMode: record.rangeMode === "auto" ? "auto" : "custom",
 		bucketUnit: hasValidRange
 			? bucketUnit
 			: defaultTemporalFrequencyDistributionSettings.bucketUnit,

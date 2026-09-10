@@ -1,16 +1,12 @@
 import { reactive } from "vue";
 
+import type { QueryExecutionFields } from "@/lib/query-execution";
 import { colors } from "@/utils/colors";
 import { getConcordanceInputKey } from "@/utils/concordance-query";
-import {
-	buildFinalQuery,
-	fixedKWICStructures,
-	normalizeFacettingValues,
-} from "@/utils/corpus-query";
-import type { QueryListItem } from "~/server/api/queries.get.ts";
+import { buildFinalQuery, normalizeFacettingValues } from "@/utils/corpus-query";
 
 export function useCorpusQueryBuilder() {
-	function buildCorpusQuery(item: QueryListItem, index: number): CorpusQuery {
+	function buildCorpusQuery(item: QueryExecutionFields, index: number): CorpusQuery {
 		const finalQuery = buildFinalQuery(item.type, item.userInput);
 		const concordance_query = {
 			queryselector: item.type,
@@ -29,10 +25,7 @@ export function useCorpusQueryBuilder() {
 			corpus: item.corpus,
 			subCorpus: item.subCorpus,
 			concordance_query,
-			KWICAttrsStructs: {
-				attributes: [],
-				structures: [...fixedKWICStructures],
-			},
+			KWICAttrsStructs: { attributes: [], structures: [] },
 			KWICAttrsStructsOptions: {
 				attributes: [],
 				structures: [],

@@ -102,6 +102,7 @@ const concordanceErrors = computed(() =>
 				v-for="(query, index) of queries"
 				:key="query.id"
 				:data="concordanceData[index]"
+				:allow-details="!usesProvidedData"
 				:interactive="interactive"
 				:loading="concordanceLoading[index]"
 				:query="query"

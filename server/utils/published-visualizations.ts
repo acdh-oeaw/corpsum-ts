@@ -7,7 +7,6 @@ import {
 	type KwicQueryOptions,
 	type KwicQueryOptionsById,
 	createKwicRequestOptionParams,
-	fixedKWICStructures,
 	getKwicAuthoritativeOptions,
 	resolveValidatedKwicQueryOptions,
 } from "@/lib/kwic-query-options";
@@ -189,10 +188,7 @@ async function resolvePublishedKwicQueryOptions(input: {
 	);
 	if (!hasKwic) {
 		return Object.fromEntries(
-			queryIds.map((queryId) => [
-				queryId,
-				{ attributes: [], structures: [...fixedKWICStructures] },
-			]),
+			queryIds.map((queryId) => [queryId, { attributes: [], structures: [] }]),
 		) satisfies KwicQueryOptionsById;
 	}
 
@@ -284,7 +280,7 @@ function createQuerySnapshot(
 		facettingValues: query.facettingValues,
 		KWICAttrsStructs: {
 			attributes: [...(kwicQueryOptions?.attributes ?? [])],
-			structures: [...(kwicQueryOptions?.structures ?? fixedKWICStructures)],
+			structures: [...(kwicQueryOptions?.structures ?? [])],
 		},
 		SampleRatio: 100,
 	};
@@ -365,7 +361,7 @@ function createQueryParams(
 	};
 	if (type === "data-display-keyword-in-context") {
 		const optionParams = createKwicRequestOptionParams(
-			kwicQueryOptions ?? { attributes: [], structures: [...fixedKWICStructures] },
+			kwicQueryOptions ?? { attributes: [], structures: [] },
 		);
 		return {
 			corpname: query.corpus,

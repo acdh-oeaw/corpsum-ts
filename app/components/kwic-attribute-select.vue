@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { fixedKWICStructures } from "@/utils/corpus-query";
-
 const t = useTranslations();
 
 const props = defineProps<{ query: CorpusQuery }>();
@@ -79,7 +77,6 @@ const toggleSelection = (
 						<Checkbox
 							:aria-label="structure"
 							:model-value="currentQuery.KWICAttrsStructs.structures.includes(structure)"
-							:disabled="fixedKWICStructures.some((fixed) => fixed === structure)"
 							@update:model-value="
 								toggleSelection(currentQuery.KWICAttrsStructs.structures, structure, $event)
 							"

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { fixedKWICStructures } from "@/utils/corpus-query";
 import { getKWICColumns } from "@/utils/kwic";
 import type { components } from "~/lib/noske-types";
 
@@ -10,12 +9,14 @@ const props = withDefaults(
 		query: CorpusQuery;
 		data?: ConcordanceResponse | null;
 		interactive?: boolean;
+		allowDetails?: boolean;
 		loading?: boolean;
 		queryKey?: ReadonlyArray<unknown>;
 	}>(),
 	{
 		data: undefined,
 		interactive: true,
+		allowDetails: true,
 		loading: false,
 		queryKey: undefined,
 	},
@@ -27,21 +28,28 @@ const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 const t = useTranslations();
 
 const kwicResults = computed<Array<KeywordInContext>>(() =>
-	(props.data?.Lines ?? []).map(({ Tbl_refs, Left, Kwic, toknum, Right }) => ({
-		refs: Tbl_refs ?? [],
-		date: Tbl_refs?.[1] ?? "",
-		source: Tbl_refs?.[3] ?? "",
-		region: Tbl_refs?.[2] ?? "",
-		left:
-			Left?.map((entry) => ("str" in entry ? (entry as { str?: string }).str : entry.strc)).join(
-				" ",
-			) ?? "",
-		word: Kwic?.map((entry) => entry.str ?? "").join(" ") ?? "",
-		right: Right?.map((entry) => entry.str ?? "").join(" ") ?? "",
-		docid: Tbl_refs?.[0] ?? "",
-		topic: "",
-		toknum: toknum ?? 0,
-	})),
+	(props.data?.Lines ?? []).map(({ Tbl_refs, Left, Kwic, toknum, Right }) => {
+		const refs = Tbl_refs ?? [];
+		const refValues = Object.fromEntries(
+			props.query.KWICAttrsStructs.structures.map((header, index) => [header, refs[index] ?? ""]),
+		);
+		return {
+			refValues,
+			refs,
+			date: refValues["doc.datum"] ?? refValues["doc.year"] ?? "",
+			source: refValues["doc.docsrc"] ?? "",
+			region: refValues["doc.region"] ?? "",
+			left:
+				Left?.map((entry) => ("str" in entry ? (entry as { str?: string }).str : entry.strc)).join(
+					" ",
+				) ?? "",
+			word: Kwic?.map((entry) => entry.str ?? "").join(" ") ?? "",
+			right: Right?.map((entry) => entry.str ?? "").join(" ") ?? "",
+			docid: refValues["doc.id"] ?? "",
+			topic: "",
+			toknum: toknum ?? 0,
+		};
+	}),
 );
 
 function open(item: KeywordInContext) {
@@ -53,7 +61,7 @@ const columns = computed(() =>
 		t as unknown as (key: string) => string,
 		open,
 		props.query.KWICAttrsStructs.structures,
-		[...fixedKWICStructures],
+		props.allowDetails,
 	),
 );
 </script>

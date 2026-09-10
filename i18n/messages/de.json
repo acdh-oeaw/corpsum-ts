@@ -156,7 +156,8 @@
 	"QueryForm": {
 		"actions": {
 			"cancel": "Abbrechen",
-			"editFacetting": "Bearbeiten"
+			"editFacetting": "Bearbeiten",
+			"run": "Abfrage ausführen"
 		},
 		"labels": {
 			"corpus": "Korpus",
@@ -187,6 +188,24 @@
 			"required": "{label} ist erforderlich."
 		},
 		"copyName": "Kopiert von {name}"
+	},
+	"QueryVisualizationPreview": {
+		"defaultName": "Visualisierung für {name}",
+		"description": "Ergebnisse der zuletzt ausgeführten Abfrage.",
+		"dialogDescription": "Speichert diese ausgeführte Abfrage mit den aktuellen Visualisierungseinstellungen.",
+		"dialogStaleDescription": "Das Formular wurde geändert. Gespeichert wird die zuletzt ausgeführte, unten angezeigte Abfrage.",
+		"dialogTitle": "Visualisierung speichern",
+		"loading": "Visualisierungen werden vorbereitet...",
+		"name": "Name der Visualisierung",
+		"save": "Visualisierung speichern",
+		"saveFailed": "Die Visualisierung konnte nicht gespeichert werden.",
+		"stale": "Die Abfrage wurde geändert. Führen Sie sie erneut aus, um diese Ergebnisse zu aktualisieren.",
+		"title": "Abfragevisualisierung"
+	},
+	"KwicReferences": {
+		"date": "Datum",
+		"documentId": "Dokument",
+		"year": "Jahr"
 	},
 	"WrongCredentials": "Falsche Zugangsdaten.",
 	"NoskeForm": {
@@ -395,6 +414,7 @@
 	"TemporalFrequencyDistribution": {
 		"description": "Vergleicht die Abfragefrequenzen im Zeitverlauf.",
 		"errors": {
+			"automaticRangeTooLarge": "Der automatische Datumsbereich enthält zu viele Intervalle. Wählen Sie eine gröbere Zeiteinheit oder einen eigenen Bereich.",
 			"invalidRange": "Das exklusive Enddatum muss nach dem Startdatum liegen.",
 			"loadFailed": "Die zeitlichen Frequenzdaten konnten nicht geladen werden."
 		},
@@ -403,6 +423,7 @@
 			"title": "Zeitliche Frequenzen pro {count} {unit}"
 		},
 		"labels": {
+			"automaticRange": "Automatischer Bereich",
 			"endDate": "Enddatum (exklusiv)",
 			"frequencyMode": "Frequenzmodus",
 			"groupFromBeginning": "Gruppierung am Anfang des Datumsbereichs beginnen",

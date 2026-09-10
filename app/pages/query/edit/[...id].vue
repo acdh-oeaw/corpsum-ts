@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+	cloneQueryExecution,
+	getQueryExecutionFingerprint,
+	type QueryExecutionInput,
+} from "@/lib/query-execution";
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 
@@ -42,6 +47,21 @@ const initialValues = computed(() => {
 	};
 });
 const formId = "query-form";
+const execution = ref<QueryExecutionInput | null>(null);
+const executedFingerprint = ref("");
+const runId = ref(0);
+const resultsAreStale = ref(false);
+
+function execute(payload: QueryExecutionInput) {
+	execution.value = cloneQueryExecution(payload);
+	executedFingerprint.value = getQueryExecutionFingerprint(payload);
+	resultsAreStale.value = false;
+	runId.value += 1;
+}
+
+function updateDraft(fingerprint: string) {
+	resultsAreStale.value = Boolean(execution.value && fingerprint !== executedFingerprint.value);
+}
 
 async function save(payload: {
 	name: string;
@@ -119,7 +139,16 @@ function cancel() {
 			:show-actions="false"
 			:submit-label="t('Actions.save')"
 			@cancel="cancel"
+			@draft-change="updateDraft"
+			@execute="execute"
 			@submit="save"
+		/>
+		<QueryVisualizationPreview
+			v-if="execution"
+			:execution="execution"
+			:run-id="runId"
+			:source-query="query"
+			:stale="resultsAreStale"
 		/>
 	</MainContent>
 </template>

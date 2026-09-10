@@ -14,6 +14,7 @@ type SearchFunctionKey =
 	| "wordFormFrequencies"
 	| "yearlyFrequencies";
 interface KeywordInContext {
+	refValues: Record<string, string>;
 	date: string;
 	source: string;
 	region: string;

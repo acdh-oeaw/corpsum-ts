@@ -6,7 +6,11 @@ import DataDisplayMediaType from "@/components/data-display/data-display-media-t
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
-import { getKwicAttrsStructsOptions } from "@/lib/kwic-query-options";
+import {
+	getDefaultKwicQueryOptions,
+	getKwicAttrsStructsOptions,
+	getKwicAuthoritativeOptions,
+} from "@/lib/kwic-query-options";
 import {
 	type VisualizationType,
 	getVisualizationMetadataSemantics,
@@ -60,13 +64,21 @@ const corpusInfoDescriptors = computed<Array<NoskeCorpusInfoQueryDescriptor>>(()
 		: [],
 );
 const corpusInfoResults = useNoskeCorpusInfoQueries(corpusInfoDescriptors);
+const initializedKwicQueries = new Set<number>();
 watch(
 	[corpusQueries, corpusInfoResults],
 	([currentQueries, currentResults]) => {
 		currentQueries.forEach((query, index) => {
-			const options = getKwicAttrsStructsOptions(currentResults[index]?.data);
+			const corpusInfo = currentResults[index]?.data;
+			const options = getKwicAttrsStructsOptions(corpusInfo);
 			if (JSON.stringify(query.KWICAttrsStructsOptions) !== JSON.stringify(options)) {
 				query.KWICAttrsStructsOptions = options;
+			}
+			if (!initializedKwicQueries.has(query.id) && corpusInfo) {
+				query.KWICAttrsStructs = getDefaultKwicQueryOptions(
+					getKwicAuthoritativeOptions(corpusInfo),
+				);
+				initializedKwicQueries.add(query.id);
 			}
 		});
 	},

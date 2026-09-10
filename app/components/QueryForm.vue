@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from "@tanstack/vue-form";
 
+import { type QueryExecutionInput, getQueryExecutionFingerprint } from "@/lib/query-execution";
 import type { components } from "~/lib/noske-types";
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
@@ -41,6 +42,7 @@ const props = withDefaults(
 		submitLabel?: string;
 		initialValues?: Partial<QueryFormValues>;
 		showActions?: boolean;
+		showRun?: boolean;
 		formId?: string;
 	}>(),
 	{
@@ -48,6 +50,7 @@ const props = withDefaults(
 		submitLabel: "Create",
 		initialValues: () => ({}),
 		showActions: true,
+		showRun: true,
 		formId: undefined,
 	},
 );
@@ -75,6 +78,8 @@ const emit = defineEmits<{
 		},
 	): void;
 	(event: "cancel"): void;
+	(event: "execute", payload: QueryExecutionInput): void;
+	(event: "draft-change", fingerprint: string): void;
 }>();
 
 const emptyValues: QueryFormValues = {
@@ -139,40 +144,71 @@ const firstError = (state: { meta?: { errors?: Array<unknown> } }) => {
 const errorClass = (state: { meta?: { errors?: Array<unknown> } }) =>
 	hasError(state) ? "border-destructive focus-visible:ring-destructive" : "";
 
+const submitIntent = ref<"save" | "execute">("save");
+
+function toPayload(value: QueryFormValues): QueryExecutionInput | null {
+	const safeTrim = (input: string | undefined | null) => input?.trim() ?? "";
+	const trimmed = {
+		name: safeTrim(value.name) || fallbackName,
+		noske: safeTrim(value.noske),
+		corpus: safeTrim(value.corpus),
+		subCorpus: safeTrim(value.subCorpus),
+		type: value.type,
+		userInput: safeTrim(value.userInput),
+		facettingValuesText: safeTrim(value.facettingValuesText),
+	};
+	let facettingValues: unknown = {};
+	if (trimmed.facettingValuesText) {
+		try {
+			facettingValues = JSON.parse(trimmed.facettingValuesText);
+		} catch {
+			return null;
+		}
+	}
+	return {
+		name: trimmed.name,
+		noske: trimmed.noske,
+		corpus: trimmed.corpus,
+		subCorpus: trimmed.subCorpus,
+		type: trimmed.type,
+		userInput: trimmed.userInput,
+		facettingValues,
+	};
+}
+
 const form = useForm({
 	defaultValues: resolveValues(props.initialValues),
 	onSubmit: async ({ value }) => {
-		const safeTrim = (input: string | undefined | null) => input?.trim() ?? "";
-		const trimmed = {
-			name: safeTrim(value.name) || fallbackName,
-			noske: safeTrim(value.noske),
-			corpus: safeTrim(value.corpus),
-			subCorpus: safeTrim(value.subCorpus),
-			type: value.type,
-			userInput: safeTrim(value.userInput),
-			facettingValuesText: safeTrim(value.facettingValuesText),
-		};
-
-		let facettingValues: unknown = {};
-		if (trimmed.facettingValuesText) {
-			try {
-				facettingValues = JSON.parse(trimmed.facettingValuesText);
-			} catch {
-				return;
-			}
-		}
-
-		emit("submit", {
-			name: trimmed.name,
-			noske: trimmed.noske,
-			corpus: trimmed.corpus,
-			subCorpus: trimmed.subCorpus,
-			type: trimmed.type,
-			userInput: trimmed.userInput,
-			facettingValues,
-		});
+		const payload = toPayload(value);
+		if (!payload) return;
+		if (submitIntent.value === "execute") emit("execute", payload);
+		else emit("submit", payload);
 	},
 });
+
+async function execute() {
+	submitIntent.value = "execute";
+	try {
+		await form.handleSubmit();
+	} finally {
+		submitIntent.value = "save";
+	}
+}
+
+const formValues = form.useStore((state) => state.values);
+watch(
+	formValues,
+	(value) => {
+		const payload = toPayload(value);
+		emit(
+			"draft-change",
+			payload
+				? getQueryExecutionFingerprint(payload)
+				: JSON.stringify({ invalid: true, values: value }),
+		);
+	},
+	{ deep: true, immediate: true },
+);
 
 const noskeId = form.useStore((state) => state.values.noske);
 const corpusId = form.useStore((state) => state.values.corpus);
@@ -557,9 +593,21 @@ watch(corpusId, (value, previous) => {
 			</div>
 		</div>
 
-		<div v-if="props.showActions" class="flex flex-wrap gap-2">
-			<Button :disabled="props.isSaving" type="submit">{{ props.submitLabel }}</Button>
-			<Button :disabled="props.isSaving" type="button" variant="outline" @click="emit('cancel')">
+		<div v-if="props.showRun || props.showActions" class="flex flex-wrap gap-2">
+			<Button v-if="props.showRun" :disabled="props.isSaving" type="button" @click="execute">
+				<LucideIcon class="mr-1 size-4" name="Play" :stroke-width="2" />
+				{{ t("QueryForm.actions.run") }}
+			</Button>
+			<Button v-if="props.showActions" :disabled="props.isSaving" type="submit">
+				{{ props.submitLabel }}
+			</Button>
+			<Button
+				v-if="props.showActions"
+				:disabled="props.isSaving"
+				type="button"
+				variant="outline"
+				@click="emit('cancel')"
+			>
 				{{ t("QueryForm.actions.cancel") }}
 			</Button>
 		</div>

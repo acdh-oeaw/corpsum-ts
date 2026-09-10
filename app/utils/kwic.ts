@@ -8,26 +8,25 @@ interface RowObj {
 export const getKWICColumns = (
 	t: (s: string) => string,
 	open: (keyword: KeywordInContext) => void,
-	additionalRefHeaders: Array<string>,
-	fixedKWICStructures: Array<string>,
+	refHeaders: Array<string>,
+	allowDetails = true,
 ): Array<ColumnDef<KeywordInContext>> => {
-	const columns: Array<ColumnDef<KeywordInContext>> = [
-		{
-			accessorKey: "source",
-			header: () => h("div", { class: "text-right" }, t("Corpsum.source")),
-			cell: ({ row }: RowObj) => {
-				const source = row.getValue("source");
-				return h("div", { class: "text-right font-medium" }, source);
-			},
-		},
-		{
-			accessorKey: "region",
-			header: () => h("div", { class: "text-right" }, t("Corpsum.region")),
-			cell: ({ row }: RowObj) => {
-				const region = row.getValue("region");
-				return h("div", { class: "text-right font-medium" }, region);
-			},
-		},
+	const referenceLabels: Record<string, string> = {
+		"doc.id": t("KwicReferences.documentId"),
+		"doc.datum": t("KwicReferences.date"),
+		"doc.year": t("KwicReferences.year"),
+		"doc.region": t("Corpsum.region"),
+		"doc.docsrc": t("Corpsum.source"),
+	};
+	const columns: Array<ColumnDef<KeywordInContext>> = refHeaders.map((header) => ({
+		id: `ref:${header}`,
+		accessorFn: (row) => row.refValues[header] ?? "",
+		header: () => h("div", { class: "text-right" }, referenceLabels[header] ?? header),
+		cell: ({ row }) =>
+			h("div", { class: "text-right font-medium" }, row.original.refValues[header] ?? ""),
+	}));
+
+	columns.push(
 		{
 			accessorKey: "left",
 			header: () => h("div", { class: "text-right ml-auto" }, t("Corpsum.left")),
@@ -65,38 +64,25 @@ export const getKWICColumns = (
 				);
 			},
 		},
-	];
+	);
 
-	additionalRefHeaders
-		.filter((header) => !fixedKWICStructures.includes(header))
-		.forEach((header, i) => {
-			const idx = i + fixedKWICStructures.length;
-			columns.push({
-				accessorKey: "refs",
-				header: () => h("div", { class: "text-right" }, t(header)),
-				cell: ({ row }: RowObj) => {
-					const value = row.getValue("refs")[idx];
-					return h("div", { class: "text-right font-medium" }, value);
-				},
-			});
-		});
-
-	columns.push({
-		accessorKey: "link",
-		header: () => h("div", { class: "text-right" }, t("Corpsum.link")),
-		cell: ({ row }: RowObj) => {
-			return h(
-				"button",
-				{
-					class: "inline-flex items-center text-sm text-primary hover:underline",
-					onClick: () => {
-						open(row.original);
+	if (allowDetails)
+		columns.push({
+			accessorKey: "link",
+			header: () => h("div", { class: "text-right" }, t("Corpsum.link")),
+			cell: ({ row }: RowObj) => {
+				return h(
+					"button",
+					{
+						class: "inline-flex items-center text-sm text-primary hover:underline",
+						onClick: () => {
+							open(row.original);
+						},
 					},
-				},
-				[h(ExternalLink, { class: "mr-1 size-4" }), t("Corpsum.open")],
-			);
-		},
-	});
+					[h(ExternalLink, { class: "mr-1 size-4" }), t("Corpsum.open")],
+				);
+			},
+		});
 
 	return columns;
 };

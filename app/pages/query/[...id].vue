@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { QueryExecutionInput } from "@/lib/query-execution";
 import { createCopiedQueryName, queryCopyNameKey } from "@/utils/query-copy";
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 import type { VisualizationListItem } from "~/server/api/visualizations.get.ts";
@@ -51,6 +52,19 @@ const queryVisualizations = computed(() => {
 	const id = query.value?._id ?? queryId.value ?? "";
 	if (!id) return [];
 	return (visualizations.value ?? []).filter((visualization) => visualization.queries.includes(id));
+});
+
+const queryExecution = computed<QueryExecutionInput | null>(() => {
+	if (!query.value) return null;
+	return {
+		name: query.value.name,
+		noske: query.value.noske,
+		corpus: query.value.corpus,
+		subCorpus: query.value.subCorpus,
+		type: query.value.type,
+		userInput: query.value.userInput,
+		facettingValues: query.value.facettingValues,
+	};
 });
 
 const copyQueryParams = computed(() => {
@@ -196,5 +210,10 @@ const copyQueryParams = computed(() => {
 				</table>
 			</div>
 		</div>
+		<QueryVisualizationPreview
+			v-if="queryExecution"
+			:execution="queryExecution"
+			:source-query="query"
+		/>
 	</MainContent>
 </template>

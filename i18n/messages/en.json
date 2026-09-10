@@ -156,7 +156,8 @@
 	"QueryForm": {
 		"actions": {
 			"cancel": "Cancel",
-			"editFacetting": "Edit"
+			"editFacetting": "Edit",
+			"run": "Run query"
 		},
 		"labels": {
 			"corpus": "Corpus",
@@ -187,6 +188,24 @@
 			"required": "{label} is required."
 		},
 		"copyName": "Copied from {name}"
+	},
+	"QueryVisualizationPreview": {
+		"defaultName": "{name} visualization",
+		"description": "Results for the last executed query.",
+		"dialogDescription": "Save this executed query and its current visualization settings.",
+		"dialogStaleDescription": "The form has changed. This saves the last executed query shown below.",
+		"dialogTitle": "Save visualization",
+		"loading": "Preparing visualizations...",
+		"name": "Visualization name",
+		"save": "Save visualization",
+		"saveFailed": "The visualization could not be saved.",
+		"stale": "The query has changed. Run it again to update these results.",
+		"title": "Query visualization"
+	},
+	"KwicReferences": {
+		"date": "Date",
+		"documentId": "Document",
+		"year": "Year"
 	},
 	"WrongCredentials": "Wrong credentials.",
 	"NoskeForm": {
@@ -395,6 +414,7 @@
 	"TemporalFrequencyDistribution": {
 		"description": "Compare query frequencies over time.",
 		"errors": {
+			"automaticRangeTooLarge": "The automatic date range contains too many buckets. Choose a coarser time unit or a custom range.",
 			"invalidRange": "The exclusive end date must be later than the start date.",
 			"loadFailed": "The temporal frequency data could not be loaded."
 		},
@@ -403,6 +423,7 @@
 			"title": "Temporal frequencies per {count} {unit}"
 		},
 		"labels": {
+			"automaticRange": "Auto range",
 			"endDate": "End date (exclusive)",
 			"frequencyMode": "Frequency mode",
 			"groupFromBeginning": "Start grouping at the beginning of the date range",

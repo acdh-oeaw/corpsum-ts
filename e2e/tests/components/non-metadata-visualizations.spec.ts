@@ -8,6 +8,7 @@ import PublishedVisualizationRenderer from "@/components/published/published-vis
 import {
 	createKwicRequestOptionParams,
 	getKwicAuthoritativeOptions,
+	getDefaultKwicQueryOptions,
 	parseKwicQueryOptionsOverrides,
 	resolveValidatedKwicQueryOptions,
 } from "@/lib/kwic-query-options";
@@ -764,13 +765,28 @@ test.describe("non-metadata visualization contracts", () => {
 			{ attributes: ["lemma", "lemma"], structures: corpusInfoResponse.structs },
 			{ attributes: ["lemma,bad"], structures: corpusInfoResponse.structs },
 			{ attributes: ["lemma=bad"], structures: corpusInfoResponse.structs },
-			{ attributes: [], structures: ["doc.datum", "doc.id", "doc.region", "doc.docsrc"] },
-			{ attributes: [], structures: ["doc.id", "doc.datum", "doc.region"] },
+			{ attributes: [], structures: ["doc.id", "doc.id"] },
 		]) {
 			expect(parseKwicQueryOptionsOverrides({ "query-a": invalid }, allowed)).toBeNull();
 		}
+		expect(
+			parseKwicQueryOptionsOverrides(
+				{
+					"query-a": {
+						attributes: [],
+						structures: ["doc.datum", "doc.id", "doc.region"],
+					},
+				},
+				allowed,
+			),
+		).toStrictEqual({
+			"query-a": { attributes: [], structures: ["doc.datum", "doc.id", "doc.region"] },
+		});
 
 		const authoritative = getKwicAuthoritativeOptions(corpusInfoResponse);
+		expect(
+			getDefaultKwicQueryOptions({ attributes: ["word"], structures: ["text.id"] }),
+		).toStrictEqual({ attributes: [], structures: [] });
 		expect(
 			resolveValidatedKwicQueryOptions({
 				overrides: {

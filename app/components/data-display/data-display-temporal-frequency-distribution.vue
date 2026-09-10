@@ -18,7 +18,9 @@ import {
 	type TemporalFrequencyParser,
 	type TemporalFrequencyPoint,
 	aggregateTemporalFrequencies,
+	addTemporalUnits,
 	createTemporalFrequencyParser,
+	floorDateToUnit,
 	formatTemporalFrequencyInterval,
 	formatTemporalTimestamp,
 	getAllowedTemporalBucketUnitsForMappings,
@@ -72,12 +74,15 @@ const normalizedSettings = computed(() =>
 
 const intervalOptions = temporalIntervalOptions;
 const mode = ref<FrequencyMode>(normalizedSettings.value.mode);
+const rangeMode = ref(normalizedSettings.value.rangeMode);
 const bucketUnit = ref<TemporalUnit>(normalizedSettings.value.bucketUnit);
 const interval = ref(normalizedSettings.value.intervalSize);
 const reverse = ref(normalizedSettings.value.reverseIntervals);
 const expand = ref(normalizedSettings.value.sourceTableExpanded);
 const rangeStart = ref(normalizedSettings.value.dateRange.start.slice(0, 10));
 const rangeEnd = ref(normalizedSettings.value.dateRange.end.slice(0, 10));
+const automaticDateRange = ref<{ start: string; end: string } | null>(null);
+const automaticRangeTooLarge = ref(false);
 
 function createIsoDate(value: string) {
 	const date = new Date(`${value}T00:00:00.000Z`);
@@ -94,6 +99,7 @@ watch(
 	normalizedSettings,
 	(value) => {
 		mode.value = value.mode;
+		rangeMode.value = value.rangeMode;
 		bucketUnit.value = value.bucketUnit;
 		interval.value = value.intervalSize;
 		reverse.value = value.reverseIntervals;
@@ -104,11 +110,12 @@ watch(
 	{ deep: true },
 );
 
-watch([mode, bucketUnit, interval, reverse, expand, rangeStart, rangeEnd], () => {
+watch([mode, rangeMode, bucketUnit, interval, reverse, expand, rangeStart, rangeEnd], () => {
 	if (!selectedDateRange.value) return;
 	emit("update:settings", {
 		type: defaultTemporalFrequencyDistributionSettings.type,
 		mode: mode.value,
+		rangeMode: rangeMode.value,
 		bucketUnit: bucketUnit.value,
 		dateRange: selectedDateRange.value,
 		intervalSize: interval.value,
@@ -156,10 +163,16 @@ watchEffect(() => {
 		bucketUnit.value = availableBucketUnits.value.at(-1) ?? "year";
 	}
 });
-const dateRange = computed(() => ({
-	start: new Date(selectedDateRange.value?.start ?? normalizedSettings.value.dateRange.start),
-	end: new Date(selectedDateRange.value?.end ?? normalizedSettings.value.dateRange.end),
-}));
+const dateRange = computed(() => {
+	const selected =
+		rangeMode.value === "auto" && automaticDateRange.value
+			? automaticDateRange.value
+			: selectedDateRange.value;
+	return {
+		start: new Date(selected?.start ?? normalizedSettings.value.dateRange.start),
+		end: new Date(selected?.end ?? normalizedSettings.value.dateRange.end),
+	};
+});
 const missingMappingQueries = computed(() =>
 	activeQueries.value.filter((_, index) => !mappings.value[index]),
 );
@@ -217,8 +230,51 @@ const frequencyData = computed(() =>
 		: queryResults.value.map((result) => result.data),
 );
 
+watchEffect(() => {
+	if (rangeMode.value !== "auto") return;
+	const dates = frequencyData.value.flatMap((data, index) => {
+		const parser = temporalParsers.value[index];
+		if (!data || !parser || parser.error) return [];
+		return parseTemporalFrequencies(data, parser).map((entry) => entry.date);
+	});
+	if (dates.length === 0) {
+		automaticDateRange.value = null;
+		automaticRangeTooLarge.value = false;
+		return;
+	}
+	const start = floorDateToUnit(
+		new Date(Math.min(...dates.map((date) => date.getTime()))),
+		bucketUnit.value,
+	);
+	const end = addTemporalUnits(
+		floorDateToUnit(new Date(Math.max(...dates.map((date) => date.getTime()))), bucketUnit.value),
+		bucketUnit.value,
+		1,
+	);
+	if (!isTemporalBucketRangeSupported(start, end, bucketUnit.value)) {
+		automaticDateRange.value = null;
+		automaticRangeTooLarge.value = true;
+		return;
+	}
+	automaticRangeTooLarge.value = false;
+	automaticDateRange.value = { start: start.toISOString(), end: end.toISOString() };
+	rangeStart.value = start.toISOString().slice(0, 10);
+	rangeEnd.value = end.toISOString().slice(0, 10);
+});
+
+function setCustomRangeStart(value: string | number) {
+	rangeMode.value = "custom";
+	rangeStart.value = String(value);
+}
+
+function setCustomRangeEnd(value: string | number) {
+	rangeMode.value = "custom";
+	rangeEnd.value = String(value);
+}
+
 const temporalFrequencies = computed(() =>
 	frequencyData.value.map((data, index) => {
+		if (rangeMode.value === "auto" && automaticRangeTooLarge.value) return [];
 		const parser = temporalParsers.value[index];
 		const mapping = mappings.value[index];
 		if (!parser || parser.error || !data) return [];
@@ -487,15 +543,27 @@ function toggleSourceTable() {
 							<ToolbarSeparator />
 							<div class="inline-flex min-w-0 items-center gap-1.5">
 								<CalendarRange class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+								<Button
+									:aria-pressed="rangeMode === 'auto'"
+									class="h-8"
+									size="sm"
+									type="button"
+									:variant="rangeMode === 'auto' ? 'default' : 'outline'"
+									@click="rangeMode = 'auto'"
+								>
+									{{ t("TemporalFrequencyDistribution.labels.automaticRange") }}
+								</Button>
 								<Label for="temporal-range-start" class="sr-only">{{
 									t("TemporalFrequencyDistribution.labels.startDate")
 								}}</Label>
 								<Input
 									id="temporal-range-start"
-									v-model="rangeStart"
 									class="h-8 w-[9.25rem] min-w-0"
+									:disabled="rangeMode === 'auto'"
+									:model-value="rangeStart"
 									:title="t('TemporalFrequencyDistribution.tooltips.startDate')"
 									type="date"
+									@update:model-value="setCustomRangeStart"
 								/>
 							</div>
 							<div class="inline-flex min-w-0 items-center gap-1.5">
@@ -504,10 +572,12 @@ function toggleSourceTable() {
 								}}</Label>
 								<Input
 									id="temporal-range-end"
-									v-model="rangeEnd"
 									class="h-8 w-[9.25rem] min-w-0"
+									:disabled="rangeMode === 'auto'"
+									:model-value="rangeEnd"
 									:title="t('TemporalFrequencyDistribution.tooltips.endDate')"
 									type="date"
+									@update:model-value="setCustomRangeEnd"
 								/>
 							</div>
 							<ToolbarSeparator />
@@ -563,6 +633,13 @@ function toggleSourceTable() {
 							role="alert"
 						>
 							{{ t("TemporalFrequencyDistribution.errors.invalidRange") }}
+						</p>
+						<p
+							v-if="automaticRangeTooLarge"
+							class="basis-full text-sm text-destructive"
+							role="alert"
+						>
+							{{ t("TemporalFrequencyDistribution.errors.automaticRangeTooLarge") }}
 						</p>
 					</Toolbar>
 				</div>

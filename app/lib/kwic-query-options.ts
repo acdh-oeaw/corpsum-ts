@@ -2,6 +2,7 @@ import type { components } from "~/lib/noske-types";
 
 type CorpusInfoResponse = components["schemas"]["01_corp_info"];
 
+/** Preferred AMC references. Only references offered by a corpus are selected. */
 export const fixedKWICStructures = ["doc.id", "doc.datum", "doc.region", "doc.docsrc"] as const;
 
 export interface KwicQueryOptions {
@@ -39,12 +40,18 @@ function hasDuplicates(values: Array<string>) {
 	return new Set(values).size !== values.length;
 }
 
-function hasCanonicalFixedPrefix(structures: Array<string>) {
-	return fixedKWICStructures.every((structure, index) => structures[index] === structure);
-}
-
 function isStringArray(value: unknown): value is Array<string> {
 	return Array.isArray(value) && value.every(isSafeToken) && !hasDuplicates(value);
+}
+
+export function getDefaultKwicQueryOptions(
+	authoritative: KwicAuthoritativeOptions,
+): KwicQueryOptions {
+	const offeredStructures = new Set(authoritative.structures);
+	return {
+		attributes: [],
+		structures: fixedKWICStructures.filter((structure) => offeredStructures.has(structure)),
+	};
 }
 
 export function getKwicAuthoritativeOptions(
@@ -99,8 +106,7 @@ export function parseKwicQueryOptionsOverrides(
 		if (
 			Object.keys(record).some((key) => key !== "attributes" && key !== "structures") ||
 			!isStringArray(record.attributes) ||
-			!isStringArray(record.structures) ||
-			!hasCanonicalFixedPrefix(record.structures)
+			!isStringArray(record.structures)
 		) {
 			return null;
 		}
@@ -116,17 +122,12 @@ export function validateKwicQueryOptions(
 	options: KwicQueryOptions,
 	authoritative: KwicAuthoritativeOptions,
 ) {
-	if (
-		!isStringArray(options.attributes) ||
-		!isStringArray(options.structures) ||
-		!hasCanonicalFixedPrefix(options.structures)
-	) {
+	if (!isStringArray(options.attributes) || !isStringArray(options.structures)) {
 		return false;
 	}
 	const offeredAttributes = new Set(authoritative.attributes);
 	const offeredStructures = new Set(authoritative.structures);
 	return (
-		fixedKWICStructures.every((structure) => offeredStructures.has(structure)) &&
 		options.attributes.every((attribute) => offeredAttributes.has(attribute)) &&
 		options.structures.every((structure) => offeredStructures.has(structure))
 	);
@@ -139,12 +140,10 @@ export function resolveValidatedKwicQueryOptions(input: {
 }): KwicQueryOptionsById | null {
 	const resolved: KwicQueryOptionsById = {};
 	for (const queryId of input.queryIds) {
-		const options = input.overrides[queryId] ?? {
-			attributes: [],
-			structures: [...fixedKWICStructures],
-		};
 		const authoritative = input.authoritativeByQueryId[queryId];
-		if (!authoritative || !validateKwicQueryOptions(options, authoritative)) return null;
+		if (!authoritative) return null;
+		const options = input.overrides[queryId] ?? getDefaultKwicQueryOptions(authoritative);
+		if (!validateKwicQueryOptions(options, authoritative)) return null;
 		resolved[queryId] = {
 			attributes: [...options.attributes],
 			structures: [...options.structures],

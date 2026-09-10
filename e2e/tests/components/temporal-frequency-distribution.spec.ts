@@ -306,6 +306,42 @@ test.describe("temporal visualization component", () => {
 		});
 	});
 
+	test("fits automatic ranges to supplied results newer than the legacy default", async ({
+		mount,
+	}) => {
+		const updates: Array<TemporalFrequencyDistributionSettings> = [];
+		const component = await mount(TemporalFrequencyDistribution, {
+			props: componentProps({
+				data: [
+					{
+						Blocks: [
+							{
+								Items: [
+									{ Word: [{ n: "2026-02-03" }], frq: 3, reltt: 0.3 },
+									{ Word: [{ n: "2028-07-01" }], frq: 4, reltt: 0.4 },
+								],
+							},
+						],
+					},
+				],
+				settings: {
+					rangeMode: "auto",
+					bucketUnit: "year",
+					mode: "relative",
+				},
+			}),
+			on: { "update:settings": (settings) => updates.push(settings) },
+		});
+		await expect(component.getByLabel("Start date")).toHaveValue("2026-01-01");
+		await expect(component.getByLabel("End date (exclusive)")).toHaveValue("2029-01-01");
+		await expect(component.getByLabel("Start date")).toBeDisabled();
+		await expect.poll(() => updates.at(-1)?.rangeMode).toBe("auto");
+		expect(updates.at(-1)?.dateRange).toStrictEqual({
+			start: "2026-01-01T00:00:00.000Z",
+			end: "2029-01-01T00:00:00.000Z",
+		});
+	});
+
 	test("populates time units from mapping precision and selected range", async ({
 		mount,
 		page,
@@ -534,6 +570,7 @@ test.describe("temporal visualization settings", () => {
 			intervalSize: 2,
 		});
 		expect(settings.bucketUnit).toBe("year");
+		expect(settings.rangeMode).toBe("custom");
 		expect(settings.dateRange).toStrictEqual({
 			start: "2020-01-01T00:00:00.000Z",
 			end: "2025-01-01T00:00:00.000Z",
