@@ -39,4 +39,8 @@ dist
 
 #generated
 lib
+!app/lib/
+app/lib/*
+!app/lib/default-visualization-presets.ts
+!app/lib/query-execution.ts
 plans

@@ -183,7 +183,7 @@ async function saveVisualization() {
 	const sourceQuery = props.sourceQuery
 		? { _id: props.sourceQuery._id, name: props.sourceQuery.name }
 		: null;
-	const attempt =
+	const attempt: PromotionAttempt =
 		promotionAttempt.value?.fingerprint === fingerprint ? promotionAttempt.value : { fingerprint };
 	promotionAttempt.value = attempt;
 	try {
