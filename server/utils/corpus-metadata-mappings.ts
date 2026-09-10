@@ -12,6 +12,7 @@ import {
 	type CorpusMetadataMappingDocument,
 	CorpusMetadataMappingModel,
 } from "~/server/models/corpusmetadatamappings.schema";
+import { getAmcTemporalDefault } from "~/server/utils/amc-metadata-defaults";
 
 function isValidRegularExpression(pattern: string) {
 	try {
@@ -106,6 +107,32 @@ export function serializeCorpusMetadataMapping(
 	};
 }
 
+export async function ensureDefaultCorpusMetadataMapping(input: {
+	noske: string | Types.ObjectId;
+	corpus: string;
+	semantic: CorpusMetadataSemantic;
+}) {
+	const filter = { ...input, scope: "default" as const };
+	const existing = await CorpusMetadataMappingModel.findOne<CorpusMetadataMappingDocument>(filter);
+	if (existing) return existing;
+	const defaults = input.semantic === "temporal" ? getAmcTemporalDefault(input.corpus) : null;
+	if (!defaults) return null;
+
+	try {
+		return await CorpusMetadataMappingModel.findOneAndUpdate<CorpusMetadataMappingDocument>(
+			filter,
+			{ $setOnInsert: defaults },
+			{
+				upsert: true,
+				returnDocument: "after",
+			},
+		);
+	} catch (error) {
+		if (!isRecord(error) || error.code !== 11000) throw error;
+		return CorpusMetadataMappingModel.findOne<CorpusMetadataMappingDocument>(filter);
+	}
+}
+
 export async function resolveCorpusMetadataMapping(input: {
 	noske: string | Types.ObjectId;
 	corpus: string;
@@ -120,11 +147,10 @@ export async function resolveCorpusMetadataMapping(input: {
 			scope: "user",
 			owner: input.userId,
 		}),
-		CorpusMetadataMappingModel.findOne<CorpusMetadataMappingDocument>({
+		ensureDefaultCorpusMetadataMapping({
 			noske: input.noske,
 			corpus: input.corpus,
 			semantic: input.semantic,
-			scope: "default",
 		}),
 	]);
 

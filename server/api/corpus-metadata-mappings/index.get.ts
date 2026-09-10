@@ -2,6 +2,7 @@ import { defineEventHandler, getQuery } from "h3";
 
 import { CorpusMetadataMappingModel } from "~/server/models/corpusmetadatamappings.schema";
 import {
+	ensureDefaultCorpusMetadataMapping,
 	isSemantic,
 	resolveCorpusMetadataMapping,
 	serializeCorpusMetadataMapping,
@@ -26,6 +27,7 @@ export default defineEventHandler(async (event) => {
 	}
 
 	if (scope === "all") {
+		await ensureDefaultCorpusMetadataMapping({ noske: noske._id, corpus, semantic });
 		const mappings = await CorpusMetadataMappingModel.find({
 			noske: noske._id,
 			corpus,

@@ -3,6 +3,8 @@ import { resolve } from "node:path";
 
 import mongoose from "mongoose";
 
+import { seedAmcPublicMappings } from "./migrations/amc-public-mappings.ts";
+
 type MongoDatabase = NonNullable<mongoose.Connection["db"]>;
 
 interface Migration {
@@ -41,7 +43,9 @@ function requireDatabaseUrl() {
 	return value;
 }
 
-const migrations: Array<Migration> = [];
+const migrations: Array<Migration> = [
+	{ id: "2026-09-10-amc-public-mappings", up: seedAmcPublicMappings },
+];
 
 async function main() {
 	await mongoose.connect(requireDatabaseUrl());
