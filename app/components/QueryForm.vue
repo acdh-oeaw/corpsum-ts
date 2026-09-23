@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useForm } from "@tanstack/vue-form";
+import { Loader2 } from "lucide-vue-next";
 
 import { type QueryExecutionInput, getQueryExecutionFingerprint } from "@/lib/query-execution";
 import type { components } from "~/lib/noske-types";
@@ -39,6 +40,7 @@ const props = withDefaults(
 	defineProps<{
 		noskeInstances: Array<PopulatedNoskeDocument>;
 		isSaving?: boolean;
+		isExecuting?: boolean;
 		submitLabel?: string;
 		initialValues?: Partial<QueryFormValues>;
 		showActions?: boolean;
@@ -47,6 +49,7 @@ const props = withDefaults(
 	}>(),
 	{
 		isSaving: false,
+		isExecuting: false,
 		submitLabel: "Create",
 		initialValues: () => ({}),
 		showActions: true,
@@ -594,8 +597,18 @@ watch(corpusId, (value, previous) => {
 		</div>
 
 		<div v-if="props.showRun || props.showActions" class="flex flex-wrap gap-2">
-			<Button v-if="props.showRun" :disabled="props.isSaving" type="button" @click="execute">
-				<LucideIcon class="mr-1 size-4" name="Play" :stroke-width="2" />
+			<Button
+				v-if="props.showRun"
+				:disabled="props.isSaving || props.isExecuting"
+				type="button"
+				@click="execute"
+			>
+				<Loader2
+					v-if="props.isExecuting"
+					class="mr-1 size-4 animate-spin"
+					:aria-label="t('QueryForm.actions.loading')"
+				/>
+				<LucideIcon v-else class="mr-1 size-4" name="Play" :stroke-width="2" />
 				{{ t("QueryForm.actions.run") }}
 			</Button>
 			<Button v-if="props.showActions" :disabled="props.isSaving" type="submit">

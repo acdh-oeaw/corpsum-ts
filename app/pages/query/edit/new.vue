@@ -71,6 +71,7 @@ const execution = ref<QueryExecutionInput | null>(null);
 const executedFingerprint = ref("");
 const runId = ref(0);
 const resultsAreStale = ref(false);
+const executionLoading = ref(false);
 
 function execute(payload: QueryExecutionInput) {
 	execution.value = cloneQueryExecution(payload);
@@ -143,6 +144,7 @@ function cancel() {
 			:form-id="formId"
 			:initial-values="initialValues"
 			:is-saving="isSaving"
+			:is-executing="executionLoading"
 			:noske-instances="noskeInstances"
 			:show-actions="false"
 			:submit-label="t('Actions.create')"
@@ -156,6 +158,7 @@ function cancel() {
 			:execution="execution"
 			:run-id="runId"
 			:stale="resultsAreStale"
+			@loading-change="executionLoading = $event"
 		/>
 	</MainContent>
 </template>

@@ -38,6 +38,12 @@ const props = withDefaults(
 	},
 );
 
+const emit = defineEmits<{
+	"loading-change": [loading: boolean];
+}>();
+
+const panelsLoading = ref(false);
+
 const t = useTranslations();
 const locale = useLocale();
 const localeRoute = useLocaleRoute();
@@ -67,6 +73,18 @@ const corpusInfoDescriptors = computed<Array<NoskeCorpusInfoQueryDescriptor>>(()
 	},
 ]);
 const corpusInfoResults = useNoskeCorpusInfoQueries(corpusInfoDescriptors);
+const corpusInfoLoading = computed(() =>
+	corpusInfoResults.value.some(
+		(result) =>
+			result &&
+			!result.isError &&
+			(result.data === undefined || result.isPending || result.isFetching || result.isLoading),
+	),
+);
+const executionLoading = computed(() => panelsLoading.value || corpusInfoLoading.value);
+
+watch(executionLoading, (value) => emit("loading-change", value), { immediate: true });
+
 const kwicReady = computed(() => {
 	const result = corpusInfoResults.value[0];
 	return Boolean(result && (!result.isPending || result.data !== undefined));
@@ -240,6 +258,7 @@ async function saveVisualization() {
 				:queries="corpusQueries"
 				:selected-types="selectedTypes"
 				:settings="settingsByType"
+				@loading-change="panelsLoading = $event"
 				@update:settings="updatePanelSettings"
 			/>
 			<template #fallback>
