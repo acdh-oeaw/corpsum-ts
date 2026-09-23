@@ -2,6 +2,7 @@
 import { useForm } from "@tanstack/vue-form";
 import { Loader2 } from "lucide-vue-next";
 
+import FacettingCopyDialog from "@/components/facetting/facetting-copy-dialog.vue";
 import { type QueryExecutionInput, getQueryExecutionFingerprint } from "@/lib/query-execution";
 import type { components } from "~/lib/noske-types";
 import type { PopulatedNoskeDocument } from "~/server/api/noskeinstances.get.ts";
@@ -46,6 +47,7 @@ const props = withDefaults(
 		showActions?: boolean;
 		showRun?: boolean;
 		formId?: string;
+		currentQueryId?: string;
 	}>(),
 	{
 		isSaving: false,
@@ -55,6 +57,7 @@ const props = withDefaults(
 		showActions: true,
 		showRun: true,
 		formId: undefined,
+		currentQueryId: undefined,
 	},
 );
 
@@ -218,6 +221,7 @@ const corpusId = form.useStore((state) => state.values.corpus);
 const userInput = form.useStore((state) => state.values.userInput);
 const facettingValuesText = form.useStore((state) => state.values.facettingValuesText);
 const facettingModalOpen = ref(false);
+const facettingCopyDialogOpen = ref(false);
 const { useNoskeQuery } = useNoskeClient(noskeId);
 const corporaQuery = useNoskeQuery<Array<CorporaListItem>>({
 	queryKey: computed(() => ["noske-corpora", noskeId.value]),
@@ -526,15 +530,28 @@ watch(corpusId, (value, previous) => {
 							<label class="text-sm font-medium" for="facettingValues">
 								{{ t("QueryForm.labels.facettingValues") }}
 							</label>
-							<Button
-								:disabled="props.isSaving || !noskeId || !corpusId"
-								size="sm"
-								type="button"
-								variant="outline"
-								@click="facettingModalOpen = true"
-							>
-								{{ t("QueryForm.actions.editFacetting") }}
-							</Button>
+							<div class="flex flex-wrap justify-end gap-2">
+								<Button
+									:disabled="props.isSaving || !noskeId || !corpusId"
+									size="sm"
+									type="button"
+									variant="outline"
+									@click="facettingModalOpen = true"
+								>
+									<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+									{{ t("QueryForm.actions.editFacetting") }}
+								</Button>
+								<Button
+									:disabled="props.isSaving || !noskeId || !corpusId"
+									size="sm"
+									type="button"
+									variant="outline"
+									@click="facettingCopyDialogOpen = true"
+								>
+									<LucideIcon class="mr-1 size-4" name="Copy" :stroke-width="2" />
+									{{ t("QueryForm.actions.copyFacetting") }}
+								</Button>
+							</div>
 						</div>
 						<div
 							id="facettingValues"
@@ -582,6 +599,16 @@ watch(corpusId, (value, previous) => {
 								(value) => field.handleChange(JSON.stringify(cleanFacettingValues(value), null, 2))
 							"
 							@update:open="facettingModalOpen = $event"
+						/>
+						<FacettingCopyDialog
+							v-if="facettingCopyDialogOpen"
+							:current-query-id="props.currentQueryId"
+							:open="facettingCopyDialogOpen"
+							:query="{ noske: noskeId, corpus: corpusId }"
+							@update:model-value="
+								(value) => field.handleChange(JSON.stringify(cleanFacettingValues(value), null, 2))
+							"
+							@update:open="facettingCopyDialogOpen = $event"
 						/>
 						<p
 							v-if="hasError(state)"
