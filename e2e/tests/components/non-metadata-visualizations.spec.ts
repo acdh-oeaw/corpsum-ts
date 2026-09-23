@@ -5,6 +5,7 @@ import Collocations from "@/components/data-display/data-display-collocations.vu
 import KeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
 import WordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
 import PublishedVisualizationRenderer from "@/components/published/published-visualization-renderer.vue";
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
 import {
 	createKwicRequestOptionParams,
 	getKwicAuthoritativeOptions,
@@ -203,6 +204,15 @@ async function routeConcordanceResponses(page: Page, failedNoskes: Array<string>
 }
 
 test.describe("non-metadata visualization contracts", () => {
+	test("shows the pending query status in the visualization body", async ({ mount }) => {
+		const component = await mount(QueryDataStatusList, {
+			props: { errors: [null], loading: [true], queries: [queries[0]!] },
+		});
+		await expect(component.getByTestId("query-display")).toHaveAttribute("data-loading", "true");
+		await component.update({ props: { errors: [null], loading: [false], queries: [queries[0]!] } });
+		await expect(component.getByTestId("query-display")).toHaveAttribute("data-loading", "false");
+	});
+
 	test("routes word-form requests per query and keeps a partial failure aligned", async ({
 		mount,
 		page,
