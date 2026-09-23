@@ -156,6 +156,7 @@
 	"QueryForm": {
 		"actions": {
 			"cancel": "Cancel",
+			"copyFacetting": "Copy from",
 			"editFacetting": "Edit",
 			"loading": "Loading query data",
 			"run": "Run query"
@@ -189,6 +190,20 @@
 			"required": "{label} is required."
 		},
 		"copyName": "Copied from {name}"
+	},
+	"FacettingCopy": {
+		"actions": {
+			"confirm": "Overwrite values"
+		},
+		"description": "Select a saved query using the same NoSketch instance and corpus.",
+		"messages": {
+			"empty": "No matching saved queries found.",
+			"error": "The saved queries could not be loaded.",
+			"loading": "Loading saved queries..."
+		},
+		"overwriteDescription": "All currently configured facetting values will be overwritten with the values from this query.",
+		"overwriteTitle": "Overwrite facetting values?",
+		"title": "Copy facetting values"
 	},
 	"QueryVisualizationPreview": {
 		"defaultName": "{name} visualization",
@@ -420,6 +435,7 @@
 		"description": "Compare query frequencies over time.",
 		"errors": {
 			"automaticRangeTooLarge": "The automatic date range contains too many buckets. Choose a coarser time unit or a custom range.",
+			"invalidMappingRegex": "The temporal metadata mapping contains an invalid regular expression.",
 			"invalidRange": "The exclusive end date must be later than the start date.",
 			"loadFailed": "The temporal frequency data could not be loaded."
 		},
@@ -502,11 +518,90 @@
 			"sourceData": "Show or hide the source data table."
 		}
 	},
+	"Navigation": {
+		"platformFunctions": "Platform functions",
+		"settings": "Settings",
+		"colorScheme": "Color scheme",
+		"language": "Language",
+		"imprint": "Imprint",
+		"publishedPanels": "Published panels",
+		"noSketchEngines": "NoSketch engines"
+	},
+	"UserMenu": {
+		"notYet": "Not yet available",
+		"start": "Start",
+		"accountSettings": "Account settings",
+		"credentialManagement": "Credential management",
+		"logOut": "Log out"
+	},
+	"NoskeInstanceDetail": {
+		"availableCorpora": "Available corpora",
+		"loadingCorpora": "Loading corpora...",
+		"createQuery": "Create query",
+		"emptyCorpora": "No corpora found for this instance."
+	},
+	"QueryDetail": {
+		"owners": "Owners",
+		"visualizationsUsingQuery": "Visualizations using this query",
+		"action": "Action",
+		"viewVisualization": "View visualization",
+		"emptyVisualizations": "No visualizations yet."
+	},
+	"MetadataMappingEditor": {
+		"title": "Corpus metadata mappings",
+		"selectQuery": "Select a query with a corpus before editing metadata mappings.",
+		"mappingLabel": "{corpus} metadata mapping",
+		"private": "Private",
+		"default": "Default",
+		"missing": "Missing",
+		"savePrivate": "Save private mapping",
+		"saveDefault": "Save default mapping",
+		"saveCopy": "Save private copy",
+		"saving": "Saving...",
+		"saveFailed": "Could not save mapping."
+	},
+	"PublishVisualization": {
+		"publish": "Publish",
+		"title": "Publish visualization",
+		"description": "Create an immutable public snapshot from cached NoSketch results.",
+		"titleLabel": "Title",
+		"descriptionLabel": "Description",
+		"publishedLink": "Published link",
+		"embedSnippet": "Embed snippet",
+		"publishing": "Publishing...",
+		"failed": "Publishing failed.",
+		"missingResults": "Cannot publish yet. {count} cached result(s) are missing; view or refresh the selected visualization panels first."
+	},
+	"PublishedPanelsPage": {
+		"title": "Published panels",
+		"tableTitle": "Title",
+		"state": "State",
+		"published": "Published",
+		"link": "Link",
+		"embed": "Embed",
+		"actions": "Actions",
+		"public": "Public",
+		"hidden": "Hidden",
+		"hide": "Hide",
+		"empty": "No published visualizations yet."
+	},
+	"PublishedVisualizationPage": {
+		"unavailable": "Published visualization unavailable",
+		"noLongerAvailable": "This published visualization is no longer publicly available.",
+		"publishedBy": "Published by {username} on {date}"
+	},
+	"Accessibility": {
+		"refreshNoSketchResult": "Refresh NoSketch result",
+		"close": "Close",
+		"previousSlide": "Previous slide",
+		"nextSlide": "Next slide",
+		"toggleSidebar": "Toggle sidebar"
+	},
+	"Charts": "Charts",
 	"email": "Email",
 	"login": "Log in",
 	"password": "Password",
 	"skip-to-main-content": "Skip to main content",
-	"splashtext": "Summaries at scale for your corpora.",
 	"username": "Username",
 	"Corpsum": {
 		"left": "Left",

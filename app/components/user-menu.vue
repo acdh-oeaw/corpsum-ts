@@ -2,6 +2,7 @@
 import { useSidebar } from "@/components/ui/sidebar";
 
 const auth = useAuth();
+const t = useTranslations();
 
 const { isMobile } = useSidebar();
 
@@ -30,7 +31,7 @@ const logout = async () => {
 						</div>
 						<div class="grid flex-1 text-left text-sm leading-tight">
 							<span class="truncate font-semibold">{{ auth.username }}</span>
-							<span class="truncate text-xs">not yet</span>
+							<span class="truncate text-xs">{{ t("UserMenu.notYet") }}</span>
 						</div>
 						<LucideIcon class="ml-auto size-4" name="ChevronsUpDown" />
 					</SidebarMenuButton>
@@ -46,7 +47,7 @@ const logout = async () => {
 							<LucideIcon class="size-4" name="User" :stroke-width="3" />
 							<div class="grid flex-1 text-left text-sm leading-tight">
 								<span class="truncate font-semibold">{{ auth.username }}</span>
-								<span class="truncate text-xs">not yet</span>
+								<span class="truncate text-xs">{{ t("UserMenu.notYet") }}</span>
 							</div>
 						</div>
 					</DropdownMenuLabel>
@@ -55,24 +56,24 @@ const logout = async () => {
 						<NuxtLinkLocale :href="{ path: '/' }">
 							<DropdownMenuItem>
 								<LucideIcon name="Star" />
-								Start
+								{{ t("UserMenu.start") }}
 							</DropdownMenuItem>
 						</NuxtLinkLocale>
 						<DropdownMenuItem>
 							<LucideIcon name="BadgeCheck" />
-							Account Settings
+							{{ t("UserMenu.accountSettings") }}
 						</DropdownMenuItem>
 						<NuxtLinkLocale :href="{ path: '/credentials' }">
 							<DropdownMenuItem>
 								<LucideIcon name="LockKeyhole" />
-								Credential Management
+								{{ t("UserMenu.credentialManagement") }}
 							</DropdownMenuItem>
 						</NuxtLinkLocale>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem @click="logout">
 						<LucideIcon name="LogOut" />
-						Log out
+						{{ t("UserMenu.logOut") }}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

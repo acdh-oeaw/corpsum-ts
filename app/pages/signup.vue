@@ -147,11 +147,6 @@ onBeforeMount(async () => {
 		<div class="relative h-full flex-col p-10 text-white dark:border-r lg:flex">
 			<div class="absolute inset-0 bg-zinc-900" />
 			<div class="relative text-7xl font-bold">CorpSum</div>
-			<div class="relative mt-auto">
-				<p class="text-lg">
-					{{ t("splashtext") }}
-				</p>
-			</div>
 		</div>
 		<div class="h-full lg:p-4">
 			<div class="flex justify-end">

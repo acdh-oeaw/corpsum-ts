@@ -299,6 +299,9 @@ const temporalFrequenciesLoading = computed(() =>
 const temporalFrequenciesErrors = computed(() =>
 	activeQueries.value.map((_, index) => {
 		const parserError = temporalParsers.value[index]?.error;
+		if (parserError === "invalidMappingRegex") {
+			return t("TemporalFrequencyDistribution.errors.invalidMappingRegex");
+		}
 		if (parserError) return parserError;
 		if (usesProvidedData.value) return null;
 		const result = queryResults.value[index];

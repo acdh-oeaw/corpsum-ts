@@ -177,8 +177,8 @@ async function publishVisualization() {
 		const missing = data?.data?.missing;
 		publishError.value =
 			Array.isArray(missing) && missing.length > 0
-				? `Cannot publish yet. ${missing.length} cached result(s) are missing; view or refresh the selected visualization panels first.`
-				: (data?.message ?? "Publishing failed.");
+				? t("PublishVisualization.missingResults", { count: missing.length })
+				: (data?.message ?? t("PublishVisualization.failed"));
 	} finally {
 		isPublishing.value = false;
 	}
@@ -205,23 +205,25 @@ async function publishVisualization() {
 					<DialogTrigger as-child>
 						<Button size="sm" type="button" variant="ghost">
 							<LucideIcon class="mr-1 size-4" name="Upload" :stroke-width="2" />
-							Publish
+							{{ t("PublishVisualization.publish") }}
 						</Button>
 					</DialogTrigger>
 					<DialogContent>
 						<DialogHeader>
-							<DialogTitle>Publish visualization</DialogTitle>
+							<DialogTitle>{{ t("PublishVisualization.title") }}</DialogTitle>
 							<DialogDescription>
-								Create an immutable public snapshot from cached NoSketch results.
+								{{ t("PublishVisualization.description") }}
 							</DialogDescription>
 						</DialogHeader>
 						<div class="grid gap-4">
 							<div class="grid gap-2">
-								<Label for="published-title">Title</Label>
+								<Label for="published-title">{{ t("PublishVisualization.titleLabel") }}</Label>
 								<Input id="published-title" v-model="publishTitle" :disabled="isPublishing" />
 							</div>
 							<div class="grid gap-2">
-								<Label for="published-description">Description</Label>
+								<Label for="published-description">{{
+									t("PublishVisualization.descriptionLabel")
+								}}</Label>
 								<textarea
 									id="published-description"
 									v-model="publishDescription"
@@ -231,9 +233,9 @@ async function publishVisualization() {
 							</div>
 							<p v-if="publishError" class="text-sm text-destructive">{{ publishError }}</p>
 							<div v-if="publishedUid" class="grid gap-2 rounded-md border bg-muted/40 p-3 text-sm">
-								<p class="font-medium">Published link</p>
+								<p class="font-medium">{{ t("PublishVisualization.publishedLink") }}</p>
 								<a class="break-all underline" :href="publishedLink">{{ publishedLink }}</a>
-								<p class="font-medium">Embed snippet</p>
+								<p class="font-medium">{{ t("PublishVisualization.embedSnippet") }}</p>
 								<code class="whitespace-pre-wrap break-all rounded bg-background p-2 text-xs">{{
 									embedSnippet
 								}}</code>
@@ -244,7 +246,11 @@ async function publishVisualization() {
 								:disabled="isPublishing || !publishTitle.trim()"
 								@click="publishVisualization"
 							>
-								{{ isPublishing ? "Publishing..." : "Publish" }}
+								{{
+									isPublishing
+										? t("PublishVisualization.publishing")
+										: t("PublishVisualization.publish")
+								}}
 							</Button>
 						</DialogFooter>
 					</DialogContent>

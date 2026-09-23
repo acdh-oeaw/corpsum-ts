@@ -2,6 +2,7 @@
 import type { PublishedVisualizationResponse } from "~/server/utils/published-visualization-response";
 
 const env = useRuntimeConfig();
+const t = useTranslations();
 
 const { data: published, refresh } = await useFetch<Array<PublishedVisualizationResponse>>(
 	"/api/published-visualizations",
@@ -39,25 +40,27 @@ async function hide(item: PublishedVisualizationResponse) {
 			<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
 				<LucideIcon class="size-8 text-foreground" name="PanelsTopLeft" :stroke-width="2" />
 			</div>
-			<PageTitle>Published panels</PageTitle>
+			<PageTitle>{{ t("PublishedPanelsPage.title") }}</PageTitle>
 		</div>
 
 		<div class="overflow-x-auto rounded-md border">
 			<Table class="w-full text-sm">
 				<TableHeader>
 					<TableRow>
-						<TableHead>Title</TableHead>
-						<TableHead>State</TableHead>
-						<TableHead>Published</TableHead>
-						<TableHead>Link</TableHead>
-						<TableHead>Embed</TableHead>
-						<TableHead class="text-right">Actions</TableHead>
+						<TableHead>{{ t("PublishedPanelsPage.tableTitle") }}</TableHead>
+						<TableHead>{{ t("PublishedPanelsPage.state") }}</TableHead>
+						<TableHead>{{ t("PublishedPanelsPage.published") }}</TableHead>
+						<TableHead>{{ t("PublishedPanelsPage.link") }}</TableHead>
+						<TableHead>{{ t("PublishedPanelsPage.embed") }}</TableHead>
+						<TableHead class="text-right">{{ t("PublishedPanelsPage.actions") }}</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
 					<TableRow v-for="item in published ?? []" :key="item.uid">
 						<TableCell class="font-medium">{{ item.title }}</TableCell>
-						<TableCell>{{ item.isPublic ? "Public" : "Hidden" }}</TableCell>
+						<TableCell>{{
+							item.isPublic ? t("PublishedPanelsPage.public") : t("PublishedPanelsPage.hidden")
+						}}</TableCell>
 						<TableCell>{{ new Date(item.publishedAt).toLocaleDateString() }}</TableCell>
 						<TableCell>
 							<a class="break-all underline" :href="publicLink(item.uid)">{{
@@ -78,13 +81,13 @@ async function hide(item: PublishedVisualizationResponse) {
 								variant="outline"
 								@click="hide(item)"
 							>
-								Hide
+								{{ t("PublishedPanelsPage.hide") }}
 							</Button>
 						</TableCell>
 					</TableRow>
 					<TableRow v-if="(published ?? []).length === 0">
 						<TableCell class="text-muted-foreground" colspan="6">
-							No published visualizations yet.
+							{{ t("PublishedPanelsPage.empty") }}
 						</TableCell>
 					</TableRow>
 				</TableBody>

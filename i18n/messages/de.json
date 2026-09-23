@@ -156,6 +156,7 @@
 	"QueryForm": {
 		"actions": {
 			"cancel": "Abbrechen",
+			"copyFacetting": "Kopieren von",
 			"editFacetting": "Bearbeiten",
 			"loading": "Abfragedaten werden geladen",
 			"run": "Abfrage ausführen"
@@ -189,6 +190,20 @@
 			"required": "{label} ist erforderlich."
 		},
 		"copyName": "Kopiert von {name}"
+	},
+	"FacettingCopy": {
+		"actions": {
+			"confirm": "Werte überschreiben"
+		},
+		"description": "Wählen Sie eine gespeicherte Abfrage mit derselben NoSketch-Instanz und demselben Korpus.",
+		"messages": {
+			"empty": "Keine passenden gespeicherten Abfragen gefunden.",
+			"error": "Die gespeicherten Abfragen konnten nicht geladen werden.",
+			"loading": "Gespeicherte Abfragen werden geladen..."
+		},
+		"overwriteDescription": "Alle derzeit konfigurierten Facettierungswerte werden mit den Werten dieser Abfrage überschrieben.",
+		"overwriteTitle": "Facettierungswerte überschreiben?",
+		"title": "Facettierungswerte kopieren"
 	},
 	"QueryVisualizationPreview": {
 		"defaultName": "Visualisierung für {name}",
@@ -312,12 +327,12 @@
 		"emptySections": "Noch keine Visualisierungen hinzugefügt.",
 		"card": {
 			"queryCount": "Abfragen",
-			"visualizationCount": "Charts"
+			"visualizationCount": "Diagramme"
 		},
 		"table": {
 			"name": "Name",
 			"queryCount": "Abfragen",
-			"visualizationCount": "Charts",
+			"visualizationCount": "Diagramme",
 			"actions": "Aktionen"
 		}
 	},
@@ -420,6 +435,7 @@
 		"description": "Vergleicht die Abfragefrequenzen im Zeitverlauf.",
 		"errors": {
 			"automaticRangeTooLarge": "Der automatische Datumsbereich enthält zu viele Intervalle. Wählen Sie eine gröbere Zeiteinheit oder einen eigenen Bereich.",
+			"invalidMappingRegex": "Die zeitliche Metadatenzuordnung enthält einen ungültigen regulären Ausdruck.",
 			"invalidRange": "Das exklusive Enddatum muss nach dem Startdatum liegen.",
 			"loadFailed": "Die zeitlichen Frequenzdaten konnten nicht geladen werden."
 		},
@@ -502,11 +518,90 @@
 			"sourceData": "Die Quelldatentabelle ein- oder ausblenden."
 		}
 	},
+	"Navigation": {
+		"platformFunctions": "Funktionen",
+		"settings": "Einstellungen",
+		"colorScheme": "Farbschema",
+		"language": "Sprache",
+		"imprint": "Impressum",
+		"publishedPanels": "Veröffentlichte Panels",
+		"noSketchEngines": "NoSketch-Engines"
+	},
+	"UserMenu": {
+		"notYet": "Noch nicht verfügbar",
+		"start": "Startseite",
+		"accountSettings": "Kontoeinstellungen",
+		"credentialManagement": "Zugangsdatenverwaltung",
+		"logOut": "Abmelden"
+	},
+	"NoskeInstanceDetail": {
+		"availableCorpora": "Verfügbare Korpora",
+		"loadingCorpora": "Korpora werden geladen ...",
+		"createQuery": "Abfrage erstellen",
+		"emptyCorpora": "Für diese Instanz wurden keine Korpora gefunden."
+	},
+	"QueryDetail": {
+		"owners": "Eigentümer",
+		"visualizationsUsingQuery": "Visualisierungen mit dieser Abfrage",
+		"action": "Aktion",
+		"viewVisualization": "Visualisierung ansehen",
+		"emptyVisualizations": "Noch keine Visualisierungen vorhanden."
+	},
+	"MetadataMappingEditor": {
+		"title": "Korpus-Metadatenzuordnungen",
+		"selectQuery": "Wählen Sie eine Abfrage mit Korpus aus, bevor Sie Metadatenzuordnungen bearbeiten.",
+		"mappingLabel": "Metadatenzuordnung für {corpus}",
+		"private": "Privat",
+		"default": "Standard",
+		"missing": "Fehlt",
+		"savePrivate": "Private Zuordnung speichern",
+		"saveDefault": "Standardzuordnung speichern",
+		"saveCopy": "Private Kopie speichern",
+		"saving": "Wird gespeichert ...",
+		"saveFailed": "Die Zuordnung konnte nicht gespeichert werden."
+	},
+	"PublishVisualization": {
+		"publish": "Veröffentlichen",
+		"title": "Visualisierung veröffentlichen",
+		"description": "Erstellen Sie einen unveränderlichen öffentlichen Snapshot aus den zwischengespeicherten NoSketch-Ergebnissen.",
+		"titleLabel": "Titel",
+		"descriptionLabel": "Beschreibung",
+		"publishedLink": "Veröffentlichter Link",
+		"embedSnippet": "Einbettungscode",
+		"publishing": "Wird veröffentlicht ...",
+		"failed": "Veröffentlichen fehlgeschlagen.",
+		"missingResults": "Die Veröffentlichung ist noch nicht möglich. Es fehlen {count} zwischengespeicherte Ergebnisse. Öffnen oder aktualisieren Sie zuerst die ausgewählten Visualisierungspanels."
+	},
+	"PublishedPanelsPage": {
+		"title": "Veröffentlichte Panels",
+		"tableTitle": "Titel",
+		"state": "Status",
+		"published": "Veröffentlicht",
+		"link": "Link",
+		"embed": "Einbettung",
+		"actions": "Aktionen",
+		"public": "Öffentlich",
+		"hidden": "Ausgeblendet",
+		"hide": "Ausblenden",
+		"empty": "Noch keine veröffentlichten Visualisierungen vorhanden."
+	},
+	"PublishedVisualizationPage": {
+		"unavailable": "Veröffentlichte Visualisierung nicht verfügbar",
+		"noLongerAvailable": "Diese veröffentlichte Visualisierung ist nicht mehr öffentlich verfügbar.",
+		"publishedBy": "Veröffentlicht von {username} am {date}"
+	},
+	"Accessibility": {
+		"refreshNoSketchResult": "NoSketch-Ergebnis aktualisieren",
+		"close": "Schließen",
+		"previousSlide": "Vorherige Folie",
+		"nextSlide": "Nächste Folie",
+		"toggleSidebar": "Seitenleiste umschalten"
+	},
+	"Charts": "Diagramme",
 	"email": "E-Mail",
 	"login": "Anmelden",
 	"password": "Passwort",
 	"skip-to-main-content": "Zum Hauptinhalt springen",
-	"splashtext": "Zusammenfassungen im Großen fuer Ihre Korpora.",
 	"username": "Benutzername",
 	"Corpsum": {
 		"left": "Links",

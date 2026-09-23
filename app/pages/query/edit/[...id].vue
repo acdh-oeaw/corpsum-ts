@@ -133,6 +133,7 @@ function cancel() {
 		</p>
 		<QueryForm
 			v-if="isOwner"
+			:current-query-id="queryId"
 			:form-id="formId"
 			:initial-values="initialValues"
 			:is-saving="isSaving"

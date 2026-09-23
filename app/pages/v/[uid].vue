@@ -13,6 +13,7 @@ useHead({
 });
 
 const route = useRoute();
+const t = useTranslations();
 const uid = computed(() => {
 	const value = route.params.uid;
 	return Array.isArray(value) ? value[0] : value;
@@ -33,9 +34,9 @@ const publicSnapshot = computed(() => {
 <template>
 	<MainContent class="w-full min-w-0 py-8">
 		<div v-if="isTombstone" class="mx-auto grid max-w-3xl gap-3">
-			<PageTitle>{{ snapshot?.title ?? "Published visualization unavailable" }}</PageTitle>
+			<PageTitle>{{ snapshot?.title ?? t("PublishedVisualizationPage.unavailable") }}</PageTitle>
 			<p class="text-muted-foreground">
-				This published visualization is no longer publicly available.
+				{{ t("PublishedVisualizationPage.noLongerAvailable") }}
 			</p>
 		</div>
 
@@ -49,21 +50,25 @@ const publicSnapshot = computed(() => {
 					{{ publicSnapshot.description }}
 				</p>
 				<p class="text-sm text-muted-foreground">
-					Published by {{ publicSnapshot.publisherUsername }} on
-					{{ new Date(publicSnapshot.publishedAt).toLocaleDateString() }}
+					{{
+						t("PublishedVisualizationPage.publishedBy", {
+							username: publicSnapshot.publisherUsername,
+							date: new Date(publicSnapshot.publishedAt).toLocaleDateString(),
+						})
+					}}
 				</p>
 			</header>
 
 			<section class="grid gap-3">
-				<h2 class="text-lg font-semibold">Queries</h2>
+				<h2 class="text-lg font-semibold">{{ t("QueriesPage.title") }}</h2>
 				<div class="overflow-x-auto rounded-md border">
 					<table class="w-full text-sm">
 						<thead>
 							<tr class="border-b bg-muted/40 text-left">
-								<th class="px-3 py-2">Corpus</th>
-								<th class="px-3 py-2">Subcorpus</th>
-								<th class="px-3 py-2">Type</th>
-								<th class="px-3 py-2">Input</th>
+								<th class="px-3 py-2">{{ t("QueryCard.corpus") }}</th>
+								<th class="px-3 py-2">{{ t("QueryCard.subCorpus") }}</th>
+								<th class="px-3 py-2">{{ t("QueryCard.type") }}</th>
+								<th class="px-3 py-2">{{ t("QueryCard.input") }}</th>
 							</tr>
 						</thead>
 						<tbody>

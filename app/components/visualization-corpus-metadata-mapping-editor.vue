@@ -8,6 +8,7 @@ const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	semantic: CorpusMetadataSemantic;
 }>();
+const t = useTranslations();
 
 const emit = defineEmits<{
 	updated: [];
@@ -56,9 +57,9 @@ function createMappingDraft(lookup: CorpusMetadataMappingLookupResponse | undefi
 
 function getMappingActionLabel(query: CorpusQuery) {
 	const lookup = mappingLookupsByKey.value[createCorpusMetadataMappingKey(query, props.semantic)];
-	if (lookup?.user) return "Save private mapping";
-	if (lookup?.canEditDefault) return "Save default mapping";
-	return "Save private copy";
+	if (lookup?.user) return t("MetadataMappingEditor.savePrivate");
+	if (lookup?.canEditDefault) return t("MetadataMappingEditor.saveDefault");
+	return t("MetadataMappingEditor.saveCopy");
 }
 
 async function saveMapping(query: CorpusQuery, forceUserCopy = false) {
@@ -98,7 +99,7 @@ async function saveMapping(query: CorpusQuery, forceUserCopy = false) {
 	} catch (error) {
 		mappingErrors.value = {
 			...mappingErrors.value,
-			[key]: error instanceof Error ? error.message : "Could not save mapping.",
+			[key]: error instanceof Error ? error.message : t("MetadataMappingEditor.saveFailed"),
 		};
 	} finally {
 		mappingSaving.value = { ...mappingSaving.value, [key]: false };
@@ -121,12 +122,12 @@ function hasUserMapping(query: CorpusQuery) {
 <template>
 	<div class="grid gap-3 rounded-md border p-3">
 		<div>
-			<p class="text-sm font-medium">Corpus metadata mappings</p>
+			<p class="text-sm font-medium">{{ t("MetadataMappingEditor.title") }}</p>
 			<p class="text-xs text-muted-foreground">{{ semantic }}</p>
 		</div>
 
 		<p v-if="uniqueMappingQueries.length === 0" class="text-sm text-muted-foreground">
-			Select a query with a corpus before editing metadata mappings.
+			{{ t("MetadataMappingEditor.selectQuery") }}
 		</p>
 
 		<div
@@ -136,12 +137,12 @@ function hasUserMapping(query: CorpusQuery) {
 		>
 			<div class="flex flex-wrap items-center justify-between gap-2">
 				<Label :for="`mapping-${createCorpusMetadataMappingKey(query, semantic)}`">
-					{{ query.corpus }} metadata mapping
+					{{ t("MetadataMappingEditor.mappingLabel", { corpus: query.corpus }) }}
 				</Label>
 				<div class="flex flex-wrap gap-1 text-xs text-muted-foreground">
-					<span v-if="hasUserMapping(query)">Private</span>
-					<span v-else-if="hasDefaultMapping(query)">Default</span>
-					<span v-else>Missing</span>
+					<span v-if="hasUserMapping(query)">{{ t("MetadataMappingEditor.private") }}</span>
+					<span v-else-if="hasDefaultMapping(query)">{{ t("MetadataMappingEditor.default") }}</span>
+					<span v-else>{{ t("MetadataMappingEditor.missing") }}</span>
 				</div>
 			</div>
 			<textarea
@@ -165,7 +166,7 @@ function hasUserMapping(query: CorpusQuery) {
 				>
 					{{
 						mappingSaving[createCorpusMetadataMappingKey(query, semantic)]
-							? "Saving..."
+							? t("MetadataMappingEditor.saving")
 							: getMappingActionLabel(query)
 					}}
 				</Button>
@@ -177,7 +178,7 @@ function hasUserMapping(query: CorpusQuery) {
 					variant="outline"
 					@click="saveMapping(query, true)"
 				>
-					Save private copy
+					{{ t("MetadataMappingEditor.saveCopy") }}
 				</Button>
 			</div>
 		</div>

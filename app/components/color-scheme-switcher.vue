@@ -2,13 +2,14 @@
 import { colorSchemes } from "@/config/colorSchemes.config";
 
 const colorMode = useColorMode();
+const t = useTranslations();
 </script>
 
 <template>
 	<ClientOnly>
-		<Select v-model="colorMode.preference" aria-label="Select Color Scheme">
+		<Select v-model="colorMode.preference" :aria-label="t('ColorSchemeToggle.change-color-scheme')">
 			<SelectTrigger class="w-16">
-				<SelectValue placeholder="Select Color Scheme" />
+				<SelectValue :placeholder="t('ColorSchemeToggle.change-color-scheme')" />
 			</SelectTrigger>
 			<SelectContent>
 				<SelectGroup>

@@ -66,7 +66,7 @@ function formatCacheDate(value: string) {
 			@click="refreshQuery"
 		>
 			<RefreshCw class="size-4" />
-			<span class="sr-only">Refresh NoSketch result</span>
+			<span class="sr-only">{{ t("Accessibility.refreshNoSketchResult") }}</span>
 		</Button>
 	</div>
 </template>

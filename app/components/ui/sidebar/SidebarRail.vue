@@ -8,13 +8,14 @@ import { useSidebar } from "./utils";
 const props = defineProps<{
 	class?: HTMLAttributes["class"];
 }>();
+const t = useTranslations();
 
 const { toggleSidebar } = useSidebar();
 </script>
 
 <template>
 	<button
-		aria-label="Toggle Sidebar"
+		:aria-label="t('Accessibility.toggleSidebar')"
 		:class="
 			cn(
 				'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex',
@@ -28,7 +29,7 @@ const { toggleSidebar } = useSidebar();
 		"
 		data-sidebar="rail"
 		:tabindex="-1"
-		title="Toggle Sidebar"
+		:title="t('Accessibility.toggleSidebar')"
 		@click="toggleSidebar"
 	>
 		<slot />

@@ -115,11 +115,21 @@ const copyQueryParams = computed(() => {
 		</div>
 		<div class="grid gap-6 lg:grid-cols-2">
 			<div class="flex flex-col gap-3">
-				<p><span class="text-xs">Type:</span> {{ query.type }}</p>
-				<p><span class="text-xs">Corpus:</span> {{ query.corpus }}</p>
-				<p><span class="text-xs">Sub corpus:</span> {{ query.subCorpus }}</p>
-				<p><span class="text-xs">NoSketch Engine:</span> {{ query.noske }}</p>
-				<p><span class="text-xs">Owners:</span> {{ ownerNames.join(", ") }}</p>
+				<p>
+					<span class="text-xs">{{ t("QueryCard.type") }}:</span> {{ query.type }}
+				</p>
+				<p>
+					<span class="text-xs">{{ t("QueryCard.corpus") }}:</span> {{ query.corpus }}
+				</p>
+				<p>
+					<span class="text-xs">{{ t("QueryCard.subCorpus") }}:</span> {{ query.subCorpus }}
+				</p>
+				<p>
+					<span class="text-xs">{{ t("QueryForm.labels.noske") }}:</span> {{ query.noske }}
+				</p>
+				<p>
+					<span class="text-xs">{{ t("QueryDetail.owners") }}:</span> {{ ownerNames.join(", ") }}
+				</p>
 				<p>
 					<span class="text-xs">{{ t("Common.createdAt") }}:</span>
 					{{ formatDate(query.createdAt) }}
@@ -131,10 +141,10 @@ const copyQueryParams = computed(() => {
 			</div>
 			<div class="flex flex-col gap-4">
 				<p v-if="query.type !== 'cqlrow'">
-					<span class="text-xs">Input:</span> {{ query.userInput }}
+					<span class="text-xs">{{ t("QueryCard.input") }}:</span> {{ query.userInput }}
 				</p>
 				<div v-else class="grid gap-2">
-					<p class="text-xs">Input:</p>
+					<p class="text-xs">{{ t("QueryCard.input") }}:</p>
 					<CqlPrettyPrint :query="query.userInput" />
 				</div>
 				<div class="grid gap-2">
@@ -175,14 +185,16 @@ const copyQueryParams = computed(() => {
 			</div>
 		</div>
 		<div class="mt-8 grid gap-2">
-			<h2 class="text-lg font-semibold">Visualizations using this query</h2>
+			<h2 class="text-lg font-semibold">{{ t("QueryDetail.visualizationsUsingQuery") }}</h2>
 			<div class="w-full overflow-hidden rounded-md border">
 				<table class="min-w-full text-sm">
 					<thead class="bg-muted/40 text-left">
 						<tr>
-							<th class="px-3 py-2 font-medium">Visualization</th>
-							<th class="px-3 py-2 font-medium">Charts</th>
-							<th class="px-3 py-2 text-right font-medium">Action</th>
+							<th class="px-3 py-2 font-medium">{{ t("VisualizationsPage.table.name") }}</th>
+							<th class="px-3 py-2 font-medium">
+								{{ t("VisualizationsPage.table.visualizationCount") }}
+							</th>
+							<th class="px-3 py-2 text-right font-medium">{{ t("QueryDetail.action") }}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -196,14 +208,14 @@ const copyQueryParams = computed(() => {
 							<td class="px-3 py-2 text-right">
 								<Button as-child size="sm" variant="outline">
 									<NuxtLinkLocale :href="{ path: `/visualization/${visualization._id}` }">
-										View visualization
+										{{ t("QueryDetail.viewVisualization") }}
 									</NuxtLinkLocale>
 								</Button>
 							</td>
 						</tr>
 						<tr v-if="queryVisualizations.length === 0">
 							<td class="px-3 py-2 text-sm text-muted-foreground" colspan="3">
-								No visualizations yet.
+								{{ t("QueryDetail.emptyVisualizations") }}
 							</td>
 						</tr>
 					</tbody>

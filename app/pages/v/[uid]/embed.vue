@@ -13,6 +13,7 @@ useHead({
 });
 
 const route = useRoute();
+const t = useTranslations();
 const uid = computed(() => {
 	const value = route.params.uid;
 	return Array.isArray(value) ? value[0] : value;
@@ -33,7 +34,7 @@ const publicSnapshot = computed(() => {
 <template>
 	<div class="w-full min-w-0 p-3">
 		<div v-if="isTombstone" class="rounded-md border p-4 text-sm text-muted-foreground">
-			This published visualization is no longer publicly available.
+			{{ t("PublishedVisualizationPage.noLongerAvailable") }}
 		</div>
 		<PublishedVisualizationRenderer v-else-if="publicSnapshot" embed :snapshot="publicSnapshot" />
 	</div>

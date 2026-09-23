@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 const props = defineProps<DialogContentProps & { class?: HTMLAttributes["class"] }>();
 const emits = defineEmits<DialogContentEmits>();
+const t = useTranslations();
 
 const delegatedProps = reactiveOmit(props, "class");
 
@@ -54,7 +55,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
 					class="absolute right-4 top-4 rounded-md p-0.5 transition-colors hover:bg-secondary"
 				>
 					<X class="size-4" />
-					<span class="sr-only">Close</span>
+					<span class="sr-only">{{ t("Accessibility.close") }}</span>
 				</DialogClose>
 			</DialogContent>
 		</DialogOverlay>

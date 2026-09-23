@@ -136,7 +136,7 @@ export function createTemporalFrequencyParser(
 	if (mapping.parser.mode === "regex" && !expression) {
 		return {
 			parse: () => null,
-			error: "The temporal metadata mapping contains an invalid regular expression.",
+			error: "invalidMappingRegex",
 		};
 	}
 

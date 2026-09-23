@@ -8,6 +8,7 @@ import type { WithClassAsProps } from "./interface";
 import { useCarousel } from "./useCarousel";
 
 const props = defineProps<WithClassAsProps>();
+const t = useTranslations();
 
 const { orientation, canScrollNext, scrollNext } = useCarousel();
 </script>
@@ -29,7 +30,7 @@ const { orientation, canScrollNext, scrollNext } = useCarousel();
 	>
 		<slot>
 			<ArrowRight class="size-4 text-current" />
-			<span class="sr-only">Next Slide</span>
+			<span class="sr-only">{{ t("Accessibility.nextSlide") }}</span>
 		</slot>
 	</Button>
 </template>

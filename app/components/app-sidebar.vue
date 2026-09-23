@@ -6,32 +6,33 @@ import { locales } from "@/config/i18n.config";
 const NavItems = [
 	{
 		icon: "Database",
-		tooltip: "NoSketch Engines",
+		tooltip: "Navigation.noSketchEngines",
 		href: "/noskeinstances",
 	},
 	{
 		icon: "Book",
-		tooltip: "Corpora",
+		tooltip: "CorporaPage.title",
 		href: "/corpora",
 	},
 	{
 		icon: "Terminal",
-		tooltip: "Queries",
+		tooltip: "QueriesPage.title",
 		href: "/queries",
 	},
 	{
 		icon: "ChartLine",
-		tooltip: "Visualizations",
+		tooltip: "VisualizationsPage.title",
 		href: "/visualizations",
 	},
 	{
 		icon: "LayoutPanelTop",
-		tooltip: "Published Panels",
+		tooltip: "Navigation.publishedPanels",
 		href: "/publishedpanels",
 	},
 ];
 
 const colorMode = useColorMode();
+const t = useTranslations();
 
 const currentLocale = useLocale();
 
@@ -52,14 +53,14 @@ const { isMobile } = useSidebar();
 		</SidebarHeader>
 		<SidebarContent>
 			<SidebarGroup>
-				<SidebarGroupLabel>Platform Functions</SidebarGroupLabel>
+				<SidebarGroupLabel>{{ t("Navigation.platformFunctions") }}</SidebarGroupLabel>
 				<SidebarGroupContent>
 					<SidebarMenu>
 						<SidebarMenuItem v-for="(item, index) in NavItems" :key="index">
-							<SidebarMenuButton as-child :tooltip="item.tooltip">
+							<SidebarMenuButton as-child :tooltip="t(item.tooltip)">
 								<NuxtLinkLocale :href="{ path: item.href }">
 									<LucideIcon :name="item.icon" :stroke-width="2" />
-									<span>{{ item.tooltip }}</span>
+									<span>{{ t(item.tooltip) }}</span>
 								</NuxtLinkLocale>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
@@ -67,15 +68,15 @@ const { isMobile } = useSidebar();
 				</SidebarGroupContent>
 			</SidebarGroup>
 			<SidebarGroup class="mt-auto">
-				<SidebarGroupLabel>Settings</SidebarGroupLabel>
+				<SidebarGroupLabel>{{ t("Navigation.settings") }}</SidebarGroupLabel>
 				<SidebarGroupContent>
 					<SidebarMenu>
 						<SidebarMenuItem>
 							<DropdownMenu>
 								<DropdownMenuTrigger>
-									<SidebarMenuButton tooltip="Color Scheme">
+									<SidebarMenuButton :tooltip="t('Navigation.colorScheme')">
 										<LucideIcon name="Eclipse" :stroke-width="2" />
-										<span>Color Scheme</span>
+										<span>{{ t("Navigation.colorScheme") }}</span>
 									</SidebarMenuButton>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
@@ -101,9 +102,9 @@ const { isMobile } = useSidebar();
 						<SidebarMenuItem>
 							<DropdownMenu>
 								<DropdownMenuTrigger>
-									<SidebarMenuButton tooltip="Language">
+									<SidebarMenuButton :tooltip="t('Navigation.language')">
 										<LucideIcon name="Globe" :stroke-width="2" />
-										<span>Language</span>
+										<span>{{ t("Navigation.language") }}</span>
 									</SidebarMenuButton>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent
@@ -124,10 +125,10 @@ const { isMobile } = useSidebar();
 					</SidebarMenu>
 					<SidebarMenu>
 						<SidebarMenuItem>
-							<SidebarMenuButton as-child tooltip="Imprint">
+							<SidebarMenuButton as-child :tooltip="t('Navigation.imprint')">
 								<NuxtLinkLocale :href="{ path: '/imprint' }">
 									<LucideIcon name="Scale" :stroke-width="2" />
-									<span>Imprint</span>
+									<span>{{ t("Navigation.imprint") }}</span>
 								</NuxtLinkLocale>
 							</SidebarMenuButton>
 						</SidebarMenuItem>

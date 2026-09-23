@@ -10,6 +10,7 @@ import { useSidebar } from "./utils";
 const props = defineProps<{
 	class?: HTMLAttributes["class"];
 }>();
+const t = useTranslations();
 
 const { toggleSidebar } = useSidebar();
 </script>
@@ -23,6 +24,6 @@ const { toggleSidebar } = useSidebar();
 		@click="toggleSidebar"
 	>
 		<PanelLeft />
-		<span class="sr-only">Toggle Sidebar</span>
+		<span class="sr-only">{{ t("Accessibility.toggleSidebar") }}</span>
 	</Button>
 </template>

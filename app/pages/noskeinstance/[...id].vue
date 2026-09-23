@@ -113,17 +113,31 @@ async function deleteInstance() {
 		</div>
 		<div class="mt-4 grid gap-6 lg:grid-cols-2">
 			<div class="flex flex-col gap-3">
-				<p><span class="text-xs">Host:</span> {{ noskeInstance.host }}</p>
-				<p><span class="text-xs">Version:</span> {{ noskeInstance.version }}</p>
-				<p><span class="text-xs">Public:</span> {{ noskeInstance.public ? "Yes" : "No" }}</p>
+				<p>
+					<span class="text-xs">{{ t("NoskeInstanceCard.host") }}:</span> {{ noskeInstance.host }}
+				</p>
+				<p>
+					<span class="text-xs">{{ t("NoskeInstanceCard.version") }}:</span>
+					{{ noskeInstance.version }}
+				</p>
+				<p>
+					<span class="text-xs">{{ t("NoskeInstanceCard.public") }}:</span>
+					{{ noskeInstance.public ? t("Common.yes") : t("Common.no") }}
+				</p>
 				<p>
 					<span class="text-xs">{{ t("Common.createdAt") }}:</span>
 					{{ formatDate(noskeInstance.createdAt) }}
 				</p>
 			</div>
 			<div class="flex flex-col gap-3">
-				<p><span class="text-xs">Authentication:</span> {{ noskeInstance.authentication }}</p>
-				<p><span class="text-xs">Owned by:</span> {{ noskeInstance.owner.username }}</p>
+				<p>
+					<span class="text-xs">{{ t("NoskeInstanceCard.authentication") }}:</span>
+					{{ noskeInstance.authentication }}
+				</p>
+				<p>
+					<span class="text-xs">{{ t("NoskeInstanceCard.ownedBy") }}:</span>
+					{{ noskeInstance.owner.username }}
+				</p>
 				<p>
 					<span class="text-xs">{{ t("Common.updatedAt") }}:</span>
 					{{ formatDate(noskeInstance.updatedAt) }}
@@ -131,17 +145,23 @@ async function deleteInstance() {
 			</div>
 		</div>
 		<div class="mt-8">
-			<h2 class="text-lg font-semibold">Available corpora</h2>
-			<p v-if="corporaPending" class="mt-2 text-sm text-muted-foreground">Loading corpora...</p>
+			<h2 class="text-lg font-semibold">{{ t("NoskeInstanceDetail.availableCorpora") }}</h2>
+			<p v-if="corporaPending" class="mt-2 text-sm text-muted-foreground">
+				{{ t("NoskeInstanceDetail.loadingCorpora") }}
+			</p>
 			<div v-else class="mt-3 overflow-x-auto rounded-md border">
 				<table class="min-w-full text-sm">
 					<thead class="bg-muted/40 text-left">
 						<tr>
-							<th class="px-3 py-2 font-medium">Corpus</th>
-							<th class="px-3 py-2 font-medium">Language</th>
-							<th class="px-3 py-2 text-right font-medium">Words</th>
-							<th class="px-3 py-2 text-right font-medium">Documents</th>
-							<th class="px-3 py-2 text-right font-medium">Create query</th>
+							<th class="px-3 py-2 font-medium">{{ t("CorporaPage.table.corpus") }}</th>
+							<th class="px-3 py-2 font-medium">{{ t("CorporaPage.table.language") }}</th>
+							<th class="px-3 py-2 text-right font-medium">{{ t("CorporaPage.table.words") }}</th>
+							<th class="px-3 py-2 text-right font-medium">
+								{{ t("CorporaPage.table.documents") }}
+							</th>
+							<th class="px-3 py-2 text-right font-medium">
+								{{ t("NoskeInstanceDetail.createQuery") }}
+							</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -174,7 +194,7 @@ async function deleteInstance() {
 						</tr>
 						<tr v-if="corpora.length === 0">
 							<td class="p-3 text-sm text-muted-foreground" colspan="5">
-								No corpora found for this instance.
+								{{ t("NoskeInstanceDetail.emptyCorpora") }}
 							</td>
 						</tr>
 					</tbody>
