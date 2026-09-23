@@ -42,7 +42,7 @@ export async function useCorpusMetadataMappings(
 			.join("|"),
 	);
 
-	const { data, refresh } = await useAsyncData<Array<CorpusMetadataMappingLookupEntry>>(
+	const { data, refresh, status } = await useAsyncData<Array<CorpusMetadataMappingLookupEntry>>(
 		() => `corpus-metadata-mappings:${activeSemantic.value}:${lookupKey.value}`,
 		async () => {
 			const requestFetch = import.meta.server ? (useRequestFetch() as typeof $fetch) : $fetch;
@@ -87,6 +87,7 @@ export async function useCorpusMetadataMappings(
 		mappingsForQueries,
 		missingMappingQueries,
 		refreshMappings: refresh,
+		mappingsStatus: status,
 		uniqueMappingQueries,
 	};
 }

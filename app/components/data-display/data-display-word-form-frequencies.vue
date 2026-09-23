@@ -30,6 +30,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	"update:settings": [settings: WordFormFrequencyVisualizationSettings];
+	"loading-change": [loading: boolean];
 }>();
 
 const t = useTranslations();
@@ -117,7 +118,10 @@ const wordFormFrequencies = computed(() => frequencyData.value.map(parseWordForm
 const wordFormFrequenciesLoading = computed(() =>
 	usesProvidedData.value
 		? queries.value.map(() => false)
-		: queryResults.value.map((result) => result.isFetching || result.isLoading),
+		: queryResults.value.map(
+				(result) =>
+					!result.isError && (result.data === undefined || result.isFetching || result.isLoading),
+			),
 );
 const wordFormFrequencyErrors = computed(() =>
 	queries.value.map((_, index) => {
@@ -192,6 +196,13 @@ const series = computed(() =>
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<QueryDataStatusList
+				:errors="wordFormFrequencyErrors"
+				:loading="wordFormFrequenciesLoading"
+				:queries="queries"
+				@loading-change="emit('loading-change', $event)"
+			/>
 
 			<div v-if="wordFormFrequencyErrors.some(Boolean)" class="space-y-2">
 				<div

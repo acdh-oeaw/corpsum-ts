@@ -30,6 +30,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	"update:settings": [settings: MediaTypeVisualizationSettings];
+	"loading-change": [loading: boolean];
 }>();
 
 const t = useTranslations();
@@ -133,7 +134,10 @@ const sourceDistributions = computed(() => frequencyData.value.map(parseMediaDis
 const sourceDistributionsLoading = computed(() =>
 	usesProvidedData.value
 		? queries.value.map(() => false)
-		: queryResults.value.map((result) => result.isFetching || result.isLoading),
+		: queryResults.value.map(
+				(result) =>
+					!result.isError && (result.data === undefined || result.isFetching || result.isLoading),
+			),
 );
 const sourceDistributionErrors = computed(() =>
 	queries.value.map((_, index) => {
@@ -290,6 +294,13 @@ const mediaTypeSeries = computed(() =>
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<QueryDataStatusList
+				:errors="sourceDistributionErrors"
+				:loading="sourceDistributionsLoading"
+				:queries="queries"
+				@loading-change="emit('loading-change', $event)"
+			/>
 
 			<div v-if="sourceDistributionErrors.some(Boolean)" class="space-y-2">
 				<div

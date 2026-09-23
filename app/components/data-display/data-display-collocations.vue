@@ -42,6 +42,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	"update:settings": [settings: CollocationVisualizationSettings];
+	"loading-change": [loading: boolean];
 }>();
 
 const t = useTranslations();
@@ -181,7 +182,10 @@ const sortedCollocations = computed(() =>
 const collocationsLoading = computed(() =>
 	usesProvidedData.value
 		? queries.value.map(() => false)
-		: queryResults.value.map((result) => result.isFetching || result.isLoading),
+		: queryResults.value.map(
+				(result) =>
+					!result.isError && (result.data === undefined || result.isFetching || result.isLoading),
+			),
 );
 const collocationErrors = computed(() =>
 	queries.value.map((_, index) => {
@@ -258,6 +262,13 @@ const wordClouds = computed(() =>
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<QueryDataStatusList
+				:errors="collocationErrors"
+				:loading="collocationsLoading"
+				:queries="queries"
+				@loading-change="emit('loading-change', $event)"
+			/>
 
 			<div v-if="collocationErrors.some(Boolean)" class="space-y-2">
 				<div

@@ -41,6 +41,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	"update:settings": [settings: RegionalVisualizationSettings];
+	"loading-change": [loading: boolean];
 }>();
 
 const t = useTranslations();
@@ -162,7 +163,10 @@ const regionalFrequencies = computed(() =>
 const regionalFrequenciesLoading = computed(() =>
 	usesProvidedData.value
 		? queries.value.map(() => false)
-		: queryResults.value.map((result) => result.isFetching || result.isLoading),
+		: queryResults.value.map(
+				(result) =>
+					!result.isError && (result.data === undefined || result.isFetching || result.isLoading),
+			),
 );
 const regionalFrequencyErrors = computed(() =>
 	queries.value.map((_, index) => {
@@ -362,6 +366,13 @@ const regionalBarSeries = computed(() =>
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<QueryDataStatusList
+				:errors="regionalFrequencyErrors"
+				:loading="regionalFrequenciesLoading"
+				:queries="queries"
+				@loading-change="emit('loading-change', $event)"
+			/>
 
 			<div v-if="regionalFrequencyErrors.some(Boolean)" class="space-y-2">
 				<div

@@ -20,6 +20,11 @@ const props = withDefaults(
 );
 
 const t = useTranslations();
+
+const emit = defineEmits<{
+	"loading-change": [loading: boolean];
+}>();
+
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const queryDescriptors = computed<Array<NoskeConcordanceQueryDescriptor>>(() =>
@@ -63,7 +68,10 @@ const concordanceData = computed(() =>
 const concordanceLoading = computed(() =>
 	usesProvidedData.value
 		? queries.value.map(() => false)
-		: queryResults.value.map((result) => result.isFetching || result.isLoading),
+		: queryResults.value.map(
+				(result) =>
+					!result.isError && (result.data === undefined || result.isFetching || result.isLoading),
+			),
 );
 const concordanceErrors = computed(() =>
 	queries.value.map((_, index) => {
@@ -84,6 +92,13 @@ const concordanceErrors = computed(() =>
 			<CardDescription>{{ t("keywordInContextDesc") }}</CardDescription>
 		</CardHeader>
 		<CardContent class="space-y-4">
+			<QueryDataStatusList
+				:errors="concordanceErrors"
+				:loading="concordanceLoading"
+				:queries="queries"
+				@loading-change="emit('loading-change', $event)"
+			/>
+
 			<div v-if="concordanceErrors.some(Boolean)" class="space-y-2">
 				<div
 					v-for="(query, index) of queries"

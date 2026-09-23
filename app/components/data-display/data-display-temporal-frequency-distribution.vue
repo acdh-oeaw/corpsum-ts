@@ -62,6 +62,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	"update:settings": [settings: TemporalFrequencyDistributionSettings];
+	"loading-change": [loading: boolean];
 }>();
 
 const t = useTranslations();
@@ -290,7 +291,10 @@ const temporalFrequencies = computed(() =>
 const temporalFrequenciesLoading = computed(() =>
 	usesProvidedData.value
 		? activeQueries.value.map(() => false)
-		: queryResults.value.map((result) => result.isFetching || result.isLoading),
+		: queryResults.value.map(
+				(result) =>
+					!result.isError && (result.data === undefined || result.isFetching || result.isLoading),
+			),
 );
 const temporalFrequenciesErrors = computed(() =>
 	activeQueries.value.map((_, index) => {
@@ -427,6 +431,13 @@ function toggleSourceTable() {
 		</CardHeader>
 
 		<CardContent class="space-y-6">
+			<QueryDataStatusList
+				:errors="temporalFrequenciesErrors"
+				:loading="temporalFrequenciesLoading"
+				:queries="activeQueries"
+				@loading-change="emit('loading-change', $event)"
+			/>
+
 			<div v-if="missingMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
 				<p class="font-medium">
 					{{ t("TemporalFrequencyDistribution.mapping.missingTitle") }}
