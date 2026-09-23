@@ -55,7 +55,7 @@ export function createNoskeCacheHeaders(queryKey: QueryKey) {
 	const serializedQueryKey = serializeNoskeQueryKey(queryKey);
 	const refreshingKeys = useState<Array<string>>("noske-cache-refreshing-keys", () => []);
 	const headers: Record<string, string> = {
-		[clientQueryKeyHeader]: serializedQueryKey,
+		[clientQueryKeyHeader]: encodeURIComponent(serializedQueryKey),
 	};
 
 	if (refreshingKeys.value.includes(serializedQueryKey)) {
@@ -88,9 +88,16 @@ export function withNoskeCacheHeaders<TClient extends object>(
 }
 
 export function recordNoskeCacheMetadataFromResponse(request: Request, response: Response) {
-	const queryKey = request.headers.get(clientQueryKeyHeader);
+	const encodedQueryKey = request.headers.get(clientQueryKeyHeader);
 	const metadata = readNoskeCacheMetadata(response);
-	if (!queryKey || !metadata) return;
+	if (!encodedQueryKey || !metadata) return;
+
+	let queryKey: string;
+	try {
+		queryKey = decodeURIComponent(encodedQueryKey);
+	} catch {
+		queryKey = encodedQueryKey;
+	}
 
 	const metadataByQueryKey = useState<Record<string, NoskeCacheMetadata>>(
 		"noske-cache-metadata",
