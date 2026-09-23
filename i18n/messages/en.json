@@ -157,6 +157,7 @@
 		"actions": {
 			"cancel": "Cancel",
 			"editFacetting": "Edit",
+			"loading": "Loading query data",
 			"run": "Run query"
 		},
 		"labels": {
@@ -384,6 +385,10 @@
 		"yes": "Yes",
 		"createdAt": "Created",
 		"updatedAt": "Updated"
+	},
+	"QueryDataStatus": {
+		"label": "Query data status",
+		"loading": "Loading query data"
 	},
 	"DataDisplayErrors": {
 		"keywordInContext": {

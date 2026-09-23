@@ -157,6 +157,7 @@
 		"actions": {
 			"cancel": "Abbrechen",
 			"editFacetting": "Bearbeiten",
+			"loading": "Abfragedaten werden geladen",
 			"run": "Abfrage ausführen"
 		},
 		"labels": {
@@ -384,6 +385,10 @@
 		"yes": "Ja",
 		"createdAt": "Erstellt",
 		"updatedAt": "Aktualisiert"
+	},
+	"QueryDataStatus": {
+		"label": "Status der Abfragedaten",
+		"loading": "Abfragedaten werden geladen"
 	},
 	"DataDisplayErrors": {
 		"keywordInContext": {
