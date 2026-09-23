@@ -13,14 +13,69 @@ import {
 } from "~/server/utils/noske-query-cache";
 import { requireUser } from "~/server/utils/user";
 
+interface NoskeFetchError {
+	message?: unknown;
+	status?: unknown;
+	statusCode?: unknown;
+	statusMessage?: unknown;
+	statusText?: unknown;
+	data?: unknown;
+	response?: {
+		status?: unknown;
+		statusText?: unknown;
+		_data?: unknown;
+	};
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null;
+}
+
+function logNoskeApiError({
+	error,
+	instanceId,
+	method,
+	path,
+	params,
+	body,
+	durationMs,
+	version,
+}: {
+	error: unknown;
+	instanceId: string;
+	method: string;
+	path: string;
+	params: unknown;
+	body: unknown;
+	durationMs: number;
+	version: string;
+}) {
+	const details: NoskeFetchError = isRecord(error) ? error : {};
+	const response = isRecord(details.response) ? details.response : {};
+
+	console.error("[NoSkE proxy] upstream request failed", {
+		instanceId,
+		version,
+		method,
+		path,
+		status: response.status ?? details.status ?? details.statusCode,
+		statusText: response.statusText ?? details.statusText ?? details.statusMessage,
+		message: details.message,
+		responseData: response._data ?? details.data,
+		params,
+		body,
+		durationMs,
+	});
+}
+
 export default defineEventHandler(async (event) => {
 	const user = await requireUser(event);
 	const routeParam = event.context.params?.engine ?? "";
-	const [instanceId, ...targetSegments] = routeParam.split("/").filter(Boolean);
+	const [instanceId = "", ...targetSegments] = routeParam.split("/").filter(Boolean);
 	const noske = await requireReadableNoske(instanceId, user);
 	let authheader: string | undefined;
 
-	const method = event.method;
+	const method = event.method ?? "GET";
 	const params = getQuery(event);
 	const headers = getHeaders(event);
 
@@ -84,13 +139,28 @@ export default defineEventHandler(async (event) => {
 
 		const fetchedAt = new Date();
 		const startedAt = performance.now();
-		const data = await fetcher(upstreamPath, {
-			headers: proxyHeaders,
-			baseURL: noske.base,
-			method,
-			params,
-			body,
-		});
+		let data: unknown;
+		try {
+			data = await fetcher(upstreamPath, {
+				headers: proxyHeaders,
+				baseURL: noske.base,
+				method,
+				params,
+				body,
+			});
+		} catch (error) {
+			logNoskeApiError({
+				error,
+				instanceId,
+				version: noske.version,
+				method,
+				path: upstreamPath,
+				params,
+				body,
+				durationMs: Math.round(performance.now() - startedAt),
+			});
+			throw error;
+		}
 		const cached = await saveNoskeCachedResponse({
 			user,
 			noske,
@@ -113,11 +183,26 @@ export default defineEventHandler(async (event) => {
 
 	setNoskeCacheHeaders({ event, status: "skip", noskeId: noske._id.toString() });
 
-	return await fetcher(upstreamPath, {
-		headers: proxyHeaders,
-		baseURL: noske.base,
-		method,
-		params,
-		body,
-	});
+	const startedAt = performance.now();
+	try {
+		return await fetcher(upstreamPath, {
+			headers: proxyHeaders,
+			baseURL: noske.base,
+			method,
+			params,
+			body,
+		});
+	} catch (error) {
+		logNoskeApiError({
+			error,
+			instanceId,
+			version: noske.version,
+			method,
+			path: upstreamPath,
+			params,
+			body,
+			durationMs: Math.round(performance.now() - startedAt),
+		});
+		throw error;
+	}
 });
