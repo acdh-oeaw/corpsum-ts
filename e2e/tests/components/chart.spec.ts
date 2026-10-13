@@ -1,6 +1,11 @@
 // oxlint-disable playwright/no-raw-locators
 import { expect, test } from "@playwright/experimental-ct-vue";
-import { VisGroupedBarSelectors, VisLineSelectors, VisStackedBarSelectors } from "@unovis/vue";
+import {
+	VisAxisSelectors,
+	VisGroupedBarSelectors,
+	VisLineSelectors,
+	VisStackedBarSelectors,
+} from "@unovis/vue";
 
 import Chart from "@/components/chart.vue";
 
@@ -26,6 +31,29 @@ const series = [
 ];
 
 test.describe("chart", () => {
+	for (const chartType of ["bar", "stack", "percent"] as const) {
+		for (const orientation of ["vertical", "horizontal"] as const) {
+			test(`sorts ${orientation} ${chartType} categories and restores their input order`, async ({
+				mount,
+			}) => {
+				const component = await mount(Chart, {
+					props: { series, chartType, orientation, height: 320 },
+				});
+				const labels = component
+					.locator(`.${VisAxisSelectors.tickLabel}`)
+					.filter({ hasText: /^202[0-2]$/ });
+				const descendingDataOrder =
+					orientation === "horizontal" ? ["2020", "2021", "2022"] : ["2022", "2021", "2020"];
+				const ascendingDataOrder = [...descendingDataOrder].reverse();
+				await expect(labels).toHaveText(descendingDataOrder);
+				await component.update({ props: { sortOrder: "ascending" } });
+				await expect(labels).toHaveText(ascendingDataOrder);
+				await component.update({ props: { sortOrder: "descending" } });
+				await expect(labels).toHaveText(descendingDataOrder);
+			});
+		}
+	}
+
 	[
 		{
 			chartType: "line" as const,

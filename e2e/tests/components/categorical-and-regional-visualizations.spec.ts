@@ -291,6 +291,23 @@ function props(overrides = {}) {
 }
 
 test.describe("categorical and regional visualization components", () => {
+	test("selects ascending and descending sorting from the media source toolbar", async ({
+		mount,
+	}) => {
+		const component = await mount(MediaSourceDistribution, { props: props() });
+		const ascending = component.getByRole("button", { name: "Sort ascending" });
+		const descending = component.getByRole("button", { name: "Sort descending" });
+		const chart = component.getByTestId("media-stacked-bar-chart");
+		await expect(descending).toHaveAttribute("aria-pressed", "true");
+		await expect(chart).toHaveAttribute("sort-order", "descending");
+		await ascending.click();
+		await expect(ascending).toHaveAttribute("aria-pressed", "true");
+		await expect(chart).toHaveAttribute("sort-order", "ascending");
+		await descending.click();
+		await expect(descending).toHaveAttribute("aria-pressed", "true");
+		await expect(chart).toHaveAttribute("sort-order", "descending");
+	});
+
 	test("emits complete media source settings after persisted controls change", async ({
 		mount,
 	}) => {
