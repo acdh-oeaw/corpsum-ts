@@ -64,12 +64,16 @@ const props = withDefaults(
 		domainType?: "categorical" | "temporal";
 		domainValueFormatter?: (value: string | number) => string;
 		fillPatterns?: boolean;
+		sortOrder?: "ascending" | "descending";
+		sortCategories?: boolean;
 	}>(),
 	{
 		chartType: "bar",
 		domainType: "categorical",
 		orientation: "vertical",
 		fillPatterns: false,
+		sortOrder: "descending",
+		sortCategories: true,
 	},
 );
 const percent = computed(() => props.chartType === "percent");
@@ -107,7 +111,16 @@ function renderTooltipContent(
 	return html;
 }
 
-const chartData = computed(() => alignChartSeriesData(props.series.map((entry) => entry.data)));
+const chartData = computed(() => {
+	const rows = alignChartSeriesData(props.series.map((entry) => entry.data));
+	if (!props.sortCategories || props.chartType === "line" || props.chartType === "donut") {
+		return rows;
+	}
+	const total = (row: Array<Datum>) => row.reduce((sum, [, value]) => sum + value, 0);
+	const direction = props.sortOrder === "descending" ? -1 : 1;
+	const sorted = rows.toSorted((a, b) => direction * (total(a) - total(b)));
+	return props.orientation === "horizontal" ? sorted.toReversed() : sorted;
+});
 const renderScatterPoints = computed(
 	() => chartData.value.length * props.series.length <= maximumScatterPointCount,
 );

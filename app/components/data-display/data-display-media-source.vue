@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { BarChart3, BarChart4, ChartBarStacked, Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
+import ChartSortToggle from "@/components/chart-sort-toggle.vue";
 import {
 	type MediaSourceVisualizationSettings,
 	normalizeMediaSourceVisualizationSettings,
@@ -34,6 +35,7 @@ const emit = defineEmits<{
 }>();
 
 const t = useTranslations();
+const sortOrder = ref<"ascending" | "descending">("descending");
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() =>
@@ -164,6 +166,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 
 		<CardContent class="space-y-4">
 			<Toolbar :aria-label="t('VisualizationToolbar.mediaSource')">
+				<ChartSortToggle v-if="interactive" v-model="sortOrder" />
 				<template v-if="interactive">
 					<ToolbarToggleGroup
 						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
@@ -304,6 +307,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 			</div>
 
 			<MediaStackedBarChart
+				:sort-order="sortOrder"
 				:mode="mode"
 				:queries="queries"
 				:source-distributions="sourceDistributions"

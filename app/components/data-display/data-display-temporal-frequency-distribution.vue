@@ -405,9 +405,9 @@ const series = computed(() =>
 const intervalseries = computed(() =>
 	series.value.map((querySeries) => ({
 		...querySeries,
-		data: groupTemporalFrequencyPoints(querySeries.data, interval.value, reverse.value).map(
-			(item) => formatTemporalFrequencyInterval(item, bucketUnit.value, locale.value),
-		),
+		data: groupTemporalFrequencyPoints(querySeries.data, interval.value, reverse.value)
+			.toSorted((a, b) => a.startTimestamp - b.startTimestamp)
+			.map((item) => formatTemporalFrequencyInterval(item, bucketUnit.value, locale.value)),
 	})),
 );
 
@@ -751,6 +751,7 @@ function toggleSourceTable() {
 
 				<Chart
 					chart-type="bar"
+					:sort-categories="false"
 					class="h-96"
 					:series="intervalseries"
 					:title="`${intervalseries.length} ${t('queries')}`"

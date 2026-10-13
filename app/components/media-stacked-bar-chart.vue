@@ -5,24 +5,16 @@ const props = defineProps<{
 	sourceDistributions: Array<Array<IsourceDistribution>>;
 	mode: Mode;
 	chartMode: "stack" | "bar" | "percent";
+	sortOrder?: "ascending" | "descending";
 }>();
 
 const t = useTranslations();
 
-const categories = computed(() => {
-	const allCats: Array<string> = [];
-
-	const mediaSorting: Record<string, number> = {};
-
-	props.queries.forEach((query: CorpusQuery, i) => {
-		props.sourceDistributions[i]?.forEach((qm) => {
-			if (!mediaSorting[qm.media]) mediaSorting[qm.media] = 0;
-			mediaSorting[qm.media]! += qm[props.mode];
-			allCats.push(qm.media);
-		});
-	});
-	return [...new Set(allCats)].sort((a, b) => mediaSorting[b]! - mediaSorting[a]!);
-});
+const categories = computed(() => [
+	...new Set(
+		props.sourceDistributions.flatMap((distribution) => distribution.map(({ media }) => media)),
+	),
+]);
 
 const series = computed(() => {
 	return props.queries.map((query: CorpusQuery, i) => {
@@ -53,6 +45,7 @@ watch(
 <template>
 	<Chart
 		:chart-type="chartMode"
+		:sort-order="sortOrder ?? 'descending'"
 		orientation="horizontal"
 		:series="series"
 		:title="`${series.length} ${t('queries')}`"

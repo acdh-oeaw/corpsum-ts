@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
+import ChartSortToggle from "@/components/chart-sort-toggle.vue";
 import {
 	type WordFormFrequencyVisualizationSettings,
 	normalizeWordFormFrequencyVisualizationSettings,
@@ -34,6 +35,7 @@ const emit = defineEmits<{
 }>();
 
 const t = useTranslations();
+const sortOrder = ref<"ascending" | "descending">("descending");
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() =>
@@ -158,6 +160,7 @@ const series = computed(() =>
 
 		<CardContent class="space-y-4">
 			<Toolbar :aria-label="t('VisualizationToolbar.wordFormFrequency')">
+				<ChartSortToggle v-if="interactive" v-model="sortOrder" />
 				<template v-if="interactive">
 					<ToolbarToggleGroup
 						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
@@ -219,6 +222,7 @@ const series = computed(() =>
 			</div>
 
 			<Chart
+				:sort-order="sortOrder"
 				v-if="queries.length > 0"
 				chart-type="bar"
 				class="h-96"
