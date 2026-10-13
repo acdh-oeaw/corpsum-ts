@@ -535,7 +535,7 @@ function toggleSourceTable() {
 								<Select v-model="bucketUnit">
 									<SelectTrigger
 										id="temporal-bucket-unit"
-										class="h-8 w-[8.5rem] min-w-0"
+										class="h-8 w-34 min-w-0"
 										:disabled="!hasMultipleBucketUnitOptions"
 										:title="t('TemporalFrequencyDistribution.tooltips.timeUnit')"
 									>
@@ -572,7 +572,7 @@ function toggleSourceTable() {
 								}}</Label>
 								<Input
 									id="temporal-range-start"
-									class="h-8 w-[9.25rem] min-w-0"
+									class="h-8 w-37 min-w-0"
 									:disabled="rangeMode === 'auto'"
 									:model-value="rangeStart"
 									:title="t('TemporalFrequencyDistribution.tooltips.startDate')"
@@ -586,7 +586,7 @@ function toggleSourceTable() {
 								}}</Label>
 								<Input
 									id="temporal-range-end"
-									class="h-8 w-[9.25rem] min-w-0"
+									class="h-8 w-37 min-w-0"
 									:disabled="rangeMode === 'auto'"
 									:model-value="rangeEnd"
 									:title="t('TemporalFrequencyDistribution.tooltips.endDate')"
@@ -691,7 +691,7 @@ function toggleSourceTable() {
 							<Select v-model="interval" :aria-label="t('interval')">
 								<SelectTrigger
 									id="temporal-interval"
-									class="h-8 w-[8.5rem] min-w-0"
+									class="h-8 w-34 min-w-0"
 									:title="t('TemporalFrequencyDistribution.tooltips.intervalSize')"
 								>
 									<SelectValue :placeholder="t('interval')" />
