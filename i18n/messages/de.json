@@ -365,6 +365,10 @@
 		"label": "Karte"
 	},
 	"Chart": {
+		"sortOrder": "Sortierreihenfolge",
+		"sortAscending": "Aufsteigend sortieren",
+		"sortDescending": "Absteigend sortieren",
+
 		"fullscreen": "Vollbild öffnen",
 		"export": {
 			"csv": "CSV exportieren",

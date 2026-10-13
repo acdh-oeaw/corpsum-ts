@@ -365,6 +365,10 @@
 		"label": "Map"
 	},
 	"Chart": {
+		"sortOrder": "Sort order",
+		"sortAscending": "Sort ascending",
+		"sortDescending": "Sort descending",
+
 		"fullscreen": "Open fullscreen",
 		"export": {
 			"csv": "Export CSV",
