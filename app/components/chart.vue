@@ -66,6 +66,7 @@ const props = withDefaults(
 		fillPatterns?: boolean;
 		sortOrder?: "ascending" | "descending";
 		sortCategories?: boolean;
+		valueRange?: [number, number];
 	}>(),
 	{
 		chartType: "bar",
@@ -86,6 +87,14 @@ const chartConfig = computed(() =>
 	),
 );
 const appContext = getCurrentInstance()?.appContext;
+const rangeBounds = computed<[number, number]>(() => {
+	const values =
+		props.chartType === "donut"
+			? props.series.map((series) => series.data.reduce((sum, [, value]) => sum + value, 0))
+			: props.series.flatMap((series) => series.data.map(([, value]) => value));
+	return values.length > 0 ? [Math.min(...values), Math.max(...values)] : [0, 0];
+});
+const valueRange = computed(() => props.valueRange ?? rangeBounds.value);
 
 function formatDomainValue(value: string | number) {
 	return props.domainValueFormatter?.(value) ?? String(value);
@@ -112,7 +121,15 @@ function renderTooltipContent(
 }
 
 const chartData = computed(() => {
-	const rows = alignChartSeriesData(props.series.map((entry) => entry.data));
+	const [minimum, maximum] = valueRange.value;
+	const rows = alignChartSeriesData(props.series.map((entry) => entry.data))
+		.map((row) =>
+			row.map(
+				([domain, value]) =>
+					[domain, value >= minimum && value <= maximum ? value : 0] satisfies Datum,
+			),
+		)
+		.filter((row) => row.some(([, value]) => value !== 0));
 	if (!props.sortCategories || props.chartType === "line" || props.chartType === "donut") {
 		return rows;
 	}
@@ -134,11 +151,13 @@ function zip(arrays: Array<Array<Datum>>) {
 
 type DonutDatum = { label: string; value: number; color?: string };
 const donutData = computed<Array<DonutDatum>>(() =>
-	props.series.map((s) => ({
-		label: String(s.label ?? s.name ?? ""),
-		value: s.data.reduce((sum, d) => sum + (d?.[1] ?? 0), 0),
-		color: s.color,
-	})),
+	props.series
+		.map((s) => ({
+			label: String(s.label ?? s.name ?? ""),
+			value: s.data.reduce((sum, d) => sum + (d?.[1] ?? 0), 0),
+			color: s.color,
+		}))
+		.filter(({ value }) => value >= valueRange.value[0] && value <= valueRange.value[1]),
 );
 const donutLayers = [(d: DonutDatum) => d.label];
 const currentLocale = useLocale();

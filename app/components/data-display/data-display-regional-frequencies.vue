@@ -12,6 +12,7 @@ import {
 } from "lucide-vue-next";
 
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
+import ChartValueRangeFilter from "@/components/chart-value-range-filter.vue";
 import {
 	type RegionalVisualizationSettings,
 	normalizeRegionalVisualizationSettings,
@@ -47,6 +48,7 @@ const emit = defineEmits<{
 
 const t = useTranslations();
 const sortOrder = ref<"ascending" | "descending">("descending");
+const valueRange = ref<[number, number] | undefined>();
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() => normalizeRegionalVisualizationSettings(props.settings));
@@ -200,6 +202,9 @@ const regionalBarSeries = computed(() =>
 		};
 	}),
 );
+const rangeValues = computed(() =>
+	regionalBarSeries.value.flatMap((entry) => entry.data.map(([, value]) => value)),
+);
 </script>
 
 <template>
@@ -346,6 +351,7 @@ const regionalBarSeries = computed(() =>
 					<ToolbarSeparator />
 				</template>
 
+				<ChartValueRangeFilter v-if="interactive" v-model="valueRange" :values="rangeValues" />
 				<Popover>
 					<PopoverTrigger
 						class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
@@ -398,15 +404,22 @@ const regionalBarSeries = computed(() =>
 						:mode="mode"
 						:query="query"
 						:resdata="regionalFrequencies[index].data"
+						:value-range="interactive ? valueRange : undefined"
 					/>
 				</ClientOnly>
 			</div>
 
 			<div v-if="isCombined && !loading && queries.length > 0">
-				<CombinedMapChart :mode="mode" :queries="queries" :resdata="regionalFrequencies" />
+				<CombinedMapChart
+					:mode="mode"
+					:queries="queries"
+					:resdata="regionalFrequencies"
+					:value-range="interactive ? valueRange : undefined"
+				/>
 			</div>
 
 			<Chart
+				:value-range="interactive ? valueRange : undefined"
 				:sort-order="sortOrder"
 				v-if="!loading && queries.length > 0"
 				:chart-type="barChartMode"

@@ -2,6 +2,7 @@
 import { Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
+import ChartValueRangeFilter from "@/components/chart-value-range-filter.vue";
 import {
 	type WordFormFrequencyVisualizationSettings,
 	normalizeWordFormFrequencyVisualizationSettings,
@@ -36,6 +37,7 @@ const emit = defineEmits<{
 
 const t = useTranslations();
 const sortOrder = ref<"ascending" | "descending">("descending");
+const valueRange = ref<[number, number] | undefined>();
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() =>
@@ -149,6 +151,9 @@ const series = computed(() =>
 			) ?? [],
 	})),
 );
+const rangeValues = computed(() =>
+	series.value.flatMap((entry) => entry.data.map(([, value]) => value)),
+);
 </script>
 
 <template>
@@ -180,6 +185,7 @@ const series = computed(() =>
 					<ToolbarSeparator />
 				</template>
 
+				<ChartValueRangeFilter v-if="interactive" v-model="valueRange" :values="rangeValues" />
 				<Popover>
 					<PopoverTrigger
 						class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
@@ -222,6 +228,7 @@ const series = computed(() =>
 			</div>
 
 			<Chart
+				:value-range="interactive ? valueRange : undefined"
 				:sort-order="sortOrder"
 				v-if="queries.length > 0"
 				chart-type="bar"

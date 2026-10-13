@@ -11,6 +11,7 @@ const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	resdata: Array<RegionalFrequency>;
 	mode: string;
+	valueRange?: [number, number];
 }>();
 
 const t = useTranslations();
@@ -54,7 +55,11 @@ const currentRegionData = computed(() => {
 		for (const d of rdata.data) {
 			const entry = map.get(d.region);
 			if (!entry) continue;
-			entry.values[queryIdx] = props.mode === "relative" ? d.relative : d.absolute;
+			const value = props.mode === "relative" ? d.relative : d.absolute;
+			entry.values[queryIdx] =
+				props.valueRange && (value < props.valueRange[0] || value > props.valueRange[1])
+					? 0
+					: value;
 		}
 	}
 

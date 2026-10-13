@@ -6,6 +6,7 @@ const props = defineProps<{
 	mode: Mode;
 	chartMode: "stack" | "bar" | "percent";
 	sortOrder?: "ascending" | "descending";
+	valueRange?: [number, number];
 }>();
 
 const t = useTranslations();
@@ -46,6 +47,7 @@ watch(
 	<Chart
 		:chart-type="chartMode"
 		:sort-order="sortOrder ?? 'descending'"
+		:value-range="valueRange"
 		orientation="horizontal"
 		:series="series"
 		:title="`${series.length} ${t('queries')}`"

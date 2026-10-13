@@ -14,7 +14,7 @@ const bounds = computed<[number, number]>(() => {
 const step = computed(() => Math.max((bounds.value[1] - bounds.value[0]) / 100, 0.000001));
 const locale = useLocale();
 const formatValue = (value: number) =>
-	value.toLocaleString(locale.value, { maximumFractionDigits: 2 });
+	value.toLocaleString(locale.value, { maximumFractionDigits: 5 });
 
 const selectedRange = computed({
 	get: () => range.value ?? bounds.value,

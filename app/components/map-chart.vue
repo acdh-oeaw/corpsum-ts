@@ -15,6 +15,7 @@ const props = withDefaults(
 		resdata: Array<RegionalFreqData>;
 		mode: string;
 		scale?: "log" | "linear";
+		valueRange?: [number, number];
 	}>(),
 	{
 		scale: "log",
@@ -27,7 +28,13 @@ const valueMap = computed(() => {
 	const map = new Map<string, number>();
 	for (const d of props.resdata) {
 		if (usedRegions.includes(d.region)) {
-			map.set(d.region, props.mode === "relative" ? d.relative : d.absolute);
+			const value = props.mode === "relative" ? d.relative : d.absolute;
+			map.set(
+				d.region,
+				props.valueRange && (value < props.valueRange[0] || value > props.valueRange[1])
+					? 0
+					: value,
+			);
 		}
 	}
 	return map;

@@ -2,6 +2,7 @@
 import { BarChart3, BarChart4, ChartBarStacked, Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
+import ChartValueRangeFilter from "@/components/chart-value-range-filter.vue";
 import {
 	type MediaSourceVisualizationSettings,
 	normalizeMediaSourceVisualizationSettings,
@@ -36,6 +37,7 @@ const emit = defineEmits<{
 
 const t = useTranslations();
 const sortOrder = ref<"ascending" | "descending">("descending");
+const valueRange = ref<[number, number] | undefined>();
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() =>
@@ -135,6 +137,9 @@ const frequencyData = computed(() =>
 		: queryResults.value.map((result) => result.data),
 );
 const sourceDistributions = computed(() => frequencyData.value.map(parseMediaDistribution));
+const rangeValues = computed(() =>
+	sourceDistributions.value.flatMap((distribution) => distribution.map((item) => item[mode.value])),
+);
 const sourceDistributionsLoading = computed(() =>
 	usesProvidedData.value
 		? queries.value.map(() => false)
@@ -261,6 +266,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 					<ToolbarSeparator />
 				</template>
 
+				<ChartValueRangeFilter v-if="interactive" v-model="valueRange" :values="rangeValues" />
 				<Popover>
 					<PopoverTrigger
 						class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
@@ -307,6 +313,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 			</div>
 
 			<MediaStackedBarChart
+				:value-range="interactive ? valueRange : undefined"
 				:sort-order="sortOrder"
 				:mode="mode"
 				:queries="queries"
