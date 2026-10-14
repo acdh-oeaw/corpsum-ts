@@ -352,6 +352,16 @@ const rangeValues = computed(() =>
 				</template>
 
 				<ChartValueRangeFilter v-if="interactive" v-model="valueRange" :values="rangeValues" />
+				<ToolbarButton
+					v-if="showSourceData && interactive"
+					:aria-label="!expand ? t('ShowData') : t('HideData')"
+					:aria-pressed="expand"
+					type="button"
+					variant="outline"
+					@click="setSourceTableExpanded(!expand)"
+				>
+					<Rows3 />
+				</ToolbarButton>
 				<Popover>
 					<PopoverTrigger
 						class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
@@ -375,6 +385,17 @@ const rangeValues = computed(() =>
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
+				<CollapsibleContent class="pb-0">
+					<DataDisplaySourceTable
+						:data="regionalFrequencies.map((entry) => entry.data)"
+						datatype="regionalFrequencies"
+						:loading="regionalFrequenciesLoading"
+						:queries="queries"
+					/>
+				</CollapsibleContent>
+			</Collapsible>
 
 			<QueryDataStatusList
 				:errors="regionalFrequencyErrors"
@@ -430,39 +451,5 @@ const rangeValues = computed(() =>
 				:y-axis="t('freq')"
 			/>
 		</CardContent>
-
-		<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
-			<CollapsibleContent class="px-6 pb-6">
-				<DataDisplaySourceTable
-					:data="regionalFrequencies.map((entry) => entry.data)"
-					datatype="regionalFrequencies"
-					:loading="regionalFrequenciesLoading"
-					:queries="queries"
-				/>
-			</CollapsibleContent>
-		</Collapsible>
-
-		<Separator v-if="showSourceData" />
-
-		<CardFooter v-if="showSourceData && interactive">
-			<Toolbar :aria-label="t('VisualizationToolbar.sourceData')">
-				<TooltipProvider>
-					<Tooltip>
-						<TooltipTrigger as-child>
-							<ToolbarButton
-								:aria-label="!expand ? t('ShowData') : t('HideData')"
-								:aria-pressed="expand"
-								type="button"
-								variant="outline"
-								@click="setSourceTableExpanded(!expand)"
-							>
-								<Rows3 />
-							</ToolbarButton>
-						</TooltipTrigger>
-						<TooltipContent>{{ t("VisualizationToolbar.tooltips.sourceData") }}</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-			</Toolbar>
-		</CardFooter>
 	</Card>
 </template>

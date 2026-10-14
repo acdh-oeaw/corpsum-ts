@@ -243,6 +243,16 @@ const wordClouds = computed(() =>
 					<ToolbarSeparator />
 				</template>
 
+				<ToolbarButton
+					v-if="showSourceData && interactive"
+					:aria-label="!expand ? t('ShowData') : t('HideData')"
+					:aria-pressed="expand"
+					type="button"
+					variant="outline"
+					@click="setSourceTableExpanded(!expand)"
+				>
+					<Rows3 />
+				</ToolbarButton>
 				<Popover>
 					<PopoverTrigger
 						class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
@@ -262,6 +272,17 @@ const wordClouds = computed(() =>
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
+				<CollapsibleContent class="pb-0">
+					<DataDisplaySourceTable
+						:data="sortedCollocations"
+						datatype="collocations"
+						:loading="collocationsLoading"
+						:queries="queries"
+					/>
+				</CollapsibleContent>
+			</Collapsible>
 
 			<QueryDataStatusList
 				:errors="collocationErrors"
@@ -294,30 +315,5 @@ const wordClouds = computed(() =>
 				/>
 			</div>
 		</CardContent>
-
-		<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
-			<CollapsibleContent class="px-6 pb-6">
-				<DataDisplaySourceTable
-					:data="sortedCollocations"
-					datatype="collocations"
-					:loading="collocationsLoading"
-					:queries="queries"
-				/>
-			</CollapsibleContent>
-		</Collapsible>
-		<Separator v-if="showSourceData" />
-		<CardFooter v-if="showSourceData && interactive">
-			<Toolbar :aria-label="t('VisualizationToolbar.sourceData')">
-				<ToolbarButton
-					:aria-label="!expand ? t('ShowData') : t('HideData')"
-					:aria-pressed="expand"
-					type="button"
-					variant="outline"
-					@click="setSourceTableExpanded(!expand)"
-				>
-					<Rows3 />
-				</ToolbarButton>
-			</Toolbar>
-		</CardFooter>
 	</Card>
 </template>

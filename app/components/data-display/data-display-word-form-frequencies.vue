@@ -186,6 +186,16 @@ const rangeValues = computed(() =>
 				</template>
 
 				<ChartValueRangeFilter v-if="interactive" v-model="valueRange" :values="rangeValues" />
+				<ToolbarButton
+					v-if="showSourceData && interactive"
+					:aria-label="!expand ? t('ShowData') : t('HideData')"
+					:aria-pressed="expand"
+					type="button"
+					variant="outline"
+					@click="setSourceTableExpanded(!expand)"
+				>
+					<Rows3 />
+				</ToolbarButton>
 				<Popover>
 					<PopoverTrigger
 						class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
@@ -205,6 +215,17 @@ const rangeValues = computed(() =>
 					</PopoverContent>
 				</Popover>
 			</Toolbar>
+
+			<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
+				<CollapsibleContent class="pb-0">
+					<DataDisplaySourceTable
+						:data="wordFormFrequencies"
+						datatype="wordFormFrequencies"
+						:loading="wordFormFrequenciesLoading"
+						:queries="queries"
+					/>
+				</CollapsibleContent>
+			</Collapsible>
 
 			<QueryDataStatusList
 				:errors="wordFormFrequencyErrors"
@@ -239,31 +260,5 @@ const rangeValues = computed(() =>
 				:y-axis="t('sources')"
 			/>
 		</CardContent>
-
-		<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
-			<CollapsibleContent class="px-6 pb-6">
-				<DataDisplaySourceTable
-					:data="wordFormFrequencies"
-					datatype="wordFormFrequencies"
-					:loading="wordFormFrequenciesLoading"
-					:queries="queries"
-				/>
-			</CollapsibleContent>
-		</Collapsible>
-
-		<Separator v-if="showSourceData" />
-		<CardFooter v-if="showSourceData && interactive">
-			<Toolbar :aria-label="t('VisualizationToolbar.sourceData')">
-				<ToolbarButton
-					:aria-label="!expand ? t('ShowData') : t('HideData')"
-					:aria-pressed="expand"
-					type="button"
-					variant="outline"
-					@click="setSourceTableExpanded(!expand)"
-				>
-					<Rows3 />
-				</ToolbarButton>
-			</Toolbar>
-		</CardFooter>
 	</Card>
 </template>
