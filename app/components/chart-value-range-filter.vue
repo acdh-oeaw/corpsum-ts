@@ -20,7 +20,15 @@ const selectedRange = computed({
 	get: () => range.value ?? bounds.value,
 	set: (value: [number, number]) => (range.value = value),
 });
-watch(bounds, (value) => (range.value = [...value]), { immediate: true });
+watch(
+	[() => bounds.value[0], () => bounds.value[1]],
+	([minimum, maximum]) => {
+		const currentRange = range.value;
+		if (currentRange && currentRange[0] === minimum && currentRange[1] === maximum) return;
+		range.value = [minimum, maximum];
+	},
+	{ immediate: true },
+);
 </script>
 
 <template>

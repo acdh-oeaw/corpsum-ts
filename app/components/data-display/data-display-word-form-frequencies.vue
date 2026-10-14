@@ -36,8 +36,8 @@ const emit = defineEmits<{
 }>();
 
 const t = useTranslations();
-const sortOrder = ref<"ascending" | "descending">("descending");
-const valueRange = ref<[number, number] | undefined>();
+const sortOrderByQuery = reactive<Record<string, "ascending" | "descending">>({});
+const valueRangeByQuery = reactive<Record<string, [number, number] | undefined>>({});
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() =>
@@ -53,6 +53,24 @@ watch(
 		expand.value = value.sourceTableExpanded;
 	},
 	{ deep: true },
+);
+
+watch(
+	queries,
+	(value) => {
+		const queryIds = new Set(value.map((query) => String(query.id)));
+		for (const queryId of Object.keys(sortOrderByQuery)) {
+			if (!queryIds.has(queryId)) {
+				delete sortOrderByQuery[queryId];
+				delete valueRangeByQuery[queryId];
+			}
+		}
+		for (const query of value) {
+			const queryId = String(query.id);
+			sortOrderByQuery[queryId] ??= "descending";
+		}
+	},
+	{ immediate: true },
 );
 
 function emitSettings() {
@@ -138,7 +156,7 @@ const wordFormFrequencyErrors = computed(() =>
 	}),
 );
 
-const series = computed(() =>
+const seriesByQuery = computed(() =>
 	queries.value.map((query, index) => ({
 		color: query.color,
 		name: `${query.type}: ${query.userInput} (${query.corpus}${
@@ -151,9 +169,6 @@ const series = computed(() =>
 			) ?? [],
 	})),
 );
-const rangeValues = computed(() =>
-	series.value.flatMap((entry) => entry.data.map(([, value]) => value)),
-);
 </script>
 
 <template>
@@ -162,71 +177,7 @@ const rangeValues = computed(() =>
 			<CardTitle>{{ t("wordFormFrequencies") }}</CardTitle>
 			<CardDescription>{{ t("wordFormFrequenciesDesc") }}</CardDescription>
 		</CardHeader>
-
 		<CardContent class="space-y-4">
-			<Toolbar :aria-label="t('VisualizationToolbar.wordFormFrequency')">
-				<ChartSortToggle v-if="interactive" v-model="sortOrder" />
-				<template v-if="interactive">
-					<ToolbarToggleGroup
-						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
-						:model-value="mode"
-						size="sm"
-						type="single"
-						:aria-label="t('VisualizationToolbar.frequencyMode')"
-						@update:model-value="setMode"
-					>
-						<ToolbarToggleItem value="absolute" :aria-label="t('absolute')">
-							<Hash />
-						</ToolbarToggleItem>
-						<ToolbarToggleItem value="relative" :aria-label="t('relative')">
-							<Percent />
-						</ToolbarToggleItem>
-					</ToolbarToggleGroup>
-					<ToolbarSeparator />
-				</template>
-
-				<ChartValueRangeFilter v-if="interactive" v-model="valueRange" :values="rangeValues" />
-				<ToolbarButton
-					v-if="showSourceData && interactive"
-					:aria-label="!expand ? t('ShowData') : t('HideData')"
-					:aria-pressed="expand"
-					type="button"
-					variant="outline"
-					@click="setSourceTableExpanded(!expand)"
-				>
-					<Rows3 />
-				</ToolbarButton>
-				<Popover>
-					<PopoverTrigger
-						class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
-						:aria-label="t('VisualizationToolbar.queryDetails')"
-						type="button"
-					>
-						<Info />
-					</PopoverTrigger>
-					<PopoverContent align="end" class="w-80 p-2">
-						<QueryDisplay
-							v-for="(query, index) of queries"
-							:key="query.id"
-							:loading="wordFormFrequenciesLoading[index]"
-							:query="query"
-							:query-key="queryDescriptors[index]?.queryKey"
-						/>
-					</PopoverContent>
-				</Popover>
-			</Toolbar>
-
-			<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
-				<CollapsibleContent class="pb-0">
-					<DataDisplaySourceTable
-						:data="wordFormFrequencies"
-						datatype="wordFormFrequencies"
-						:loading="wordFormFrequenciesLoading"
-						:queries="queries"
-					/>
-				</CollapsibleContent>
-			</Collapsible>
-
 			<QueryDataStatusList
 				:errors="wordFormFrequencyErrors"
 				:loading="wordFormFrequenciesLoading"
@@ -234,11 +185,74 @@ const rangeValues = computed(() =>
 				@loading-change="emit('loading-change', $event)"
 			/>
 
-			<div v-if="wordFormFrequencyErrors.some(Boolean)" class="space-y-2">
+			<div v-for="(query, index) of queries" :key="query.id" class="space-y-4">
+				<Toolbar :aria-label="t('VisualizationToolbar.wordFormFrequency')">
+					<ChartSortToggle v-if="interactive" v-model="sortOrderByQuery[String(query.id)]" />
+					<template v-if="interactive">
+						<ToolbarToggleGroup
+							class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
+							:model-value="mode"
+							size="sm"
+							type="single"
+							:aria-label="t('VisualizationToolbar.frequencyMode')"
+							@update:model-value="setMode"
+						>
+							<ToolbarToggleItem value="absolute" :aria-label="t('absolute')">
+								<Hash />
+							</ToolbarToggleItem>
+							<ToolbarToggleItem value="relative" :aria-label="t('relative')">
+								<Percent />
+							</ToolbarToggleItem>
+						</ToolbarToggleGroup>
+						<ToolbarSeparator />
+					</template>
+
+					<ChartValueRangeFilter
+						v-if="interactive"
+						v-model="valueRangeByQuery[String(query.id)]"
+						:values="seriesByQuery[index]?.data.map(([, value]) => value) ?? []"
+					/>
+					<ToolbarButton
+						v-if="showSourceData && interactive"
+						:aria-label="!expand ? t('ShowData') : t('HideData')"
+						:aria-pressed="expand"
+						type="button"
+						variant="outline"
+						@click="setSourceTableExpanded(!expand)"
+					>
+						<Rows3 />
+					</ToolbarButton>
+					<Popover>
+						<PopoverTrigger
+							class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
+							:aria-label="t('VisualizationToolbar.queryDetails')"
+							type="button"
+						>
+							<Info />
+						</PopoverTrigger>
+						<PopoverContent align="end" class="w-80 p-2">
+							<QueryDisplay
+								:loading="wordFormFrequenciesLoading[index]"
+								:query="query"
+								:query-key="queryDescriptors[index]?.queryKey"
+							/>
+						</PopoverContent>
+					</Popover>
+				</Toolbar>
+
+				<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
+					<CollapsibleContent class="pb-0">
+						<DataDisplaySourceTable
+							:data="[wordFormFrequencies[index] ?? []]"
+							datatype="wordFormFrequencies"
+							:loading="[wordFormFrequenciesLoading[index] ?? false]"
+							:queries="[query]"
+						/>
+					</CollapsibleContent>
+				</Collapsible>
+
 				<div
-					v-for="(query, index) of queries"
-					v-show="wordFormFrequencyErrors[index]"
-					:key="query.id"
+					v-if="wordFormFrequencyErrors[index]"
 					class="rounded-md border border-destructive/50 bg-destructive/5 p-3"
 				>
 					<QueryDisplay class="my-0" :query="query" />
@@ -246,19 +260,20 @@ const rangeValues = computed(() =>
 						{{ wordFormFrequencyErrors[index] }}
 					</p>
 				</div>
-			</div>
 
-			<Chart
-				:value-range="interactive ? valueRange : undefined"
-				:sort-order="sortOrder"
-				v-if="queries.length > 0"
-				chart-type="bar"
-				class="h-96"
-				orientation="horizontal"
-				:series="series"
-				:title="t('wordFormFrequencies')"
-				:y-axis="t('sources')"
-			/>
+				<Chart
+					v-if="queries.length > 0"
+					:sort-order="sortOrderByQuery[String(query.id)]"
+					:value-range="interactive ? valueRangeByQuery[String(query.id)] : undefined"
+					chart-type="bar"
+					class="h-96"
+					orientation="horizontal"
+					:series="seriesByQuery.slice(index, index + 1)"
+					:title="query.userInput"
+					:y-axis="t('wordFormFrequencies')"
+				/>
+				<Separator v-if="index < queries.length - 1" />
+			</div>
 		</CardContent>
 	</Card>
 </template>
