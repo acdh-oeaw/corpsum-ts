@@ -212,7 +212,7 @@ const wordClouds = computed(() =>
 		</CardHeader>
 
 		<CardContent class="space-y-4">
-			<Toolbar class="flex-wrap" :aria-label="t('VisualizationToolbar.collocations')">
+			<Toolbar class="flex-nowrap" :aria-label="t('VisualizationToolbar.collocations')">
 				<template v-if="interactive">
 					<ToolbarToggleGroup
 						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
@@ -231,7 +231,7 @@ const wordClouds = computed(() =>
 					</ToolbarToggleGroup>
 					<ToolbarSeparator />
 					<Select :model-value="cattr" :aria-label="t('cattr')" @update:model-value="setCattr">
-						<SelectTrigger id="collocations-cattr" class="h-8 min-w-40">
+						<SelectTrigger id="collocations-cattr" class="h-8 w-24 min-w-0">
 							<SelectValue :placeholder="t('cattr')" />
 						</SelectTrigger>
 						<SelectContent>
