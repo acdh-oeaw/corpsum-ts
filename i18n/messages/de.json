@@ -633,6 +633,8 @@
 	"collocationsDesc": "Zeigt Wörter, die häufig im Umfeld der Abfrage vorkommen.",
 	"collocationsTitle": "{mode} für {query}",
 	"freq": "Frequenz",
+	"lemma": "Lemma",
+	"lempos": "Lemma und Wortart",
 	"log_dice": "logDice",
 	"interval": "Intervall",
 	"keywordInContext": "Keyword im Kontext",

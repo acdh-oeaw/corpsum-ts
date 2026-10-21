@@ -41,6 +41,7 @@ watch(
 			v-model="selectedRange"
 			class="w-28 px-2"
 			:aria-label="t('Chart.valueRange')"
+			:title="t('Chart.valueRange')"
 			:min="bounds[0]"
 			:max="bounds[1]"
 			:step="step"

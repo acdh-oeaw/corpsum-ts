@@ -27,6 +27,7 @@ const forwardedProps = useForwardProps(delegatedProps);
 <template>
 	<ToolbarButton
 		v-bind="forwardedProps"
+		:title="typeof props['aria-label'] === 'string' ? props['aria-label'] : undefined"
 		:class="cn(buttonVariants({ variant, size }), props.class)"
 	>
 		<slot />

@@ -230,14 +230,19 @@ const wordClouds = computed(() =>
 						</ToolbarToggleItem>
 					</ToolbarToggleGroup>
 					<ToolbarSeparator />
-					<Select :model-value="cattr" :aria-label="t('cattr')" @update:model-value="setCattr">
+					<Select
+						:model-value="cattr"
+						:aria-label="t('cattr')"
+						:title="t('cattr')"
+						@update:model-value="setCattr"
+					>
 						<SelectTrigger id="collocations-cattr" class="h-8 w-24 min-w-0">
 							<SelectValue :placeholder="t('cattr')" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="lemma">lemma</SelectItem>
-							<SelectItem value="word">word</SelectItem>
-							<SelectItem value="lempos">lempos</SelectItem>
+							<SelectItem value="lemma">{{ t("lemma") }}</SelectItem>
+							<SelectItem value="word">{{ t("word") }}</SelectItem>
+							<SelectItem value="lempos">{{ t("lempos") }}</SelectItem>
 						</SelectContent>
 					</Select>
 					<ToolbarSeparator />
@@ -257,6 +262,7 @@ const wordClouds = computed(() =>
 					<PopoverTrigger
 						class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
 						:aria-label="t('VisualizationToolbar.queryDetails')"
+						:title="t('VisualizationToolbar.tooltips.queryDetails')"
 						type="button"
 					>
 						<Info />

@@ -32,6 +32,7 @@ const size = computed(() => props.size ?? context.size);
 <template>
 	<ToolbarToggleItem
 		v-bind="forwardedProps"
+		:title="typeof props['aria-label'] === 'string' ? props['aria-label'] : undefined"
 		:class="cn(toggleVariants({ variant, size }), props.class)"
 	>
 		<slot />

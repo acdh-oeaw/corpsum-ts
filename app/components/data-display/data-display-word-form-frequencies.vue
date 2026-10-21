@@ -226,6 +226,7 @@ const seriesByQuery = computed(() =>
 						<PopoverTrigger
 							class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
 							:aria-label="t('VisualizationToolbar.queryDetails')"
+							:title="t('VisualizationToolbar.tooltips.queryDetails')"
 							type="button"
 						>
 							<Info />

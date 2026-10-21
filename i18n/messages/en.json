@@ -633,6 +633,8 @@
 	"collocationsDesc": "Explore words that frequently occur near each query.",
 	"collocationsTitle": "{mode} for {query}",
 	"freq": "Frequency",
+	"lemma": "Lemma",
+	"lempos": "Lemma and part of speech",
 	"log_dice": "logDice",
 	"interval": "Interval",
 	"keywordInContext": "Keyword in context",
