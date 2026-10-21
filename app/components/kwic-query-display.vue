@@ -26,6 +26,7 @@ const showViewOptionsMode = ref(false);
 const viewOptionsId = computed(() => `kwic-view-options-${props.query.id}`);
 const selectedKWIC: Ref<KeywordInContext | null> = ref(null);
 const t = useTranslations();
+const locale = useLocale();
 
 const kwicResults = computed<Array<KeywordInContext>>(() =>
 	(props.data?.Lines ?? []).map(({ Tbl_refs, Left, Kwic, toknum, Right }) => {
@@ -64,6 +65,7 @@ const columns = computed(() =>
 		props.allowDetails,
 	),
 );
+const totalHits = computed(() => props.data?.fullsize ?? props.data?.concsize);
 </script>
 
 <template>
@@ -79,6 +81,9 @@ const columns = computed(() =>
 		<KwicAttributeSelect v-if="interactive && showViewOptionsMode" class="mt-4" :query="query" />
 		<div class="mt-4">
 			<QueryDisplay :loading="loading" :query="query" :query-key="queryKey" />
+			<p v-if="!loading && totalHits !== undefined" class="mb-2 text-sm text-muted-foreground">
+				{{ t("totalHits") }}: {{ totalHits.toLocaleString(locale.value) }}
+			</p>
 			<CorpsumDataTable v-if="!loading" :columns="columns" :data="kwicResults" />
 			<KwicDetailDialog
 				v-if="selectedKWIC"

@@ -11,8 +11,8 @@ import {
 	Rows3,
 } from "lucide-vue-next";
 
+import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
-import ChartValueRangeFilter from "@/components/chart-value-range-filter.vue";
 import {
 	type RegionalVisualizationSettings,
 	normalizeRegionalVisualizationSettings,
@@ -48,7 +48,7 @@ const emit = defineEmits<{
 
 const t = useTranslations();
 const sortOrder = ref<"ascending" | "descending">("descending");
-const valueRange = ref<[number, number] | undefined>();
+const rowLimit = ref(30);
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() => normalizeRegionalVisualizationSettings(props.settings));
@@ -202,9 +202,6 @@ const regionalBarSeries = computed(() =>
 		};
 	}),
 );
-const rangeValues = computed(() =>
-	regionalBarSeries.value.flatMap((entry) => entry.data.map(([, value]) => value)),
-);
 </script>
 
 <template>
@@ -351,7 +348,7 @@ const rangeValues = computed(() =>
 					<ToolbarSeparator />
 				</template>
 
-				<ChartValueRangeFilter v-if="interactive" v-model="valueRange" :values="rangeValues" />
+				<ChartRowLimitSelect v-if="interactive" v-model="rowLimit" />
 				<ToolbarButton
 					v-if="showSourceData && interactive"
 					:aria-label="!expand ? t('ShowData') : t('HideData')"
@@ -425,22 +422,16 @@ const rangeValues = computed(() =>
 						:mode="mode"
 						:query="query"
 						:resdata="regionalFrequencies[index].data"
-						:value-range="interactive ? valueRange : undefined"
 					/>
 				</ClientOnly>
 			</div>
 
 			<div v-if="isCombined && !loading && queries.length > 0">
-				<CombinedMapChart
-					:mode="mode"
-					:queries="queries"
-					:resdata="regionalFrequencies"
-					:value-range="interactive ? valueRange : undefined"
-				/>
+				<CombinedMapChart :mode="mode" :queries="queries" :resdata="regionalFrequencies" />
 			</div>
 
 			<Chart
-				:value-range="interactive ? valueRange : undefined"
+				:row-limit="interactive ? rowLimit : undefined"
 				:sort-order="sortOrder"
 				v-if="!loading && queries.length > 0"
 				:chart-type="barChartMode"

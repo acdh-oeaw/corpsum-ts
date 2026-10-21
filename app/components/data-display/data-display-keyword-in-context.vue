@@ -23,6 +23,7 @@ const t = useTranslations();
 
 const emit = defineEmits<{
 	"loading-change": [loading: boolean];
+	"update:total-hits": [hits: Array<number | undefined>];
 }>();
 
 const queries = computed(() => props.queries);
@@ -64,6 +65,15 @@ const concordanceData = computed(() =>
 	usesProvidedData.value
 		? queries.value.map((_, index) => props.data?.[index])
 		: queryResults.value.map((result) => result.data),
+);
+watch(
+	concordanceData,
+	(data) =>
+		emit(
+			"update:total-hits",
+			data.map((entry) => entry?.fullsize ?? entry?.concsize),
+		),
+	{ immediate: true },
 );
 const concordanceLoading = computed(() =>
 	usesProvidedData.value

@@ -43,6 +43,7 @@ const emit = defineEmits<{
 }>();
 
 const panelsLoading = ref(false);
+const totalHits = ref<number | undefined>();
 
 const t = useTranslations();
 const locale = useLocale();
@@ -136,8 +137,13 @@ watch(
 	() => {
 		promotionAttempt.value = null;
 		saveError.value = "";
+		totalHits.value = undefined;
 	},
 );
+
+function updateTotalHits(hits: Array<number | undefined>) {
+	totalHits.value = hits[0];
+}
 
 function openSaveDialog() {
 	visualizationName.value = t("QueryVisualizationPreview.defaultName", {
@@ -240,6 +246,9 @@ async function saveVisualization() {
 				<p class="text-sm text-muted-foreground">
 					{{ t("QueryVisualizationPreview.description") }}
 				</p>
+				<p v-if="totalHits !== undefined" class="mt-1 text-sm font-medium">
+					{{ t("totalHits") }}: {{ totalHits.toLocaleString(locale) }}
+				</p>
 			</div>
 			<Button v-if="allowSave" type="button" variant="outline" @click="openSaveDialog">
 				<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
@@ -260,6 +269,7 @@ async function saveVisualization() {
 				:settings="settingsByType"
 				@loading-change="panelsLoading = $event"
 				@update:settings="updatePanelSettings"
+				@update:total-hits="updateTotalHits"
 			/>
 			<template #fallback>
 				<p class="text-sm text-muted-foreground">{{ t("QueryVisualizationPreview.loading") }}</p>

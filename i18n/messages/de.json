@@ -218,6 +218,7 @@
 		"stale": "Die Abfrage wurde geändert. Führen Sie sie erneut aus, um diese Ergebnisse zu aktualisieren.",
 		"title": "Abfragevisualisierung"
 	},
+	"totalHits": "Treffer insgesamt",
 	"KwicReferences": {
 		"date": "Datum",
 		"documentId": "Dokument",
@@ -369,6 +370,8 @@
 		"sortAscending": "Aufsteigend sortieren",
 		"sortDescending": "Absteigend sortieren",
 		"valueRange": "Wertebereich",
+		"rowsToInclude": "Anzahl der Zeilen",
+		"rowCount": "{count} Zeilen",
 
 		"fullscreen": "Vollbild öffnen",
 		"export": {

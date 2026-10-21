@@ -26,6 +26,7 @@ const emit = defineEmits<{
 		payload: { type: VisualizationType; settings: VisualizationSettingsByType[VisualizationType] },
 	];
 	"loading-change": [loading: boolean];
+	"update:total-hits": [hits: Array<number | undefined>];
 }>();
 
 const temporalQueries = computed(() =>
@@ -84,6 +85,7 @@ function updateSettings<TType extends VisualizationType>(
 			:interactive="false"
 			:queries="queries"
 			@loading-change="updateLoading('data-display-keyword-in-context', $event)"
+			@update:total-hits="emit('update:total-hits', $event)"
 		/>
 		<DataDisplayMediaSource
 			v-if="selectedTypes.includes('data-display-media-source')"

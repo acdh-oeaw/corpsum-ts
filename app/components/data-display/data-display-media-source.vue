@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { BarChart3, BarChart4, ChartBarStacked, Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
+import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
-import ChartValueRangeFilter from "@/components/chart-value-range-filter.vue";
 import {
 	type MediaSourceVisualizationSettings,
 	normalizeMediaSourceVisualizationSettings,
@@ -37,7 +37,7 @@ const emit = defineEmits<{
 
 const t = useTranslations();
 const sortOrder = ref<"ascending" | "descending">("descending");
-const valueRange = ref<[number, number] | undefined>();
+const rowLimit = ref(30);
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() =>
@@ -137,9 +137,6 @@ const frequencyData = computed(() =>
 		: queryResults.value.map((result) => result.data),
 );
 const sourceDistributions = computed(() => frequencyData.value.map(parseMediaDistribution));
-const rangeValues = computed(() =>
-	sourceDistributions.value.flatMap((distribution) => distribution.map((item) => item[mode.value])),
-);
 const sourceDistributionsLoading = computed(() =>
 	usesProvidedData.value
 		? queries.value.map(() => false)
@@ -266,7 +263,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 					<ToolbarSeparator />
 				</template>
 
-				<ChartValueRangeFilter v-if="interactive" v-model="valueRange" :values="rangeValues" />
+				<ChartRowLimitSelect v-if="interactive" v-model="rowLimit" />
 				<ToolbarButton
 					v-if="showSourceData && interactive"
 					:aria-label="!expand ? t('ShowData') : t('HideData')"
@@ -334,7 +331,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 			</div>
 
 			<MediaStackedBarChart
-				:value-range="interactive ? valueRange : undefined"
+				:row-limit="interactive ? rowLimit : undefined"
 				:sort-order="sortOrder"
 				:mode="mode"
 				:queries="queries"

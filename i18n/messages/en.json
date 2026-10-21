@@ -218,6 +218,7 @@
 		"stale": "The query has changed. Run it again to update these results.",
 		"title": "Query visualization"
 	},
+	"totalHits": "Total hits",
 	"KwicReferences": {
 		"date": "Date",
 		"documentId": "Document",
@@ -369,6 +370,8 @@
 		"sortAscending": "Sort ascending",
 		"sortDescending": "Sort descending",
 		"valueRange": "Value range",
+		"rowsToInclude": "Rows to include",
+		"rowCount": "{count} rows",
 
 		"fullscreen": "Open fullscreen",
 		"export": {

@@ -66,7 +66,7 @@ const props = withDefaults(
 		fillPatterns?: boolean;
 		sortOrder?: "ascending" | "descending";
 		sortCategories?: boolean;
-		valueRange?: [number, number];
+		rowLimit?: number;
 	}>(),
 	{
 		chartType: "bar",
@@ -87,15 +87,6 @@ const chartConfig = computed(() =>
 	),
 );
 const appContext = getCurrentInstance()?.appContext;
-const rangeBounds = computed<[number, number]>(() => {
-	const values =
-		props.chartType === "donut"
-			? props.series.map((series) => series.data.reduce((sum, [, value]) => sum + value, 0))
-			: props.series.flatMap((series) => series.data.map(([, value]) => value));
-	return values.length > 0 ? [Math.min(...values), Math.max(...values)] : [0, 0];
-});
-const valueRange = computed(() => props.valueRange ?? rangeBounds.value);
-
 function formatDomainValue(value: string | number) {
 	return props.domainValueFormatter?.(value) ?? String(value);
 }
@@ -121,27 +112,21 @@ function renderTooltipContent(
 }
 
 const chartData = computed(() => {
-	const [minimum, maximum] = valueRange.value;
 	const rows = alignChartSeriesData(props.series.map((entry) => entry.data))
-		.map((row) =>
-			row.map(
-				([domain, value]) =>
-					[domain, value >= minimum && value <= maximum ? value : 0] satisfies Datum,
-			),
-		)
 		.map((row) => {
 			if (!percent.value) return row;
 			const total = row.reduce((sum, [, value]) => sum + value, 0);
 			return row.map(([domain, value]) => [domain, total > 0 ? value / total : 0] satisfies Datum);
 		})
 		.filter((row) => row.some(([, value]) => value !== 0));
-	if (!props.sortCategories || props.chartType === "line" || props.chartType === "donut") {
-		return rows;
+	if (props.sortCategories && props.chartType !== "line" && props.chartType !== "donut") {
+		const total = (row: Array<Datum>) => row.reduce((sum, [, value]) => sum + value, 0);
+		const direction = props.sortOrder === "descending" ? -1 : 1;
+		const sorted = rows.toSorted((a, b) => direction * (total(a) - total(b)));
+		const limited = props.rowLimit === undefined ? sorted : sorted.slice(0, props.rowLimit);
+		return props.orientation === "horizontal" ? limited.toReversed() : limited;
 	}
-	const total = (row: Array<Datum>) => row.reduce((sum, [, value]) => sum + value, 0);
-	const direction = props.sortOrder === "descending" ? -1 : 1;
-	const sorted = rows.toSorted((a, b) => direction * (total(a) - total(b)));
-	return props.orientation === "horizontal" ? sorted.toReversed() : sorted;
+	return props.rowLimit === undefined ? rows : rows.slice(0, props.rowLimit);
 });
 const renderScatterPoints = computed(
 	() => chartData.value.length * props.series.length <= maximumScatterPointCount,
@@ -162,7 +147,8 @@ const donutData = computed<Array<DonutDatum>>(() =>
 			value: s.data.reduce((sum, d) => sum + (d?.[1] ?? 0), 0),
 			color: s.color,
 		}))
-		.filter(({ value }) => value >= valueRange.value[0] && value <= valueRange.value[1]),
+		.toSorted((a, b) => b.value - a.value)
+		.slice(0, props.rowLimit ?? Number.POSITIVE_INFINITY),
 );
 const donutLayers = [(d: DonutDatum) => d.label];
 const currentLocale = useLocale();

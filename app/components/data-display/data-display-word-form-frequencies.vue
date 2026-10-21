@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
+import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
-import ChartValueRangeFilter from "@/components/chart-value-range-filter.vue";
 import {
 	type WordFormFrequencyVisualizationSettings,
 	normalizeWordFormFrequencyVisualizationSettings,
@@ -37,7 +37,7 @@ const emit = defineEmits<{
 
 const t = useTranslations();
 const sortOrderByQuery = reactive<Record<string, "ascending" | "descending">>({});
-const valueRangeByQuery = reactive<Record<string, [number, number] | undefined>>({});
+const rowLimitByQuery = reactive<Record<string, number>>({});
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
 const normalizedSettings = computed(() =>
@@ -62,12 +62,13 @@ watch(
 		for (const queryId of Object.keys(sortOrderByQuery)) {
 			if (!queryIds.has(queryId)) {
 				delete sortOrderByQuery[queryId];
-				delete valueRangeByQuery[queryId];
+				delete rowLimitByQuery[queryId];
 			}
 		}
 		for (const query of value) {
 			const queryId = String(query.id);
 			sortOrderByQuery[queryId] ??= "descending";
+			rowLimitByQuery[queryId] ??= 30;
 		}
 	},
 	{ immediate: true },
@@ -207,11 +208,7 @@ const seriesByQuery = computed(() =>
 						<ToolbarSeparator />
 					</template>
 
-					<ChartValueRangeFilter
-						v-if="interactive"
-						v-model="valueRangeByQuery[String(query.id)]"
-						:values="seriesByQuery[index]?.data.map(([, value]) => value) ?? []"
-					/>
+					<ChartRowLimitSelect v-if="interactive" v-model="rowLimitByQuery[String(query.id)]" />
 					<ToolbarButton
 						v-if="showSourceData && interactive"
 						:aria-label="!expand ? t('ShowData') : t('HideData')"
@@ -265,7 +262,7 @@ const seriesByQuery = computed(() =>
 				<Chart
 					v-if="queries.length > 0"
 					:sort-order="sortOrderByQuery[String(query.id)]"
-					:value-range="interactive ? valueRangeByQuery[String(query.id)] : undefined"
+					:row-limit="interactive ? rowLimitByQuery[String(query.id)] : undefined"
 					chart-type="bar"
 					class="h-96"
 					orientation="horizontal"
