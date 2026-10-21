@@ -129,6 +129,11 @@ const chartData = computed(() => {
 					[domain, value >= minimum && value <= maximum ? value : 0] satisfies Datum,
 			),
 		)
+		.map((row) => {
+			if (!percent.value) return row;
+			const total = row.reduce((sum, [, value]) => sum + value, 0);
+			return row.map(([domain, value]) => [domain, total > 0 ? value / total : 0] satisfies Datum);
+		})
 		.filter((row) => row.some(([, value]) => value !== 0));
 	if (!props.sortCategories || props.chartType === "line" || props.chartType === "donut") {
 		return rows;
