@@ -82,7 +82,7 @@ const totalHits = computed(() => props.data?.fullsize ?? props.data?.concsize);
 		<div class="mt-4">
 			<QueryDisplay :loading="loading" :query="query" :query-key="queryKey" />
 			<p v-if="!loading && totalHits !== undefined" class="mb-2 text-sm text-muted-foreground">
-				{{ t("totalHits") }}: {{ totalHits.toLocaleString(locale.value) }}
+				{{ t("totalHits") }}: {{ totalHits.toLocaleString(locale) }}
 			</p>
 			<CorpsumDataTable v-if="!loading" :columns="columns" :data="kwicResults" />
 			<KwicDetailDialog

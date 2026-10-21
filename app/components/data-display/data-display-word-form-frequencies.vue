@@ -208,7 +208,11 @@ const seriesByQuery = computed(() =>
 						<ToolbarSeparator />
 					</template>
 
-					<ChartRowLimitSelect v-if="interactive" v-model="rowLimitByQuery[String(query.id)]" />
+					<ChartRowLimitSelect
+						v-if="interactive"
+						:model-value="rowLimitByQuery[String(query.id)] ?? 10"
+						@update:model-value="rowLimitByQuery[String(query.id)] = $event"
+					/>
 					<ToolbarButton
 						v-if="showSourceData && interactive"
 						:aria-label="!expand ? t('ShowData') : t('HideData')"

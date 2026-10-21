@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 const props = withDefaults(
 	defineProps<
 		ToolbarButtonProps & {
+			"aria-label"?: string;
 			class?: HTMLAttributes["class"];
 			variant?: ButtonVariants["variant"];
 			size?: ButtonVariants["size"];

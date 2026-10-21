@@ -11,6 +11,7 @@ type ToolbarToggleGroupVariants = VariantProps<typeof toggleVariants>;
 
 const props = defineProps<
 	ToolbarToggleItemProps & {
+		"aria-label"?: string;
 		class?: HTMLAttributes["class"];
 		variant?: ToolbarToggleGroupVariants["variant"];
 		size?: ToolbarToggleGroupVariants["size"];
