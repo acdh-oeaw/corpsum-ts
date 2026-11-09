@@ -9,6 +9,7 @@ export interface TemporalFrequency {
 	date: Date;
 	absolute: number;
 	relative: number;
+	norm?: number;
 }
 
 export type TemporalFrequencyPoint = [timestamp: number, value: number];
@@ -228,14 +229,14 @@ export function aggregateTemporalFrequencies(
 			continue;
 		}
 		const timestamp = date.getTime();
-		const current = totalsByTimestamp.get(timestamp) ?? {
-			date,
-			absolute: 0,
-			relative: 0,
-		};
+		const current = totalsByTimestamp.get(timestamp);
+		if (!current) {
+			totalsByTimestamp.set(timestamp, { ...frequency, date });
+			continue;
+		}
 		current.absolute += frequency.absolute;
-		current.relative += frequency.relative;
-		totalsByTimestamp.set(timestamp, current);
+		current.norm = (current.norm ?? 0) + (frequency.norm ?? 0);
+		current.relative = current.norm > 0 ? (current.absolute / current.norm) * 1_000_000 : 0;
 	}
 
 	const buckets: Array<TemporalFrequency> = [];
@@ -247,6 +248,29 @@ export function aggregateTemporalFrequencies(
 		buckets.push(totalsByTimestamp.get(date.getTime()) ?? { date, absolute: 0, relative: 0 });
 	}
 	return buckets;
+}
+
+export function groupTemporalFrequencies(
+	frequencies: Array<TemporalFrequency>,
+	intervalSize: number,
+	useReverseIntervals: boolean,
+	mode: "absolute" | "relative",
+): Array<TemporalFrequencyInterval> {
+	if (!Number.isSafeInteger(intervalSize) || intervalSize <= 0) return [];
+	const source = useReverseIntervals ? [...frequencies].reverse() : frequencies;
+	const intervals: Array<TemporalFrequencyInterval> = [];
+	for (let index = 0; index < source.length; index += intervalSize) {
+		const group = source.slice(index, index + intervalSize);
+		const timestamps = group.map(({ date }) => date.getTime());
+		const absolute = group.reduce((sum, item) => sum + item.absolute, 0);
+		const norm = group.reduce((sum, item) => sum + (item.norm ?? 0), 0);
+		intervals.push({
+			startTimestamp: Math.min(...timestamps),
+			endTimestamp: Math.max(...timestamps),
+			value: mode === "absolute" ? absolute : norm > 0 ? (absolute / norm) * 1_000_000 : 0,
+		});
+	}
+	return useReverseIntervals ? intervals.reverse() : intervals;
 }
 
 function getTemporalBucketDate(

@@ -488,7 +488,7 @@
 			"fromEnd": "Group intervals backward from the end of the selected date range.",
 			"intervalSize": "Choose how many selected time units are combined into each interval.",
 			"queryDetails": "Show query details and cache controls.",
-			"relativeMode": "Show relative frequencies.",
+			"relativeMode": "Show relative frequencies per million tokens.",
 			"sourceData": "Show or hide the source data table.",
 			"startDate": "Set the first date included in the temporal frequency range.",
 			"timeUnit": "Choose the time unit used to bucket the time-series chart."
@@ -522,7 +522,7 @@
 		"tooltips": {
 			"absoluteMode": "Show absolute frequencies.",
 			"queryDetails": "Show query details and cache controls.",
-			"relativeMode": "Show relative frequencies.",
+			"relativeMode": "Show relative frequencies per million tokens.",
 			"sourceData": "Show or hide the source data table."
 		}
 	},

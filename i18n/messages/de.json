@@ -488,7 +488,7 @@
 			"fromEnd": "Intervalle rückwärts ab dem Ende des gewählten Datumsbereichs gruppieren.",
 			"intervalSize": "Legt fest, wie viele ausgewählte Zeiteinheiten zu einem Intervall zusammengefasst werden.",
 			"queryDetails": "Abfragedetails und Cache-Steuerung anzeigen.",
-			"relativeMode": "Relative Frequenzen anzeigen.",
+			"relativeMode": "Relative Frequenzen pro Million Token anzeigen.",
 			"sourceData": "Die Quelldatentabelle ein- oder ausblenden.",
 			"startDate": "Legt das erste Datum fest, das im zeitlichen Frequenzbereich enthalten ist.",
 			"timeUnit": "Legt die Zeiteinheit fest, nach der das Zeitreihendiagramm gruppiert wird."
@@ -522,7 +522,7 @@
 		"tooltips": {
 			"absoluteMode": "Absolute Frequenzen anzeigen.",
 			"queryDetails": "Abfragedetails und Cache-Steuerung anzeigen.",
-			"relativeMode": "Relative Frequenzen anzeigen.",
+			"relativeMode": "Relative Frequenzen pro Million Token anzeigen.",
 			"sourceData": "Die Quelldatentabelle ein- oder ausblenden."
 		}
 	},

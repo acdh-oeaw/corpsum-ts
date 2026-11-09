@@ -25,7 +25,7 @@ import {
 	formatTemporalTimestamp,
 	getAllowedTemporalBucketUnitsForMappings,
 	getTemporalSourceUnit,
-	groupTemporalFrequencyPoints,
+	groupTemporalFrequencies,
 } from "./data-display-temporal-frequency-distribution.transformations.ts";
 
 type FreqMlResponse = components["schemas"]["11_freqml"];
@@ -288,6 +288,15 @@ const temporalFrequencies = computed(() =>
 	}),
 );
 
+const temporalSourceRows = computed(() =>
+	temporalFrequencies.value.map((frequencies) =>
+		frequencies.map((frequency) => ({
+			...frequency,
+			date: formatTemporalTimestamp(frequency.date.getTime(), bucketUnit.value, locale.value),
+		})),
+	),
+);
+
 const temporalFrequenciesLoading = computed(() =>
 	usesProvidedData.value
 		? activeQueries.value.map(() => false)
@@ -334,6 +343,7 @@ function parseTemporalFrequencyItem(
 		{
 			absolute: item.frq ?? 0,
 			relative: item.reltt ?? 0,
+			norm: item.norm,
 			date,
 		},
 	];
@@ -403,12 +413,26 @@ const series = computed(() =>
 );
 
 const intervalseries = computed(() =>
-	series.value.map((querySeries) => ({
-		...querySeries,
-		data: groupTemporalFrequencyPoints(querySeries.data, interval.value, reverse.value)
-			.toSorted((a, b) => a.startTimestamp - b.startTimestamp)
-			.map((item) => formatTemporalFrequencyInterval(item, bucketUnit.value, locale.value)),
-	})),
+	activeQueries.value.flatMap((query, index) => {
+		const frequencies = temporalFrequencies.value[index];
+		const parser = temporalParsers.value[index];
+		if (!frequencies || !frequencyData.value[index] || !parser || parser.error) return [];
+		return [
+			{
+				name: createSeriesName(query),
+				color: query.color,
+				data: groupTemporalFrequencies(frequencies, interval.value, reverse.value, mode.value)
+					.toSorted((a, b) => a.startTimestamp - b.startTimestamp)
+					.map((item) =>
+						formatTemporalFrequencyInterval(
+							{ ...item, value: item.value * (query.SampleRatio / 100) },
+							bucketUnit.value,
+							locale.value,
+						),
+					),
+			},
+		];
+	}),
 );
 
 function formatTemporalDomainValue(value: string | number) {
@@ -670,7 +694,7 @@ function toggleSourceTable() {
 					<Collapsible v-if="showSourceData" v-model:open="expand">
 						<CollapsibleContent class="pb-0">
 							<DataDisplaySourceTable
-								:data="temporalFrequencies"
+								:data="temporalSourceRows"
 								datatype="yearlyFrequencies"
 								:loading="temporalFrequenciesLoading"
 								:queries="activeQueries"
