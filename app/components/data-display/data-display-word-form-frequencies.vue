@@ -188,7 +188,6 @@ const seriesByQuery = computed(() =>
 
 			<div v-for="(query, index) of queries" :key="query.id" class="space-y-4">
 				<Toolbar :aria-label="t('VisualizationToolbar.wordFormFrequency')">
-					<ChartSortToggle v-if="interactive" v-model="sortOrderByQuery[String(query.id)]" />
 					<template v-if="interactive">
 						<ToolbarToggleGroup
 							class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
@@ -198,40 +197,74 @@ const seriesByQuery = computed(() =>
 							:aria-label="t('VisualizationToolbar.frequencyMode')"
 							@update:model-value="setMode"
 						>
-							<ToolbarToggleItem value="absolute" :aria-label="t('absolute')">
-								<Hash />
-							</ToolbarToggleItem>
-							<ToolbarToggleItem value="relative" :aria-label="t('relative')">
-								<Percent />
-							</ToolbarToggleItem>
+							<TooltipProvider
+								><Tooltip
+									><TooltipTrigger as-child
+										><ToolbarToggleItem
+											value="absolute"
+											:aria-label="t('absolute')"
+											class="aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+										>
+											<Hash /> </ToolbarToggleItem></TooltipTrigger
+									><TooltipContent>{{
+										t("VisualizationToolbar.tooltips.absoluteMode")
+									}}</TooltipContent></Tooltip
+								>
+								<Tooltip
+									><TooltipTrigger as-child
+										><ToolbarToggleItem
+											value="relative"
+											:aria-label="t('relative')"
+											class="aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+										>
+											<Percent /> </ToolbarToggleItem></TooltipTrigger
+									><TooltipContent>{{
+										t("VisualizationToolbar.tooltips.relativeMode")
+									}}</TooltipContent></Tooltip
+								></TooltipProvider
+							>
 						</ToolbarToggleGroup>
 						<ToolbarSeparator />
 					</template>
+					<ChartSortToggle v-if="interactive" v-model="sortOrderByQuery[String(query.id)]" />
 
 					<ChartRowLimitSelect
 						v-if="interactive"
 						:model-value="rowLimitByQuery[String(query.id)] ?? 10"
 						@update:model-value="rowLimitByQuery[String(query.id)] = $event"
 					/>
-					<ToolbarButton
-						v-if="showSourceData && interactive"
-						:aria-label="!expand ? t('ShowData') : t('HideData')"
-						:aria-pressed="expand"
-						type="button"
-						variant="outline"
-						@click="setSourceTableExpanded(!expand)"
+					<TooltipProvider v-if="showSourceData && interactive"
+						><Tooltip
+							><TooltipTrigger as-child
+								><ToolbarButton
+									:aria-label="!expand ? t('ShowData') : t('HideData')"
+									:aria-pressed="expand"
+									type="button"
+									variant="outline"
+									@click="setSourceTableExpanded(!expand)"
+								>
+									<Rows3 /> </ToolbarButton></TooltipTrigger
+							><TooltipContent>{{
+								!expand ? t("ShowData") : t("HideData")
+							}}</TooltipContent></Tooltip
+						></TooltipProvider
 					>
-						<Rows3 />
-					</ToolbarButton>
 					<Popover>
-						<PopoverTrigger
-							class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
-							:aria-label="t('VisualizationToolbar.queryDetails')"
-							:title="t('VisualizationToolbar.tooltips.queryDetails')"
-							type="button"
+						<TooltipProvider
+							><Tooltip
+								><TooltipTrigger as-child>
+									<PopoverTrigger
+										class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
+										:aria-label="t('VisualizationToolbar.queryDetails')"
+										type="button"
+									>
+										<Info />
+									</PopoverTrigger> </TooltipTrigger
+								><TooltipContent>{{
+									t("VisualizationToolbar.tooltips.queryDetails")
+								}}</TooltipContent></Tooltip
+							></TooltipProvider
 						>
-							<Info />
-						</PopoverTrigger>
 						<PopoverContent align="end" class="w-80 p-2">
 							<QueryDisplay
 								:loading="wordFormFrequenciesLoading[index]"

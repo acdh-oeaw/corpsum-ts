@@ -16,19 +16,27 @@ const t = useTranslations();
 		class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
 		type="single"
 	>
-		<ToolbarToggleItem
-			:aria-label="t('Chart.sortAscending')"
-			class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground"
-			value="ascending"
+		<TooltipProvider
+			><Tooltip
+				><TooltipTrigger as-child
+					><ToolbarToggleItem
+						:aria-label="t('Chart.sortAscending')"
+						class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+						value="ascending"
+					>
+						<ArrowUpWideNarrow /> </ToolbarToggleItem></TooltipTrigger
+				><TooltipContent>{{ t("Chart.sortAscending") }}</TooltipContent></Tooltip
+			>
+			<Tooltip
+				><TooltipTrigger as-child
+					><ToolbarToggleItem
+						:aria-label="t('Chart.sortDescending')"
+						class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+						value="descending"
+					>
+						<ArrowDownWideNarrow /> </ToolbarToggleItem></TooltipTrigger
+				><TooltipContent>{{ t("Chart.sortDescending") }}</TooltipContent></Tooltip
+			></TooltipProvider
 		>
-			<ArrowUpWideNarrow />
-		</ToolbarToggleItem>
-		<ToolbarToggleItem
-			:aria-label="t('Chart.sortDescending')"
-			class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground"
-			value="descending"
-		>
-			<ArrowDownWideNarrow />
-		</ToolbarToggleItem>
 	</ToolbarToggleGroup>
 </template>
