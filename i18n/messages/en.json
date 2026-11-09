@@ -453,6 +453,8 @@
 		},
 		"labels": {
 			"automaticRange": "Auto range",
+			"customRange": "Custom range",
+			"rangeMode": "Date range mode",
 			"endDate": "End date (exclusive)",
 			"frequencyMode": "Frequency mode",
 			"groupFromBeginning": "Start grouping at the beginning of the date range",
@@ -483,6 +485,8 @@
 		},
 		"tooltips": {
 			"absoluteMode": "Show absolute frequencies.",
+			"automaticRange": "Use the full available date range.",
+			"customRange": "Choose a custom date range.",
 			"endDate": "Set the exclusive end date for the temporal frequency range.",
 			"fromBeginning": "Group intervals forward from the beginning of the selected date range.",
 			"fromEnd": "Group intervals backward from the end of the selected date range.",

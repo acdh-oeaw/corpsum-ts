@@ -453,6 +453,8 @@
 		},
 		"labels": {
 			"automaticRange": "Automatischer Bereich",
+			"customRange": "Benutzerdefinierter Bereich",
+			"rangeMode": "Datumsbereichsmodus",
 			"endDate": "Enddatum (exklusiv)",
 			"frequencyMode": "Frequenzmodus",
 			"groupFromBeginning": "Gruppierung am Anfang des Datumsbereichs beginnen",
@@ -483,6 +485,8 @@
 		},
 		"tooltips": {
 			"absoluteMode": "Absolute Frequenzen anzeigen.",
+			"automaticRange": "Den gesamten verfügbaren Datumsbereich verwenden.",
+			"customRange": "Einen benutzerdefinierten Datumsbereich wählen.",
 			"endDate": "Legt das exklusive Enddatum für den zeitlichen Frequenzbereich fest.",
 			"fromBeginning": "Intervalle vorwärts ab dem Anfang des gewählten Datumsbereichs gruppieren.",
 			"fromEnd": "Intervalle rückwärts ab dem Ende des gewählten Datumsbereichs gruppieren.",

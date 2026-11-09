@@ -1,5 +1,16 @@
 <script lang="ts" setup>
-import { CalendarDays, CalendarRange, Hash, Info, Percent, Rows3 } from "lucide-vue-next";
+import {
+	CalendarDays,
+	CalendarRange,
+	CalendarSearch,
+	CalendarCog,
+	Ruler,
+	Hash,
+	Info,
+	Percent,
+	Rows3,
+} from "lucide-vue-next";
+import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from "reka-ui";
 
 import {
 	type CorpusMetadataMappingResponse,
@@ -152,6 +163,9 @@ const intervalSizeOptions = computed(() =>
 function setMode(value: unknown) {
 	if (value === "absolute" || value === "relative") mode.value = value;
 }
+function setRangeMode(value: unknown) {
+	if (value === "auto" || value === "custom") rangeMode.value = value;
+}
 const intervalDirection = computed({
 	get: () => (reverse.value ? "reverse" : "forward"),
 	set: (value?: string) => {
@@ -232,7 +246,6 @@ const frequencyData = computed(() =>
 );
 
 watchEffect(() => {
-	if (rangeMode.value !== "auto") return;
 	const dates = frequencyData.value.flatMap((data, index) => {
 		const parser = temporalParsers.value[index];
 		if (!data || !parser || parser.error) return [];
@@ -259,18 +272,47 @@ watchEffect(() => {
 	}
 	automaticRangeTooLarge.value = false;
 	automaticDateRange.value = { start: start.toISOString(), end: end.toISOString() };
-	rangeStart.value = start.toISOString().slice(0, 10);
-	rangeEnd.value = end.toISOString().slice(0, 10);
+	if (rangeMode.value === "auto") {
+		rangeStart.value = start.toISOString().slice(0, 10);
+		rangeEnd.value = end.toISOString().slice(0, 10);
+	}
 });
 
-function setCustomRangeStart(value: string | number) {
-	rangeMode.value = "custom";
-	rangeStart.value = String(value);
+const rangeSliderDates = computed(() => {
+	if (!automaticDateRange.value) return [];
+	const end = new Date(automaticDateRange.value.end);
+	const dates: Array<Date> = [];
+	for (
+		let date = new Date(automaticDateRange.value.start);
+		date <= end;
+		date = addTemporalUnits(date, bucketUnit.value, 1)
+	) {
+		dates.push(date);
+	}
+	return dates;
+});
+const rangeSliderValue = computed(() => {
+	const dates = rangeSliderDates.value;
+	if (dates.length < 2) return [0, 1];
+	const findIndex = (value: string) => {
+		const timestamp = new Date(`${value}T00:00:00.000Z`).getTime();
+		const index = dates.findIndex((date) => date.getTime() >= timestamp);
+		return index < 0 ? dates.length - 1 : index;
+	};
+	const start = Math.min(findIndex(rangeStart.value), dates.length - 2);
+	return [start, Math.max(start + 1, findIndex(rangeEnd.value))];
+});
+function setSliderRange(value: Array<number> | undefined) {
+	if (!value || value.length !== 2) return;
+	const start = rangeSliderDates.value[value[0] ?? -1];
+	const end = rangeSliderDates.value[value[1] ?? -1];
+	if (!start || !end || start >= end) return;
+	rangeStart.value = start.toISOString().slice(0, 10);
+	rangeEnd.value = end.toISOString().slice(0, 10);
 }
-
-function setCustomRangeEnd(value: string | number) {
-	rangeMode.value = "custom";
-	rangeEnd.value = String(value);
+function sliderDateLabel(index: number) {
+	const date = rangeSliderDates.value[index];
+	return date ? formatTemporalTimestamp(date.getTime(), bucketUnit.value, locale.value) : "";
 }
 
 const temporalFrequencies = computed(() =>
@@ -552,93 +594,197 @@ function toggleSourceTable() {
 							</div>
 							<ToolbarSeparator />
 							<div class="inline-flex min-w-0 items-center gap-1.5">
-								<CalendarDays class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+								<Ruler class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
 								<Label for="temporal-bucket-unit" class="sr-only">{{
 									t("TemporalFrequencyDistribution.labels.timeUnit")
 								}}</Label>
-								<Select v-model="bucketUnit">
-									<SelectTrigger
-										id="temporal-bucket-unit"
-										class="h-8 w-34 min-w-0"
-										:disabled="!hasMultipleBucketUnitOptions"
-										:title="t('TemporalFrequencyDistribution.tooltips.timeUnit')"
-									>
-										<SelectValue
-											:placeholder="t('TemporalFrequencyDistribution.labels.timeUnit')"
-										/>
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem
-											v-for="option of bucketUnitOptions"
-											:key="option.value"
-											:value="option.value"
-										>
-											{{ option.label }}
-										</SelectItem>
-									</SelectContent>
-								</Select>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger as-child>
+											<span
+												class="inline-flex"
+												:tabindex="!hasMultipleBucketUnitOptions ? 0 : undefined"
+												:aria-label="
+													!hasMultipleBucketUnitOptions
+														? t('TemporalFrequencyDistribution.labels.timeUnit')
+														: undefined
+												"
+											>
+												<Select v-model="bucketUnit">
+													<SelectTrigger
+														id="temporal-bucket-unit"
+														class="h-8 w-34 min-w-0"
+														:disabled="!hasMultipleBucketUnitOptions"
+													>
+														<SelectValue
+															:placeholder="t('TemporalFrequencyDistribution.labels.timeUnit')"
+														/>
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem
+															v-for="option of bucketUnitOptions"
+															:key="option.value"
+															:value="option.value"
+															>{{ option.label }}</SelectItem
+														>
+													</SelectContent>
+												</Select>
+											</span>
+										</TooltipTrigger>
+										<TooltipContent>{{
+											t("TemporalFrequencyDistribution.tooltips.timeUnit")
+										}}</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
 							</div>
 							<ToolbarSeparator />
 							<div class="inline-flex min-w-0 items-center gap-1.5">
 								<CalendarRange class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-								<Button
-									:aria-pressed="rangeMode === 'auto'"
-									class="h-8"
+								<ToolbarToggleGroup
+									:model-value="rangeMode"
+									:aria-label="t('TemporalFrequencyDistribution.labels.rangeMode')"
+									class="h-8 shrink-0 rounded-md border border-input bg-background p-0.5 shadow-sm"
 									size="sm"
-									type="button"
-									:variant="rangeMode === 'auto' ? 'default' : 'outline'"
-									@click="rangeMode = 'auto'"
+									type="single"
+									@update:model-value="setRangeMode"
 								>
-									{{ t("TemporalFrequencyDistribution.labels.automaticRange") }}
-								</Button>
-								<Label for="temporal-range-start" class="sr-only">{{
-									t("TemporalFrequencyDistribution.labels.startDate")
-								}}</Label>
-								<Input
-									id="temporal-range-start"
-									class="h-8 w-37 min-w-0"
-									:disabled="rangeMode === 'auto'"
-									:model-value="rangeStart"
-									:title="t('TemporalFrequencyDistribution.tooltips.startDate')"
-									type="date"
-									@update:model-value="setCustomRangeStart"
-								/>
-							</div>
-							<div class="inline-flex min-w-0 items-center gap-1.5">
-								<Label for="temporal-range-end" class="sr-only">{{
-									t("TemporalFrequencyDistribution.labels.endDate")
-								}}</Label>
-								<Input
-									id="temporal-range-end"
-									class="h-8 w-37 min-w-0"
-									:disabled="rangeMode === 'auto'"
-									:model-value="rangeEnd"
-									:title="t('TemporalFrequencyDistribution.tooltips.endDate')"
-									type="date"
-									@update:model-value="setCustomRangeEnd"
-								/>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<ToolbarToggleItem
+													value="auto"
+													:aria-label="t('TemporalFrequencyDistribution.labels.automaticRange')"
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+												>
+													<CalendarSearch />
+												</ToolbarToggleItem>
+											</TooltipTrigger>
+											<TooltipContent>{{
+												t("TemporalFrequencyDistribution.tooltips.automaticRange")
+											}}</TooltipContent>
+										</Tooltip>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<ToolbarToggleItem
+													value="custom"
+													:aria-label="t('TemporalFrequencyDistribution.labels.customRange')"
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+												>
+													<CalendarCog />
+												</ToolbarToggleItem>
+											</TooltipTrigger>
+											<TooltipContent>{{
+												t("TemporalFrequencyDistribution.tooltips.customRange")
+											}}</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</ToolbarToggleGroup>
+								<div
+									class="inline-flex min-w-0 items-center gap-2"
+									:class="{
+										'cursor-not-allowed opacity-40':
+											rangeMode === 'auto' || rangeSliderDates.length < 2,
+									}"
+								>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger as-child
+												><span class="whitespace-nowrap text-xs tabular-nums">{{
+													sliderDateLabel(rangeSliderValue[0] ?? 0)
+												}}</span></TooltipTrigger
+											>
+											<TooltipContent>{{
+												t("TemporalFrequencyDistribution.tooltips.startDate")
+											}}</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+									<SliderRoot
+										:model-value="rangeSliderValue"
+										:min="0"
+										:max="Math.max(1, rangeSliderDates.length - 1)"
+										:step="1"
+										:min-steps-between-thumbs="1"
+										:disabled="rangeMode === 'auto' || rangeSliderDates.length < 2"
+										class="relative flex h-8 w-28 touch-none items-center"
+										@update:model-value="setSliderRange"
+									>
+										<SliderTrack class="relative h-1.5 w-full grow rounded-full bg-secondary"
+											><SliderRange class="absolute h-full rounded-full bg-primary"
+										/></SliderTrack>
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger as-child
+													><SliderThumb
+														:aria-label="t('TemporalFrequencyDistribution.labels.startDate')"
+														:aria-valuetext="sliderDateLabel(rangeSliderValue[0] ?? 0)"
+														class="block size-4 rounded-full border border-primary bg-background shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+												/></TooltipTrigger>
+												<TooltipContent>{{
+													t("TemporalFrequencyDistribution.tooltips.startDate")
+												}}</TooltipContent>
+											</Tooltip>
+											<Tooltip>
+												<TooltipTrigger as-child
+													><SliderThumb
+														:aria-label="t('TemporalFrequencyDistribution.labels.endDate')"
+														:aria-valuetext="sliderDateLabel(rangeSliderValue[1] ?? 1)"
+														class="block size-4 rounded-full border border-primary bg-background shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+												/></TooltipTrigger>
+												<TooltipContent>{{
+													t("TemporalFrequencyDistribution.tooltips.endDate")
+												}}</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									</SliderRoot>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger as-child
+												><span class="whitespace-nowrap text-xs tabular-nums">{{
+													sliderDateLabel(rangeSliderValue[1] ?? 1)
+												}}</span></TooltipTrigger
+											>
+											<TooltipContent>{{
+												t("TemporalFrequencyDistribution.tooltips.endDate")
+											}}</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</div>
 							</div>
 							<ToolbarSeparator />
 						</template>
-						<ToolbarButton
-							v-if="showSourceData && interactive"
-							:aria-label="!expand ? t('ShowData') : t('HideData')"
-							:aria-pressed="expand"
-							type="button"
-							variant="outline"
-							@click="toggleSourceTable"
-						>
-							<Rows3 />
-						</ToolbarButton>
+						<TooltipProvider v-if="showSourceData && interactive">
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarButton
+										:aria-label="!expand ? t('ShowData') : t('HideData')"
+										:aria-pressed="expand"
+										type="button"
+										variant="outline"
+										@click="toggleSourceTable"
+									>
+										<Rows3 />
+									</ToolbarButton>
+								</TooltipTrigger>
+								<TooltipContent>{{ !expand ? t("ShowData") : t("HideData") }}</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
 						<Popover>
-							<PopoverTrigger
-								class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
-								:aria-label="t('TemporalFrequencyDistribution.labels.queryDetails')"
-								:title="t('TemporalFrequencyDistribution.tooltips.queryDetails')"
-								type="button"
-							>
-								<Info />
-							</PopoverTrigger>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger as-child>
+										<PopoverTrigger
+											class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
+											:aria-label="t('TemporalFrequencyDistribution.labels.queryDetails')"
+											type="button"
+										>
+											<Info />
+										</PopoverTrigger>
+									</TooltipTrigger>
+									<TooltipContent>{{
+										t("TemporalFrequencyDistribution.tooltips.queryDetails")
+									}}</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
 							<PopoverContent align="end" class="w-80 p-2">
 								<div class="max-h-96 space-y-3 overflow-y-auto">
 									<div
@@ -733,24 +879,30 @@ function toggleSourceTable() {
 							<Label for="temporal-interval" class="sr-only">{{
 								t("TemporalFrequencyDistribution.labels.intervalSize")
 							}}</Label>
-							<Select v-model="interval" :aria-label="t('interval')">
-								<SelectTrigger
-									id="temporal-interval"
-									class="h-8 w-34 min-w-0"
-									:title="t('TemporalFrequencyDistribution.tooltips.intervalSize')"
-								>
-									<SelectValue :placeholder="t('interval')" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem
-										v-for="option of intervalSizeOptions"
-										:key="option.value"
-										:value="option.value"
-									>
-										{{ option.label }}
-									</SelectItem>
-								</SelectContent>
-							</Select>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger as-child>
+										<span class="inline-flex">
+											<Select v-model="interval" :aria-label="t('interval')">
+												<SelectTrigger id="temporal-interval" class="h-8 w-34 min-w-0">
+													<SelectValue :placeholder="t('interval')" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem
+														v-for="option of intervalSizeOptions"
+														:key="option.value"
+														:value="option.value"
+														>{{ option.label }}</SelectItem
+													>
+												</SelectContent>
+											</Select>
+										</span>
+									</TooltipTrigger>
+									<TooltipContent>{{
+										t("TemporalFrequencyDistribution.tooltips.intervalSize")
+									}}</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
 						</div>
 						<ToolbarSeparator />
 						<TooltipProvider>
