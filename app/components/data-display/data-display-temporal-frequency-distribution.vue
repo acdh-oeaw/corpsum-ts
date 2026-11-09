@@ -12,6 +12,7 @@ import {
 } from "lucide-vue-next";
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from "reka-ui";
 
+import { buttonVariants } from "@/components/ui/button";
 import {
 	type CorpusMetadataMappingResponse,
 	type TemporalFrequencyDistributionSettings,
@@ -654,7 +655,7 @@ function toggleSourceTable() {
 												<ToolbarToggleItem
 													value="auto"
 													:aria-label="t('TemporalFrequencyDistribution.labels.automaticRange')"
-													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 												>
 													<CalendarSearch />
 												</ToolbarToggleItem>
@@ -668,7 +669,7 @@ function toggleSourceTable() {
 												<ToolbarToggleItem
 													value="custom"
 													:aria-label="t('TemporalFrequencyDistribution.labels.customRange')"
-													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 												>
 													<CalendarCog />
 												</ToolbarToggleItem>
@@ -758,6 +759,7 @@ function toggleSourceTable() {
 									<ToolbarButton
 										:aria-label="!expand ? t('ShowData') : t('HideData')"
 										:aria-pressed="expand"
+										class="w-8 px-0"
 										type="button"
 										variant="outline"
 										@click="toggleSourceTable"
@@ -768,59 +770,63 @@ function toggleSourceTable() {
 								<TooltipContent>{{ !expand ? t("ShowData") : t("HideData") }}</TooltipContent>
 							</Tooltip>
 						</TooltipProvider>
-						<Popover>
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger as-child>
-										<PopoverTrigger
-											class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
-											:aria-label="t('TemporalFrequencyDistribution.labels.queryDetails')"
-											type="button"
-										>
-											<Info />
-										</PopoverTrigger>
-									</TooltipTrigger>
-									<TooltipContent>{{
-										t("TemporalFrequencyDistribution.tooltips.queryDetails")
-									}}</TooltipContent>
-								</Tooltip>
-							</TooltipProvider>
-							<PopoverContent align="end" class="w-80 p-2">
-								<div class="max-h-96 space-y-3 overflow-y-auto">
-									<div
-										v-for="(query, index) of activeQueries"
-										v-show="temporalParsers[index] && !temporalParsers[index]?.error"
-										:key="query.id"
-										class="min-w-0 rounded-md border p-2"
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<span class="inline-flex"
+										><Popover>
+											<PopoverTrigger
+												:class="
+													buttonVariants({ variant: 'outline', size: 'sm', class: 'w-8 px-0' })
+												"
+												:aria-label="t('TemporalFrequencyDistribution.labels.queryDetails')"
+												type="button"
+											>
+												<Info />
+											</PopoverTrigger>
+											<PopoverContent align="end" class="w-80 p-2">
+												<div class="max-h-96 space-y-3 overflow-y-auto">
+													<div
+														v-for="(query, index) of activeQueries"
+														v-show="temporalParsers[index] && !temporalParsers[index]?.error"
+														:key="query.id"
+														class="min-w-0 rounded-md border p-2"
+													>
+														<QueryDisplay
+															class="my-0"
+															:loading="temporalFrequenciesLoading[index]"
+															:query="query"
+															:query-key="queryDescriptors[index]?.queryKey"
+														/>
+														<p
+															v-if="normalizationWarnings[index]"
+															class="mt-1 text-xs text-muted-foreground"
+														>
+															{{
+																t(
+																	"TemporalFrequencyDistribution.warnings.parseExcluded",
+																	normalizationWarnings[index],
+																)
+															}}
+														</p>
+														<p
+															v-if="temporalFrequenciesErrors[index]"
+															class="mt-1 text-sm text-destructive"
+															role="alert"
+														>
+															{{ temporalFrequenciesErrors[index] }}
+														</p>
+													</div>
+												</div>
+											</PopoverContent>
+										</Popover></span
 									>
-										<QueryDisplay
-											class="my-0"
-											:loading="temporalFrequenciesLoading[index]"
-											:query="query"
-											:query-key="queryDescriptors[index]?.queryKey"
-										/>
-										<p
-											v-if="normalizationWarnings[index]"
-											class="mt-1 text-xs text-muted-foreground"
-										>
-											{{
-												t(
-													"TemporalFrequencyDistribution.warnings.parseExcluded",
-													normalizationWarnings[index],
-												)
-											}}
-										</p>
-										<p
-											v-if="temporalFrequenciesErrors[index]"
-											class="mt-1 text-sm text-destructive"
-											role="alert"
-										>
-											{{ temporalFrequenciesErrors[index] }}
-										</p>
-									</div>
-								</div>
-							</PopoverContent>
-						</Popover>
+								</TooltipTrigger>
+								<TooltipContent>{{
+									t("TemporalFrequencyDistribution.tooltips.queryDetails")
+								}}</TooltipContent>
+							</Tooltip></TooltipProvider
+						>
 						<p
 							v-if="interactive && !selectedDateRange"
 							class="basis-full text-sm text-destructive"

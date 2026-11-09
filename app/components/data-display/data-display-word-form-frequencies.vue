@@ -3,6 +3,7 @@ import { Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
 import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
+import { buttonVariants } from "@/components/ui/button";
 import {
 	type WordFormFrequencyVisualizationSettings,
 	normalizeWordFormFrequencyVisualizationSettings,
@@ -203,7 +204,7 @@ const seriesByQuery = computed(() =>
 										><ToolbarToggleItem
 											value="absolute"
 											:aria-label="t('absolute')"
-											class="aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+											class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 										>
 											<Hash /> </ToolbarToggleItem></TooltipTrigger
 									><TooltipContent>{{
@@ -215,7 +216,7 @@ const seriesByQuery = computed(() =>
 										><ToolbarToggleItem
 											value="relative"
 											:aria-label="t('relative')"
-											class="aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+											class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 										>
 											<Percent /> </ToolbarToggleItem></TooltipTrigger
 									><TooltipContent>{{
@@ -239,6 +240,7 @@ const seriesByQuery = computed(() =>
 								><ToolbarButton
 									:aria-label="!expand ? t('ShowData') : t('HideData')"
 									:aria-pressed="expand"
+									class="w-8 px-0"
 									type="button"
 									variant="outline"
 									@click="setSourceTableExpanded(!expand)"
@@ -249,30 +251,30 @@ const seriesByQuery = computed(() =>
 							}}</TooltipContent></Tooltip
 						></TooltipProvider
 					>
-					<Popover>
-						<TooltipProvider
-							><Tooltip
-								><TooltipTrigger as-child>
-									<PopoverTrigger
-										class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background"
-										:aria-label="t('VisualizationToolbar.queryDetails')"
-										type="button"
-									>
-										<Info />
-									</PopoverTrigger> </TooltipTrigger
-								><TooltipContent>{{
-									t("VisualizationToolbar.tooltips.queryDetails")
-								}}</TooltipContent></Tooltip
-							></TooltipProvider
-						>
-						<PopoverContent align="end" class="w-80 p-2">
-							<QueryDisplay
-								:loading="wordFormFrequenciesLoading[index]"
-								:query="query"
-								:query-key="queryDescriptors[index]?.queryKey"
-							/>
-						</PopoverContent>
-					</Popover>
+					<TooltipProvider
+						><Tooltip
+							><TooltipTrigger as-child>
+								<span class="inline-flex"
+									><Popover>
+										<PopoverTrigger
+											:class="buttonVariants({ variant: 'outline', size: 'sm', class: 'w-8 px-0' })"
+											:aria-label="t('VisualizationToolbar.queryDetails')"
+											type="button"
+										>
+											<Info />
+										</PopoverTrigger>
+										<PopoverContent align="end" class="w-80 p-2">
+											<QueryDisplay
+												:loading="wordFormFrequenciesLoading[index]"
+												:query="query"
+												:query-key="queryDescriptors[index]?.queryKey"
+											/>
+										</PopoverContent> </Popover></span></TooltipTrigger
+							><TooltipContent>{{
+								t("VisualizationToolbar.tooltips.queryDetails")
+							}}</TooltipContent></Tooltip
+						></TooltipProvider
+					>
 				</Toolbar>
 
 				<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
