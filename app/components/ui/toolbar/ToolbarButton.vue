@@ -10,25 +10,27 @@ const props = withDefaults(
 	defineProps<
 		ToolbarButtonProps & {
 			"aria-label"?: string;
+			nativeTooltip?: boolean;
 			class?: HTMLAttributes["class"];
 			variant?: ButtonVariants["variant"];
 			size?: ButtonVariants["size"];
 		}
 	>(),
 	{
+		nativeTooltip: true,
 		size: "sm",
 		variant: "ghost",
 	},
 );
 
-const delegatedProps = reactiveOmit(props, "class", "size", "variant");
+const delegatedProps = reactiveOmit(props, "class", "size", "variant", "nativeTooltip");
 const forwardedProps = useForwardProps(delegatedProps);
 </script>
 
 <template>
 	<ToolbarButton
 		v-bind="forwardedProps"
-		:title="typeof props['aria-label'] === 'string' ? props['aria-label'] : undefined"
+		:title="props.nativeTooltip !== false ? props['aria-label'] : undefined"
 		:class="cn(buttonVariants({ variant, size }), props.class)"
 	>
 		<slot />

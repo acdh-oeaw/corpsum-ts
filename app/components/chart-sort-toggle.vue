@@ -21,6 +21,7 @@ const t = useTranslations();
 				><TooltipTrigger as-child
 					><ToolbarToggleItem
 						:aria-label="t('Chart.sortAscending')"
+						:native-tooltip="false"
 						class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 						value="ascending"
 					>
@@ -31,6 +32,7 @@ const t = useTranslations();
 				><TooltipTrigger as-child
 					><ToolbarToggleItem
 						:aria-label="t('Chart.sortDescending')"
+						:native-tooltip="false"
 						class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 						value="descending"
 					>

@@ -9,21 +9,25 @@ import { cn } from "@/lib/utils";
 
 type ToolbarToggleGroupVariants = VariantProps<typeof toggleVariants>;
 
-const props = defineProps<
-	ToolbarToggleItemProps & {
-		"aria-label"?: string;
-		class?: HTMLAttributes["class"];
-		variant?: ToolbarToggleGroupVariants["variant"];
-		size?: ToolbarToggleGroupVariants["size"];
-	}
->();
+const props = withDefaults(
+	defineProps<
+		ToolbarToggleItemProps & {
+			"aria-label"?: string;
+			nativeTooltip?: boolean;
+			class?: HTMLAttributes["class"];
+			variant?: ToolbarToggleGroupVariants["variant"];
+			size?: ToolbarToggleGroupVariants["size"];
+		}
+	>(),
+	{ nativeTooltip: true },
+);
 
 const context = inject<{
 	variant?: ToolbarToggleGroupVariants["variant"];
 	size?: ToolbarToggleGroupVariants["size"];
 }>("toolbarToggleGroup", {});
 
-const delegatedProps = reactiveOmit(props, "class", "size", "variant");
+const delegatedProps = reactiveOmit(props, "class", "size", "variant", "nativeTooltip");
 const forwardedProps = useForwardProps(delegatedProps);
 
 const variant = computed(() => props.variant ?? context.variant);
@@ -33,7 +37,7 @@ const size = computed(() => props.size ?? context.size);
 <template>
 	<ToolbarToggleItem
 		v-bind="forwardedProps"
-		:title="typeof props['aria-label'] === 'string' ? props['aria-label'] : undefined"
+		:title="props.nativeTooltip !== false ? props['aria-label'] : undefined"
 		:class="cn(toggleVariants({ variant, size }), props.class)"
 	>
 		<slot />

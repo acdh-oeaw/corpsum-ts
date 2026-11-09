@@ -3,6 +3,7 @@ import { BarChart3, BarChart4, ChartBarStacked, Hash, Info, Percent, Rows3 } fro
 
 import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
+import { buttonVariants } from "@/components/ui/button";
 import {
 	type MediaSourceVisualizationSettings,
 	normalizeMediaSourceVisualizationSettings,
@@ -168,58 +169,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 
 		<CardContent class="space-y-4">
 			<Toolbar :aria-label="t('VisualizationToolbar.mediaSource')">
-				<ChartSortToggle v-if="interactive" v-model="sortOrder" />
 				<template v-if="interactive">
-					<ToolbarToggleGroup
-						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
-						:model-value="chartMode"
-						size="sm"
-						type="single"
-						:aria-label="t('VisualizationToolbar.chartMode')"
-						@update:model-value="setChartMode"
-					>
-						<TooltipProvider>
-							<Tooltip>
-								<TooltipTrigger as-child>
-									<ToolbarToggleItem
-										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
-										value="bar"
-										:aria-label="t('separateBarChart')"
-									>
-										<BarChart4 />
-									</ToolbarToggleItem>
-								</TooltipTrigger>
-								<TooltipContent>{{ t("separateBarChart") }}</TooltipContent>
-							</Tooltip>
-							<Tooltip>
-								<TooltipTrigger as-child>
-									<ToolbarToggleItem
-										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
-										value="stack"
-										:aria-label="t('stackedBarChart')"
-									>
-										<BarChart3 />
-									</ToolbarToggleItem>
-								</TooltipTrigger>
-								<TooltipContent>{{ t("stackedBarChart") }}</TooltipContent>
-							</Tooltip>
-							<Tooltip>
-								<TooltipTrigger as-child>
-									<ToolbarToggleItem
-										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
-										value="percent"
-										:aria-label="t('percentageBarChart')"
-									>
-										<ChartBarStacked />
-									</ToolbarToggleItem>
-								</TooltipTrigger>
-								<TooltipContent>{{ t("percentageBarChart") }}</TooltipContent>
-							</Tooltip>
-						</TooltipProvider>
-					</ToolbarToggleGroup>
-
-					<ToolbarSeparator />
-
 					<ToolbarToggleGroup
 						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
 						:model-value="mode"
@@ -228,10 +178,11 @@ const isStacked = computed(() => chartMode.value === "stack");
 						:aria-label="t('VisualizationToolbar.frequencyMode')"
 						@update:model-value="setMode"
 					>
-						<TooltipProvider>
+						<TooltipProvider :disable-hoverable-content="true">
 							<Tooltip>
 								<TooltipTrigger as-child>
 									<ToolbarToggleItem
+										:native-tooltip="false"
 										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 										value="absolute"
 										:aria-label="t('absolute')"
@@ -246,6 +197,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 							<Tooltip>
 								<TooltipTrigger as-child>
 									<ToolbarToggleItem
+										:native-tooltip="false"
 										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
 										value="relative"
 										:aria-label="t('relative')"
@@ -261,41 +213,108 @@ const isStacked = computed(() => chartMode.value === "stack");
 					</ToolbarToggleGroup>
 
 					<ToolbarSeparator />
+
+					<ToolbarToggleGroup
+						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
+						:model-value="chartMode"
+						size="sm"
+						type="single"
+						:aria-label="t('VisualizationToolbar.chartMode')"
+						@update:model-value="setChartMode"
+					>
+						<TooltipProvider :disable-hoverable-content="true">
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarToggleItem
+										:native-tooltip="false"
+										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+										value="bar"
+										:aria-label="t('separateBarChart')"
+									>
+										<BarChart4 />
+									</ToolbarToggleItem>
+								</TooltipTrigger>
+								<TooltipContent>{{ t("separateBarChart") }}</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarToggleItem
+										:native-tooltip="false"
+										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+										value="stack"
+										:aria-label="t('stackedBarChart')"
+									>
+										<BarChart3 />
+									</ToolbarToggleItem>
+								</TooltipTrigger>
+								<TooltipContent>{{ t("stackedBarChart") }}</TooltipContent>
+							</Tooltip>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarToggleItem
+										:native-tooltip="false"
+										class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+										value="percent"
+										:aria-label="t('percentageBarChart')"
+									>
+										<ChartBarStacked />
+									</ToolbarToggleItem>
+								</TooltipTrigger>
+								<TooltipContent>{{ t("percentageBarChart") }}</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</ToolbarToggleGroup>
+
+					<ToolbarSeparator />
 				</template>
 
+				<ChartSortToggle v-if="interactive" v-model="sortOrder" />
 				<ChartRowLimitSelect v-if="interactive" v-model="rowLimit" />
-				<ToolbarButton
-					v-if="showSourceData && interactive"
-					:aria-label="!expand ? t('ShowData') : t('HideData')"
-					:aria-pressed="expand"
-					type="button"
-					variant="outline"
-					@click="setSourceTableExpanded(!expand)"
+				<TooltipProvider :disable-hoverable-content="true" v-if="showSourceData && interactive"
+					><Tooltip
+						><TooltipTrigger as-child
+							><ToolbarButton
+								:aria-label="!expand ? t('ShowData') : t('HideData')"
+								:aria-pressed="expand"
+								:native-tooltip="false"
+								class="w-8 px-0"
+								type="button"
+								variant="outline"
+								@click="setSourceTableExpanded(!expand)"
+							>
+								<Rows3 /> </ToolbarButton></TooltipTrigger
+						><TooltipContent>{{ !expand ? t("ShowData") : t("HideData") }}</TooltipContent></Tooltip
+					></TooltipProvider
 				>
-					<Rows3 />
-				</ToolbarButton>
-				<Popover>
-					<PopoverTrigger
-						class="inline-flex h-8 w-8 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
-						:aria-label="t('VisualizationToolbar.queryDetails')"
-						:title="t('VisualizationToolbar.tooltips.queryDetails')"
-						type="button"
-					>
-						<Info />
-					</PopoverTrigger>
-					<PopoverContent align="end" class="w-80 p-2">
-						<div class="max-h-96 space-y-3 overflow-y-auto">
-							<QueryDisplay
-								v-for="(query, index) of queries"
-								:key="query.id"
-								class="my-0 rounded-md border p-2"
-								:loading="sourceDistributionsLoading[index]"
-								:query="query"
-								:query-key="queryDescriptors[index]?.queryKey"
-							/>
-						</div>
-					</PopoverContent>
-				</Popover>
+				<TooltipProvider :disable-hoverable-content="true"
+					><Tooltip
+						><TooltipTrigger as-child
+							><span class="inline-flex"
+								><Popover>
+									<PopoverTrigger
+										:class="buttonVariants({ variant: 'outline', size: 'sm', class: 'w-8 px-0' })"
+										:aria-label="t('VisualizationToolbar.queryDetails')"
+										type="button"
+									>
+										<Info />
+									</PopoverTrigger>
+									<PopoverContent align="end" class="w-80 p-2">
+										<div class="max-h-96 space-y-3 overflow-y-auto">
+											<QueryDisplay
+												v-for="(query, index) of queries"
+												:key="query.id"
+												class="my-0 rounded-md border p-2"
+												:loading="sourceDistributionsLoading[index]"
+												:query="query"
+												:query-key="queryDescriptors[index]?.queryKey"
+											/>
+										</div>
+									</PopoverContent> </Popover></span></TooltipTrigger
+						><TooltipContent>{{
+							t("VisualizationToolbar.tooltips.queryDetails")
+						}}</TooltipContent></Tooltip
+					></TooltipProvider
+				>
 			</Toolbar>
 
 			<Collapsible v-if="showSourceData" :open="expand" @update:open="setSourceTableExpanded">
