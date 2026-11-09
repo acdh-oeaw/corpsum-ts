@@ -34,9 +34,12 @@ function getSessionUsername(data: AuthSessionResponse): string {
 
 export function useAuth() {
 	const user = useState<AuthUser | null>("auth:user", () => null);
+	const expires = useState<number | null>("auth:expires", () => null);
 	const username = computed(() => user.value?.username ?? "");
 
 	function setUser(data: AuthUser | AuthSessionResponse | null) {
+		expires.value =
+			data && "expires" in data && typeof data.expires === "number" ? data.expires : null;
 		const nextUsername = data ? getSessionUsername(data) : "";
 		user.value = nextUsername
 			? {
@@ -112,8 +115,18 @@ export function useAuth() {
 	}
 
 	function isLoggedIn(): boolean {
-		return username.value.length > 0;
+		return username.value.length > 0 && (expires.value === null || expires.value > Date.now());
 	}
 
-	return reactive({ isLoggedIn, login, logout, refresh, register, user, username });
+	return reactive({
+		expires,
+		isLoggedIn,
+		login,
+		logout,
+		refresh,
+		register,
+		setUser,
+		user,
+		username,
+	});
 }

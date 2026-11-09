@@ -22,8 +22,12 @@ export async function requireAuth(event: H3Event) {
 	if (!token)
 		throw createError({
 			statusCode: 401,
-			statusText: "Unauthorized! token invalid.",
+			statusMessage: "Session expired or invalid",
 		});
 
-	return await verifyJWT(token);
+	try {
+		return await verifyJWT(token);
+	} catch {
+		throw createError({ statusCode: 401, statusMessage: "Session expired or invalid" });
+	}
 }

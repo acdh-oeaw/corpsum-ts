@@ -20,8 +20,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
 	}
 
 	if (!auth.isLoggedIn() && !isPublicRoute) {
+		auth.setUser(null);
 		const isSignupError = to.query.error === "sso" && to.query.mode === "signup";
 		const query = to.query.error === "sso" ? { error: "sso" } : undefined;
-		return await navigateTo({ path: isSignupError ? signupPath : loginPath, query });
+		return navigateTo({ path: isSignupError ? signupPath : loginPath, query });
 	}
 });
