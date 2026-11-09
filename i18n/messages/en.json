@@ -658,7 +658,7 @@
 	"regionalFrequencies": "Regional frequencies",
 	"regionalFrequenciesDesc": "Compare query frequencies across regions.",
 	"relative": "Relative",
-	"sources": "Sources",
+	"sources": "Hits",
 	"viewOptions": "View options",
 	"wordFormFrequencies": "Word form frequencies",
 	"wordFormFrequenciesDesc": "Compare the most frequent word forms returned by each query.",
