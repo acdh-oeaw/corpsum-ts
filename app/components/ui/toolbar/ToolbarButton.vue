@@ -30,7 +30,7 @@ const forwardedProps = useForwardProps(delegatedProps);
 <template>
 	<ToolbarButton
 		v-bind="forwardedProps"
-		:title="props.nativeTooltip !== false ? props['aria-label'] : undefined"
+		:title="props.nativeTooltip ? props['aria-label'] : undefined"
 		:class="cn(buttonVariants({ variant, size }), props.class)"
 	>
 		<slot />
