@@ -111,7 +111,12 @@ export async function createPublishedSnapshot(input: {
 		fetchCorpusInfo: input.fetchCorpusInfo ?? fetchPublishedCorpusInfo,
 	});
 	const querySnapshots = queries.map((query, index) =>
-		createQuerySnapshot(query, index, resolvedKwicQueryOptions[query._id.toString()]),
+		createQuerySnapshot(
+			query,
+			index,
+			resolvedKwicQueryOptions[query._id.toString()],
+			input.visualization.queryColors?.[query._id.toString()],
+		),
 	);
 	const missing: Array<MissingPublishedCacheEntry> = [];
 	const panels: Array<PublishedPanelSnapshot> = [];
@@ -259,6 +264,7 @@ function createQuerySnapshot(
 	query: QueryDocument,
 	index: number,
 	kwicQueryOptions?: KwicQueryOptions,
+	color?: string,
 ): PublishedQuerySnapshot {
 	const finalQuery = buildFinalQuery(query.type, query.userInput);
 	const concordanceKey = getConcordanceInputKey(query.type);
@@ -270,7 +276,7 @@ function createQuerySnapshot(
 		userInput: query.userInput,
 		finalQuery,
 		preparedQuery: `aword,${finalQuery}`,
-		color: colors[index % colors.length] ?? "#111827",
+		color: color ?? colors[index % colors.length] ?? "#111827",
 		corpus: query.corpus,
 		subCorpus: query.subCorpus ?? "",
 		concordance_query: {

@@ -14,6 +14,7 @@ export interface VisualizationResponse {
 	_id: string;
 	name: string;
 	queries: Array<string>;
+	queryColors: Record<string, string>;
 	visualizations: Array<VisualizationType>;
 	settings: Array<unknown>;
 	data: Array<unknown>;
@@ -26,6 +27,7 @@ function toResponse(record: VisualizationDocument): VisualizationResponse {
 		_id: record._id.toString(),
 		name: record.name satisfies string,
 		queries: record.queries.map((queryId) => queryId.toString()),
+		queryColors: record.queryColors ?? {},
 		visualizations: record.visualizations.map((value) => normalizeVisualizationType(value)),
 		settings: [...record.settings],
 		data: [...record.data],

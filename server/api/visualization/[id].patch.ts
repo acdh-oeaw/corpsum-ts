@@ -19,6 +19,7 @@ interface VisualizationResponse {
 	_id: string;
 	name: string;
 	queries: Array<string>;
+	queryColors: Record<string, string>;
 	visualizations: Array<VisualizationType>;
 	settings: Array<unknown>;
 	data: Array<unknown>;
@@ -35,6 +36,7 @@ function toResponse(record: VisualizationDocument): VisualizationResponse {
 		_id: record._id.toString(),
 		name: record.name satisfies string,
 		queries: record.queries.map((queryId) => queryId.toString()),
+		queryColors: record.queryColors ?? {},
 		visualizations: record.visualizations.map((value) => normalizeVisualizationType(value)),
 		settings: [...record.settings],
 		data: [...record.data],
@@ -115,6 +117,21 @@ export default defineEventHandler(async (event): Promise<VisualizationResponse |
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		visualization.queries = payload.queries;
+	}
+
+	if (Object.prototype.hasOwnProperty.call(payload, "queryColors")) {
+		const ids = new Set(visualization.queries.map((id) => id.toString()));
+		if (
+			!isRecord(payload.queryColors) ||
+			Array.isArray(payload.queryColors) ||
+			!Object.entries(payload.queryColors).every(
+				([id, color]) => ids.has(id) && typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color),
+			)
+		) {
+			setResponseStatus(event, 400, "invalid query colors");
+			return;
+		}
+		visualization.queryColors = payload.queryColors as Record<string, string>;
 	}
 
 	if (Object.prototype.hasOwnProperty.call(payload, "visualizations")) {

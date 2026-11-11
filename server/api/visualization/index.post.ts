@@ -6,6 +6,7 @@ import {
 	isVisualizationType,
 	normalizeVisualizationType,
 } from "@/lib/visualization-types";
+import { assignQueryColors } from "@/utils/colors";
 import { QueryModel } from "~/server/models/queries.schema";
 import { UserModel } from "~/server/models/users.schema";
 import {
@@ -19,6 +20,7 @@ interface VisualizationResponse {
 	_id: string;
 	name: string;
 	queries: Array<string>;
+	queryColors: Record<string, string>;
 	visualizations: Array<VisualizationType>;
 	settings: Array<unknown>;
 	data: Array<unknown>;
@@ -35,6 +37,7 @@ function toResponse(record: VisualizationDocument): VisualizationResponse {
 		_id: record._id.toString(),
 		name: record.name satisfies string,
 		queries: record.queries.map((queryId) => queryId.toString()),
+		queryColors: record.queryColors ?? {},
 		visualizations: record.visualizations.map((value) => normalizeVisualizationType(value)),
 		settings: [...record.settings],
 		data: [...record.data],
@@ -106,6 +109,7 @@ export default defineEventHandler(async (event): Promise<VisualizationResponse |
 	const visualization = (await VisualizationModel.create({
 		name,
 		queries,
+		queryColors: assignQueryColors(queries),
 		visualizations,
 		settings,
 		data,
