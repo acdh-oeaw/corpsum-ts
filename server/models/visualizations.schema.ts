@@ -5,6 +5,7 @@ import { visualizationTypes } from "@/lib/visualization-types";
 
 export interface VisualizationSchema {
 	queries: Array<Types.ObjectId>;
+	queryColors?: Record<string, string>;
 	visualizations: Array<string>;
 	name: string;
 	settings: Array<unknown>;
@@ -13,6 +14,7 @@ export interface VisualizationSchema {
 
 const schemaDefinition = {
 	queries: [{ type: "ObjectId", ref: "queries", required: true }],
+	queryColors: { type: "Mixed", default: {} },
 	visualizations: [
 		{
 			type: String,
