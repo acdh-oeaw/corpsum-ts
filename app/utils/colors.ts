@@ -1,3 +1,4 @@
+//fallback for legacy visualizations without a set color
 export const colors = [
 	"#3498db",
 	"#e74c3c",
@@ -10,6 +11,7 @@ export const colors = [
 	"#34495e",
 ];
 
+//we need this for the media-types, so they're not hardcoded to the template
 export const categoryColors = [
 	"#1f77b4",
 	"#aec7e8",
