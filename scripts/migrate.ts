@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 
 import mongoose from "mongoose";
 
+import { assignQueryColors } from "../app/utils/colors.ts";
 import { seedAmcPublicMappings } from "./migrations/amc-public-mappings.ts";
 
 type MongoDatabase = NonNullable<mongoose.Connection["db"]>;
@@ -45,6 +46,17 @@ function requireDatabaseUrl() {
 
 const migrations: Array<Migration> = [
 	{ id: "2026-09-10-amc-public-mappings", up: seedAmcPublicMappings },
+	{
+		id: "2026-11-11-visualization-query-colors",
+		up: async (db) => {
+			const collection = db.collection("visualizations");
+			for await (const record of collection.find({})) {
+				const ids = (record.queries ?? []).map((id: { toString(): string }) => id.toString());
+				const queryColors = assignQueryColors(ids, record.queryColors ?? {});
+				await collection.updateOne({ _id: record._id }, { $set: { queryColors } });
+			}
+		},
+	},
 ];
 
 async function main() {
