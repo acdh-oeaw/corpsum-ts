@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import "vcolorpicker/style.css";
+
+import vcolorpicker from "vcolorpicker";
+import type { ColorPickerLocale } from "vcolorpicker";
+
 import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
 import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
 import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
@@ -18,10 +23,22 @@ import {
 	temporalFrequencyDistributionType,
 	visualizationTypes,
 } from "@/lib/visualization-types";
+import { assignQueryColors } from "@/utils/colors";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
 
+const ColorPicker = vcolorpicker.colorPicker;
 const t = useTranslations();
+const locale = useLocale();
+// The picker accepts other locale strings at runtime; all labels are supplied by app i18n.
+const pickerLocale = computed(() => locale.value as ColorPickerLocale);
+const pickerMessages = computed(() => ({
+	defaultColor: t("ColorPicker.defaultColor"),
+	themeColors: t("ColorPicker.themeColors"),
+	standardColors: t("ColorPicker.standardColors"),
+	moreColors: t("ColorPicker.moreColors"),
+	pickerLabel: t("ColorPicker.pickerLabel"),
+}));
 const route = useRoute();
 const localeRoute = useLocaleRoute();
 
@@ -39,6 +56,7 @@ const queriesList = computed(() => queries.value ?? []);
 
 const name = ref("");
 const selectedQueries = ref<Array<string>>([]);
+const queryColors = ref<Record<string, string>>({});
 const selectedVisualizations = ref<Array<VisualizationType>>([]);
 const settingsByType = ref<VisualizationSettingsState>(createVisualizationSettingsState([], []));
 const dataText = ref("[]");
@@ -54,6 +72,7 @@ watch(
 		if (!value) return;
 		name.value = value.name;
 		selectedQueries.value = [...value.queries];
+		queryColors.value = assignQueryColors(value.queries, value.queryColors);
 		selectedVisualizations.value = [...value.visualizations];
 		dataText.value = JSON.stringify(value.data);
 		settingsByType.value = createVisualizationSettingsState(value.visualizations, value.settings);
@@ -97,7 +116,9 @@ const availableQueryItems = computed(() =>
 );
 const { buildCorpusQuery } = useCorpusQueryBuilder();
 const corpusQueries = computed(() =>
-	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
+	selectedQueryItems.value.map((item, index) =>
+		buildCorpusQuery(item, index, queryColors.value[item._id]),
+	),
 );
 const { mappingsForQueries: temporalMetadataMappings, refreshMappings: refreshTemporalMappings } =
 	await useCorpusMetadataMappings(corpusQueries, "temporal");
@@ -146,11 +167,13 @@ const toggleTempSelectedRow = (id: string) => {
 
 const applySelection = () => {
 	selectedQueries.value = [...tempSelectedQueries.value];
+	queryColors.value = assignQueryColors(selectedQueries.value, queryColors.value);
 	dialogOpen.value = false;
 };
 
 const removeQuery = (id: string) => {
 	selectedQueries.value = selectedQueries.value.filter((queryId) => queryId !== id);
+	delete queryColors.value[id];
 };
 
 const parseJsonArray = (value: string): Array<unknown> | null => {
@@ -195,6 +218,7 @@ async function save() {
 				body: {
 					name: name.value.trim(),
 					queries: selectedQueries.value,
+					queryColors: queryColors.value,
 					visualizations: selectedVisualizations.value,
 					settings,
 					data,
@@ -262,30 +286,46 @@ function cancel() {
 												{{ query.name }}
 											</CardTitle>
 										</div>
-										<TooltipProvider :delay-duration="150">
-											<Tooltip>
-												<TooltipTrigger as-child>
-													<Button
-														class="text-primary-foreground hover:bg-primary-foreground hover:text-primary"
-														size="sm"
-														type="button"
-														variant="ghost"
-														@click="removeQuery(query._id)"
-													>
-														<LucideIcon class="size-4" name="X" :stroke-width="2" />
-													</Button>
-												</TooltipTrigger>
-												<TooltipContent>{{
-													t("VisualizationForm.actions.removeQuery")
-												}}</TooltipContent>
-											</Tooltip>
-										</TooltipProvider>
 									</CardHeader>
 									<CardFooter class="flex-col items-start gap-1.5 border-t bg-muted/20 text-sm">
 										<div class="line-clamp-1 flex gap-2 font-medium">
 											{{ query.type }}
 										</div>
 										<div class="line-clamp-1 text-muted-foreground">{{ query.userInput }}</div>
+									</CardFooter>
+									<CardFooter class="mt-auto w-full justify-between border-t bg-muted/20 p-3">
+										<div
+											class="flex w-full flex-nowrap items-center gap-1 rounded-md border bg-muted/40 p-1"
+										>
+											<div class="flex flex-1 justify-center">
+												<ColorPicker
+													:model-value="queryColors[query._id] ?? '#111827'"
+													:locale="pickerLocale"
+													:messages="pickerMessages"
+													teleport
+													@update:model-value="queryColors[query._id] = $event"
+												/>
+											</div>
+											<TooltipProvider :delay-duration="150">
+												<Tooltip>
+													<TooltipTrigger as-child>
+														<Button
+															class="flex-1"
+															type="button"
+															variant="ghost"
+															size="sm"
+															:aria-label="t('VisualizationForm.actions.removeQuery')"
+															@click="removeQuery(query._id)"
+														>
+															<LucideIcon class="size-4" name="X" :stroke-width="2" />
+														</Button>
+													</TooltipTrigger>
+													<TooltipContent>{{
+														t("VisualizationForm.actions.removeQuery")
+													}}</TooltipContent>
+												</Tooltip>
+											</TooltipProvider>
+										</div>
 									</CardFooter>
 								</Card>
 							</CarouselItem>

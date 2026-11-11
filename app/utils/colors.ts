@@ -32,3 +32,31 @@ export const categoryColors = [
 	"#17becf",
 	"#9edae5",
 ];
+
+export function assignQueryColors(
+	ids: string[],
+	existing: Record<string, string> = {},
+): Record<string, string> {
+	const result: Record<string, string> = {};
+	const used = new Set<string>();
+	for (const id of ids) {
+		const color = existing[id]?.toLowerCase();
+		if (color && /^#[0-9a-f]{6}$/.test(color) && !used.has(color)) {
+			result[id] = color;
+			used.add(color);
+		}
+	}
+	for (const id of ids) {
+		if (result[id]) continue;
+		let color = colors.find((candidate) => !used.has(candidate.toLowerCase()));
+		if (!color) {
+			let n = 0;
+			do {
+				color = `#${(n++).toString(16).padStart(6, "0")}`;
+			} while (used.has(color));
+		}
+		result[id] = color;
+		used.add(color.toLowerCase());
+	}
+	return result;
+}

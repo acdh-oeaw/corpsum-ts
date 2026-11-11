@@ -146,6 +146,9 @@ importers:
       vaul-vue:
         specifier: ^0.2.1
         version: 0.2.1(radix-vue@1.9.17(vue@3.5.39(typescript@6.0.3)))(vue@3.5.39(typescript@6.0.3))
+      vcolorpicker:
+        specifier: ^2.3.0
+        version: 2.3.0(vue@3.5.39(typescript@6.0.3))
       vee-validate:
         specifier: ^4.15.1
         version: 4.15.1(vue@3.5.39(typescript@6.0.3))
@@ -5269,6 +5272,7 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+    deprecated: Active development of CryptoJS has been discontinued. This library is no longer maintained.
 
   css-background-parser@0.1.0:
     resolution: {integrity: sha512-2EZLisiZQ+7m4wwur/qiYJRniHX4K5Tc9w93MT3AS0WS1u5kaZ4FKXlOTBhOjc+CgEgPiGY+fX1yWD8UwpEqUA==}
@@ -9079,6 +9083,12 @@ packages:
     peerDependencies:
       reka-ui: ^2.0.0
       vue: ^3.3.0
+
+  vcolorpicker@2.3.0:
+    resolution: {integrity: sha512-hOCGT/ye/FGTKOlNAdIbCQW+U+D+D0i69o9jr3TXptCsV9SgSEbZInXl2OUYSSP+snjGtwT1lBz6EN+lhOxxyg==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      vue: ^3.5.0
 
   vee-validate@4.15.1:
     resolution: {integrity: sha512-DkFsiTwEKau8VIxyZBGdO6tOudD+QoUBPuHj3e6QFqmbfCRj1ArmYWue9lEp6jLSWBIw4XPlDLjFIZNLdRAMSg==}
@@ -19452,6 +19462,10 @@ snapshots:
       vue: 3.5.39(typescript@6.0.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
+
+  vcolorpicker@2.3.0(vue@3.5.39(typescript@6.0.3)):
+    dependencies:
+      vue: 3.5.39(typescript@6.0.3)
 
   vee-validate@4.15.1(vue@3.5.39(typescript@6.0.3)):
     dependencies:

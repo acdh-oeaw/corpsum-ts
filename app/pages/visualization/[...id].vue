@@ -48,7 +48,9 @@ const selectedQueryItems = computed(() => {
 });
 const { buildCorpusQuery } = useCorpusQueryBuilder();
 const corpusQueries = computed(() =>
-	selectedQueryItems.value.map((item, index) => buildCorpusQuery(item, index)),
+	selectedQueryItems.value.map((item, index) =>
+		buildCorpusQuery(item, index, visualization.value?.queryColors?.[item._id]),
+	),
 );
 const hasKeywordInContext = computed(() =>
 	visualization.value?.visualizations.includes("data-display-keyword-in-context"),

@@ -6,7 +6,11 @@ import { getConcordanceInputKey } from "@/utils/concordance-query";
 import { buildFinalQuery, normalizeFacettingValues } from "@/utils/corpus-query";
 
 export function useCorpusQueryBuilder() {
-	function buildCorpusQuery(item: QueryExecutionFields, index: number): CorpusQuery {
+	function buildCorpusQuery(
+		item: QueryExecutionFields,
+		index: number,
+		color?: string,
+	): CorpusQuery {
 		const finalQuery = buildFinalQuery(item.type, item.userInput);
 		const concordance_query = {
 			queryselector: item.type,
@@ -20,7 +24,7 @@ export function useCorpusQueryBuilder() {
 			userInput: item.userInput,
 			finalQuery,
 			preparedQuery: `aword,${finalQuery}`,
-			color: colors[index % colors.length] ?? "#111827",
+			color: color ?? colors[index % colors.length] ?? "#111827",
 			showPicker: false,
 			corpus: item.corpus,
 			subCorpus: item.subCorpus,
