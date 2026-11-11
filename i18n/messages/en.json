@@ -337,6 +337,13 @@
 			"actions": "Actions"
 		}
 	},
+	"ColorPicker": {
+		"defaultColor": "Default color",
+		"themeColors": "Theme colors",
+		"standardColors": "Standard colors",
+		"moreColors": "More colors…",
+		"pickerLabel": "Choose color"
+	},
 	"VisualizationForm": {
 		"actions": {
 			"addQuery": "Add query",
