@@ -19,14 +19,18 @@ services:
     image: corpsum-refactor
     env_file:
       - local.env
+    environment:
+      NUXT_HOST: 0.0.0.0
     networks:
       - corpsumnet
     ports:
       - "3001:3000"
       - "4000:4000"
     volumes:
-      - localapp:/app/app
-      - localserver:/app/server
+      - .:/app:z
+      - app_node_modules:/app/node_modules
+      - app_nuxt:/app/.nuxt
+    command: sh -c "pnpm install --frozen-lockfile && pnpm run dev"
 
 networks:
   corpsumnet:
@@ -44,15 +48,5 @@ volumes:
       type: "none"
       o: "bind"
       device: $DOCKER_MONGODUMPS_DIR
-  localapp:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: ./app
-  localserver:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: ./server
+  app_node_modules:
+  app_nuxt:

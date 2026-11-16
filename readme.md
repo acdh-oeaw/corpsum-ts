@@ -80,6 +80,21 @@ Compose starts:
 - `corpsum-app`: the Dockerfile `dev` target, using `local.env`, exposed at
   `http://localhost:3001`.
 
+The entire repository is mounted into the app container, so changes to translations, configuration,
+public assets, and source files are visible to Nuxt. Nuxt reloads or restarts as appropriate for
+the changed file. Container dependencies and generated `.nuxt` files use separate Docker volumes,
+keeping them independent of the host installation. Dependencies are installed from the lockfile on
+container startup. After changing `package.json` or `pnpm-lock.yaml` while it is running, restart the
+app container to install the updated dependencies:
+
+```bash
+docker compose --env-file local.env restart corpsum-app
+```
+
+To add a dependency from inside the container, run `docker compose --env-file local.env exec
+corpsum-app pnpm add <package>` (or `pnpm add -D <package>` for a development dependency), then
+restart the app container. The updated manifest and lockfile are written to the repository.
+
 For Compose, `DATABASE_URL` should use the service hostname `corpsum-mongodb`, as shown in
 `local.env.example`. If you want generated metadata to point at the Compose app instead of the
 direct Nuxt dev server, set `NUXT_PUBLIC_APP_BASE_URL` to `http://localhost:3001` in `local.env`.
