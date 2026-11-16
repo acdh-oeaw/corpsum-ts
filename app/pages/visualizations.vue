@@ -63,10 +63,8 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 						:key="visualization._id"
 						class="basis-auto"
 					>
-						<Card
-							class="flex h-full w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
-						>
-							<CardHeader class="border-b border-primary bg-primary text-primary-foreground">
+						<Card class="flex h-full w-[350px] flex-col overflow-hidden">
+							<CardHeader class="border-b bg-primary text-primary-foreground">
 								<CardTitle class="text-2xl font-black tracking-normal">
 									{{ visualization.name }}
 								</CardTitle>

@@ -265,10 +265,8 @@ async function publishVisualization() {
 					<Carousel v-else class="w-full" :opts="{ align: 'start' }">
 						<CarouselContent>
 							<CarouselItem v-for="query in selectedQueryItems" :key="query._id" class="basis-auto">
-								<Card
-									class="flex h-full w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
-								>
-									<CardHeader class="border-b border-primary bg-primary text-primary-foreground">
+								<Card class="flex h-full w-[350px] flex-col overflow-hidden">
+									<CardHeader class="border-b bg-primary text-primary-foreground">
 										<CardDescription class="font-semibold text-primary-foreground/80">
 											{{ query.corpus }}
 										</CardDescription>

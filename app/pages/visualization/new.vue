@@ -218,11 +218,9 @@ function cancel() {
 					<Carousel class="w-full" :opts="{ align: 'start' }">
 						<CarouselContent>
 							<CarouselItem v-for="query in selectedQueryItems" :key="query._id" class="basis-auto">
-								<Card
-									class="flex h-full w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
-								>
+								<Card class="flex h-full w-[350px] flex-col overflow-hidden">
 									<CardHeader
-										class="flex flex-row items-start justify-between gap-2 border-b border-primary bg-primary text-primary-foreground"
+										class="flex flex-row items-start justify-between gap-2 border-b bg-primary text-primary-foreground"
 									>
 										<div>
 											<CardDescription class="font-semibold text-primary-foreground/80">
@@ -260,7 +258,7 @@ function cancel() {
 								</Card>
 							</CarouselItem>
 							<CarouselItem class="basis-auto">
-								<Card class="flex h-full w-[350px] flex-col rounded-sm border-2 border-dashed">
+								<Card class="flex h-full w-[350px] flex-col">
 									<CardHeader>
 										<CardDescription>{{ t("VisualizationForm.actions.addQuery") }}</CardDescription>
 										<CardTitle class="text-2xl font-black tracking-normal">—</CardTitle>

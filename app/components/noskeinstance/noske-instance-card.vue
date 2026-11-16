@@ -32,12 +32,8 @@ async function deleteInstance() {
 </script>
 
 <template>
-	<Card
-		class="flex w-[350px] flex-col overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
-	>
-		<CardHeader
-			class="h-32 overflow-hidden border-b border-primary bg-primary text-primary-foreground"
-		>
+	<Card class="flex w-[350px] flex-col overflow-hidden">
+		<CardHeader class="h-32 overflow-hidden border-b bg-primary text-primary-foreground">
 			<div class="flex items-start justify-between gap-3">
 				<div class="min-w-0">
 					<CardTitle class="truncate text-2xl font-black tracking-normal">

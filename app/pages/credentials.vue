@@ -135,12 +135,8 @@ async function deleteCredential(instance: PopulatedNoskeDocument) {
 		</div>
 
 		<div class="grid gap-3">
-			<Card
-				v-for="instance in instances"
-				:key="instance._id"
-				class="overflow-hidden rounded-sm border-2 border-primary/40 shadow-sm"
-			>
-				<CardHeader class="gap-2 border-b border-primary bg-primary text-primary-foreground">
+			<Card v-for="instance in instances" :key="instance._id" class="overflow-hidden">
+				<CardHeader class="gap-2 border-b bg-primary text-primary-foreground">
 					<div class="flex flex-wrap items-start justify-between gap-3">
 						<div>
 							<CardTitle class="text-2xl font-black tracking-normal">
