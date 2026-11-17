@@ -379,7 +379,6 @@
 		"valueRange": "Wertebereich",
 		"rowsToInclude": "Anzahl der Zeilen",
 		"rowCount": "{count} Zeilen",
-
 		"fullscreen": "Vollbild öffnen",
 		"export": {
 			"csv": "CSV exportieren",
@@ -555,9 +554,24 @@
 	},
 	"NoskeInstanceDetail": {
 		"availableCorpora": "Verfügbare Korpora",
+		"description": "Beschreibung",
+		"viewDescription": "Beschreibung ansehen",
 		"loadingCorpora": "Korpora werden geladen ...",
 		"createQuery": "Abfrage erstellen",
-		"emptyCorpora": "Für diese Instanz wurden keine Korpora gefunden."
+		"emptyCorpora": "Für diese Instanz wurden keine Korpora gefunden.",
+		"compiled": "Kompiliert",
+		"tagset": "Tagset",
+		"tagsetDocumentation": "Tagset-Dokumentation",
+		"filter": "Filter",
+		"minimum": "Min",
+		"maximum": "Max",
+		"columns": {
+			"corpus": "Korpus",
+			"language": "Sprache",
+			"words": "Wörter",
+			"documents": "Dokumente"
+		},
+		"actions": "Aktionen"
 	},
 	"QueryDetail": {
 		"owners": "Eigentümer",

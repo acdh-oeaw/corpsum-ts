@@ -379,7 +379,6 @@
 		"valueRange": "Value range",
 		"rowsToInclude": "Rows to include",
 		"rowCount": "{count} rows",
-
 		"fullscreen": "Open fullscreen",
 		"export": {
 			"csv": "Export CSV",
@@ -555,9 +554,24 @@
 	},
 	"NoskeInstanceDetail": {
 		"availableCorpora": "Available corpora",
+		"description": "Description",
+		"viewDescription": "View description",
 		"loadingCorpora": "Loading corpora...",
 		"createQuery": "Create query",
-		"emptyCorpora": "No corpora found for this instance."
+		"emptyCorpora": "No corpora found for this instance.",
+		"compiled": "Compiled",
+		"tagset": "Tagset",
+		"tagsetDocumentation": "Tagset documentation",
+		"filter": "Filter",
+		"minimum": "Min",
+		"maximum": "Max",
+		"columns": {
+			"corpus": "Corpus",
+			"language": "Language",
+			"words": "Words",
+			"documents": "Documents"
+		},
+		"actions": "Actions"
 	},
 	"QueryDetail": {
 		"owners": "Owners",

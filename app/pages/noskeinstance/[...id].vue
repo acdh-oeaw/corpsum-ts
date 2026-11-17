@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { components } from "~/lib/noske-types";
-
 const route = useRoute();
 const auth = useAuth();
 const t = useTranslations();
@@ -34,15 +33,6 @@ const corporaQuery = useNoskeQuery<Array<CorporaListItem>>({
 });
 const corpora = computed<Array<CorporaListItem>>(() => corporaQuery.data.value ?? []);
 const corporaPending = corporaQuery.isPending;
-
-function formatCount(value?: number) {
-	return typeof value === "number" ? value.toLocaleString() : "—";
-}
-
-function getCorpusQueryValue(corpus: CorporaListItem) {
-	if (corpus.corpname) return corpus.corpname;
-	return corpus.id != null ? String(corpus.id) : "";
-}
 
 const isDeleting = ref(false);
 const setDeleting = (value: boolean) => {
@@ -149,57 +139,16 @@ async function deleteInstance() {
 			<p v-if="corporaPending" class="mt-2 text-sm text-muted-foreground">
 				{{ t("NoskeInstanceDetail.loadingCorpora") }}
 			</p>
-			<div v-else class="mt-3 overflow-x-auto rounded-md border">
-				<table class="min-w-full text-sm">
-					<thead class="bg-muted/40 text-left">
-						<tr>
-							<th class="px-3 py-2 font-medium">{{ t("CorporaPage.table.corpus") }}</th>
-							<th class="px-3 py-2 font-medium">{{ t("CorporaPage.table.language") }}</th>
-							<th class="px-3 py-2 text-right font-medium">{{ t("CorporaPage.table.words") }}</th>
-							<th class="px-3 py-2 text-right font-medium">
-								{{ t("CorporaPage.table.documents") }}
-							</th>
-							<th class="px-3 py-2 text-right font-medium">
-								{{ t("NoskeInstanceDetail.createQuery") }}
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="corpus in corpora" :key="corpus.id ?? corpus.corpname">
-							<td class="px-3 py-2">
-								<p class="font-medium">{{ corpus.corpname ?? "—" }}</p>
-								<p class="text-xs text-muted-foreground">{{ corpus.owner_name ?? "" }}</p>
-							</td>
-							<td class="px-3 py-2">
-								<p>{{ corpus.language_name ?? "—" }}</p>
-								<p class="text-xs text-muted-foreground">{{ corpus.language_id ?? "" }}</p>
-							</td>
-							<td class="px-3 py-2 text-right">{{ formatCount(corpus.sizes?.wordcount) }}</td>
-							<td class="px-3 py-2 text-right">{{ formatCount(corpus.sizes?.doccount) }}</td>
-							<td class="px-3 py-2 text-right">
-								<Button v-if="getCorpusQueryValue(corpus)" as-child size="sm" variant="outline">
-									<NuxtLinkLocale
-										:href="{
-											path: '/query/edit/new',
-											query: {
-												noske: noskeInstance._id,
-												corpus: getCorpusQueryValue(corpus),
-											},
-										}"
-									>
-										{{ t("Actions.newQuery") }}
-									</NuxtLinkLocale>
-								</Button>
-							</td>
-						</tr>
-						<tr v-if="corpora.length === 0">
-							<td class="p-3 text-sm text-muted-foreground" colspan="5">
-								{{ t("NoskeInstanceDetail.emptyCorpora") }}
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+			<CorpusTable
+				v-else
+				:corpora="
+					corpora.map((corpus) => ({
+						...corpus,
+						noskeId: noskeInstance?._id ?? '',
+						baseUrl: noskeInstance?.base ?? '',
+					}))
+				"
+			/>
 		</div>
 	</MainContent>
 </template>

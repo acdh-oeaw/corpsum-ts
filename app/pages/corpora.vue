@@ -35,8 +35,9 @@ const dedupedCorpora = computed(() => {
 	const items: Array<{ corpus: string; noskeId: string }> = [];
 	sortedQueries.value.forEach((query) => {
 		const corpus = query.corpus;
-		if (seen.has(corpus)) return;
-		seen.add(corpus);
+		const key = `${query.noske}:${corpus}`;
+		if (seen.has(key)) return;
+		seen.add(key);
 		items.push({ corpus, noskeId: query.noske });
 	});
 	return items;
@@ -89,6 +90,8 @@ const corporaRecords = useAsyncData(
 					documents: found.sizes?.doccount,
 					noske: instance?.name ?? "—",
 					noskeId: item.noskeId,
+					baseUrl: instance?.base ?? "",
+					rawCorpus: found,
 				};
 			})
 			.filter((item): item is NonNullable<typeof item> => Boolean(item));
@@ -174,49 +177,15 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 				<h2 class="text-lg font-semibold">{{ t("CorporaPage.moreTitle") }}</h2>
 				<p class="text-sm text-muted-foreground">{{ t("CorporaPage.moreDescription") }}</p>
 			</div>
-			<div class="mt-3 max-w-full overflow-x-auto rounded-md border">
-				<Table class="w-full text-sm">
-					<TableHeader>
-						<TableRow>
-							<TableHead>{{ t("CorporaPage.table.corpus") }}</TableHead>
-							<TableHead>{{ t("CorporaPage.table.language") }}</TableHead>
-							<TableHead class="text-right">{{ t("CorporaPage.table.words") }}</TableHead>
-							<TableHead class="text-right">{{ t("CorporaPage.table.documents") }}</TableHead>
-							<TableHead>{{ t("CorporaPage.table.noske") }}</TableHead>
-							<TableHead class="text-right">{{ t("CorporaPage.table.createQuery") }}</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						<TableRow v-for="item in remainingCorpora" :key="item.id">
-							<TableCell class="font-medium">{{ item.corpus }}</TableCell>
-							<TableCell>{{ item.language }}</TableCell>
-							<TableCell class="text-right">{{ formatCount(item.words) }}</TableCell>
-							<TableCell class="text-right">{{ formatCount(item.documents) }}</TableCell>
-							<TableCell>{{ item.noske }}</TableCell>
-							<TableCell class="text-right">
-								<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
-									<Button as-child size="sm" variant="ghost">
-										<NuxtLinkLocale
-											:href="{
-												path: '/query/edit/new',
-												query: { noske: item.noskeId, corpus: item.corpus },
-											}"
-										>
-											<LucideIcon class="mr-1 size-4" name="Plus" :stroke-width="2" />
-											{{ t("CorporaPage.table.createQuery") }}
-										</NuxtLinkLocale>
-									</Button>
-								</div>
-							</TableCell>
-						</TableRow>
-						<TableRow v-if="remainingCorpora.length === 0">
-							<TableCell class="h-20 text-center text-muted-foreground" colspan="6">
-								{{ t("CorporaPage.empty") }}
-							</TableCell>
-						</TableRow>
-					</TableBody>
-				</Table>
-			</div>
+			<CorpusTable
+				:corpora="
+					remainingCorpora.map((item) => ({
+						...item.rawCorpus,
+						noskeId: item.noskeId,
+						baseUrl: item.baseUrl,
+					}))
+				"
+			/>
 		</div>
 	</MainContent>
 </template>
