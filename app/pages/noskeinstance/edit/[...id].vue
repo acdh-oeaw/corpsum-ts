@@ -55,7 +55,7 @@ async function save(payload: {
 			body: payload,
 		});
 		noskeInstance.value = updated;
-		await navigateTo(localeRoute(`/noskeinstance/${updated._id}`));
+		await navigateTo(localeRoute({ path: `/noskeinstance/${updated._id}` }));
 	} finally {
 		isSaving.value = false;
 	}
@@ -63,7 +63,7 @@ async function save(payload: {
 
 function cancel() {
 	if (!noskeId.value) return;
-	navigateTo(localeRoute(`/noskeinstance/${noskeId.value}`));
+	navigateTo(localeRoute({ path: `/noskeinstance/${noskeId.value}` }));
 }
 </script>
 

@@ -70,15 +70,13 @@ useHead({
 			description: t("DefaultLayout.meta.description"),
 		};
 
-		const scripts = [
-			{ type: "application/ld+json", innerHTML: JSON.stringify(jsonLd, safeJsonLdReplacer) },
-		];
+		const scripts: ({ type: "application/ld+json"; innerHTML: string } | { innerHTML: string })[] =
+			[{ type: "application/ld+json", innerHTML: JSON.stringify(jsonLd, safeJsonLdReplacer) }];
 
 		if (isNonEmptyString(env.public.matomoBaseUrl) && isNonEmptyString(env.public.matomoId)) {
 			const baseUrl = env.public.matomoBaseUrl;
 
 			scripts.push({
-				type: "",
 				innerHTML: createAnalyticsScript(
 					baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`,
 					env.public.matomoId,

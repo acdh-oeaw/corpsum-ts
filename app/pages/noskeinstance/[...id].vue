@@ -44,7 +44,7 @@ async function deleteInstance() {
 	setDeleting(true);
 	try {
 		await $fetch(`/api/noskeinstances/${routeId.value}`, { method: "DELETE" });
-		await navigateTo(localeRoute("/noskeinstances"));
+		await navigateTo(localeRoute({ path: "/noskeinstances" }));
 	} finally {
 		setDeleting(false);
 	}

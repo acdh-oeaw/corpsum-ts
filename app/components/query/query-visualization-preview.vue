@@ -225,7 +225,7 @@ async function saveVisualization() {
 			});
 			attempt.visualizationId = created._id;
 		}
-		await navigateTo(localeRoute(`/visualization/${attempt.visualizationId}`));
+		await navigateTo(localeRoute({ path: `/visualization/${attempt.visualizationId}` }));
 	} catch (error) {
 		saveError.value =
 			(error as { data?: { message?: string } }).data?.message ??

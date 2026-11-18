@@ -108,14 +108,14 @@ async function save(payload: {
 				facettingValues: payload.facettingValues,
 			},
 		});
-		await navigateTo(localeRoute(`/query/${created._id}`));
+		await navigateTo(localeRoute({ path: `/query/${created._id}` }));
 	} finally {
 		setSaving(false);
 	}
 }
 
 function cancel() {
-	navigateTo(localeRoute("/queries"));
+	navigateTo(localeRoute({ path: "/queries" }));
 }
 </script>
 

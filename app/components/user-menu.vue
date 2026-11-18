@@ -11,7 +11,7 @@ const { locale } = useI18n();
 
 const logout = async () => {
 	await auth.logout();
-	return await navigateTo(localeRoute("/login", locale.value));
+	return await navigateTo(localeRoute({ path: "/login" }, locale.value));
 };
 </script>
 

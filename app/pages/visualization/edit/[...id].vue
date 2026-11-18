@@ -225,7 +225,7 @@ async function save() {
 			},
 		);
 		visualization.value = updated;
-		await navigateTo(localeRoute(`/visualization/${updated._id}`));
+		await navigateTo(localeRoute({ path: `/visualization/${updated._id}` }));
 	} finally {
 		isSaving.value = false;
 	}
@@ -233,7 +233,7 @@ async function save() {
 
 function cancel() {
 	if (!visualizationId.value) return;
-	navigateTo(localeRoute(`/visualization/${visualizationId.value}`));
+	navigateTo(localeRoute({ path: `/visualization/${visualizationId.value}` }));
 }
 </script>
 

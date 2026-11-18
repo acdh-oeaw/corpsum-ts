@@ -89,7 +89,7 @@ async function save(payload: {
 			},
 		});
 		query.value = updated;
-		await navigateTo(localeRoute(`/query/${updated._id}`));
+		await navigateTo(localeRoute({ path: `/query/${updated._id}` }));
 	} finally {
 		setSaving(false);
 	}
@@ -97,7 +97,7 @@ async function save(payload: {
 
 function cancel() {
 	if (!queryId.value) return;
-	navigateTo(localeRoute(`/query/${queryId.value}`));
+	navigateTo(localeRoute({ path: `/query/${queryId.value}` }));
 }
 </script>
 

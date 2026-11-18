@@ -69,7 +69,10 @@ usePageMetadata({ title: t("IndexPage.meta.title") });
 		</div>
 		<section v-if="auth.isLoggedIn()" aria-labelledby="pinned-corpora-title">
 			<h2 id="pinned-corpora-title" class="text-lg font-semibold">
-				<NuxtLinkLocale to="/corpora" class="inline-flex items-center gap-2 hover:underline">
+				<NuxtLinkLocale
+					:to="{ name: 'corpora' }"
+					class="inline-flex items-center gap-2 hover:underline"
+				>
 					<LucideIcon name="BookOpen" class="size-5" :stroke-width="2" />
 					{{ t("IndexPage.pinnedCorpora") }}
 				</NuxtLinkLocale>
@@ -132,7 +135,10 @@ usePageMetadata({ title: t("IndexPage.meta.title") });
 		</section>
 		<section v-if="auth.isLoggedIn()" aria-labelledby="recent-queries-title">
 			<h2 id="recent-queries-title" class="text-lg font-semibold">
-				<NuxtLinkLocale to="/queries" class="inline-flex items-center gap-2 hover:underline">
+				<NuxtLinkLocale
+					:to="{ name: 'queries' }"
+					class="inline-flex items-center gap-2 hover:underline"
+				>
 					<LucideIcon name="Terminal" class="size-5" :stroke-width="2" />
 					{{ t("IndexPage.recentQueries") }}
 				</NuxtLinkLocale>

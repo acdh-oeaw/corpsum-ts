@@ -172,14 +172,14 @@ async function save() {
 				data,
 			},
 		});
-		await navigateTo(localeRoute(`/visualization/${created._id}`));
+		await navigateTo(localeRoute({ path: `/visualization/${created._id}` }));
 	} finally {
 		isSaving.value = false;
 	}
 }
 
 function cancel() {
-	navigateTo(localeRoute("/visualizations"));
+	navigateTo(localeRoute({ path: "/visualizations" }));
 }
 </script>
 

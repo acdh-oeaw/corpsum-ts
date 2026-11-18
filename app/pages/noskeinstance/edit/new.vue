@@ -31,14 +31,14 @@ async function save(payload: {
 				authentication: payload.authentication,
 			},
 		});
-		await navigateTo(localeRoute(`/noskeinstance/${created._id}`));
+		await navigateTo(localeRoute({ path: `/noskeinstance/${created._id}` }));
 	} finally {
 		setSaving(false);
 	}
 }
 
 function cancel() {
-	navigateTo(localeRoute("/noskeinstances"));
+	navigateTo(localeRoute({ path: "/noskeinstances" }));
 }
 
 const formId = "noske-form";

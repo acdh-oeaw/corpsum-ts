@@ -14,7 +14,7 @@ const isExternalUrl = computed(() => {
 
 const href = computed(() => {
 	if (isExternalUrl.value) return props.href;
-	return localePath(props.href);
+	return localePath({ path: props.href });
 });
 
 const target = computed(() => {
