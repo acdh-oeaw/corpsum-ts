@@ -28,6 +28,18 @@ const schemaDefinition = {
 		required: true,
 	},
 	credentials: [credentialsSchema],
+	settings: {
+		pinnedCorpora: {
+			type: [
+				{
+					instanceId: { type: "ObjectId", ref: "noskeinstances", required: true },
+					corpus: { type: String, required: true },
+					_id: false,
+				},
+			],
+			default: [],
+		},
+	},
 } as const;
 
 export interface UserCredential {
@@ -43,6 +55,7 @@ export interface UserDocument {
 	password?: string;
 	accounttype: "admin" | "user";
 	credentials: Array<UserCredential>;
+	settings?: { pinnedCorpora: Array<{ instanceId: Types.ObjectId; corpus: string }> };
 	createdAt?: Date;
 	updatedAt?: Date;
 }
