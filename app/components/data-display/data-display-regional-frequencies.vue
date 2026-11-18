@@ -12,7 +12,6 @@ import {
 } from "lucide-vue-next";
 
 import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
-import ChartSortToggle from "@/components/chart-sort-toggle.vue";
 import {
 	type RegionalVisualizationSettings,
 	normalizeRegionalVisualizationSettings,
@@ -47,7 +46,6 @@ const emit = defineEmits<{
 }>();
 
 const t = useTranslations();
-const sortOrder = ref<"ascending" | "descending">("descending");
 const rowLimit = ref(30);
 const queries = computed(() => props.queries);
 const usesProvidedData = computed(() => props.data !== undefined);
@@ -213,7 +211,6 @@ const regionalBarSeries = computed(() =>
 
 		<CardContent class="space-y-4">
 			<Toolbar :aria-label="t('VisualizationToolbar.regional')">
-				<ChartSortToggle v-if="interactive" v-model="sortOrder" />
 				<template v-if="interactive">
 					<ToolbarToggleGroup
 						class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
@@ -432,7 +429,7 @@ const regionalBarSeries = computed(() =>
 
 			<Chart
 				:row-limit="interactive ? rowLimit : undefined"
-				:sort-order="sortOrder"
+				:sort-categories="false"
 				v-if="!loading && queries.length > 0"
 				:chart-type="barChartMode"
 				:percent="true"
