@@ -299,7 +299,7 @@
 		"title": "Corpora",
 		"description": "Browse available corpora.",
 		"featuredTitle": "Recent corpora",
-		"featuredDescription": "Sorted by last updated query",
+		"featuredDescription": "Recently cached",
 		"moreTitle": "More corpora",
 		"moreDescription": "All remaining corpora",
 		"empty": "No more corpora to show.",

@@ -299,7 +299,7 @@
 		"title": "Korpora",
 		"description": "Verfügbare Korpora durchsuchen.",
 		"featuredTitle": "Aktuelle Korpora",
-		"featuredDescription": "Sortiert nach zuletzt aktualisierter Abfrage",
+		"featuredDescription": "Zuletzt zwischengespeichert",
 		"moreTitle": "Weitere Korpora",
 		"moreDescription": "Alle übrigen Korpora",
 		"empty": "Keine weiteren Korpora verfügbar.",
