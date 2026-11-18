@@ -689,5 +689,9 @@
 	"wordFormFrequenciesDesc": "Compare the most frequent word forms returned by each query.",
 	"yearlyFrequencies": "Yearly frequencies",
 	"yearlyFrequenciesDesc": "Compare query frequencies over time.",
-	"yearlyFrequenciesPer": "Yearly frequencies per "
+	"yearlyFrequenciesPer": "Yearly frequencies per ",
+	"Table": {
+		"sortAscending": "Sort ascending",
+		"sortDescending": "Sort descending"
+	}
 }

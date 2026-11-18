@@ -689,5 +689,9 @@
 	"wordFormFrequenciesDesc": "Vergleicht die häufigsten Wortformen je Abfrage.",
 	"yearlyFrequencies": "Jährliche Frequenzen",
 	"yearlyFrequenciesDesc": "Vergleicht die Abfragefrequenzen im Zeitverlauf.",
-	"yearlyFrequenciesPer": "Jährliche Frequenzen pro "
+	"yearlyFrequenciesPer": "Jährliche Frequenzen pro ",
+	"Table": {
+		"sortAscending": "Aufsteigend sortieren",
+		"sortDescending": "Absteigend sortieren"
+	}
 }
