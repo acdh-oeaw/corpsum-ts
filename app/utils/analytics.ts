@@ -22,12 +22,6 @@ export function trackPageView(to: RouteLocationNormalized, from: RouteLocationNo
 	}
 }
 
-declare global {
-	interface Window {
-		_paq?: Array<unknown>;
-	}
-}
-
 export function createAnalyticsScript(baseUrl: string, id: string): string {
 	return `
   var _paq = (window._paq = window._paq || [])

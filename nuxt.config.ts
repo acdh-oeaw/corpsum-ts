@@ -1,8 +1,10 @@
 import { fileURLToPath } from "node:url";
 
+import tailwindcss from "@tailwindcss/vite";
+
 // noinspection ES6PreferShortImport
-import { defaultLocale, files } from "./app/config/i18n.config";
-import oxlintGlobals from "./modules/oxlint-globals";
+import { defaultLocale, files } from "./app/config/i18n.config.ts";
+import oxlintGlobals from "./modules/oxlint-globals.ts";
 
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
 const databaseUrl = process.env.DATABASE_URL!;
@@ -42,6 +44,8 @@ export default defineNuxtConfig({
 	},
 
 	experimental: {
+		// Required by @nuxtjs/i18n until https://github.com/nuxt-modules/i18n/issues/4175 is fixed.
+		nitroAutoImports: true,
 		componentIslands: {
 			selectiveClient: true,
 		},
@@ -87,7 +91,7 @@ export default defineNuxtConfig({
 	modules: [
 		oxlintGlobals,
 		"@nuxt/fonts",
-		"@nuxt/hints",
+		["@nuxt/hints", { features: { hydration: { devtools: false, logs: true } } }],
 		"@nuxt/icon",
 		"@nuxt/image",
 		"@nuxt/scripts",
@@ -103,12 +107,6 @@ export default defineNuxtConfig({
 		options: {},
 		modelsDir: "models",
 		devtools: false,
-	},
-
-	postcss: {
-		plugins: {
-			"@tailwindcss/postcss": {},
-		},
 	},
 
 	nitro: {
@@ -162,6 +160,7 @@ export default defineNuxtConfig({
 	},
 
 	vite: {
+		plugins: [tailwindcss()],
 		build: {
 			cssMinify: "lightningcss",
 			sourcemap: "hidden",

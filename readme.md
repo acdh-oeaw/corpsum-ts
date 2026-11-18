@@ -24,7 +24,7 @@ helpers live in `server/`; shared/generated types live in `lib/`.
 
 ## Requirements
 
-- [Node.js 24.x](https://nodejs.org/en/download)
+- [Node.js 26.x](https://nodejs.org/en/download)
 - [pnpm 11.0.4](https://pnpm.io/installation)
 - Docker and Docker Compose for the local deployment
 

@@ -4,11 +4,12 @@
 # @see https://sharp.pixelplumbing.com/install#linux-memory-allocator
 
 # build
-FROM node:24-slim AS base
+FROM node:26-slim AS base
 
 ENV COREPACK_HOME=/opt/corepack
 
-RUN corepack enable && mkdir "$COREPACK_HOME" && chown node:node "$COREPACK_HOME"
+RUN npm install --global corepack@0.36.0 && corepack enable && \
+	mkdir "$COREPACK_HOME" && chown node:node "$COREPACK_HOME"
 
 RUN mkdir /app && chown -R node:node /app
 WORKDIR /app
@@ -62,7 +63,7 @@ RUN --mount=type=secret,id=DATABASE_URL,uid=1000 \
     pnpm run build
 
 # serve
-FROM node:24-alpine AS serve
+FROM node:26-alpine AS serve
 
 RUN mkdir /app && chown -R node:node /app
 WORKDIR /app
