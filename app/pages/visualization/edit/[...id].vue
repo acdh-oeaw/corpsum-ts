@@ -21,7 +21,6 @@ import {
 	normalizeVisualizationSettings,
 	serializeVisualizationSettingsState,
 	temporalFrequencyDistributionType,
-	visualizationTypes,
 } from "@/lib/visualization-types";
 import { assignQueryColors } from "@/utils/colors";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
@@ -29,24 +28,6 @@ import type { VisualizationResponse } from "~/server/api/visualization/[id].get.
 
 const ColorPicker = vcolorpicker.colorPicker;
 const t = useTranslations();
-const visualizationLabels: Record<
-	VisualizationType,
-	| "collocations"
-	| "keywordInContext"
-	| "mediaSources"
-	| "mediaTypes"
-	| "regionalFrequencies"
-	| "wordFormFrequencies"
-	| "yearlyFrequencies"
-> = {
-	"data-display-collocations": "collocations",
-	"data-display-keyword-in-context": "keywordInContext",
-	"data-display-media-source": "mediaSources",
-	"data-display-media-type": "mediaTypes",
-	"data-display-regional-frequencies": "regionalFrequencies",
-	"data-display-word-form-frequencies": "wordFormFrequencies",
-	[temporalFrequencyDistributionType]: "yearlyFrequencies",
-};
 const locale = useLocale();
 // The picker accepts other locale strings at runtime; all labels are supplied by app i18n.
 const pickerLocale = computed(() => locale.value as ColorPickerLocale);
@@ -407,34 +388,10 @@ function cancel() {
 			<div class="grid gap-2">
 				<p class="text-sm font-medium">{{ t("VisualizationForm.labels.visualizations") }}</p>
 				<div class="grid gap-3 md:grid-cols-2">
-					<div class="grid content-start gap-2 rounded-md border p-3">
-						<label
-							v-for="visualizationType in visualizationTypes"
-							:key="visualizationType"
-							class="group flex cursor-pointer items-center gap-3 overflow-hidden rounded-md border bg-card p-1.5 shadow-sm transition-colors hover:border-primary/60"
-							:class="
-								selectedVisualizations.includes(visualizationType)
-									? 'border-primary ring-1 ring-primary'
-									: 'border-border'
-							"
-						>
-							<img
-								:src="`/assets/images/visualization-previews/${visualizationType}.webp`"
-								alt=""
-								loading="lazy"
-								class="aspect-video w-20 shrink-0 rounded-sm border bg-white object-cover object-top"
-							/>
-							<div class="flex items-center gap-2">
-								<Checkbox
-									:model-value="selectedVisualizations.includes(visualizationType)"
-									@update:model-value="toggleVisualizationSelection(visualizationType, $event)"
-								/>
-								<span class="text-xs font-medium">{{
-									t(visualizationLabels[visualizationType])
-								}}</span>
-							</div>
-						</label>
-					</div>
+					<VisualizationTypeSelector
+						:model-value="selectedVisualizations"
+						@toggle="toggleVisualizationSelection"
+					/>
 					<div v-if="editableMetadataSemantics.length > 0" class="grid gap-3">
 						<VisualizationCorpusMetadataMappingEditor
 							v-for="semantic in editableMetadataSemantics"

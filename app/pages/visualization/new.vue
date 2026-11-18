@@ -16,7 +16,6 @@ import {
 	normalizeVisualizationSettings,
 	serializeVisualizationSettingsState,
 	temporalFrequencyDistributionType,
-	visualizationTypes,
 } from "@/lib/visualization-types";
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
@@ -319,19 +318,10 @@ function cancel() {
 			<div class="grid gap-2">
 				<p class="text-sm font-medium">{{ t("VisualizationForm.labels.visualizations") }}</p>
 				<div class="grid gap-3 md:grid-cols-2">
-					<div class="space-y-2 rounded-md border p-3">
-						<div
-							v-for="visualization in visualizationTypes"
-							:key="visualization"
-							class="flex items-center gap-2"
-						>
-							<Checkbox
-								:model-value="selectedVisualizations.includes(visualization)"
-								@update:model-value="toggleVisualizationSelection(visualization, $event)"
-							/>
-							<span class="text-sm">{{ visualization }}</span>
-						</div>
-					</div>
+					<VisualizationTypeSelector
+						:model-value="selectedVisualizations"
+						@toggle="toggleVisualizationSelection"
+					/>
 					<div v-if="editableMetadataSemantics.length > 0" class="grid gap-3">
 						<VisualizationCorpusMetadataMappingEditor
 							v-for="semantic in editableMetadataSemantics"
