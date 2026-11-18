@@ -47,7 +47,14 @@
 		"meta": {
 			"title": "Home"
 		},
-		"title": "Home"
+		"title": "Home",
+		"welcome": "Welcome to CorpSum, a visualization tool for corpus data.",
+		"overview": "This page provides an overview of the tool’s basic features. Select an item to see more details.",
+		"navigation": "All options are available at any time through the menu on the left.",
+		"pinnedCorpora": "Pinned corpora",
+		"noPinnedCorpora": "You have not pinned any corpora yet.",
+		"recentQueries": "Recent queries",
+		"noRecentQueries": "No queries yet."
 	},
 	"LoginPage": {
 		"actions": {
@@ -696,5 +703,10 @@
 	"Table": {
 		"sortAscending": "Sort ascending",
 		"sortDescending": "Sort descending"
+	},
+	"CorpusPin": {
+		"pin": "Pin corpus",
+		"unpin": "Unpin corpus",
+		"error": "Could not update pin."
 	}
 }

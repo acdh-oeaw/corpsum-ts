@@ -47,7 +47,14 @@
 		"meta": {
 			"title": "Startseite"
 		},
-		"title": "Startseite"
+		"title": "Startseite",
+		"welcome": "Willkommen bei CorpSum, einem Visualisierungstool für Korpusdaten.",
+		"overview": "Diese Seite bietet eine Übersicht über die grundlegenden Funktionen des Tools. Durch Klicken auf den jeweiligen Punkt erhalten Sie Detailinformationen.",
+		"navigation": "Über die Menüleiste am linken Bildschirmrand sind sämtliche Optionen jederzeit zugänglich.",
+		"pinnedCorpora": "Angeheftete Korpora",
+		"noPinnedCorpora": "Sie haben noch keine Korpora angeheftet.",
+		"recentQueries": "Letzte Abfragen",
+		"noRecentQueries": "Noch keine Abfragen vorhanden."
 	},
 	"LoginPage": {
 		"actions": {
@@ -696,5 +703,10 @@
 	"Table": {
 		"sortAscending": "Aufsteigend sortieren",
 		"sortDescending": "Absteigend sortieren"
+	},
+	"CorpusPin": {
+		"pin": "Korpus anheften",
+		"unpin": "Korpus lösen",
+		"error": "Anheftung konnte nicht geändert werden."
 	}
 }

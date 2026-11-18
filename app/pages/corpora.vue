@@ -52,6 +52,7 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 							</CardContent>
 							<CardFooter class="mt-auto border-t bg-muted/20 p-3">
 								<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+									<CorpusPinButton :instance-id="item.noskeId" :corpus="item.corpus" />
 									<Button as-child size="sm" variant="ghost">
 										<NuxtLinkLocale
 											:href="{
