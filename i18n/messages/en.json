@@ -616,6 +616,9 @@
 		"public": "Public",
 		"hidden": "Hidden",
 		"hide": "Hide",
+		"hideTitle": "Take visualization offline?",
+		"hideDescription": "‘{title}’ will no longer be publicly accessible. Existing links and embeds will stop working.",
+		"hideError": "Could not take the visualization offline. Please try again.",
 		"empty": "No published visualizations yet."
 	},
 	"PublishedVisualizationPage": {

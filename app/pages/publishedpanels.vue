@@ -3,6 +3,9 @@ import type { PublishedVisualizationResponse } from "~/server/utils/published-vi
 
 const env = useRuntimeConfig();
 const t = useTranslations();
+const selected = ref<PublishedVisualizationResponse | null>(null);
+const isHiding = ref(false);
+const hideFailed = ref(false);
 
 const { data: published, refresh } = await useFetch<Array<PublishedVisualizationResponse>>(
 	"/api/published-visualizations",
@@ -25,12 +28,22 @@ function embedSnippet(item: PublishedVisualizationResponse) {
 	return `<iframe src="${src}" width="100%" height="720" loading="lazy" style="border:0;" title="${escapeAttribute(item.title)}"></iframe>`;
 }
 
-async function hide(item: PublishedVisualizationResponse) {
-	await $fetch(`/api/published-visualization/${item.uid}`, {
-		method: "PATCH",
-		body: { isPublic: false },
-	});
-	await refresh();
+async function hide() {
+	if (!selected.value || isHiding.value) return;
+	isHiding.value = true;
+	hideFailed.value = false;
+	try {
+		await $fetch(`/api/published-visualization/${selected.value.uid}`, {
+			method: "PATCH",
+			body: { isPublic: false },
+		});
+		await refresh();
+		selected.value = null;
+	} catch {
+		hideFailed.value = true;
+	} finally {
+		isHiding.value = false;
+	}
 }
 </script>
 
@@ -79,7 +92,10 @@ async function hide(item: PublishedVisualizationResponse) {
 								size="sm"
 								type="button"
 								variant="outline"
-								@click="hide(item)"
+								@click="
+									hideFailed = false;
+									selected = item;
+								"
 							>
 								{{ t("PublishedPanelsPage.hide") }}
 							</Button>
@@ -93,5 +109,29 @@ async function hide(item: PublishedVisualizationResponse) {
 				</TableBody>
 			</Table>
 		</div>
+		<AlertDialog
+			:open="selected !== null"
+			@update:open="
+				(open) => {
+					if (!open && !isHiding) selected = null;
+				}
+			"
+		>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>{{ t("PublishedPanelsPage.hideTitle") }}</AlertDialogTitle>
+					<AlertDialogDescription>{{
+						t("PublishedPanelsPage.hideDescription", { title: selected?.title ?? "" })
+					}}</AlertDialogDescription>
+				</AlertDialogHeader>
+				<p v-if="hideFailed" role="alert" class="text-sm text-destructive">
+					{{ t("PublishedPanelsPage.hideError") }}
+				</p>
+				<AlertDialogFooter>
+					<AlertDialogCancel :disabled="isHiding">{{ t("Actions.cancel") }}</AlertDialogCancel>
+					<Button :disabled="isHiding" @click="hide">{{ t("PublishedPanelsPage.hide") }}</Button>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
 	</MainContent>
 </template>

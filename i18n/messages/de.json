@@ -616,6 +616,9 @@
 		"public": "Öffentlich",
 		"hidden": "Ausgeblendet",
 		"hide": "Ausblenden",
+		"hideTitle": "Visualisierung offline nehmen?",
+		"hideDescription": "„{title}“ ist dann nicht mehr öffentlich zugänglich. Bestehende Links und Einbettungen funktionieren nicht mehr.",
+		"hideError": "Die Visualisierung konnte nicht offline genommen werden. Bitte versuchen Sie es erneut.",
 		"empty": "Noch keine veröffentlichten Visualisierungen vorhanden."
 	},
 	"PublishedVisualizationPage": {
