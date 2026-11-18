@@ -4,6 +4,8 @@ import {
 	FlexRender,
 	getCoreRowModel,
 	getPaginationRowModel,
+	getSortedRowModel,
+	type SortingState,
 	useVueTable,
 } from "@tanstack/vue-table";
 
@@ -12,7 +14,18 @@ const props = defineProps<{
 	data: Array<TData>;
 }>();
 
+const sorting = ref<SortingState>([]);
+
 const table = useVueTable({
+	state: {
+		get sorting() {
+			return sorting.value;
+		},
+	},
+	onSortingChange: (value) => {
+		sorting.value = typeof value === "function" ? value(sorting.value) : value;
+	},
+	getSortedRowModel: getSortedRowModel(),
 	get data() {
 		return props.data;
 	},
@@ -27,16 +40,24 @@ const t = useTranslations();
 </script>
 
 <template>
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-md border">
 		<Table class="relative w-full text-nowrap">
 			<TableHeader>
 				<TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
 					<TableHead v-for="header in headerGroup.headers" :key="header.id">
-						<FlexRender
-							v-if="!header.isPlaceholder"
-							:props="header.getContext()"
-							:render="header.column.columnDef.header"
-						/>
+						<template v-if="!header.isPlaceholder">
+							<TableSortButton
+								v-if="header.column.getCanSort()"
+								:sorted="header.column.getIsSorted()"
+								@click="header.column.toggleSorting(header.column.getIsSorted() === 'asc')"
+								><FlexRender :props="header.getContext()" :render="header.column.columnDef.header"
+							/></TableSortButton>
+							<FlexRender
+								v-else
+								:props="header.getContext()"
+								:render="header.column.columnDef.header"
+							/>
+						</template>
 					</TableHead>
 				</TableRow>
 			</TableHeader>
@@ -62,8 +83,8 @@ const t = useTranslations();
 				</template>
 			</TableBody>
 		</Table>
-		<div class="flex items-center justify-end space-x-2 py-4">
-			<div class="ml-2 flex-1 text-sm">
+		<div class="flex items-center justify-end gap-2 p-3">
+			<div class="flex-1 text-sm">
 				{{ table.getState().pagination.pageIndex + 1 }} / {{ table.getPageCount() }}.
 				<!-- @vue-ignore -->
 				{{ $t("Corpsum.total-of-n-entries", [data?.length || 0]) }}
@@ -78,7 +99,6 @@ const t = useTranslations();
 					{{ t("previous") }}
 				</Button>
 				<Button
-					class="mr-2"
 					:disabled="!table.getCanNextPage()"
 					size="sm"
 					variant="outline"

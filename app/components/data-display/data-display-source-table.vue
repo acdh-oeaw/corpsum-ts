@@ -28,7 +28,7 @@ function createColumns(row: LegalAny | undefined) {
 	return Object.keys(row).map((key) => {
 		return {
 			accessorKey: key,
-			header: () => h("div", { class: "text-right" }, key),
+			header: () => h("div", key),
 			// @ts-expect-error tanstack table typing
 			cell: ({ row }) => {
 				const value = row.getValue(key);

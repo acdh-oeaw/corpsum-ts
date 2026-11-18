@@ -21,7 +21,7 @@ export const getKWICColumns = (
 	const columns: Array<ColumnDef<KeywordInContext>> = refHeaders.map((header) => ({
 		id: `ref:${header}`,
 		accessorFn: (row) => row.refValues[header] ?? "",
-		header: () => h("div", { class: "text-right" }, referenceLabels[header] ?? header),
+		header: () => h("div", referenceLabels[header] ?? header),
 		cell: ({ row }) =>
 			h("div", { class: "text-right font-medium" }, row.original.refValues[header] ?? ""),
 	}));
@@ -29,7 +29,7 @@ export const getKWICColumns = (
 	columns.push(
 		{
 			accessorKey: "left",
-			header: () => h("div", { class: "text-right ml-auto" }, t("Corpsum.left")),
+			header: () => h("div", t("Corpsum.left")),
 			cell: ({ row }: RowObj) => {
 				const left = row.getValue("left");
 				return h(
@@ -44,7 +44,7 @@ export const getKWICColumns = (
 		},
 		{
 			accessorKey: "word",
-			header: () => h("div", { class: "text-center" }, t("Corpsum.word")),
+			header: () => h("div", t("Corpsum.word")),
 			cell: ({ row }: RowObj) => {
 				const word = row.getValue("word");
 				return h("div", { class: "text-center font-medium" }, word);
@@ -69,12 +69,12 @@ export const getKWICColumns = (
 	if (allowDetails)
 		columns.push({
 			accessorKey: "link",
-			header: () => h("div", { class: "text-right" }, t("Corpsum.link")),
+			header: () => h("div", t("Corpsum.link")),
 			cell: ({ row }: RowObj) => {
 				return h(
 					"button",
 					{
-						class: "inline-flex items-center text-sm text-primary hover:underline",
+						class: "ml-auto flex items-center text-sm text-primary hover:underline",
 						onClick: () => {
 							open(row.original);
 						},

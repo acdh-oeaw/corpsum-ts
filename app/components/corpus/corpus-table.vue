@@ -146,21 +146,12 @@ function getCorpusQueryValue(corpus: CorpusTableItem) {
 						:key="header.id"
 					>
 						<div class="flex items-center gap-2">
-							<button
+							<TableSortButton
 								v-if="header.column"
-								type="button"
-								class="inline-flex items-center gap-1 rounded-sm text-inherit hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+								:sorted="header.column.getIsSorted()"
 								@click="header.column.toggleSorting(header.column.getIsSorted() === 'asc')"
+								>{{ header.label }}</TableSortButton
 							>
-								{{ header.label }}
-								{{
-									header.column.getIsSorted() === "asc"
-										? "↑"
-										: header.column.getIsSorted() === "desc"
-											? "↓"
-											: ""
-								}}
-							</button>
 							<span v-else>{{ header.label }}</span>
 							<Input
 								v-if="header.column && (header.id === 'corpus' || header.id === 'language')"
