@@ -130,6 +130,14 @@ export default defineEventHandler(async (event): Promise<PopulatedNoskeDocument 
 		return;
 	}
 
+	if (
+		(updates.base !== undefined && updates.base !== noskeinstance.base) ||
+		(updates.version !== undefined && updates.version !== noskeinstance.version) ||
+		(updates.authentication !== undefined &&
+			updates.authentication !== noskeinstance.authentication)
+	) {
+		noskeinstance.corpusInfoCache = [];
+	}
 	Object.assign(noskeinstance, updates);
 	await noskeinstance.save();
 

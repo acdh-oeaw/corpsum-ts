@@ -1,5 +1,7 @@
-import { defineEventHandler, getHeaders, getQuery, readBody } from "h3";
+import { defineEventHandler, getHeaders, getQuery, readBody, setHeader } from "h3";
 
+import type { components } from "~/lib/noske-types";
+import { retrieveCorpusInfo } from "~/server/utils/corpus-info-cache";
 import { decryptCredentialPassword } from "~/server/utils/credentials";
 import { requireReadableNoske } from "~/server/utils/noske";
 import { resolveNoskeTargetPath } from "~/server/utils/noske-path";
@@ -99,7 +101,7 @@ export default defineEventHandler(async (event) => {
 	const upstreamPath = resolveNoskeTargetPath(noske.version, targetPath);
 	const fetcher = $fetch as (input: string, opts: unknown) => Promise<unknown>;
 	const proxyHeaders: Record<string, string> = {};
-	const cacheEligible = isNoskeCacheEligible(targetPath);
+	const cacheEligible = targetPath !== "/search/corp_info" && isNoskeCacheEligible(targetPath);
 	const refreshCache = isNoskeCacheRefresh(headers);
 
 	if (headers["content-type"]) {
@@ -107,6 +109,29 @@ export default defineEventHandler(async (event) => {
 	}
 	if (authheader) {
 		proxyHeaders.Authorization = authheader;
+	}
+
+	if (
+		method === "GET" &&
+		targetPath === "/search/corp_info" &&
+		typeof params.corpname === "string" &&
+		Object.keys(params).every((key) => key === "corpname" || key === "format")
+	) {
+		const result = await retrieveCorpusInfo({
+			noske,
+			corpus: params.corpname,
+			userId: noske.authentication === "basic" ? user._id.toString() : null,
+			refresh: refreshCache,
+			fetch: () =>
+				fetcher(upstreamPath, {
+					headers: proxyHeaders,
+					baseURL: noske.base,
+					method,
+					params,
+				}) as Promise<components["schemas"]["01_corp_info"]>,
+		});
+		setHeader(event, "X-Corpsum-Cache", result.status);
+		return result.info;
 	}
 
 	if (cacheEligible) {

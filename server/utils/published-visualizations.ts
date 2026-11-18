@@ -27,6 +27,7 @@ import { NoskeQueryCacheModel } from "~/server/models/noskequerycache.schema";
 import { type QueryDocument, QueryModel } from "~/server/models/queries.schema";
 import type { UserDocument } from "~/server/models/users.schema";
 import type { VisualizationDocument } from "~/server/models/visualizations.schema";
+import { retrieveCorpusInfo } from "~/server/utils/corpus-info-cache";
 import {
 	resolveCorpusMetadataMapping,
 	serializeCorpusMetadataMapping,
@@ -252,12 +253,19 @@ async function fetchPublishedCorpusInfo({ noske, corpus, publisher }: PublishedC
 	}
 
 	const upstreamPath = resolveNoskeTargetPath(noske.version, "/search/corp_info");
-	return await $fetch<CorpusInfoResponse>(upstreamPath, {
-		baseURL: noske.base,
-		method: "GET",
-		headers,
-		params: { corpname: corpus },
+	const result = await retrieveCorpusInfo({
+		noske,
+		corpus,
+		userId: noske.authentication === "basic" ? publisher._id.toString() : null,
+		fetch: () =>
+			$fetch<CorpusInfoResponse>(upstreamPath, {
+				baseURL: noske.base,
+				method: "GET",
+				headers,
+				params: { corpname: corpus },
+			}),
 	});
+	return result.info;
 }
 
 function createQuerySnapshot(
