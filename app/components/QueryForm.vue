@@ -102,6 +102,7 @@ const resolveValues = (values?: Partial<QueryFormValues>) => {
 	const resolved = {
 		...emptyValues,
 		...(values ?? {}),
+		type: values?.type ?? emptyValues.type,
 	};
 	return {
 		...resolved,
