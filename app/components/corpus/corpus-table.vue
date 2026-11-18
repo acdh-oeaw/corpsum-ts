@@ -188,6 +188,10 @@ function getCorpusQueryValue(corpus: CorpusTableItem) {
 						<TableCell
 							><TooltipProvider :delay-duration="150"
 								><div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+									<CorpusPinButton
+										:instance-id="row.original.noskeId"
+										:corpus="getCorpusQueryValue(row.original)"
+									/>
 									<Tooltip v-if="getCorpusQueryValue(row.original)"
 										><TooltipTrigger as-child
 											><Button as-child size="sm" variant="ghost"
