@@ -1,6 +1,6 @@
 ---
-navigationOrder: 16
 title: Visualisierungen
+navigationOrder: 16
 ---
 
 # Visualisierungen

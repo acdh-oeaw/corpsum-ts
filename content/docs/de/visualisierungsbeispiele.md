@@ -1,7 +1,7 @@
 ---
-navigationOrder: 6
 title: Visualisierungsbeispiele
 description: In der Folge werden die unterschiedlichen Visualisierungsoptionen am Beispielfall Paradeiser/Tomate (Korpus amc_5.25q4LTS, Suchtyp lemmarow) vorgestellt.
+navigationOrder: 6
 ---
 
 # Visualisierungsbeispiele
