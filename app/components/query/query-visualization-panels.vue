@@ -35,6 +35,7 @@ const temporalQueries = computed(() =>
 const {
 	mappingsForQueries: temporalMetadataMappings,
 	mappingsStatus: temporalMetadataMappingsStatus,
+	refreshMappings: refreshTemporalMappings,
 } = await useCorpusMetadataMappings(temporalQueries, "temporal");
 
 const loadingByType = reactive<Partial<Record<VisualizationType, boolean>>>({});
@@ -65,9 +66,16 @@ function updateSettings<TType extends VisualizationType>(
 
 <template>
 	<div class="grid gap-6">
+		<VisualizationCorpusMetadataMappingEditor
+			v-if="temporalQueries.length > 0"
+			:queries="temporalQueries"
+			semantic="temporal"
+			@updated="refreshTemporalMappings"
+		/>
 		<DataDisplayTemporalFrequencyDistribution
 			v-if="selectedTypes.includes(temporalFrequencyDistributionType)"
 			:metadata-mappings="temporalMetadataMappings"
+			:mappings-status="temporalMetadataMappingsStatus"
 			:queries="queries"
 			:settings="getSettings(temporalFrequencyDistributionType)"
 			@loading-change="updateLoading(temporalFrequencyDistributionType, $event)"

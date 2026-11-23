@@ -14,7 +14,7 @@ const emit = defineEmits<{
 	updated: [];
 }>();
 
-const { mappingLookupsByKey, refreshMappings, uniqueMappingQueries } =
+const { mappingLookupsByKey, refreshMappings, mappingsStatus, uniqueMappingQueries } =
 	await useCorpusMetadataMappings(
 		() => props.queries,
 		() => props.semantic,
@@ -27,17 +27,14 @@ const mappingSaving = ref<Record<string, boolean>>({});
 watchEffect(() => {
 	for (const query of uniqueMappingQueries.value) {
 		const key = createCorpusMetadataMappingKey(query, props.semantic);
-		if (mappingDrafts.value[key]) continue;
-		mappingDrafts.value[key] = JSON.stringify(
-			createMappingDraft(mappingLookupsByKey.value[key]),
-			null,
-			2,
-		);
+		const lookup = mappingLookupsByKey.value[key];
+		if (!lookup || Object.hasOwn(mappingDrafts.value, key)) continue;
+		mappingDrafts.value[key] = JSON.stringify(createMappingDraft(lookup), null, 2);
 	}
 });
 
-function createMappingDraft(lookup: CorpusMetadataMappingLookupResponse | undefined) {
-	const mapping = lookup?.resolved;
+function createMappingDraft(lookup: CorpusMetadataMappingLookupResponse) {
+	const mapping = lookup.resolved;
 	return mapping
 		? {
 				attribute: mapping.attribute,
@@ -71,12 +68,13 @@ async function saveMapping(query: CorpusQuery, forceUserCopy = false) {
 	try {
 		const parsed = JSON.parse(mappingDrafts.value[key] ?? "{}") as Record<string, unknown>;
 		const lookup = mappingLookupsByKey.value[key];
-		const target = !forceUserCopy && lookup?.canEditDefault ? lookup.default : lookup?.user;
+		const scope = forceUserCopy || lookup?.user || !lookup?.canEditDefault ? "user" : "default";
+		const target = scope === "user" ? lookup?.user : lookup?.default;
 		const body = {
 			noske,
 			corpus: query.corpus,
 			semantic: props.semantic,
-			scope: forceUserCopy || !lookup?.canEditDefault ? "user" : "default",
+			scope,
 			attribute: parsed.attribute,
 			parser: parsed.parser,
 			valueMap: parsed.valueMap ?? {},
@@ -129,58 +127,77 @@ function hasUserMapping(query: CorpusQuery) {
 		<p v-if="uniqueMappingQueries.length === 0" class="text-sm text-muted-foreground">
 			{{ t("MetadataMappingEditor.selectQuery") }}
 		</p>
+		<p v-else-if="mappingsStatus === 'pending'" class="text-sm text-muted-foreground" role="status">
+			{{ t("MetadataMappingEditor.loading") }}
+		</p>
+		<div v-else-if="mappingsStatus === 'error'" class="flex items-center gap-2">
+			<p class="text-sm text-destructive" role="status">
+				{{ t("MetadataMappingEditor.loadFailed") }}
+			</p>
+			<Button size="sm" type="button" variant="outline" @click="refreshMappings()">
+				{{ t("MetadataMappingEditor.retry") }}
+			</Button>
+		</div>
 
-		<div
-			v-for="query in uniqueMappingQueries"
-			:key="createCorpusMetadataMappingKey(query, semantic)"
-			class="grid gap-2"
-		>
-			<div class="flex flex-wrap items-center justify-between gap-2">
-				<Label :for="`mapping-${createCorpusMetadataMappingKey(query, semantic)}`">
-					{{ t("MetadataMappingEditor.mappingLabel", { corpus: query.corpus }) }}
-				</Label>
-				<div class="flex flex-wrap gap-1 text-xs text-muted-foreground">
-					<span v-if="hasUserMapping(query)">{{ t("MetadataMappingEditor.private") }}</span>
-					<span v-else-if="hasDefaultMapping(query)">{{ t("MetadataMappingEditor.default") }}</span>
-					<span v-else>{{ t("MetadataMappingEditor.missing") }}</span>
+		<template v-else-if="mappingsStatus === 'success'">
+			<div
+				v-for="query in uniqueMappingQueries"
+				:key="createCorpusMetadataMappingKey(query, semantic)"
+				class="grid gap-2"
+			>
+				<div class="flex flex-wrap items-center justify-between gap-2">
+					<Label :for="`mapping-${createCorpusMetadataMappingKey(query, semantic)}`">
+						{{ t("MetadataMappingEditor.mappingLabel", { corpus: query.corpus }) }}
+					</Label>
+					<div class="flex flex-wrap gap-1 text-xs text-muted-foreground">
+						<span v-if="hasUserMapping(query)">{{ t("MetadataMappingEditor.private") }}</span>
+						<span v-else-if="hasDefaultMapping(query)">{{
+							t("MetadataMappingEditor.default")
+						}}</span>
+						<span v-else>{{ t("MetadataMappingEditor.missing") }}</span>
+					</div>
+				</div>
+				<textarea
+					:id="`mapping-${createCorpusMetadataMappingKey(query, semantic)}`"
+					v-model="mappingDrafts[createCorpusMetadataMappingKey(query, semantic)]"
+					class="min-h-44 rounded-md border bg-background p-3 font-mono text-xs"
+				></textarea>
+				<p
+					v-if="mappingErrors[createCorpusMetadataMappingKey(query, semantic)]"
+					class="text-xs text-destructive"
+				>
+					{{ mappingErrors[createCorpusMetadataMappingKey(query, semantic)] }}
+				</p>
+				<div class="flex flex-wrap gap-2">
+					<Button
+						class="w-fit"
+						:disabled="mappingSaving[createCorpusMetadataMappingKey(query, semantic)]"
+						size="sm"
+						type="button"
+						@click="saveMapping(query)"
+					>
+						{{
+							mappingSaving[createCorpusMetadataMappingKey(query, semantic)]
+								? t("MetadataMappingEditor.saving")
+								: getMappingActionLabel(query)
+						}}
+					</Button>
+					<Button
+						v-if="
+							!hasUserMapping(query) &&
+							hasDefaultMapping(query) &&
+							mappingLookupsByKey[createCorpusMetadataMappingKey(query, semantic)]?.canEditDefault
+						"
+						:disabled="mappingSaving[createCorpusMetadataMappingKey(query, semantic)]"
+						size="sm"
+						type="button"
+						variant="outline"
+						@click="saveMapping(query, true)"
+					>
+						{{ t("MetadataMappingEditor.saveCopy") }}
+					</Button>
 				</div>
 			</div>
-			<textarea
-				:id="`mapping-${createCorpusMetadataMappingKey(query, semantic)}`"
-				v-model="mappingDrafts[createCorpusMetadataMappingKey(query, semantic)]"
-				class="min-h-44 rounded-md border bg-background p-3 font-mono text-xs"
-			></textarea>
-			<p
-				v-if="mappingErrors[createCorpusMetadataMappingKey(query, semantic)]"
-				class="text-xs text-destructive"
-			>
-				{{ mappingErrors[createCorpusMetadataMappingKey(query, semantic)] }}
-			</p>
-			<div class="flex flex-wrap gap-2">
-				<Button
-					class="w-fit"
-					:disabled="mappingSaving[createCorpusMetadataMappingKey(query, semantic)]"
-					size="sm"
-					type="button"
-					@click="saveMapping(query)"
-				>
-					{{
-						mappingSaving[createCorpusMetadataMappingKey(query, semantic)]
-							? t("MetadataMappingEditor.saving")
-							: getMappingActionLabel(query)
-					}}
-				</Button>
-				<Button
-					v-if="!hasUserMapping(query) && hasDefaultMapping(query)"
-					:disabled="mappingSaving[createCorpusMetadataMappingKey(query, semantic)]"
-					size="sm"
-					type="button"
-					variant="outline"
-					@click="saveMapping(query, true)"
-				>
-					{{ t("MetadataMappingEditor.saveCopy") }}
-				</Button>
-			</div>
-		</div>
+		</template>
 	</div>
 </template>

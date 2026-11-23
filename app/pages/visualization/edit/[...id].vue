@@ -119,8 +119,11 @@ const corpusQueries = computed(() =>
 		buildCorpusQuery(item, index, queryColors.value[item._id]),
 	),
 );
-const { mappingsForQueries: temporalMetadataMappings, refreshMappings: refreshTemporalMappings } =
-	await useCorpusMetadataMappings(corpusQueries, "temporal");
+const {
+	mappingsForQueries: temporalMetadataMappings,
+	mappingsStatus: temporalMappingsStatus,
+	refreshMappings: refreshTemporalMappings,
+} = await useCorpusMetadataMappings(corpusQueries, "temporal");
 const editableMetadataSemantics = computed<Array<CorpusMetadataSemantic>>(() => [
 	...new Set(selectedVisualizations.value.flatMap(getEditableVisualizationMetadataSemantics)),
 ]);
@@ -416,6 +419,7 @@ function cancel() {
 			v-if="selectedVisualizations.includes(temporalFrequencyDistributionType)"
 			class="mt-6"
 			:metadata-mappings="temporalMetadataMappings"
+			:mappings-status="temporalMappingsStatus"
 			:queries="corpusQueries"
 			:settings="getSettings(temporalFrequencyDistributionType)"
 			@update:settings="updateVisualizationSettings(temporalFrequencyDistributionType, $event)"

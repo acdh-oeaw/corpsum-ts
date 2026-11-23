@@ -85,10 +85,8 @@ watch(
 	},
 	{ deep: true, immediate: true },
 );
-const { mappingsForQueries: temporalMetadataMappings } = await useCorpusMetadataMappings(
-	corpusQueries,
-	"temporal",
-);
+const { mappingsForQueries: temporalMetadataMappings, mappingsStatus: temporalMappingsStatus } =
+	await useCorpusMetadataMappings(corpusQueries, "temporal");
 
 const visualizationComponents: Record<VisualizationType, unknown> = {
 	"data-display-collocations": DataDisplayCollocations,
@@ -297,6 +295,9 @@ async function publishVisualization() {
 						v-for="(item, index) in visualization.visualizations"
 						:key="`${item}-${index}`"
 						:metadata-mappings="getVisualizationMetadataMappings(item)"
+						:mappings-status="
+							item === temporalFrequencyDistributionType ? temporalMappingsStatus : undefined
+						"
 						:queries="corpusQueries"
 						:settings="getVisualizationSettings(index, item)"
 					/>
