@@ -138,11 +138,9 @@ async function deleteCredential(instance: PopulatedNoskeDocument) {
 			<Card v-for="instance in instances" :key="instance._id" class="overflow-hidden">
 				<CardHeader class="gap-2 border-b bg-primary text-primary-foreground">
 					<div class="flex flex-wrap items-start justify-between gap-3">
-						<div>
-							<CardTitle class="text-2xl font-black tracking-normal">
-								{{ instance.name }}
-							</CardTitle>
-							<CardDescription class="font-semibold text-primary-foreground/80">
+						<div class="min-w-0">
+							<TruncatedCardTitle :title="instance.name" />
+							<CardDescription class="truncate font-semibold text-primary-foreground/80">
 								{{ instance.host }}
 							</CardDescription>
 						</div>

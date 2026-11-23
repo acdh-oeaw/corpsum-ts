@@ -73,17 +73,15 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 									{{ visualization.queryOwners.join(", ") || "—" }}
 								</CardDescription>
 							</CardHeader>
-							<CardContent class="flex-1">
-								<p>
-									<span class="text-xs">{{ t("VisualizationsPage.card.queryCount") }}:</span>
-									{{ visualization.queries.length }}
-								</p>
-								<p>
-									<span class="text-xs"
-										>{{ t("VisualizationsPage.card.visualizationCount") }}:</span
-									>
-									{{ visualization.visualizations.length }}
-								</p>
+							<CardContent class="flex-1 pt-4">
+								<dl class="grid grid-cols-1 gap-2">
+									<CardProperty :label="t('VisualizationsPage.card.queryCount')">
+										{{ visualization.queries.length }}
+									</CardProperty>
+									<CardProperty :label="t('VisualizationsPage.card.visualizationCount')">
+										{{ visualization.visualizations.length }}
+									</CardProperty>
+								</dl>
 							</CardContent>
 							<CardFooter class="mt-auto border-t bg-muted/20 p-3">
 								<TooltipProvider :delay-duration="150">

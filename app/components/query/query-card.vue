@@ -58,23 +58,24 @@ async function deleteQuery() {
 				{{ t("QueryCard.owner") }}: {{ ownerNames.join(", ") || "—" }}
 			</CardDescription>
 		</CardHeader>
-		<CardContent class="flex-1">
-			<p>
-				<span class="text-xs">{{ t("QueryCard.type") }}:</span> {{ query.type }}
-			</p>
-			<p v-if="query.subCorpus.trim()">
-				<span class="text-xs">{{ t("QueryCard.subCorpus") }}:</span> {{ query.subCorpus }}
-			</p>
-			<p>
-				<span class="text-xs">{{ t("QueryCard.corpus") }}:</span> {{ query.corpus }}
-			</p>
-			<p>
-				<span class="text-xs">{{ t("QueryCard.input") }}:</span> {{ query.userInput }}
-			</p>
-			<p>
-				<span class="text-xs">{{ t("Common.updatedAt") }}:</span>
-				<QueryUpdatedDate :updated-at="query.updatedAt" />
-			</p>
+		<CardContent class="flex-1 pt-4">
+			<dl class="grid grid-cols-1 gap-2">
+				<CardProperty :label="t('QueryCard.type')">
+					{{ query.type }}
+				</CardProperty>
+				<CardProperty v-if="query.subCorpus.trim()" :label="t('QueryCard.subCorpus')">
+					{{ query.subCorpus }}
+				</CardProperty>
+				<CardProperty :label="t('QueryCard.corpus')">
+					{{ query.corpus }}
+				</CardProperty>
+				<CardProperty :label="t('QueryCard.input')">
+					{{ query.userInput }}
+				</CardProperty>
+				<CardProperty :label="t('Common.updatedAt')">
+					<QueryUpdatedDate :updated-at="query.updatedAt" />
+				</CardProperty>
+			</dl>
 		</CardContent>
 		<CardFooter class="mt-auto w-full border-t bg-muted/20 p-3">
 			<TooltipProvider :delay-duration="150">

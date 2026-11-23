@@ -36,23 +36,21 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 									{{ t("CorporaPage.instanceOwner") }}: {{ item.instanceOwner || "—" }}
 								</CardDescription>
 							</CardHeader>
-							<CardContent class="flex-1">
-								<p>
-									<span class="text-xs">{{ t("CorporaPage.table.language") }}:</span>
-									{{ item.language }}
-								</p>
-								<p>
-									<span class="text-xs">{{ t("CorporaPage.table.words") }}:</span>
-									{{ formatCount(item.words) }}
-								</p>
-								<p>
-									<span class="text-xs">{{ t("CorporaPage.table.documents") }}:</span>
-									{{ formatCount(item.documents) }}
-								</p>
-								<p>
-									<span class="text-xs">{{ t("CorporaPage.table.noske") }}:</span>
-									{{ item.noske }}
-								</p>
+							<CardContent class="flex-1 pt-4">
+								<dl class="grid grid-cols-1 gap-2">
+									<CardProperty :label="t('CorporaPage.table.language')">
+										{{ item.language }}
+									</CardProperty>
+									<CardProperty :label="t('CorporaPage.table.words')">
+										{{ formatCount(item.words) }}
+									</CardProperty>
+									<CardProperty :label="t('CorporaPage.table.documents')">
+										{{ formatCount(item.documents) }}
+									</CardProperty>
+									<CardProperty :label="t('CorporaPage.table.noske')">
+										{{ item.noske }}
+									</CardProperty>
+								</dl>
 							</CardContent>
 							<CardFooter class="mt-auto border-t bg-muted/20 p-3">
 								<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">

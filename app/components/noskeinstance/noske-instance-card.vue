@@ -73,21 +73,14 @@ async function deleteInstance() {
 			</div>
 		</CardHeader>
 		<CardContent class="flex-1 pt-4">
-			<dl class="grid gap-2 text-sm">
-				<div class="flex items-center justify-between gap-3">
-					<dt class="text-xs text-muted-foreground">{{ t("NoskeInstanceCard.version") }}</dt>
-					<dd class="truncate font-medium">{{ noskeInstance.version }}</dd>
-				</div>
-				<div class="flex items-center justify-between gap-3">
-					<dt class="text-xs text-muted-foreground">{{ t("NoskeInstanceCard.host") }}</dt>
-					<dd class="truncate font-medium">{{ noskeInstance.host }}</dd>
-				</div>
-				<div class="flex items-center justify-between gap-3">
-					<dt class="text-xs text-muted-foreground">{{ t("NoskeInstanceCard.public") }}</dt>
-					<dd class="truncate font-medium">
-						{{ noskeInstance.public ? t("Common.yes") : t("Common.no") }}
-					</dd>
-				</div>
+			<dl class="grid grid-cols-1 gap-2">
+				<CardProperty :label="t('NoskeInstanceCard.version')">{{
+					noskeInstance.version
+				}}</CardProperty>
+				<CardProperty :label="t('NoskeInstanceCard.host')">{{ noskeInstance.host }}</CardProperty>
+				<CardProperty :label="t('NoskeInstanceCard.public')">{{
+					noskeInstance.public ? t("Common.yes") : t("Common.no")
+				}}</CardProperty>
 			</dl>
 		</CardContent>
 		<CardFooter class="mt-auto w-full border-t bg-muted/20 p-3">

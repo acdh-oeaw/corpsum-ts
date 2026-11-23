@@ -224,19 +224,17 @@ function cancel() {
 									<CardHeader
 										class="flex flex-row items-start justify-between gap-2 border-b bg-primary text-primary-foreground"
 									>
-										<div>
-											<CardDescription class="font-semibold text-primary-foreground/80">
+										<div class="min-w-0">
+											<CardDescription class="truncate font-semibold text-primary-foreground/80">
 												{{ query.corpus }}
 											</CardDescription>
-											<CardTitle class="text-2xl font-black tracking-normal">
-												{{ query.name }}
-											</CardTitle>
+											<TruncatedCardTitle :title="query.name" />
 										</div>
 										<TooltipProvider :delay-duration="150">
 											<Tooltip>
 												<TooltipTrigger as-child>
 													<Button
-														class="text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+														class="shrink-0 text-primary-foreground hover:bg-primary-foreground hover:text-primary"
 														size="sm"
 														type="button"
 														variant="ghost"
@@ -251,12 +249,14 @@ function cancel() {
 											</Tooltip>
 										</TooltipProvider>
 									</CardHeader>
-									<CardFooter class="flex-col items-start gap-1.5 border-t bg-muted/20 text-sm">
-										<div class="line-clamp-1 flex gap-2 font-medium">
-											{{ query.type }}
-										</div>
-										<div class="line-clamp-1 text-muted-foreground">{{ query.userInput }}</div>
-									</CardFooter>
+									<CardContent class="flex-1 pt-4">
+										<dl class="grid grid-cols-1 gap-2">
+											<CardProperty :label="t('QueryCard.type')">{{ query.type }}</CardProperty>
+											<CardProperty :label="t('QueryCard.input')">{{
+												query.userInput
+											}}</CardProperty>
+										</dl>
+									</CardContent>
 								</Card>
 							</CarouselItem>
 							<CarouselItem class="basis-auto">

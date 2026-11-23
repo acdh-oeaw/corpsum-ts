@@ -265,19 +265,19 @@ async function publishVisualization() {
 							<CarouselItem v-for="query in selectedQueryItems" :key="query._id" class="basis-auto">
 								<Card class="flex h-full w-[350px] flex-col overflow-hidden">
 									<CardHeader class="border-b bg-primary text-primary-foreground">
-										<CardDescription class="font-semibold text-primary-foreground/80">
+										<CardDescription class="truncate font-semibold text-primary-foreground/80">
 											{{ query.corpus }}
 										</CardDescription>
-										<CardTitle class="text-2xl font-black tracking-normal">
-											{{ query.name }}
-										</CardTitle>
+										<TruncatedCardTitle :title="query.name" />
 									</CardHeader>
-									<CardFooter class="flex-col items-start gap-1.5 border-t bg-muted/20 text-sm">
-										<div class="line-clamp-1 flex gap-2 font-medium">
-											{{ query.type }}
-										</div>
-										<div class="line-clamp-1 text-muted-foreground">{{ query.userInput }}</div>
-									</CardFooter>
+									<CardContent class="flex-1 pt-4">
+										<dl class="grid grid-cols-1 gap-2">
+											<CardProperty :label="t('QueryCard.type')">{{ query.type }}</CardProperty>
+											<CardProperty :label="t('QueryCard.input')">{{
+												query.userInput
+											}}</CardProperty>
+										</dl>
+									</CardContent>
 								</Card>
 							</CarouselItem>
 						</CarouselContent>
