@@ -113,7 +113,7 @@ export function serializeNoskeQueryKey(queryKey: QueryKey) {
 	return JSON.stringify(queryKey);
 }
 
-function readNoskeCacheMetadata(response: Response): NoskeCacheMetadata | undefined {
+export function readNoskeCacheMetadata(response: Response): NoskeCacheMetadata | undefined {
 	const status = response.headers.get("X-Corpsum-Cache");
 	if (status !== "hit" && status !== "miss" && status !== "refresh" && status !== "skip") {
 		return undefined;

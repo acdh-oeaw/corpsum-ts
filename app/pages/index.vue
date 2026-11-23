@@ -2,6 +2,15 @@
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
 const t = useTranslations();
+const locale = useLocale();
+const introPath = computed(() => `/${locale.value}`);
+const { data: intro } = await useAsyncData(
+	computed(() => `home-intro:${locale.value}`),
+	() =>
+		queryCollection(locale.value === "de" ? "homeDe" : "homeEn")
+			.path(introPath.value)
+			.first(),
+);
 const auth = useAuth();
 const { pins } = usePinnedCorpora();
 const { data: instancesData } = useGetNoskeinstances(null, {
@@ -48,6 +57,7 @@ const pinnedCorpora = computed(() => {
 			{
 				...pin,
 				instanceName: instance.name,
+				instanceOwner: instance.owner.username,
 				language: details?.language,
 				words: details?.words,
 				documents: details?.documents,
@@ -62,7 +72,8 @@ usePageMetadata({ title: t("IndexPage.meta.title") });
 <template>
 	<MainContent class="grid w-full min-w-0 content-start gap-y-8 py-8">
 		<PageTitle>{{ t("IndexPage.title") }}</PageTitle>
-		<div class="space-y-3">
+		<ContentRenderer v-if="intro" class="space-y-3" :value="intro" />
+		<div v-else class="space-y-3">
 			<p>{{ t("IndexPage.welcome") }}</p>
 			<p>{{ t("IndexPage.overview") }}</p>
 			<p>{{ t("IndexPage.navigation") }}</p>
@@ -88,11 +99,12 @@ usePageMetadata({ title: t("IndexPage.meta.title") });
 						class="basis-auto"
 					>
 						<Card class="flex h-full w-[350px] flex-col overflow-hidden">
-							<CardHeader class="border-b bg-primary text-primary-foreground"
-								><CardTitle class="text-2xl font-black tracking-normal">{{
-									item.corpus
-								}}</CardTitle></CardHeader
-							>
+							<CardHeader class="border-b bg-primary text-primary-foreground">
+								<TruncatedCardTitle :title="item.corpus" />
+								<CardDescription class="truncate font-semibold text-primary-foreground/80">
+									{{ t("CorporaPage.instanceOwner") }}: {{ item.instanceOwner || "—" }}
+								</CardDescription>
+							</CardHeader>
 							<CardContent class="flex-1">
 								<p>
 									<span class="text-xs">{{ t("CorporaPage.table.language") }}:</span>

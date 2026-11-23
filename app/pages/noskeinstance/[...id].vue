@@ -22,17 +22,30 @@ const isOwner = computed(() => noskeInstance.value?.owner.username === auth.user
 
 type CorporaListItem = components["schemas"]["03_corpora_list"];
 
+const corporaQueryKey = computed(() => ["noske-corpora", routeId.value]);
+const { metadata: corporaCache } = useNoskeCacheMetadata(corporaQueryKey);
 const corporaQuery = useNoskeQuery<Array<CorporaListItem>>({
-	queryKey: computed(() => ["noske-corpora", routeId.value]),
-	initialData: [],
+	queryKey: corporaQueryKey,
 	async queryFn(client) {
 		const { data, error } = await client.GET("/ca/api/corpora");
 		if (error) throw error;
 		return data?.data ?? [];
 	},
 });
-const corpora = computed<Array<CorporaListItem>>(() => corporaQuery.data.value ?? []);
-const corporaPending = corporaQuery.isPending;
+const corpora = computed(() =>
+	(corporaQuery.isPlaceholderData.value ? [] : (corporaQuery.data.value ?? [])).map((corpus) => ({
+		...corpus,
+		noskeId: noskeInstance.value?._id ?? "",
+		baseUrl: noskeInstance.value?.base ?? "",
+	})),
+);
+const { isFetching: corporaFetching, isError: corporaFailed } = corporaQuery;
+const corporaLoading = computed(() => corporaFetching.value || corporaQuery.isPending.value);
+const corporaStatus = computed(() => {
+	if (corporaLoading.value) return t("NoskeInstanceDetail.loadingCorpora");
+	if (corporaFailed.value) return t("NoskeInstanceDetail.corporaFailed");
+	return t("NoskeInstanceDetail.corporaLoaded", { count: corpora.value.length });
+});
 
 const isDeleting = ref(false);
 const setDeleting = (value: boolean) => {
@@ -136,19 +149,21 @@ async function deleteInstance() {
 		</div>
 		<div class="mt-8">
 			<h2 class="text-lg font-semibold">{{ t("NoskeInstanceDetail.availableCorpora") }}</h2>
-			<p v-if="corporaPending" class="mt-2 text-sm text-muted-foreground">
-				{{ t("NoskeInstanceDetail.loadingCorpora") }}
-			</p>
 			<CorpusTable
-				v-else
-				:corpora="
-					corpora.map((corpus) => ({
-						...corpus,
-						noskeId: noskeInstance?._id ?? '',
-						baseUrl: noskeInstance?.base ?? '',
-					}))
-				"
-			/>
+				:corpora="corpora"
+				:loading="corporaLoading"
+				:failed="corporaFailed"
+				show-detail-status
+			>
+				<template #status>
+					<CorpusRequestStatus
+						:label="corporaStatus"
+						:loading="corporaLoading"
+						:failed="corporaFailed && !corporaLoading"
+						:cache="corporaCache"
+					/>
+				</template>
+			</CorpusTable>
 		</div>
 	</MainContent>
 </template>

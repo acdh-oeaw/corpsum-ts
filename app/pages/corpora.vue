@@ -28,9 +28,10 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 					<CarouselItem v-for="item in featuredCorpora" :key="item.id" class="basis-auto">
 						<Card class="flex h-full w-[350px] flex-col overflow-hidden">
 							<CardHeader class="border-b bg-primary text-primary-foreground">
-								<CardTitle class="text-2xl font-black tracking-normal">
-									{{ item.corpus }}
-								</CardTitle>
+								<TruncatedCardTitle :title="item.corpus" />
+								<CardDescription class="truncate font-semibold text-primary-foreground/80">
+									{{ t("CorporaPage.instanceOwner") }}: {{ item.instanceOwner || "—" }}
+								</CardDescription>
 							</CardHeader>
 							<CardContent class="flex-1">
 								<p>

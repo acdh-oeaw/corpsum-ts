@@ -5,8 +5,10 @@ export default defineEventHandler(async (event) => {
 	await requireUser(event);
 	const instances = await NoskeModel.find(
 		{ public: true },
-		{ name: 1, base: 1, corpusInfoCache: 1 },
-	).lean<Array<NoskeDocument>>();
+		{ name: 1, base: 1, owner: 1, corpusInfoCache: 1 },
+	)
+		.lean<Array<NoskeDocument>>()
+		.populate<{ owner: { username: string } | null }>("owner", "username");
 	return instances
 		.flatMap((instance) =>
 			(instance.corpusInfoCache ?? [])
@@ -20,6 +22,7 @@ export default defineEventHandler(async (event) => {
 					documents:
 						entry.info.sizes?.doccount == null ? undefined : Number(entry.info.sizes.doccount),
 					noske: instance.name,
+					instanceOwner: instance.owner?.username ?? "",
 					noskeId: instance._id.toString(),
 					baseUrl: instance.base,
 					rawCorpus: {
