@@ -5,6 +5,7 @@ export default defineContentConfig({
 		docsEn: defineCollection({
 			type: "page",
 			source: { include: "docs/en/**/*", prefix: "/en/docs" },
+			schema: z.object({ navigationOrder: z.number().default(1000) }),
 		}),
 		docsDe: defineCollection({
 			type: "page",

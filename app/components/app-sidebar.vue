@@ -73,9 +73,9 @@ watch(
 const { data: docsNavigation } = await useAsyncData(
 	computed(() => `navigation:${docsCollection.value}`),
 	() =>
-		docsCollection.value === "docsDe"
-			? queryCollectionNavigation("docsDe").order("navigationOrder", "ASC").order("stem", "ASC")
-			: queryCollectionNavigation("docsEn"),
+		queryCollectionNavigation(docsCollection.value)
+			.order("navigationOrder", "ASC")
+			.order("stem", "ASC"),
 );
 const docsItems = computed(() => {
 	const localeRoot = docsNavigation.value?.find((item) => item.path === `/${currentLocale.value}`);

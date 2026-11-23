@@ -22,7 +22,10 @@ const tocLinks = computed(() => page.value?.body?.toc?.links ?? []);
 
 const { data: surroundings } = await useAsyncData(
 	computed(() => `documentation-surroundings:${collection.value}:${path.value}`),
-	() => queryCollectionItemSurroundings(collection.value, path.value),
+	() =>
+		queryCollectionItemSurroundings(collection.value, path.value)
+			.order("navigationOrder", "ASC")
+			.order("stem", "ASC"),
 );
 const searchOpen = ref(false);
 const search = ref("");

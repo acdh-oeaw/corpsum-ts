@@ -1,8 +1,9 @@
 ---
 title: Documentation
-description: Documentation for Corpsum.
+description: Documentation for CorpSum.
+navigationOrder: 0
 ---
 
 # Documentation
 
-Documentation for Corpsum will be added here.
+The [start page](/) gives you an overview of the menu items. The guides explain the individual features and visualizations.
