@@ -11,3 +11,5 @@ allowBuilds:
   unrs-resolver: true
   vue-demi: true
 minimumReleaseAge: 4320
+overrides:
+  nuxt-mongoose>mongoose: $mongoose
