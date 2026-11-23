@@ -57,6 +57,7 @@ const props = withDefaults(
 		queries: Array<CorpusQuery>;
 		settings?: Partial<TemporalFrequencyDistributionSettings>;
 		metadataMappings?: Array<CorpusMetadataMappingResponse | null>;
+		mappingsStatus?: "idle" | "pending" | "success" | "error";
 		data?: Array<FreqMlResponse | null | undefined>;
 		interactive?: boolean;
 		showHeader?: boolean;
@@ -66,6 +67,7 @@ const props = withDefaults(
 		data: undefined,
 		interactive: true,
 		metadataMappings: undefined,
+		mappingsStatus: undefined,
 		settings: undefined,
 		showHeader: true,
 		showSourceData: true,
@@ -508,7 +510,13 @@ function toggleSourceTable() {
 				@loading-change="emit('loading-change', $event)"
 			/>
 
-			<div v-if="missingMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
+			<p v-if="mappingsStatus === 'pending'" class="text-sm text-muted-foreground" role="status">
+				{{ t("MetadataMappingEditor.loading") }}
+			</p>
+			<p v-else-if="mappingsStatus === 'error'" class="text-sm text-destructive" role="status">
+				{{ t("MetadataMappingEditor.loadFailed") }}
+			</p>
+			<div v-else-if="missingMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
 				<p class="font-medium">
 					{{ t("TemporalFrequencyDistribution.mapping.missingTitle") }}
 				</p>
