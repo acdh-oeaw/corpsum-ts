@@ -177,10 +177,10 @@ settings.
 
 | Variable                               | Required   | Scope        | Description                                                                                     |
 | -------------------------------------- | ---------- | ------------ | ----------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`                         | yes        | server/build | MongoDB connection string. Use `corpsum-mongodb` for Compose and `localhost` for host-run Nuxt. |
-| `NUXT_AUTH_SECRET`                     | yes        | server/build | Secret used for auth/session JWT signing. Use at least 32 characters.                           |
-| `NUXT_CREDENTIAL_SECRET`               | yes        | server/build | Secret used to encrypt stored NoSketch credentials. Use at least 32 characters.                 |
-| `NUXT_JWT_EXPIRATION`                  | yes        | server/build | JWT lifetime in milliseconds.                                                                   |
+| `DATABASE_URL`                         | yes        | server       | MongoDB connection string. Use `corpsum-mongodb` for Compose and `localhost` for host-run Nuxt. |
+| `NUXT_AUTH_SECRET`                     | yes        | server       | Secret used for auth/session JWT signing. Use at least 32 characters.                           |
+| `NUXT_CREDENTIAL_SECRET`               | yes        | server       | Secret used to encrypt stored NoSketch credentials. Use at least 32 characters.                 |
+| `NUXT_JWT_EXPIRATION`                  | yes        | server       | JWT lifetime in milliseconds.                                                                   |
 | `NUXT_OAUTH_GITHUB_CLIENT_ID`          | no         | server       | GitHub OAuth app client id. GitHub sign-in is unavailable when unset.                           |
 | `NUXT_OAUTH_GITHUB_CLIENT_SECRET`      | no         | server       | GitHub OAuth app client secret. Keep this value secret.                                         |
 | `NUXT_PUBLIC_APP_BASE_URL`             | yes        | public/build | Canonical public app URL for i18n, metadata, robots, and sitemap output.                        |

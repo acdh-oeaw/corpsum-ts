@@ -47,23 +47,10 @@ ARG NUXT_PUBLIC_BOTS
 ARG NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION
 ARG NUXT_PUBLIC_MATOMO_BASE_URL
 ARG NUXT_PUBLIC_MATOMO_ID
-ARG NUXT_OAUTH_GITHUB_CLIENT_ID
 
 ENV NODE_ENV=production
 
-# to mount secrets which need to be available at build time
-# @see https://docs.docker.com/build/building/secrets/
-RUN --mount=type=secret,id=DATABASE_URL,uid=1000 \
-    --mount=type=secret,id=NUXT_AUTH_SECRET,uid=1000 \
-    --mount=type=secret,id=NUXT_CREDENTIAL_SECRET,uid=1000 \
-    --mount=type=secret,id=NUXT_JWT_EXPIRATION,uid=1000 \
-    --mount=type=secret,id=NUXT_OAUTH_GITHUB_CLIENT_SECRET,uid=1000 \
-    DATABASE_URL=$(cat /run/secrets/DATABASE_URL) \
-    NUXT_AUTH_SECRET=$(cat /run/secrets/NUXT_AUTH_SECRET) \
-    NUXT_CREDENTIAL_SECRET=$(cat /run/secrets/NUXT_CREDENTIAL_SECRET) \
-    NUXT_JWT_EXPIRATION=$(cat /run/secrets/NUXT_JWT_EXPIRATION) \
-    NUXT_OAUTH_GITHUB_CLIENT_SECRET=$(cat /run/secrets/NUXT_OAUTH_GITHUB_CLIENT_SECRET) \
-    pnpm run build
+RUN pnpm run build
 
 # serve
 FROM node:26-alpine AS serve

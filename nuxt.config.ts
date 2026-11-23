@@ -7,7 +7,6 @@ import { defaultLocale, files } from "./app/config/i18n.config.ts";
 import oxlintGlobals from "./modules/oxlint-globals.ts";
 
 const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
-const databaseUrl = process.env.DATABASE_URL!;
 
 export default defineNuxtConfig({
 	alias: {
@@ -110,7 +109,7 @@ export default defineNuxtConfig({
 	},
 
 	mongoose: {
-		uri: databaseUrl,
+		uri: process.env.NODE_ENV === "development" ? (process.env.DATABASE_URL ?? "") : "",
 		options: {},
 		modelsDir: "models",
 		devtools: false,
@@ -127,13 +126,13 @@ export default defineNuxtConfig({
 	},
 
 	runtimeConfig: {
-		authSecret: process.env.NUXT_AUTH_SECRET,
-		credentialSecret: process.env.NUXT_CREDENTIAL_SECRET ?? process.env.NUXT_AUTH_SECRET,
-		jwtExpiration: process.env.NUXT_JWT_EXPIRATION,
+		authSecret: "",
+		credentialSecret: "",
+		jwtExpiration: "",
 		oauth: {
 			github: {
-				clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
-				clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
+				clientId: "",
+				clientSecret: "",
 			},
 		},
 		public: {
