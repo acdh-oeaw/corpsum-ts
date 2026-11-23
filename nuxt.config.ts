@@ -104,6 +104,11 @@ export default defineNuxtConfig({
 		"nuxt-studio",
 	],
 
+	image: {
+		// Documentation screenshots are served directly from public/.
+		provider: "none",
+	},
+
 	mongoose: {
 		uri: databaseUrl,
 		options: {},
