@@ -329,11 +329,6 @@ function openFullscreen() {
 				}}</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
-		<canvas
-			ref="canvasRef"
-			role="img"
-			:aria-label="t('Map.label')"
-			style="width: 100%; height: 100%"
-		/>
+		<canvas ref="canvasRef" role="img" :aria-label="t('Map.label')" class="size-full" />
 	</div>
 </template>

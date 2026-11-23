@@ -236,7 +236,7 @@ watch(
 				tabindex="0"
 				@focusout="hoveredWord = null"
 			>
-				<svg :height="height" role="img" style="display: block" :width="containerWidth">
+				<svg :height="height" role="img" class="block" :width="containerWidth">
 					<g :transform="`translate(${containerWidth / 2}, ${height / 2})`">
 						<g
 							v-for="word in layoutedWords"
@@ -256,7 +256,7 @@ watch(
 								font-family="Inter, sans-serif"
 								:font-size="`${word.fontSize}px`"
 								font-weight="800"
-								style="cursor: default; user-select: none"
+								class="cursor-default select-none"
 								text-anchor="middle"
 							>
 								{{ word.label }}
