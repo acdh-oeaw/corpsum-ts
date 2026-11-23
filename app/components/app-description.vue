@@ -3,10 +3,7 @@ defineOptions({ inheritAttrs: false });
 
 const props = defineProps<{ name?: string }>();
 const locale = useLocale();
-const contentPath = computed(() => {
-	const name = props.name ?? (locale.value === "de" ? "startseite" : "");
-	return name ? `/${locale.value}/${name}` : `/${locale.value}`;
-});
+const contentPath = computed(() => `/${locale.value}/${props.name ?? "startseite"}`);
 const { data: description } = useAsyncData(
 	computed(() => `app-description:${contentPath.value}`),
 	() =>
