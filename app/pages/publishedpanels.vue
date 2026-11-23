@@ -54,7 +54,9 @@ async function hide() {
 				<LucideIcon class="size-8 text-foreground" name="PanelsTopLeft" :stroke-width="2" />
 			</div>
 			<PageTitle>{{ t("PublishedPanelsPage.title") }}</PageTitle>
+			<DocumentationLink slug="veroeffentlichte-panels" />
 		</div>
+		<AppDescription name="veroeffentlichte-panels" class="mb-4" />
 
 		<div class="overflow-x-auto rounded-md border">
 			<Table class="w-full text-sm">

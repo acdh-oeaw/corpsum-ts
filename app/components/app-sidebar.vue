@@ -72,7 +72,10 @@ watch(
 
 const { data: docsNavigation } = await useAsyncData(
 	computed(() => `navigation:${docsCollection.value}`),
-	() => queryCollectionNavigation(docsCollection.value),
+	() =>
+		docsCollection.value === "docsDe"
+			? queryCollectionNavigation("docsDe").order("navigationOrder", "ASC").order("stem", "ASC")
+			: queryCollectionNavigation("docsEn"),
 );
 const docsItems = computed(() => {
 	const localeRoot = docsNavigation.value?.find((item) => item.path === `/${currentLocale.value}`);
@@ -148,7 +151,7 @@ async function switchDocumentationLocale(locale: "en" | "de") {
 					<SidebarMenu>
 						<SidebarMenuItem>
 							<DropdownMenu>
-								<DropdownMenuTrigger>
+								<DropdownMenuTrigger as-child>
 									<SidebarMenuButton :tooltip="t('Navigation.colorScheme')">
 										<LucideIcon name="Eclipse" :stroke-width="2" />
 										<span>{{ t("Navigation.colorScheme") }}</span>
@@ -176,7 +179,7 @@ async function switchDocumentationLocale(locale: "en" | "de") {
 						</SidebarMenuItem>
 						<SidebarMenuItem>
 							<DropdownMenu>
-								<DropdownMenuTrigger>
+								<DropdownMenuTrigger as-child>
 									<SidebarMenuButton :tooltip="t('Navigation.language')">
 										<LucideIcon name="Globe" :stroke-width="2" />
 										<span>{{ t("Navigation.language") }}</span>

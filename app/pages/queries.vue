@@ -57,6 +57,7 @@ async function deleteQuery(query: QueryListItem) {
 					<LucideIcon class="size-8 text-foreground" name="Terminal" :stroke-width="2" />
 				</div>
 				<PageTitle>{{ t("QueriesPage.title") }}</PageTitle>
+				<DocumentationLink slug="abfragen" />
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
 				<Button as-child size="sm" variant="ghost">
@@ -67,6 +68,7 @@ async function deleteQuery(query: QueryListItem) {
 				</Button>
 			</div>
 		</div>
+		<AppDescription name="abfragen" />
 		<div class="mt-4">
 			<div class="flex items-end justify-between">
 				<h2 class="text-lg font-semibold">{{ t("QueriesPage.featuredTitle") }}</h2>

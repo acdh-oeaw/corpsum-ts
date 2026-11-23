@@ -1,9 +1,6 @@
 ---
 title: NoSketch-Engines
+description: Bietet einen Überblick über verfügbare Korpora bzw. Instanzen.
 ---
-
-# NoSketch-Engines
-
-![Abbildung: NoSketch-Engines](/assets/documentation/de/image2.png)
 
 Bietet einen Überblick über verfügbare Korpora bzw. Instanzen.

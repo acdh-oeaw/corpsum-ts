@@ -107,7 +107,10 @@ router.afterEach((to, from) => {
 		</SkipLink>
 		<SidebarProvider :default-open="showDocsSidebar">
 			<AppSidebar />
-			<SidebarInset class="w-full max-w-full overflow-x-hidden">
+			<SidebarInset
+				class="w-full max-w-full"
+				:class="showDocsSidebar ? 'overflow-x-clip' : 'overflow-x-hidden'"
+			>
 				<div class="block w-full min-w-0 px-4 sm:px-6 lg:px-8">
 					<SidebarTrigger class="mt-3 md:hidden" />
 					<ErrorBoundary>

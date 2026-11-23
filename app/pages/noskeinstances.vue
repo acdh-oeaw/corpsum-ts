@@ -33,6 +33,7 @@ function handleDeleted() {
 					<LucideIcon class="size-8 text-foreground" name="Database" :stroke-width="2" />
 				</div>
 				<PageTitle>{{ t("NoskeInstancesPage.title") }}</PageTitle>
+				<DocumentationLink slug="nosketch-engines" />
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
 				<Button as-child size="sm" variant="ghost">
@@ -43,6 +44,7 @@ function handleDeleted() {
 				</Button>
 			</div>
 		</div>
+		<AppDescription name="nosketch-engines" />
 		<div class="mt-4 flex flex-wrap gap-3">
 			<NoskeInstanceCard
 				v-for="instance in instances"

@@ -39,6 +39,7 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 					<LucideIcon class="size-8 text-foreground" name="ChartColumn" :stroke-width="2" />
 				</div>
 				<PageTitle>{{ t("VisualizationsPage.title") }}</PageTitle>
+				<DocumentationLink slug="visualisierungen" />
 			</div>
 			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
 				<Button as-child size="sm" variant="ghost">
@@ -49,6 +50,7 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 				</Button>
 			</div>
 		</div>
+		<AppDescription name="visualisierungen" />
 		<div class="mt-4">
 			<div class="flex items-end justify-between">
 				<h2 class="text-lg font-semibold">{{ t("VisualizationsPage.featuredTitle") }}</h2>

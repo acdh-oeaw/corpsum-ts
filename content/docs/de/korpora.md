@@ -1,10 +1,10 @@
 ---
+navigationOrder: 4
 title: Korpora
+description: Unter diesem Menüpunkt werden die bisher verwendeten Korpora aufgelistet. Mittels Pfeiltasten  kann zwischen diesen Korpora hin- und hergewechselt werden.
 ---
 
 # Korpora
-
-![Abbildung: Korpora](/assets/documentation/de/image3.png)
 
 Unter diesem Menüpunkt werden die bisher verwendeten Korpora aufgelistet. Mittels Pfeiltasten ![Abbildung: Korpora](/assets/documentation/de/image14.png)![Abbildung: Korpora](/assets/documentation/de/image15.png) kann zwischen diesen Korpora hin- und hergewechselt werden.
 

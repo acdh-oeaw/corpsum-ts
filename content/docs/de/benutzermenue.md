@@ -1,10 +1,10 @@
 ---
 title: Benutzer*innen-Menü
+description: 'Das Benutzer*innen-Menü beinhaltet folgende Punkte:'
+navigationOrder: 2
 ---
 
 # Benutzer\*innen-Menü
-
-![Abbildung: Benutzer*innen-Menü](/assets/documentation/de/image1.png)
 
 Das Benutzer\*innen-Menü beinhaltet folgende Punkte:
 

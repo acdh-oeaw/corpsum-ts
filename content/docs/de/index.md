@@ -1,8 +1,9 @@
 ---
-title: "Dokumentation"
-description: "Dokumentation für CorpSum."
+title: Dokumentation
+description: Dokumentation für CorpSum.
+navigationOrder: 0
 ---
 
 # Dokumentation
 
-Auf der [Startseite](/docs/startseite) finden Sie einen Überblick über die Menüpunkte. Die [Detailanleitungen](/docs/details) erklären die einzelnen Funktionen und Visualisierungen.
+Auf der [Startseite](/) finden Sie einen Überblick über die Menüpunkte. Die Detailanleitungen erklären die einzelnen Funktionen und Visualisierungen.

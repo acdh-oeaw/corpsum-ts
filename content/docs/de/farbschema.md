@@ -1,9 +1,8 @@
 ---
+navigationOrder: 18
 title: "Farbschema"
 ---
 
 # Farbschema
-
-![Abbildung: Farbschema](/assets/documentation/de/image7.png)
 
 Durch Klicken auf das Icon kann zwischen hellem, dunklem oder systemseitig eingestelltem Farbschema gewechselt werden.

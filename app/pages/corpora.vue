@@ -15,9 +15,12 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 					<LucideIcon class="size-8 text-foreground" name="BookOpen" :stroke-width="2" />
 				</div>
 				<PageTitle>{{ t("CorporaPage.title") }}</PageTitle>
+				<DocumentationLink slug="korpora" />
 			</div>
 		</div>
-		<p class="text-sm text-muted-foreground">{{ t("CorporaPage.description") }}</p>
+		<AppDescription name="korpora">
+			<p class="text-sm text-muted-foreground">{{ t("CorporaPage.description") }}</p>
+		</AppDescription>
 		<div class="mt-4">
 			<div class="flex items-end justify-between">
 				<h2 class="text-lg font-semibold">{{ t("CorporaPage.featuredTitle") }}</h2>

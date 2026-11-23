@@ -1,9 +1,6 @@
 ---
 title: Abfragen
+description: Um eine neue Korpusabfrage zu starten, verwenden Sie diesen Menüpunkt.
 ---
-
-# Abfragen
-
-![Abbildung: Abfragen](/assets/documentation/de/image4.png)
 
 Um eine neue Korpusabfrage zu starten, verwenden Sie diesen Menüpunkt.

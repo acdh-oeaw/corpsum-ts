@@ -18,6 +18,7 @@ const { data: page, error } = await useAsyncData(
 );
 if (error.value) throw error.value;
 usePageMetadata({ title: page.value?.title ?? t("Documentation.title") });
+const tocLinks = computed(() => page.value?.body?.toc?.links ?? []);
 
 const { data: surroundings } = await useAsyncData(
 	computed(() => `documentation-surroundings:${collection.value}:${path.value}`),
@@ -74,14 +75,17 @@ const results = computed(() => {
 			</DialogContent>
 		</Dialog>
 
-		<div class="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_12rem]">
+		<div
+			class="grid min-w-0 gap-8"
+			:class="{ 'lg:grid-cols-[minmax(0,1fr)_12rem]': tocLinks.length }"
+		>
 			<nav
-				v-if="page?.body?.toc?.links.length"
-				class="lg:order-last"
+				v-if="tocLinks.length"
+				class="lg:sticky lg:top-8 lg:order-last lg:max-h-[calc(100dvh-4rem)] lg:self-start lg:overflow-y-auto"
 				:aria-label="t('Documentation.toc')"
 			>
 				<h2 class="mb-2 font-semibold">{{ t("Documentation.toc") }}</h2>
-				<DocsTocTree :links="page.body.toc.links" />
+				<DocsTocTree :links="tocLinks" />
 			</nav>
 			<ContentRenderer v-if="page" class="prose min-w-0 dark:prose-invert" :value="page" />
 		</div>

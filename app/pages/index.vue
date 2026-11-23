@@ -2,15 +2,6 @@
 import type { QueryListItem } from "~/server/api/queries.get.ts";
 
 const t = useTranslations();
-const locale = useLocale();
-const introPath = computed(() => `/${locale.value}`);
-const { data: intro } = await useAsyncData(
-	computed(() => `home-intro:${locale.value}`),
-	() =>
-		queryCollection(locale.value === "de" ? "homeDe" : "homeEn")
-			.path(introPath.value)
-			.first(),
-);
 const auth = useAuth();
 const { pins } = usePinnedCorpora();
 const { data: instancesData } = useGetNoskeinstances(null, {
@@ -72,12 +63,13 @@ usePageMetadata({ title: t("IndexPage.meta.title") });
 <template>
 	<MainContent class="grid w-full min-w-0 content-start gap-y-8 py-8">
 		<PageTitle>{{ t("IndexPage.title") }}</PageTitle>
-		<ContentRenderer v-if="intro" class="space-y-3" :value="intro" />
-		<div v-else class="space-y-3">
-			<p>{{ t("IndexPage.welcome") }}</p>
-			<p>{{ t("IndexPage.overview") }}</p>
-			<p>{{ t("IndexPage.navigation") }}</p>
-		</div>
+		<AppDescription>
+			<div class="space-y-3">
+				<p>{{ t("IndexPage.welcome") }}</p>
+				<p>{{ t("IndexPage.overview") }}</p>
+				<p>{{ t("IndexPage.navigation") }}</p>
+			</div>
+		</AppDescription>
 		<section v-if="auth.isLoggedIn()" aria-labelledby="pinned-corpora-title">
 			<h2 id="pinned-corpora-title" class="text-lg font-semibold">
 				<NuxtLinkLocale

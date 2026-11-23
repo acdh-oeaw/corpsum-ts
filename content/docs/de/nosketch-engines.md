@@ -1,10 +1,10 @@
 ---
+navigationOrder: 3
 title: NoSketch-Engines
+description: Auf dieser Seite werden die verfügbaren Instanzen aufgeführt, deren Korpora die Grundlage für die Visualisierungen in CorpSum bilden. Wenn Sie eine neue Instanz hinzufügen wollen, klicken Sie auf  und geben die notwendigen Informationen in der Eingabemaske ein. Anschließend klicken Sie auf „Erstellen“.
 ---
 
 # NoSketch-Engines
-
-![Abbildung: NoSketch-Engines](/assets/documentation/de/image2.png)
 
 Auf dieser Seite werden die verfügbaren Instanzen aufgeführt, deren Korpora die Grundlage für die Visualisierungen in CorpSum bilden. Wenn Sie eine neue Instanz hinzufügen wollen, klicken Sie auf ![Abbildung: NoSketch-Engines](/assets/documentation/de/image12.png) und geben die notwendigen Informationen in der Eingabemaske ein. Anschließend klicken Sie auf „Erstellen“.
 

@@ -1,9 +1,6 @@
 ---
 title: Visualisierungen
+description: Zugriff auf bereits erstellte Visualisierungen samt der Option, diese weiter zu bearbeiten.
 ---
-
-# Visualisierungen
-
-![Abbildung: Visualisierungen](/assets/documentation/de/image5.png)
 
 Zugriff auf bereits erstellte Visualisierungen samt der Option, diese weiter zu bearbeiten.

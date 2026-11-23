@@ -1,12 +1,16 @@
 ---
 title: Abfragen
+description: Auf dieser Seite findet sich einerseits eine Übersicht bisheriger Abfragen. Diese können wahlweise  bearbeitet (erste Option), für eine neue Abfrage kopiert (zweite Option), gelöscht (dritte Option) oder aufgerufen (vierte Option) werden.
+navigationOrder: 5
 ---
 
 # Abfragen
 
-![Abbildung: Abfragen](/assets/documentation/de/image4.png)
+## Bestehende Abfragen
 
 Auf dieser Seite findet sich einerseits eine Übersicht bisheriger Abfragen. Diese können wahlweise ![Abbildung: Abfragen](/assets/documentation/de/image16.png) bearbeitet (erste Option), für eine neue Abfrage kopiert (zweite Option), gelöscht (dritte Option) oder aufgerufen (vierte Option) werden.
+
+## Neue Abfrage erstellen
 
 Andererseits können hier neue Abfragen erstellt werden.
 
@@ -20,6 +24,8 @@ Anschließend müssen Sie im Feld „Korpus“ ein Korpus dieser Instanz auswäh
 
 Subkorpus: Für den Fall, dass Sie nur einen Teil des Korpus untersuchen wollen, können Sie im [Interface der NoSketch-Engine](https://noske-amc.acdh.oeaw.ac.at/) eigene Subkorpora erstellen. Die Erstellung von Subkorpora direkt in CorpSum ist gegenwärtig jedoch noch nicht möglich. Subkorpora müssen derzeit über die [NoSketch Engine des AMC](https://amc.acdh.oeaw.ac.at/access-conditions/) definiert werden. Danach können sie auch direkt in CorpSum ausgewählt und für Abfragen verwendet werden.
 
+## Suchtyp und Eingabe
+
 Im Feld „Typ“ kann die Suchanfrage spezifiziert werden:
 
 - charrow: liefert jene Token, in denen die gesuchte Buchstabenkombination vorkommt
@@ -30,6 +36,8 @@ Im Feld „Typ“ kann die Suchanfrage spezifiziert werden:
 - wordrow: berücksichtigt ausschließlich das spezifisch eingetippte Wort
 
 Das Feld „Eingabe“ dient der Eingabe des gesuchten Begriffs/der gesuchten Phrase.
+
+## Facettierungsfilter
 
 Mithilfe der Option „Facettierungswerte (JSON)“ kann die jeweilige Suchanfrage spezifisch durch Filter angepasst werden. Diese Filter beruhen auf den annotierten Metadaten des Korpus. In Bezug auf das amc kann mit diesen Filtern beispielsweise die Suche auf eine bestimmte Region (doc.region), einen bestimmten Zeitraum (doc.year, doc.yymm) oder ein bestimmtes Publikationsmedium (doc.src) eingegrenzt werden. Die Annotation der Daten des amc wird [detailliert hier](https://amc.acdh.oeaw.ac.at/dokumentation/korpusinhalt-attribute/) beschrieben.
 
@@ -45,6 +53,10 @@ Beispiel: Um die Region „agesamt“ auszuwählen, muss der entsprechende Facet
 
 Bereits eingestellte Facettierungswerte einer früheren Abfrage können durch Klicken auf „Kopieren von“ plus anschließender Auswahl der gewünschten Abfrage für neue Abfragen übernommen werden.
 
+## Abfrage ausführen und speichern
+
 Wurden alle notwendigen Angaben eingegeben, kann die Abfrage durch Klick auf „Abfrage ausführen“ ![Abbildung: Abfragen](/assets/documentation/de/image20.png) durchgeführt werden. Wenn die Abfrage gespeichert werden soll, muss anschließend auf „Erstellen“ ![Abbildung: Abfragen](/assets/documentation/de/image21.png) geklickt werden. Wichtig: Die Abfrage wird nur gespeichert, wenn dieser Schritt durchgeführt wird.
 
-Nach dem Klicken auf „Abfrage ausführen“ öffnen sich mehrere Charts, die die Daten auf vielfältige Weise visualisieren – das Herzstück von CorpSum. Die Visualisierungen können gespeichert werden durch Klick auf ![Abbildung: Abfragen](/assets/documentation/de/image22.png) und der Eingabe einer beliebigen Bezeichnung der Visualisierung. Diese gespeicherten Visualisierungen stehen anschließend auch im Menüpunkt ![Abbildung: Abfragen](/assets/documentation/de/image5.png) „Visualisierungen“ (Details siehe dort) zur Verfügung.
+## Ergebnisse visualisieren
+
+Nach dem Klicken auf „Abfrage ausführen“ öffnen sich mehrere Charts, die die Daten auf vielfältige Weise visualisieren – das Herzstück von CorpSum. Die Visualisierungen können gespeichert werden durch Klick auf ![Abbildung: Abfragen](/assets/documentation/de/image22.png) und der Eingabe einer beliebigen Bezeichnung der Visualisierung. Diese gespeicherten Visualisierungen stehen anschließend auch im Menüpunkt „Visualisierungen“ (Details siehe dort) zur Verfügung.

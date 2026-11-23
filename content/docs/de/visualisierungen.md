@@ -1,12 +1,15 @@
 ---
+navigationOrder: 16
 title: Visualisierungen
 ---
 
 # Visualisierungen
 
-![Abbildung: Visualisierungen](/assets/documentation/de/image5.png)
+## Gespeicherte Visualisierungen
 
 Auf dieser Seite findet sich einerseits eine Übersicht bisher gespeicherter Visualisierungen. Diese können per Klick ![Abbildung: Visualisierungen](/assets/documentation/de/image47.png) erneut aufgerufen (erste Option), bearbeitet (zweite Option) oder gelöscht (dritte Option) werden.
+
+## Visualisierung erstellen
 
 Andererseits können hier neue Visualisierungen erstellt werden. Dazu muss auf ![Abbildung: Visualisierungen](/assets/documentation/de/image48.png) geklickt werden.
 
@@ -22,6 +25,8 @@ Im Feld „Name“ muss die neue Visualisierung benannt werden. Unter „Abfrage
 
 Anschließend kann die Visualisierung per Klick auf ![Abbildung: Visualisierungen](/assets/documentation/de/image50.png) „Erstellen“ gespeichert werden.
 
+## Visualisierung veröffentlichen
+
 Einmal erstellte und gespeicherte Visualisierungen können für Dritte zugänglich gemacht werden. Dazu wird die Visualisierung ausgewählt und auf ![Abbildung: Visualisierungen](/assets/documentation/de/image51.png) „Veröffentlichen“ geklickt. Nach Eingabe der notwendigen Informationen ![Abbildung: Visualisierungen](/assets/documentation/de/image52.png)
 
-Wird die URL des veröffentlichten Links sowie zusätzlich der Einbettungscode der Visualisierung zugänglich gemacht, um beispielsweise die Visualisierung auf einer bestimmten Website zu veröffentlichen. Nach der Veröffentlichung finden sich diese Informationen auch im Menüpunkt ![Abbildung: Visualisierungen](/assets/documentation/de/image6.png) Veröffentlichte Panels.
+Wird die URL des veröffentlichten Links sowie zusätzlich der Einbettungscode der Visualisierung zugänglich gemacht, um beispielsweise die Visualisierung auf einer bestimmten Website zu veröffentlichen. Nach der Veröffentlichung finden sich diese Informationen auch im Menüpunkt Veröffentlichte Panels.
