@@ -65,9 +65,11 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 					>
 						<Card class="flex h-full w-[350px] flex-col overflow-hidden">
 							<CardHeader class="border-b bg-primary text-primary-foreground">
-								<CardTitle class="text-2xl font-black tracking-normal">
-									{{ visualization.name }}
-								</CardTitle>
+								<TruncatedCardTitle :title="visualization.name" />
+								<CardDescription class="truncate font-semibold text-primary-foreground/80">
+									{{ t("VisualizationsPage.card.queryOwners") }}:
+									{{ visualization.queryOwners.join(", ") || "—" }}
+								</CardDescription>
 							</CardHeader>
 							<CardContent class="flex-1">
 								<p>

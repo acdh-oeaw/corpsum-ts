@@ -53,9 +53,9 @@ async function deleteQuery() {
 <template>
 	<Card class="flex h-full w-[350px] flex-col overflow-hidden">
 		<CardHeader class="border-b bg-primary text-primary-foreground">
-			<CardTitle class="text-2xl font-black tracking-normal">{{ query.name }}</CardTitle>
-			<CardDescription class="font-semibold text-primary-foreground/80">
-				{{ t("QueryCard.corpus") }}: {{ query.corpus }}
+			<TruncatedCardTitle :title="query.name" />
+			<CardDescription class="truncate font-semibold text-primary-foreground/80">
+				{{ t("QueryCard.owner") }}: {{ ownerNames.join(", ") || "—" }}
 			</CardDescription>
 		</CardHeader>
 		<CardContent class="flex-1">
@@ -66,7 +66,7 @@ async function deleteQuery() {
 				<span class="text-xs">{{ t("QueryCard.subCorpus") }}:</span> {{ query.subCorpus }}
 			</p>
 			<p>
-				<span class="text-xs">{{ t("QueryCard.owner") }}:</span> {{ ownerNames.join(", ") }}
+				<span class="text-xs">{{ t("QueryCard.corpus") }}:</span> {{ query.corpus }}
 			</p>
 			<p>
 				<span class="text-xs">{{ t("QueryCard.input") }}:</span> {{ query.userInput }}

@@ -36,9 +36,7 @@ async function deleteInstance() {
 		<CardHeader class="h-32 overflow-hidden border-b bg-primary text-primary-foreground">
 			<div class="flex items-start justify-between gap-3">
 				<div class="min-w-0">
-					<CardTitle class="truncate text-2xl font-black tracking-normal">
-						{{ noskeInstance.name }}
-					</CardTitle>
+					<TruncatedCardTitle :title="noskeInstance.name" />
 					<CardDescription class="truncate font-semibold text-primary-foreground/80">
 						{{ t("NoskeInstanceCard.ownedBy") }}: {{ noskeInstance.owner.username }}
 					</CardDescription>
