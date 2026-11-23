@@ -13,8 +13,6 @@ const localePath = useLocalePath();
 			<TooltipTrigger as-child>
 				<NuxtLink
 					:to="localePath(docsRoute('/docs/' + slug), 'de')"
-					target="_blank"
-					rel="noopener noreferrer"
 					:aria-label="t('Documentation.title')"
 					class="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
 				>
