@@ -96,8 +96,9 @@ export function serializeCorpusMetadataMapping(
 		owner: record.owner?.toString(),
 		attribute: record.attribute,
 		parser: {
-			...record.parser,
+			mode: record.parser.mode,
 			sourceUnit: isTemporalUnit(record.parser.sourceUnit) ? record.parser.sourceUnit : "year",
+			pattern: record.parser.pattern,
 		},
 		valueMap: record.valueMap ?? {},
 		label: record.label,

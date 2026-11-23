@@ -1,4 +1,4 @@
-import { Schema, type HydratedDocument, type Types } from "mongoose";
+import type { HydratedDocument, Types } from "mongoose";
 
 import { defineMongooseModel } from "#nuxt/mongoose";
 import type {
@@ -6,24 +6,6 @@ import type {
 	CorpusMetadataSemantic,
 	TemporalParserConfig,
 } from "@/lib/visualization-types";
-
-const parserSchema = new Schema(
-	{
-		mode: {
-			type: String,
-			enum: ["year", "date", "regex"],
-			required: true,
-		},
-		sourceUnit: {
-			type: String,
-			enum: ["day", "week", "month", "quarter", "year"],
-			default: "year",
-			required: true,
-		},
-		pattern: { type: String, required: false },
-	},
-	{ _id: false },
-);
 
 const schemaDefinition = {
 	noske: { type: "ObjectId", ref: "noskeinstances", required: true },
@@ -40,7 +22,24 @@ const schemaDefinition = {
 	},
 	owner: { type: "ObjectId", ref: "users", required: false },
 	attribute: { type: String, required: true },
-	parser: { type: parserSchema, required: true },
+	parser: {
+		type: {
+			mode: {
+				type: String,
+				enum: ["year", "date", "regex"],
+				required: true,
+			},
+			sourceUnit: {
+				type: String,
+				enum: ["day", "week", "month", "quarter", "year"],
+				default: "year",
+				required: true,
+			},
+			pattern: { type: String, required: false },
+		},
+		_id: false,
+		required: true,
+	},
 	valueMap: { type: Object, required: true },
 	label: { type: String, required: false },
 	description: { type: String, required: false },
