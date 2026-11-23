@@ -6,6 +6,9 @@
 # build
 FROM node:26-slim AS base
 
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
+	&& rm -rf /var/lib/apt/lists/*
+
 ENV COREPACK_HOME=/opt/corepack
 
 RUN npm install --global corepack@0.36.0 && corepack enable && \

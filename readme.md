@@ -99,6 +99,35 @@ For Compose, `DATABASE_URL` should use the service hostname `corpsum-mongodb`, a
 `local.env.example`. If you want generated metadata to point at the Compose app instead of the
 direct Nuxt dev server, set `NUXT_PUBLIC_APP_BASE_URL` to `http://localhost:3001` in `local.env`.
 
+### Documentation and Nuxt Studio
+
+Documentation lives in `content/docs/en/` and `content/docs/de/`. The
+Documentation menu displays the active language's content tree. To add
+a section, create a folder with an `index.md` and put its article files
+alongside it. Give each page a frontmatter title. Use matching relative
+paths for translations so readers can switch languages on the same article.
+
+The home intro lives in `content/app/en/index.md` and
+`content/app/de/index.md`. Edit the paragraphs in Studio to update the
+matching home page. The collection prefixes and `index.md` filenames give Studio
+the localized home URLs for preview. Add documentation images using
+Studio’s media library.
+
+In development, open the Studio button on an app page. Studio writes
+edits and uploads into the working tree, which Compose mounts into the app.
+For a deployed instance, configure the separate GitHub OAuth credentials,
+session secret, and moderator emails from `local.env.example`. Register
+`/__nuxt_studio/auth/github` on the deployed origin as the OAuth callback.
+Open `/_studio`, sign in as an approved editor, and use Studio’s preview
+before publishing. Sign in to CorpSum as well to view its protected pages.
+Publishing targets `acdh-oeaw/corpsum-ts` on `dev` and requires GitHub write
+access. Published edits appear after deployment.
+
+The docs reader adapts
+[shadcn-docs-nuxt at b40f17d](https://github.com/ZTL-UwU/shadcn-docs-nuxt/tree/b40f17d7c616bb7846a5e2103272c09cb2eb9db5).
+The upstream MIT notice is in
+[shadcn-docs-nuxt.LICENSE](app/components/shadcn-docs-nuxt.LICENSE).
+
 Create a gzipped MongoDB archive dump from the running Compose MongoDB service:
 
 ```bash

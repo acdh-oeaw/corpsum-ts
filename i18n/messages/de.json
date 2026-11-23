@@ -1,4 +1,13 @@
 {
+	"Documentation": {
+		"title": "Dokumentation",
+		"overview": "Übersicht",
+		"search": "Dokumentation durchsuchen",
+		"noResults": "Keine Ergebnisse",
+		"toc": "Auf dieser Seite",
+		"previous": "Zurück",
+		"next": "Weiter"
+	},
 	"AppFooter": {
 		"links": {
 			"imprint": "Impressum"
@@ -303,6 +312,7 @@
 		}
 	},
 	"CorporaPage": {
+		"instanceOwner": "Instanzbesitzer",
 		"title": "Korpora",
 		"description": "Verfügbare Korpora durchsuchen.",
 		"featuredTitle": "Aktuelle Korpora",
@@ -334,6 +344,7 @@
 		"sectionsDescription": "Gespeicherte Visualisierungssektionen",
 		"emptySections": "Noch keine Visualisierungen hinzugefügt.",
 		"card": {
+			"queryOwners": "Abfragebesitzer",
 			"queryCount": "Abfragen",
 			"visualizationCount": "Diagramme"
 		},
@@ -564,6 +575,19 @@
 		"description": "Beschreibung",
 		"viewDescription": "Beschreibung ansehen",
 		"loadingCorpora": "Korpora werden geladen ...",
+		"corporaLoaded": "Geladene Korpora: {count}",
+		"corporaFailed": "Korpora konnten nicht geladen werden.",
+		"detailsStatus": {
+			"loading": "Details werden geladen …",
+			"success": "Details geladen",
+			"error": "Details konnten nicht geladen werden."
+		},
+		"cache": {
+			"hit": "Cache-Treffer",
+			"miss": "Cache-Fehltreffer",
+			"refresh": "Cache aktualisiert",
+			"skip": "Cache umgangen"
+		},
 		"createQuery": "Abfrage erstellen",
 		"emptyCorpora": "Für diese Instanz wurden keine Korpora gefunden.",
 		"compiled": "Kompiliert",

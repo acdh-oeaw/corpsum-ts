@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 import type { SidebarProps } from ".";
@@ -15,6 +15,7 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 	collapsible: "offcanvas",
 });
 
+const t = useTranslations();
 const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 </script>
 
@@ -39,6 +40,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 				'--sidebar-width': SIDEBAR_WIDTH_MOBILE,
 			}"
 		>
+			<SheetTitle class="sr-only">{{ t("Navigation.platformFunctions") }}</SheetTitle>
 			<div class="flex size-full flex-col">
 				<slot />
 			</div>

@@ -17,6 +17,7 @@ services:
       context: ./
       target: dev
     image: corpsum-refactor
+    # Includes the separate Studio OAuth credentials and session secret.
     env_file:
       - local.env
     environment:

@@ -1,4 +1,13 @@
 {
+	"Documentation": {
+		"title": "Documentation",
+		"overview": "Overview",
+		"search": "Search documentation",
+		"noResults": "No results",
+		"toc": "On this page",
+		"previous": "Previous",
+		"next": "Next"
+	},
 	"AppFooter": {
 		"links": {
 			"imprint": "Imprint"
@@ -303,6 +312,7 @@
 		}
 	},
 	"CorporaPage": {
+		"instanceOwner": "Instance owner",
 		"title": "Corpora",
 		"description": "Browse available corpora.",
 		"featuredTitle": "Recent corpora",
@@ -334,6 +344,7 @@
 		"sectionsDescription": "Saved visualization sections",
 		"emptySections": "No visualizations added yet.",
 		"card": {
+			"queryOwners": "Query owners",
 			"queryCount": "Queries",
 			"visualizationCount": "Charts"
 		},
@@ -564,6 +575,19 @@
 		"description": "Description",
 		"viewDescription": "View description",
 		"loadingCorpora": "Loading corpora...",
+		"corporaLoaded": "Corpora loaded: {count}",
+		"corporaFailed": "Could not load corpora.",
+		"detailsStatus": {
+			"loading": "Loading details…",
+			"success": "Details loaded",
+			"error": "Could not load details."
+		},
+		"cache": {
+			"hit": "Cache hit",
+			"miss": "Cache miss",
+			"refresh": "Cache refreshed",
+			"skip": "Cache bypassed"
+		},
 		"createQuery": "Create query",
 		"emptyCorpora": "No corpora found for this instance.",
 		"compiled": "Compiled",

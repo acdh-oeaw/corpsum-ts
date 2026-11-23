@@ -90,6 +90,7 @@ export default defineNuxtConfig({
 
 	modules: [
 		oxlintGlobals,
+		"@nuxt/content",
 		"@nuxt/fonts",
 		["@nuxt/hints", { features: { hydration: { devtools: false, logs: true } } }],
 		"@nuxt/icon",
@@ -100,6 +101,7 @@ export default defineNuxtConfig({
 		"@nuxtjs/i18n",
 		"@vueuse/nuxt",
 		"nuxt-mongoose",
+		"nuxt-studio",
 	],
 
 	mongoose: {
@@ -142,6 +144,20 @@ export default defineNuxtConfig({
 	sourcemap: {
 		client: "hidden",
 		server: "hidden",
+	},
+
+	content: {
+		experimental: { sqliteConnector: "native" },
+	},
+
+	studio: {
+		repository: {
+			provider: "github",
+			owner: "acdh-oeaw",
+			repo: "corpsum-ts",
+			branch: "dev",
+			private: false,
+		},
 	},
 
 	typescript: {

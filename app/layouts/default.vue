@@ -3,10 +3,18 @@ import { createUrl, isNonEmptyString } from "@acdh-oeaw/lib";
 import inter from "@fontsource-variable/inter/files/inter-latin-standard-normal.woff2?url";
 import type { WebSite, WithContext } from "schema-dts";
 
+import { docsRoute } from "@/utils/docs-route";
+
 const env = useRuntimeConfig();
 
 const locale = useLocale();
 const t = useTranslations();
+const route = useRoute();
+const localePath = useLocalePath();
+const docsPath = computed(() => localePath(docsRoute()));
+const showDocsSidebar = computed(
+	() => route.path === docsPath.value || route.path.startsWith(docsPath.value + "/"),
+);
 
 const router = useRouter();
 
@@ -97,10 +105,11 @@ router.afterEach((to, from) => {
 		<SkipLink target-id="main-content">
 			{{ t("DefaultLayout.skip-to-main-content") }}
 		</SkipLink>
-		<SidebarProvider :default-open="false">
+		<SidebarProvider :default-open="showDocsSidebar">
 			<AppSidebar />
 			<SidebarInset class="w-full max-w-full overflow-x-hidden">
 				<div class="block w-full min-w-0 px-4 sm:px-6 lg:px-8">
+					<SidebarTrigger class="mt-3 md:hidden" />
 					<ErrorBoundary>
 						<slot />
 					</ErrorBoundary>
