@@ -303,6 +303,7 @@
 		"featuredDescription": "Zeigt die ersten {count} Abfragen",
 		"moreTitle": "Weitere Abfragen",
 		"moreDescription": "Zeigt alle übrigen Abfragen",
+		"empty": "Keine weiteren Abfragen vorhanden.",
 		"table": {
 			"name": "Name",
 			"corpus": "Korpus",
@@ -612,6 +613,9 @@
 		"emptyVisualizations": "Noch keine Visualisierungen vorhanden."
 	},
 	"MetadataMappingEditor": {
+		"loading": "Metadatenzuordnungen werden geladen …",
+		"loadFailed": "Metadatenzuordnungen konnten nicht geladen werden.",
+		"retry": "Erneut versuchen",
 		"title": "Korpus-Metadatenzuordnungen",
 		"selectQuery": "Wählen Sie eine Abfrage mit Korpus aus, bevor Sie Metadatenzuordnungen bearbeiten.",
 		"mappingLabel": "Metadatenzuordnung für {corpus}",

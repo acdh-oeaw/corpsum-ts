@@ -303,6 +303,7 @@
 		"featuredDescription": "Showing the first {count} queries",
 		"moreTitle": "More queries",
 		"moreDescription": "Showing all remaining queries",
+		"empty": "No more queries to show.",
 		"table": {
 			"name": "Name",
 			"corpus": "Corpus",
@@ -612,6 +613,9 @@
 		"emptyVisualizations": "No visualizations yet."
 	},
 	"MetadataMappingEditor": {
+		"loading": "Loading metadata mappings…",
+		"loadFailed": "Could not load metadata mappings.",
+		"retry": "Retry",
 		"title": "Corpus metadata mappings",
 		"selectQuery": "Select a query with a corpus before editing metadata mappings.",
 		"mappingLabel": "{corpus} metadata mapping",
