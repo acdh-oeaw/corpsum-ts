@@ -97,6 +97,7 @@ async function deleteQuery(query: QueryListItem) {
 							<TableHead>{{ t("QueriesPage.table.corpus") }}</TableHead>
 							<TableHead>{{ t("QueriesPage.table.type") }}</TableHead>
 							<TableHead>{{ t("QueriesPage.table.owner") }}</TableHead>
+							<TableHead>{{ t("Common.updatedAt") }}</TableHead>
 							<TableHead class="text-right">{{ t("QueriesPage.table.actions") }}</TableHead>
 						</TableRow>
 					</TableHeader>
@@ -106,6 +107,9 @@ async function deleteQuery(query: QueryListItem) {
 							<TableCell>{{ query.corpus }}</TableCell>
 							<TableCell>{{ query.type }}</TableCell>
 							<TableCell>{{ formatOwnerNames(query) }}</TableCell>
+							<TableCell class="whitespace-nowrap">
+								<QueryUpdatedDate :updated-at="query.updatedAt" />
+							</TableCell>
 							<TableCell class="text-right">
 								<TooltipProvider :delay-duration="150">
 									<div
@@ -192,8 +196,8 @@ async function deleteQuery(query: QueryListItem) {
 							</TableCell>
 						</TableRow>
 						<TableRow v-if="remainingQueries.length === 0">
-							<TableCell class="h-20 text-center text-muted-foreground" colspan="5">
-								No more queries to show.
+							<TableCell class="h-20 text-center text-muted-foreground" colspan="6">
+								{{ t("QueriesPage.empty") }}
 							</TableCell>
 						</TableRow>
 					</TableBody>

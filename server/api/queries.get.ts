@@ -23,7 +23,7 @@ interface Owner {
 }
 
 interface QueryRecord {
-	_id: { toString: () => string };
+	_id: QueryDocument["_id"];
 	name: unknown;
 	owner?: ReadonlyArray<
 		{ _id: { toString: () => string }; username?: unknown } | { toString: () => string }
@@ -34,6 +34,7 @@ interface QueryRecord {
 	type: unknown;
 	userInput: unknown;
 	facettingValues: unknown;
+	createdAt?: Date;
 	updatedAt?: Date;
 }
 
@@ -69,17 +70,19 @@ function toResponse(query: QueryRecord): QueryListItem {
 		return { _id: toOwnerId(owner), username: "" };
 	});
 	const type = isQueryType(query.type) ? query.type : "wordrow";
+	// Older queries may predate Mongoose timestamps. Their ObjectId records when it was generated.
+	const lastKnownDate = query.updatedAt ?? query.createdAt ?? query._id.getTimestamp();
 	return {
 		_id: query._id.toString(),
 		name: String(query.name),
 		owner: ownerList,
 		noske: query.noske.toString(),
 		corpus: String(query.corpus),
-		subCorpus: String(query.subCorpus),
+		subCorpus: typeof query.subCorpus === "string" ? query.subCorpus : "",
 		type,
 		userInput: String(query.userInput),
 		facettingValues: query.facettingValues,
-		updatedAt: query.updatedAt ? query.updatedAt.toISOString() : "",
+		updatedAt: lastKnownDate.toISOString(),
 	};
 }
 

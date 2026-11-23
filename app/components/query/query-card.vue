@@ -62,7 +62,7 @@ async function deleteQuery() {
 			<p>
 				<span class="text-xs">{{ t("QueryCard.type") }}:</span> {{ query.type }}
 			</p>
-			<p>
+			<p v-if="query.subCorpus.trim()">
 				<span class="text-xs">{{ t("QueryCard.subCorpus") }}:</span> {{ query.subCorpus }}
 			</p>
 			<p>
@@ -70,6 +70,10 @@ async function deleteQuery() {
 			</p>
 			<p>
 				<span class="text-xs">{{ t("QueryCard.input") }}:</span> {{ query.userInput }}
+			</p>
+			<p>
+				<span class="text-xs">{{ t("Common.updatedAt") }}:</span>
+				<QueryUpdatedDate :updated-at="query.updatedAt" />
 			</p>
 		</CardContent>
 		<CardFooter class="mt-auto w-full border-t bg-muted/20 p-3">
