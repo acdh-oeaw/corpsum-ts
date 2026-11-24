@@ -1,7 +1,7 @@
 ---
-navigationOrder: 4
 title: Korpora
 description: Unter diesem Menüpunkt werden die bisher verwendeten Korpora aufgelistet. Mittels Pfeiltasten  kann zwischen diesen Korpora hin- und hergewechselt werden.
+navigationOrder: 4
 ---
 
 # Korpora
