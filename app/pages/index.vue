@@ -7,10 +7,6 @@ const { pins } = usePinnedCorpora();
 const { data: instancesData } = useGetNoskeinstances(null, {
 	enabled: computed(() => auth.isLoggedIn()),
 });
-const { data: catalogue, execute: loadCatalogue } = await useFetch("/api/corpus-catalogue", {
-	default: () => [],
-	immediate: auth.isLoggedIn(),
-});
 const { data: queries, refresh: refreshQueries } = await useFetch<Array<QueryListItem>>(
 	"/api/queries",
 	{
@@ -27,12 +23,12 @@ watch(
 	() => auth.username,
 	(username) => {
 		if (username) {
-			void loadCatalogue();
 			void refreshQueries();
 		}
 	},
 );
-const pinnedCorpora = computed(() => {
+const accessiblePinnedCorpora = computed(() => {
+	if (!auth.isLoggedIn()) return [];
 	const instances = Array.isArray(instancesData.value)
 		? instancesData.value
 		: instancesData.value
@@ -41,22 +37,34 @@ const pinnedCorpora = computed(() => {
 	return pins.value.flatMap((pin) => {
 		const instance = instances.find((item) => item._id === pin.instanceId);
 		if (!instance) return [];
-		const details = catalogue.value.find(
-			(item) => item.noskeId === pin.instanceId && item.corpus === pin.corpus,
-		);
 		return [
 			{
 				...pin,
 				instanceName: instance.name,
 				instanceOwner: instance.owner.username,
-				language: details?.language,
-				words: details?.words,
-				documents: details?.documents,
 			},
 		];
 	});
 });
-const formatCount = (value?: number) => (typeof value === "number" ? value.toLocaleString() : "—");
+const corpusInfoDescriptors = computed(() =>
+	accessiblePinnedCorpora.value.map(({ instanceId, corpus }) => ({
+		queryKey: ["pinned-corpus-info", auth.username, instanceId, corpus],
+		noske: instanceId,
+		corpus,
+	})),
+);
+const corpusInfoResults = useNoskeCorpusInfoQueries(corpusInfoDescriptors);
+const pinnedCorpora = computed(() =>
+	accessiblePinnedCorpora.value.map((pin, index) => ({
+		...pin,
+		info: corpusInfoResults.value[index]?.data,
+	})),
+);
+function formatCount(value?: string | number) {
+	if (value == null || String(value).trim() === "") return "—";
+	const count = Number(value);
+	return Number.isFinite(count) ? count.toLocaleString() : "—";
+}
 usePageMetadata({ title: t("IndexPage.meta.title") });
 </script>
 
@@ -100,13 +108,13 @@ usePageMetadata({ title: t("IndexPage.meta.title") });
 							<CardContent class="flex-1 pt-4">
 								<dl class="grid grid-cols-1 gap-2">
 									<CardProperty :label="t('CorporaPage.table.language')">
-										{{ item.language ?? "—" }}
+										{{ item.info?.lang || "—" }}
 									</CardProperty>
 									<CardProperty :label="t('CorporaPage.table.words')">
-										{{ formatCount(item.words) }}
+										{{ formatCount(item.info?.sizes?.wordcount) }}
 									</CardProperty>
 									<CardProperty :label="t('CorporaPage.table.documents')">
-										{{ formatCount(item.documents) }}
+										{{ formatCount(item.info?.sizes?.doccount) }}
 									</CardProperty>
 									<CardProperty :label="t('CorporaPage.table.noske')">
 										{{ item.instanceName }}
