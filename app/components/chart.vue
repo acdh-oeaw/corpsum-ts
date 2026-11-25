@@ -602,6 +602,9 @@ function updateKey() {
 					:label="xAxis"
 					:num-ticks="minTicks"
 					:tick-format="tickFormat"
+					:tick-text-fit-mode="
+						orientation === 'horizontal' && domainType === 'categorical' ? 'trim' : 'wrap'
+					"
 					:tick-text-hide-overlapping="orientation === 'vertical'"
 					:tick-values="axisTickValues"
 					:type="orientation === 'vertical' ? 'x' : 'y'"
