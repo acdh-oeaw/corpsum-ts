@@ -232,7 +232,7 @@
 		"save": "Visualisierung speichern",
 		"saveFailed": "Die Visualisierung konnte nicht gespeichert werden.",
 		"stale": "Die Abfrage wurde geändert. Führen Sie sie erneut aus, um diese Ergebnisse zu aktualisieren.",
-		"title": "Abfragevisualisierung"
+		"title": "Vorschau der Abfragevisualisierungen"
 	},
 	"totalHits": "Treffer insgesamt",
 	"KwicReferences": {

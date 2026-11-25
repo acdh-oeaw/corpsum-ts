@@ -232,7 +232,7 @@
 		"save": "Save visualization",
 		"saveFailed": "The visualization could not be saved.",
 		"stale": "The query has changed. Run it again to update these results.",
-		"title": "Query visualization"
+		"title": "Query visualization previews"
 	},
 	"totalHits": "Total hits",
 	"KwicReferences": {
