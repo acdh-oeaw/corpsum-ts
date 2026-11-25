@@ -19,6 +19,7 @@ const props = defineProps<{
 	selectedTypes: Array<VisualizationType>;
 	settings: VisualizationSettingsState;
 	kwicReady: boolean;
+	showMetadataMappingEditor: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -65,9 +66,10 @@ function updateSettings<TType extends VisualizationType>(
 </script>
 
 <template>
-	<div class="grid gap-6">
+	<div class="grid grid-cols-1 gap-6 @min-[56rem]:grid-cols-2 [&>*]:min-w-0">
 		<VisualizationCorpusMetadataMappingEditor
-			v-if="temporalQueries.length > 0"
+			v-if="showMetadataMappingEditor && temporalQueries.length > 0"
+			class="col-span-full"
 			:queries="temporalQueries"
 			semantic="temporal"
 			@updated="refreshTemporalMappings"

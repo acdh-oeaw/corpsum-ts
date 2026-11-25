@@ -38,7 +38,9 @@ test.describe("query visualization preview", () => {
 		});
 
 		const component = await mount(QueryVisualizationPreview, { props: { execution } });
-		await expect(component.getByRole("heading", { name: "Query visualization" })).toBeVisible();
+		await expect(
+			component.getByRole("heading", { name: "Query visualization previews", exact: true }),
+		).toBeVisible();
 		await expect(component.getByText("Word form frequencies", { exact: true })).toBeVisible();
 		await expect(component.getByText("Keyword in context", { exact: true })).toBeVisible();
 		expect(queryCreates).toBe(0);

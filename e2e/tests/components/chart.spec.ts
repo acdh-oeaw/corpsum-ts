@@ -31,6 +31,41 @@ const series = [
 ];
 
 test.describe("chart", () => {
+	test("keeps horizontal bars proportional when ascending sort reveals a long category label", async ({
+		mount,
+		page,
+	}) => {
+		await page.setViewportSize({ width: 480, height: 600 });
+		const component = await mount(Chart, {
+			props: {
+				series: [
+					{
+						label: "Word forms",
+						data: [
+							["common", 30],
+							["other", 10],
+							["longword".repeat(20), 5],
+						],
+					},
+				],
+				orientation: "horizontal",
+				rowLimit: 2,
+				height: 320,
+			},
+		});
+		const bars = component.locator(`.${VisGroupedBarSelectors.bar}`);
+		await expect(bars).toHaveCount(2);
+		await component.update({ props: { sortOrder: "ascending" } });
+		await expect
+			.poll(async () => {
+				const [larger, smaller] = await bars.evaluateAll((elements) =>
+					elements.map((element) => element.getBoundingClientRect().width),
+				);
+				return larger > 100 && Math.abs(larger - smaller * 2) < 1;
+			})
+			.toBe(true);
+	});
+
 	for (const chartType of ["bar", "stack", "percent"] as const) {
 		for (const orientation of ["vertical", "horizontal"] as const) {
 			test(`sorts ${orientation} ${chartType} categories and restores their input order`, async ({

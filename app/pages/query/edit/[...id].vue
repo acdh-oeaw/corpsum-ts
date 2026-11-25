@@ -150,6 +150,7 @@ function cancel() {
 			v-if="execution"
 			:execution="execution"
 			:run-id="runId"
+			:show-metadata-mapping-editor="false"
 			:source-query="query"
 			:stale="resultsAreStale"
 			@loading-change="executionLoading = $event"

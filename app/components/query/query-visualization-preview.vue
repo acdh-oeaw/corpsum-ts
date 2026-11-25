@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Save } from "lucide-vue-next";
+
 import QueryVisualizationPanels from "@/components/query/query-visualization-panels.vue";
 import { getDefaultVisualizationPreset } from "@/lib/default-visualization-presets";
 import {
@@ -29,12 +31,14 @@ const props = withDefaults(
 		stale?: boolean;
 		sourceQuery?: QueryResponse | null;
 		allowSave?: boolean;
+		showMetadataMappingEditor?: boolean;
 	}>(),
 	{
 		runId: 0,
 		stale: false,
 		sourceQuery: null,
 		allowSave: true,
+		showMetadataMappingEditor: true,
 	},
 );
 
@@ -237,7 +241,10 @@ async function saveVisualization() {
 </script>
 
 <template>
-	<section class="mt-8 grid gap-6" aria-labelledby="query-preview-title">
+	<section
+		class="@container mt-8 grid w-full min-w-0 grid-cols-1 gap-6"
+		aria-labelledby="query-preview-title"
+	>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div>
 				<h2 id="query-preview-title" class="text-xl font-semibold">
@@ -250,10 +257,17 @@ async function saveVisualization() {
 					{{ t("totalHits") }}: {{ totalHits.toLocaleString(locale) }}
 				</p>
 			</div>
-			<Button v-if="allowSave" type="button" variant="outline" @click="openSaveDialog">
-				<LucideIcon class="mr-1 size-4" name="Save" :stroke-width="2" />
-				{{ t("QueryVisualizationPreview.save") }}
-			</Button>
+			<Toolbar v-if="allowSave" class="ms-auto" aria-labelledby="query-preview-title">
+				<ToolbarButton
+					:aria-label="t('QueryVisualizationPreview.save')"
+					class="w-8 px-0"
+					type="button"
+					variant="outline"
+					@click="openSaveDialog"
+				>
+					<Save />
+				</ToolbarButton>
+			</Toolbar>
 		</div>
 
 		<p v-if="stale" class="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
@@ -267,6 +281,7 @@ async function saveVisualization() {
 				:queries="corpusQueries"
 				:selected-types="selectedTypes"
 				:settings="settingsByType"
+				:show-metadata-mapping-editor="showMetadataMappingEditor"
 				@loading-change="panelsLoading = $event"
 				@update:settings="updatePanelSettings"
 				@update:total-hits="updateTotalHits"

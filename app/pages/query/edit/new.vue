@@ -157,6 +157,7 @@ function cancel() {
 			v-if="execution"
 			:execution="execution"
 			:run-id="runId"
+			:show-metadata-mapping-editor="false"
 			:stale="resultsAreStale"
 			@loading-change="executionLoading = $event"
 		/>
