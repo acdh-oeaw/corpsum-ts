@@ -32,17 +32,15 @@ const visualizationId = computed(() => {
 	return Array.isArray(idParam) ? idParam[0] : idParam;
 });
 
-const { data: visualization, error: pageError } = await useFetch<VisualizationResponse>(
-	() => `/api/visualization/${visualizationId.value}`,
-);
+const [
+	{ data: visualization, error: pageError },
+	{ data: queries, error: queriesError, pending: queriesPending, refresh: retryQueries },
+] = await Promise.all([
+	useFetch<VisualizationResponse>(() => `/api/visualization/${visualizationId.value}`),
+	useFetch<Array<QueryListItem>>("/api/queries", {}),
+]);
 if (pageError.value)
 	throw createError({ statusCode: pageError.value.statusCode ?? 500, fatal: true });
-const {
-	data: queries,
-	error: queriesError,
-	pending: queriesPending,
-	refresh: retryQueries,
-} = await useFetch<Array<QueryListItem>>("/api/queries", {});
 const publishOpen = ref(false);
 const publishTitle = ref("");
 const publishDescription = ref("");

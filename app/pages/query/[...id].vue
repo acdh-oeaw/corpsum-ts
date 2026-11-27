@@ -31,17 +31,20 @@ const queryId = computed(() => {
 	return Array.isArray(idParam) ? idParam[0] : idParam;
 });
 
-const { data: query, error: pageError } = await useFetch<QueryResponse>(
-	() => `/api/query/${queryId.value}`,
-);
+const [
+	{ data: query, error: pageError },
+	{
+		data: visualizations,
+		error: visualizationsError,
+		pending: visualizationsPending,
+		refresh: retryVisualizations,
+	},
+] = await Promise.all([
+	useFetch<QueryResponse>(() => `/api/query/${queryId.value}`),
+	useFetch<Array<VisualizationListItem>>("/api/visualizations"),
+]);
 if (pageError.value)
 	throw createError({ statusCode: pageError.value.statusCode ?? 500, fatal: true });
-const {
-	data: visualizations,
-	error: visualizationsError,
-	pending: visualizationsPending,
-	refresh: retryVisualizations,
-} = await useFetch<Array<VisualizationListItem>>("/api/visualizations");
 
 const ownerNames = computed(
 	() =>
