@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import FetchErrorAlert from "@/components/fetch-error-alert.vue";
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	loading: Array<boolean>;
@@ -27,13 +28,11 @@ watch(hasLoading, (value) => emit("loading-change", value), { immediate: true })
 		:aria-label="t('QueryDataStatus.label')"
 		role="region"
 	>
-		<QueryDisplay
-			v-for="(query, index) of queries"
-			:key="query.id"
-			class="my-0"
-			:error="errors[index]"
-			:loading="loading[index]"
-			:query="query"
-		/>
+		<template v-for="(query, index) of queries" :key="query.id">
+			<div class="space-y-1">
+				<QueryDisplay class="my-0" :loading="loading[index]" :query="query" />
+				<FetchErrorAlert v-if="errors[index]" :message="errors[index]" />
+			</div>
+		</template>
 	</div>
 </template>
