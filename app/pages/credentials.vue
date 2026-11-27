@@ -18,9 +18,12 @@ interface CredentialFormState {
 
 const t = useTranslations();
 const { data: instancesData } = useGetNoskeinstances(null);
-const { data: credentials, refresh: refreshCredentials } = await useFetch<
-	Array<CredentialListItem>
->("/api/credentials", {
+const {
+	data: credentials,
+	refresh: refreshCredentials,
+	error: credentialsError,
+	pending: credentialsPending,
+} = await useFetch<Array<CredentialListItem>>("/api/credentials", {
 	default: () => [],
 });
 
@@ -125,6 +128,12 @@ async function deleteCredential(instance: PopulatedNoskeDocument) {
 
 <template>
 	<MainContent class="w-full min-w-0">
+		<FetchErrorAlert
+			v-if="credentialsError"
+			class="my-3"
+			:pending="credentialsPending"
+			:retry="refreshCredentials"
+		/>
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
