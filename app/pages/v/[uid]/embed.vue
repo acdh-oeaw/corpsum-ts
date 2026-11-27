@@ -5,6 +5,7 @@ import type {
 } from "~/server/utils/published-visualization-response";
 
 definePageMeta({
+	key: (route) => route.path,
 	layout: "full-page",
 });
 
@@ -19,9 +20,11 @@ const uid = computed(() => {
 	return Array.isArray(value) ? value[0] : value;
 });
 
-const { data: snapshot } = await useFetch<
+const { data: snapshot, error: pageError } = await useFetch<
 	PublishedVisualizationResponse | PublishedVisualizationTombstoneResponse
 >(() => `/api/published-visualization/${uid.value}`);
+if (pageError.value)
+	throw createError({ statusCode: pageError.value.statusCode ?? 500, fatal: true });
 
 const isTombstone = computed(() => snapshot.value && "tombstone" in snapshot.value);
 const publicSnapshot = computed(() => {
