@@ -13,6 +13,23 @@ const execution = {
 };
 
 test.describe("query visualization preview", () => {
+	for (const locale of ["en", "de"] as const) {
+		test(`shows the localized Save label in the preview toolbar (${locale})`, async ({
+			mount,
+			page,
+		}) => {
+			await page.setViewportSize({ width: 320, height: 640 });
+			const component = await mount(QueryVisualizationPreview, {
+				props: { execution },
+				hooksConfig: { locale },
+			});
+			const label = locale === "de" ? "Visualisierung speichern" : "Save visualization";
+			const button = component.getByRole("button", { name: label, exact: true });
+			await expect(button).toHaveText(label);
+			await expect(button).toBeInViewport({ ratio: 1 });
+		});
+	}
+
 	test("runs the generic preset without persistence and reuses a promoted query on retry", async ({
 		mount,
 		page,
