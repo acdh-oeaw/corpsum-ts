@@ -11,7 +11,12 @@ const t = useTranslations();
 const localeRoute = useLocaleRoute();
 const route = useRoute();
 
-const { data: instancesData } = useGetNoskeinstances(null);
+const {
+	data: instancesData,
+	error: instancesDataError,
+	pending: instancesDataPending,
+	refresh: retryInstancesData,
+} = useGetNoskeinstances(null);
 const noskeInstances = computed<Array<PopulatedNoskeDocument>>(() => {
 	if (!instancesData.value) return [];
 	return Array.isArray(instancesData.value) ? instancesData.value : [instancesData.value];
@@ -121,6 +126,12 @@ function cancel() {
 
 <template>
 	<MainContent class="my-4 flex w-full min-w-0 flex-col gap-4">
+		<FetchErrorAlert
+			v-if="instancesDataError"
+			class="my-3"
+			:pending="instancesDataPending"
+			:retry="retryInstancesData"
+		/>
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">

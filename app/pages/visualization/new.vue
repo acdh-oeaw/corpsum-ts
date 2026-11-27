@@ -21,7 +21,12 @@ import type { QueryListItem } from "~/server/api/queries.get.ts";
 
 const t = useTranslations();
 const localeRoute = useLocaleRoute();
-const { data: queries } = await useFetch<Array<QueryListItem>>("/api/queries", {});
+const {
+	data: queries,
+	error: queriesError,
+	pending: queriesPending,
+	refresh: retryQueries,
+} = await useFetch<Array<QueryListItem>>("/api/queries", {});
 
 const queriesList = computed(() => queries.value ?? []);
 
@@ -188,6 +193,12 @@ function cancel() {
 
 <template>
 	<MainContent class="w-full min-w-0">
+		<FetchErrorAlert
+			v-if="queriesError"
+			class="my-3"
+			:pending="queriesPending"
+			:retry="retryQueries"
+		/>
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">

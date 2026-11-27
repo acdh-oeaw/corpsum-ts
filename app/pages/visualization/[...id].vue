@@ -21,6 +21,8 @@ import type { QueryListItem } from "~/server/api/queries.get.ts";
 import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
 
 const t = useTranslations();
+definePageMeta({ key: (route) => route.path });
+
 const route = useRoute();
 const env = useRuntimeConfig();
 const locale = useLocale();
@@ -30,10 +32,17 @@ const visualizationId = computed(() => {
 	return Array.isArray(idParam) ? idParam[0] : idParam;
 });
 
-const { data: visualization } = await useFetch<VisualizationResponse>(
+const { data: visualization, error: pageError } = await useFetch<VisualizationResponse>(
 	() => `/api/visualization/${visualizationId.value}`,
 );
-const { data: queries } = await useFetch<Array<QueryListItem>>("/api/queries", {});
+if (pageError.value)
+	throw createError({ statusCode: pageError.value.statusCode ?? 500, fatal: true });
+const {
+	data: queries,
+	error: queriesError,
+	pending: queriesPending,
+	refresh: retryQueries,
+} = await useFetch<Array<QueryListItem>>("/api/queries", {});
 const publishOpen = ref(false);
 const publishTitle = ref("");
 const publishDescription = ref("");
@@ -182,6 +191,12 @@ async function publishVisualization() {
 
 <template>
 	<MainContent v-if="visualization" class="w-full min-w-0">
+		<FetchErrorAlert
+			v-if="queriesError"
+			class="my-3"
+			:pending="queriesPending"
+			:retry="retryQueries"
+		/>
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">

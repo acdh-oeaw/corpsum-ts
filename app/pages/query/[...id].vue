@@ -4,6 +4,8 @@ import { createCopiedQueryName, queryCopyNameKey } from "@/utils/query-copy";
 import type { QueryResponse } from "~/server/api/query/[id].get.ts";
 import type { VisualizationListItem } from "~/server/api/visualizations.get.ts";
 
+definePageMeta({ key: (route) => route.path });
+
 const route = useRoute();
 const t = useTranslations();
 const auth = useAuth();
@@ -29,9 +31,17 @@ const queryId = computed(() => {
 	return Array.isArray(idParam) ? idParam[0] : idParam;
 });
 
-const { data: query } = await useFetch<QueryResponse>(() => `/api/query/${queryId.value}`);
-const { data: visualizations } =
-	await useFetch<Array<VisualizationListItem>>("/api/visualizations");
+const { data: query, error: pageError } = await useFetch<QueryResponse>(
+	() => `/api/query/${queryId.value}`,
+);
+if (pageError.value)
+	throw createError({ statusCode: pageError.value.statusCode ?? 500, fatal: true });
+const {
+	data: visualizations,
+	error: visualizationsError,
+	pending: visualizationsPending,
+	refresh: retryVisualizations,
+} = await useFetch<Array<VisualizationListItem>>("/api/visualizations");
 
 const ownerNames = computed(
 	() =>
@@ -186,6 +196,12 @@ const copyQueryParams = computed(() => {
 		</div>
 		<div class="mt-8 grid gap-2">
 			<h2 class="text-lg font-semibold">{{ t("QueryDetail.visualizationsUsingQuery") }}</h2>
+			<FetchErrorAlert
+				v-if="visualizationsError"
+				class="my-3"
+				:pending="visualizationsPending"
+				:retry="retryVisualizations"
+			/>
 			<div class="w-full overflow-hidden rounded-md border">
 				<table class="min-w-full text-sm">
 					<thead class="bg-muted/40 text-left">
@@ -213,7 +229,11 @@ const copyQueryParams = computed(() => {
 								</Button>
 							</td>
 						</tr>
-						<tr v-if="queryVisualizations.length === 0">
+						<tr
+							v-if="
+								!visualizationsError && !visualizationsPending && queryVisualizations.length === 0
+							"
+						>
 							<td class="px-3 py-2 text-sm text-muted-foreground" colspan="3">
 								{{ t("QueryDetail.emptyVisualizations") }}
 							</td>
