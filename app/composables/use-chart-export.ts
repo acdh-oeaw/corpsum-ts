@@ -1,5 +1,7 @@
 import type { Ref } from "vue";
 
+import type { TableExportRequest } from "~/shared/request-schemas";
+
 type DataPoint = [string | number, number] | undefined;
 
 interface TableData {
@@ -119,7 +121,7 @@ export function useChartExport(
 				sheetName: title.value ?? "Chart",
 				headers: tableData.headers,
 				rows: tableData.rows,
-			}),
+			} satisfies TableExportRequest),
 		});
 
 		if (!response.ok) {
