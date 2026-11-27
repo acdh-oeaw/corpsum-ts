@@ -3,19 +3,17 @@ import bcrypt from "bcryptjs";
 import { UserModel } from "~/server/models/users.schema";
 import { setAuth } from "~/server/utils/auth";
 import { getJwtExpirationMs } from "~/server/utils/jwt";
+import { loginRequestSchema } from "~/shared/request-schemas";
 
 const errorMessage = "username or password is wrong! please try again";
 
 export default defineEventHandler(async (event) => {
-	const { username, password } = await readBody<{
-		username?: string;
-		password?: string;
-	}>(event);
-
-	if (!username || !password) {
+	const credentials = loginRequestSchema.safeParse(await readBody<unknown>(event));
+	if (!credentials.success) {
 		setResponseStatus(event, 400, "required field missing");
 		return;
 	}
+	const { username, password } = credentials.data;
 
 	const user = await UserModel.findOne({ username });
 	if (!user) {

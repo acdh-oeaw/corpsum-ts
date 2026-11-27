@@ -1,4 +1,5 @@
 import type { NormalizedSignupPayload, SignupFieldErrors } from "@/utils/auth-validation";
+import type { LoginRequest } from "~/shared/request-schemas";
 
 interface AuthUser {
 	accounttype?: string;
@@ -60,7 +61,7 @@ export function useAuth() {
 			body: JSON.stringify({
 				password: _password,
 				username: _username,
-			}),
+			} satisfies LoginRequest),
 			headers: {
 				"Content-Type": "application/json",
 			},
