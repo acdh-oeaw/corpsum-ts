@@ -6,14 +6,15 @@ node_modules/
 *.log
 
 # non-public environment variables
-.env.local
+*.env
 .env.*.local
-.env
 
 # caches
 .eslintcache
+.prettiercache
 .stylelintcache
 *.tsbuildinfo
+.tmp-corpsum-ts/
 
 # vercel
 .vercel
@@ -24,17 +25,26 @@ node_modules/
 
 # nuxt.js
 dist
+.data/
 .nuxt/
 .nitro/
 .output/
 
 # playwright
-/test-results/
-/playwright-report/
+/blob-report/
 /playwright/.cache/
+/playwright-report/
+/test-results/
+/lib/api-client/
 
-# references
-references/
-
-# generated code
-lib/api-client
+#generated
+lib
+!app/lib/
+app/lib/*
+!app/lib/default-visualization-presets.ts
+!app/lib/query-execution.ts
+plans
+.agents
+.codex
+backups
+docs

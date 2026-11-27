@@ -1,36 +1,59 @@
 # syntax=docker/dockerfile:1
 
-# build
-FROM node:22-slim AS build
+# using alpine base image to avoid `sharp` memory leaks.
+# @see https://sharp.pixelplumbing.com/install#linux-memory-allocator
 
-RUN corepack enable
+# build
+FROM node:26-slim AS base
+
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
+	&& rm -rf /var/lib/apt/lists/*
+
+ENV COREPACK_HOME=/opt/corepack
+
+RUN npm install --global corepack@0.36.0 && corepack enable && \
+	mkdir "$COREPACK_HOME" && chown node:node "$COREPACK_HOME"
 
 RUN mkdir /app && chown -R node:node /app
 WORKDIR /app
 
 USER node
 
-COPY --chown=node:node .npmrc package.json pnpm-lock.yaml ./
+RUN corepack install --global pnpm@11.0.4
 
-RUN pnpm fetch
+COPY --chown=node:node .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-COPY --chown=node:node nuxt.config.ts tailwind.config.ts tsconfig.json ./
-COPY --chown=node:node public ./public
-COPY --chown=node:node src ./src
+# Keep dependency lifecycle work cacheable independently of the application source.
+RUN --mount=type=cache,id=pnpm-store,target=/home/node/.local/share/pnpm/store,uid=1000,gid=1000 \
+	npm pkg delete scripts.preinstall scripts.postinstall scripts.prepare && \
+	CI=true pnpm install --frozen-lockfile
+
+COPY --chown=node:node ./ ./
+
+RUN CI=true pnpm run postinstall
+
+FROM base AS dev
+ENV NODE_ENV=development
+
+EXPOSE 3000
+
+CMD [ "pnpm", "run", "dev"]
+
+FROM base AS build
 
 ARG NUXT_PUBLIC_APP_BASE_URL
 ARG NUXT_PUBLIC_REDMINE_ID
+ARG NUXT_PUBLIC_BOTS
+ARG NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION
 ARG NUXT_PUBLIC_MATOMO_BASE_URL
 ARG NUXT_PUBLIC_MATOMO_ID
-
-RUN pnpm install --frozen-lockfile --offline
 
 ENV NODE_ENV=production
 
 RUN pnpm run build
 
 # serve
-FROM node:20-slim AS serve
+FROM node:26-alpine AS serve
 
 RUN mkdir /app && chown -R node:node /app
 WORKDIR /app

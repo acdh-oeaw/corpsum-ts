@@ -1,0 +1,44 @@
+<script setup lang="ts">
+import type {
+	PublishedVisualizationResponse,
+	PublishedVisualizationTombstoneResponse,
+} from "~/server/utils/published-visualization-response";
+
+definePageMeta({
+	key: (route) => route.path,
+	layout: "full-page",
+});
+
+useHead({
+	meta: [{ name: "robots", content: "noindex" }],
+});
+
+const route = useRoute();
+const t = useTranslations();
+const uid = computed(() => {
+	const value = route.params.uid;
+	return Array.isArray(value) ? value[0] : value;
+});
+
+const { data: snapshot, error: pageError } = await useFetch<
+	PublishedVisualizationResponse | PublishedVisualizationTombstoneResponse
+>(() => `/api/published-visualization/${uid.value}`);
+if (pageError.value)
+	throw createError({ statusCode: pageError.value.statusCode ?? 500, fatal: true });
+
+const isTombstone = computed(() => snapshot.value && "tombstone" in snapshot.value);
+const publicSnapshot = computed(() => {
+	const value = snapshot.value;
+	if (!value || "tombstone" in value) return null;
+	return value;
+});
+</script>
+
+<template>
+	<div class="w-full min-w-0 p-3">
+		<div v-if="isTombstone" class="rounded-md border p-4 text-sm text-muted-foreground">
+			{{ t("PublishedVisualizationPage.noLongerAvailable") }}
+		</div>
+		<PublishedVisualizationRenderer v-else-if="publicSnapshot" embed :snapshot="publicSnapshot" />
+	</div>
+</template>

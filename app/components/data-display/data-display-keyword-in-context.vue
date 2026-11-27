@@ -1,0 +1,125 @@
+<script lang="ts" setup>
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
+import { createKwicRequestOptionParams } from "@/lib/kwic-query-options";
+import { getQueryWithFacetting } from "@/utils/corpus-query";
+import type { components } from "~/lib/noske-types";
+
+type ConcordanceResponse = components["schemas"]["06_concordance"];
+
+const props = withDefaults(
+	defineProps<{
+		queries: Array<CorpusQuery>;
+		data?: Array<ConcordanceResponse | null | undefined>;
+		interactive?: boolean;
+		showHeader?: boolean;
+	}>(),
+	{
+		data: undefined,
+		interactive: true,
+		showHeader: true,
+	},
+);
+
+const t = useTranslations();
+
+const emit = defineEmits<{
+	"loading-change": [loading: boolean];
+	"update:total-hits": [hits: Array<number | undefined>];
+}>();
+
+const queries = computed(() => props.queries);
+const usesProvidedData = computed(() => props.data !== undefined);
+const queryDescriptors = computed<Array<NoskeConcordanceQueryDescriptor>>(() =>
+	queries.value.map((query) => {
+		const attrsAndStructures = createKwicRequestOptionParams(query.KWICAttrsStructs);
+		const facetedQuery = getQueryWithFacetting(query);
+		const params = {
+			viewmode: "kwic" as const,
+			...attrsAndStructures,
+			pagesize: 1000,
+			format: "json" as const,
+		};
+		const queryKey = [
+			"get-concordance",
+			query.noske,
+			query.corpus,
+			query.subCorpus,
+			params,
+			JSON.stringify(facetedQuery),
+		] as const;
+		return {
+			queryKey,
+			noske: query.noske ?? "",
+			enabled: !usesProvidedData.value && Boolean(query.noske),
+			params: {
+				corpname: query.corpus,
+				usesubcorp: query.subCorpus || undefined,
+				...params,
+				json: JSON.stringify({ concordance_query: facetedQuery }),
+			},
+		};
+	}),
+);
+
+const queryResults = useNoskeConcordanceQueries(queryDescriptors);
+const concordanceData = computed(() =>
+	usesProvidedData.value
+		? queries.value.map((_, index) => props.data?.[index])
+		: queryResults.value.map((result) => result.data),
+);
+watch(
+	concordanceData,
+	(data) =>
+		emit(
+			"update:total-hits",
+			data.map((entry) => entry?.fullsize ?? entry?.concsize),
+		),
+	{ immediate: true },
+);
+const concordanceLoading = computed(() =>
+	usesProvidedData.value
+		? queries.value.map(() => false)
+		: queryResults.value.map(
+				(result) =>
+					!result.isError && (result.data === undefined || result.isFetching || result.isLoading),
+			),
+);
+const concordanceErrors = computed(() =>
+	queries.value.map((_, index) => {
+		if (usesProvidedData.value) return null;
+		const result = queryResults.value[index];
+		if (!result?.isError) return null;
+		return result.data === undefined
+			? t("DataDisplayErrors.keywordInContext.loadFailed")
+			: t("DataDisplayErrors.keywordInContext.refreshFailed");
+	}),
+);
+</script>
+
+<template>
+	<Card>
+		<CardHeader v-if="showHeader">
+			<CardTitle>{{ t("keywordInContext") }}</CardTitle>
+			<CardDescription>{{ t("keywordInContextDesc") }}</CardDescription>
+		</CardHeader>
+		<CardContent class="space-y-4">
+			<QueryDataStatusList
+				:errors="concordanceErrors"
+				:loading="concordanceLoading"
+				:queries="queries"
+				@loading-change="emit('loading-change', $event)"
+			/>
+
+			<KwicQueryDisplay
+				v-for="(query, index) of queries"
+				:key="query.id"
+				:data="concordanceData[index]"
+				:allow-details="!usesProvidedData"
+				:interactive="interactive"
+				:loading="concordanceLoading[index]"
+				:query="query"
+				:query-key="queryDescriptors[index]?.queryKey"
+			/>
+		</CardContent>
+	</Card>
+</template>

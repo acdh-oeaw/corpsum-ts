@@ -1,0 +1,744 @@
+{
+	"Documentation": {
+		"title": "Documentation",
+		"overview": "Overview",
+		"search": "Search documentation",
+		"noResults": "No results",
+		"toc": "On this page",
+		"previous": "Previous",
+		"next": "Next"
+	},
+	"AppFooter": {
+		"links": {
+			"imprint": "Imprint"
+		},
+		"navigation-secondary": "Secondary"
+	},
+	"AppHeader": {
+		"links": {
+			"home": "Home"
+		},
+		"navigation-main": "Main"
+	},
+	"ColorSchemeToggle": {
+		"change-color-scheme": "Change color scheme",
+		"color-schemes": {
+			"dark": "Dark",
+			"light": "Light",
+			"system": "System"
+		}
+	},
+	"DefaultLayout": {
+		"meta": {
+			"description": "ACDH-CH App",
+			"title": "ACDH-CH App",
+			"twitter": "{'@acdh_oeaw'}"
+		},
+		"skip-to-main-content": "Skip to main content"
+	},
+	"ErrorBoundary": {
+		"error": "Error"
+	},
+	"ErrorPage": {
+		"meta": {
+			"title": "Error"
+		},
+		"title": "Something went wrong!",
+		"try-again": "Try again"
+	},
+	"ImprintPage": {
+		"meta": {
+			"title": "Imprint"
+		},
+		"title": "Imprint"
+	},
+	"IndexPage": {
+		"meta": {
+			"title": "Home"
+		},
+		"title": "Home",
+		"welcome": "Welcome to CorpSum, a visualization tool for corpus data.",
+		"overview": "This page provides an overview of the tool’s basic features. Select an item to see more details.",
+		"navigation": "All options are available at any time through the menu on the left.",
+		"pinnedCorpora": "Pinned corpora",
+		"noPinnedCorpora": "You have not pinned any corpora yet.",
+		"recentQueries": "Recent queries",
+		"noRecentQueries": "No queries yet."
+	},
+	"LoginPage": {
+		"actions": {
+			"continueWithGithub": "Continue with GitHub",
+			"createAccount": "Create account",
+			"loginInstead": "Log in instead",
+			"signup": "Sign up"
+		},
+		"errors": {
+			"signup": "Account creation failed.",
+			"sso": "Single sign-on failed."
+		},
+		"meta": {
+			"title": "Login"
+		},
+		"or": "or",
+		"prompts": {
+			"hasAccount": "Already have an account?",
+			"noAccount": "Need an account?"
+		}
+	},
+	"SignupPage": {
+		"errors": {
+			"failed": "Account creation failed."
+		},
+		"labels": {
+			"email": "Email",
+			"passwordConfirmation": "Repeat password"
+		},
+		"meta": {
+			"title": "Create account"
+		},
+		"validation": {
+			"email": "Enter a valid email address.",
+			"emailDuplicate": "An account with this email already exists.",
+			"password": "Use at least {min} characters and at least three of: lowercase, uppercase, number, symbol.",
+			"passwordConfirmation": "Passwords must match.",
+			"required": "This field is required.",
+			"username": "Use 3-48 lowercase letters, numbers, hyphens, or underscores.",
+			"usernameDuplicate": "This username is already taken."
+		}
+	},
+	"LocaleSwitcher": {
+		"current-locale": "Current language: {locale}",
+		"switch-locale": "Switch to {locale}"
+	},
+	"Manifest": {
+		"name": "ACDH-CH App",
+		"short-name": "ACDH-CH App",
+		"description": "ACDH-CH App"
+	},
+	"FacettingModal": {
+		"actions": {
+			"clear": "Clear",
+			"close": "Close",
+			"remove": "Remove"
+		},
+		"messages": {
+			"noTextTypes": "No text type data available.",
+			"selectAttribute": "Select an attribute to configure its filters."
+		},
+		"title": "Facetting filters for"
+	},
+	"FacettingSelection": {
+		"actions": {
+			"clearSelection": "Clear selection",
+			"loadMore": "Load more",
+			"search": "Search",
+			"useSearchAsRegex": "Use \"{search}\" as {mode} regex (clears current selection)"
+		},
+		"labels": {
+			"mode": "Mode",
+			"search": "Search"
+		},
+		"messages": {
+			"regexSelection": "Regex selection active. Clear it to select individual values."
+		},
+		"modes": {
+			"contains": "containing",
+			"endsWith": "ends with",
+			"regex": "regex",
+			"startsWith": "starts with"
+		}
+	},
+	"NoskeInstanceComboBox": {
+		"empty": "No instances found.",
+		"placeholder": "Select a NoSketch instance...",
+		"searchPlaceholder": "Search instances..."
+	},
+	"CorpusComboBox": {
+		"empty": "No corpora found.",
+		"placeholder": "Select a corpus...",
+		"searchPlaceholder": "Search corpora..."
+	},
+	"SubCorpusComboBox": {
+		"empty": "No sub corpora found.",
+		"placeholder": "Select a sub corpus...",
+		"searchPlaceholder": "Search sub corpora..."
+	},
+	"NotFoundPage": {
+		"meta": {
+			"title": "Page not found"
+		},
+		"title": "Page not found"
+	},
+	"QueryForm": {
+		"actions": {
+			"cancel": "Cancel",
+			"copyFacetting": "Copy from",
+			"editFacetting": "Edit",
+			"loading": "Loading query data",
+			"run": "Run query"
+		},
+		"labels": {
+			"corpus": "Corpus",
+			"facettingValues": "Facetting values (JSON)",
+			"name": "Name",
+			"noske": "NoSketch Instance",
+			"subCorpus": "Sub corpus",
+			"type": "Type",
+			"userInput": "Input"
+		},
+		"messages": {
+			"corporaAvailable": "{count} corpora available.",
+			"corporaLoading": "Loading corpora...",
+			"noFacettingValues": "No facetting values configured yet.",
+			"selectNoskeForCorpora": "Select a NoSketch instance to load corpora.",
+			"selectCorpusForSubcorpora": "Select a corpus to load sub corpora.",
+			"subcorporaAvailable": "{count} sub corpora available.",
+			"subcorporaLoading": "Loading sub corpora..."
+		},
+		"table": {
+			"attribute": "Attribute",
+			"value": "Value"
+		},
+		"validation": {
+			"facettingInvalidJson": "Facetting values must be valid JSON.",
+			"facettingRequired": "Facetting values are required.",
+			"invalidValue": "Invalid value.",
+			"required": "{label} is required."
+		},
+		"copyName": "Copied from {name}"
+	},
+	"FacettingCopy": {
+		"actions": {
+			"confirm": "Overwrite values"
+		},
+		"description": "Select a saved query using the same NoSketch instance and corpus.",
+		"messages": {
+			"empty": "No matching saved queries found.",
+			"error": "The saved queries could not be loaded.",
+			"loading": "Loading saved queries..."
+		},
+		"overwriteDescription": "All currently configured facetting values will be overwritten with the values from this query.",
+		"overwriteTitle": "Overwrite facetting values?",
+		"title": "Copy facetting values"
+	},
+	"QueryVisualizationPreview": {
+		"defaultName": "{name} visualization",
+		"description": "Results for the last executed query.",
+		"dialogDescription": "Save this executed query and its current visualization settings.",
+		"dialogStaleDescription": "The form has changed. This saves the last executed query shown below.",
+		"dialogTitle": "Save visualization",
+		"loading": "Preparing visualizations...",
+		"name": "Visualization name",
+		"save": "Save visualization",
+		"saveFailed": "The visualization could not be saved.",
+		"stale": "The query has changed. Run it again to update these results.",
+		"title": "Query visualization previews"
+	},
+	"totalHits": "Total hits",
+	"KwicReferences": {
+		"date": "Date",
+		"documentId": "Document",
+		"year": "Year"
+	},
+	"WrongCredentials": "Wrong credentials.",
+	"NoskeForm": {
+		"actions": {
+			"cancel": "Cancel"
+		},
+		"labels": {
+			"authentication": "Authentication",
+			"base": "Base URL",
+			"host": "Host",
+			"name": "Name",
+			"public": "Public",
+			"version": "Version"
+		},
+		"validation": {
+			"invalidValue": "Invalid value.",
+			"required": "{label} is required."
+		}
+	},
+	"Actions": {
+		"cancel": "Cancel",
+		"copy": "Copy",
+		"create": "Create",
+		"credentials": "Credentials",
+		"delete": "Delete",
+		"edit": "Edit",
+		"newInstance": "New instance",
+		"newQuery": "New query",
+		"newVisualization": "New visualization",
+		"save": "Save",
+		"view": "View"
+	},
+	"Dialogs": {
+		"deleteInstanceDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+		"deleteInstanceTitle": "Delete instance",
+		"deleteQueryDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+		"deleteQueryTitle": "Delete query",
+		"deleteVisualizationDescription": "This will permanently delete \"{name}\". This action cannot be undone.",
+		"deleteVisualizationTitle": "Delete visualization"
+	},
+	"Permissions": {
+		"queryEditDisabled": "You do not own this query. Editing is disabled.",
+		"instanceEditDisabled": "You do not own this instance. Editing is disabled."
+	},
+	"QueryCard": {
+		"corpus": "Corpus",
+		"input": "Input",
+		"owner": "Owner",
+		"subCorpus": "Sub corpus",
+		"type": "Type"
+	},
+	"NoskeInstanceCard": {
+		"authentication": "Authentication",
+		"host": "Host",
+		"ownedBy": "Owned by",
+		"public": "Public",
+		"version": "Version"
+	},
+	"QueriesPage": {
+		"title": "Queries",
+		"featuredTitle": "Featured queries",
+		"featuredDescription": "Showing the first {count} queries",
+		"moreTitle": "More queries",
+		"moreDescription": "Showing all remaining queries",
+		"empty": "No more queries to show.",
+		"table": {
+			"name": "Name",
+			"corpus": "Corpus",
+			"type": "Type",
+			"owner": "Owner",
+			"actions": "Actions"
+		}
+	},
+	"CorporaPage": {
+		"instanceOwner": "Instance owner",
+		"title": "Corpora",
+		"description": "Browse available corpora.",
+		"featuredTitle": "Recent corpora",
+		"featuredDescription": "Recently cached",
+		"moreTitle": "More corpora",
+		"moreDescription": "All remaining corpora",
+		"empty": "No more corpora to show.",
+		"table": {
+			"corpus": "Corpus",
+			"language": "Language",
+			"words": "Words",
+			"documents": "Documents",
+			"noske": "NoSketch instance",
+			"createQuery": "Query"
+		}
+	},
+	"VisualizationsPage": {
+		"title": "Visualizations",
+		"newTitle": "New visualization",
+		"detailTitle": "Visualization",
+		"featuredTitle": "Featured visualizations",
+		"featuredDescription": "Showing the first {count} visualizations",
+		"moreTitle": "More visualizations",
+		"moreDescription": "Showing all remaining visualizations",
+		"empty": "No more visualizations to show.",
+		"queriesTitle": "Queries",
+		"queriesDescription": "Most recent queries",
+		"sectionsTitle": "Visualizations",
+		"sectionsDescription": "Saved visualization sections",
+		"emptySections": "No visualizations added yet.",
+		"card": {
+			"queryOwners": "Query owners",
+			"queryCount": "Queries",
+			"visualizationCount": "Charts"
+		},
+		"table": {
+			"name": "Name",
+			"queryCount": "Queries",
+			"visualizationCount": "Charts",
+			"actions": "Actions"
+		}
+	},
+	"ColorPicker": {
+		"defaultColor": "Default color",
+		"themeColors": "Theme colors",
+		"standardColors": "Standard colors",
+		"moreColors": "More colors…",
+		"pickerLabel": "Choose color"
+	},
+	"VisualizationForm": {
+		"actions": {
+			"addQuery": "Add query",
+			"removeQuery": "Remove query"
+		},
+		"labels": {
+			"data": "Data (JSON array)",
+			"name": "Name",
+			"queries": "Queries",
+			"settings": "Settings (JSON array)",
+			"visualizations": "Visualizations"
+		},
+		"messages": {
+			"noQueries": "No queries available.",
+			"selectQueries": "Select queries to include.",
+			"noVisualizations": "No visualization types available."
+		},
+		"validation": {
+			"invalidJsonArray": "Provide valid JSON arrays for settings and data.",
+			"required": "Please fill in all required fields."
+		}
+	},
+	"NoskeInstancesPage": {
+		"title": "NoSketch instances"
+	},
+	"Map": {
+		"label": "Map"
+	},
+	"Chart": {
+		"sortOrder": "Sort order",
+		"sortAscending": "Sort ascending",
+		"sortDescending": "Sort descending",
+		"valueRange": "Value range",
+		"rowsToInclude": "Rows to include",
+		"rowCount": "{count} rows",
+		"fullscreen": "Open fullscreen",
+		"export": {
+			"csv": "Export CSV",
+			"jpg": "Export JPG",
+			"png": "Export PNG",
+			"svg": "Export SVG",
+			"xlsx": "Export XLSX"
+		}
+	},
+	"CredentialsPage": {
+		"title": "NoSketch credentials",
+		"labels": {
+			"username": "Username",
+			"password": "Password"
+		},
+		"messages": {
+			"required": "Username and password are required.",
+			"saved": "Credentials saved.",
+			"deleted": "Credentials deleted.",
+			"saveFailed": "Could not save credentials.",
+			"deleteFailed": "Could not delete credentials."
+		},
+		"placeholders": {
+			"keepExistingPassword": "Enter a new password to replace the saved one"
+		},
+		"status": {
+			"configured": "Configured",
+			"missing": "Missing"
+		}
+	},
+	"Common": {
+		"no": "No",
+		"yes": "Yes",
+		"createdAt": "Created",
+		"updatedAt": "Updated"
+	},
+	"QueryDataStatus": {
+		"label": "Query data status",
+		"loading": "Loading query data"
+	},
+	"FetchError": {
+		"loadFailed": "Could not load data.",
+		"retry": "Retry"
+	},
+	"DataDisplayErrors": {
+		"keywordInContext": {
+			"loadFailed": "Keyword-in-context data for this query could not be loaded.",
+			"refreshFailed": "Keyword-in-context data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"collocations": {
+			"loadFailed": "Collocation data for this query could not be loaded.",
+			"refreshFailed": "Collocation data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"wordFormFrequency": {
+			"loadFailed": "Word-form frequency data for this query could not be loaded.",
+			"refreshFailed": "Word-form frequency data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"mediaSource": {
+			"loadFailed": "Media source data for this query could not be loaded.",
+			"refreshFailed": "Media source data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"mediaType": {
+			"loadFailed": "Media type data for this query could not be loaded.",
+			"refreshFailed": "Media type data for this query could not be refreshed. The displayed result may be out of date."
+		},
+		"regionalFrequency": {
+			"loadFailed": "Regional frequency data for this query could not be loaded.",
+			"refreshFailed": "Regional frequency data for this query could not be refreshed. The displayed result may be out of date."
+		}
+	},
+	"TemporalFrequencyDistribution": {
+		"description": "Compare query frequencies over time.",
+		"errors": {
+			"automaticRangeTooLarge": "The automatic date range contains too many buckets. Choose a coarser time unit or a custom range.",
+			"invalidMappingRegex": "The temporal metadata mapping contains an invalid regular expression.",
+			"invalidRange": "The exclusive end date must be later than the start date.",
+			"loadFailed": "The temporal frequency data could not be loaded."
+		},
+		"intervalChart": {
+			"description": "Compare frequencies grouped into consecutive time intervals.",
+			"title": "Temporal frequencies per {count} {unit}"
+		},
+		"labels": {
+			"automaticRange": "Auto range",
+			"customRange": "Custom range",
+			"rangeMode": "Date range mode",
+			"endDate": "End date (exclusive)",
+			"frequencyMode": "Frequency mode",
+			"groupFromBeginning": "Start grouping at the beginning of the date range",
+			"groupFromEnd": "Start grouping at the end of the date range",
+			"groupingDirection": "Grouping direction",
+			"intervalSize": "Interval size",
+			"queryDetails": "Query details",
+			"startDate": "Start date",
+			"timeUnit": "Time unit"
+		},
+		"mapping": {
+			"corpusOnNoske": "{corpus} on {noske}",
+			"invalidDescription": "Correct the regular expression for each affected corpus before loading its data.",
+			"invalidTitle": "Invalid temporal metadata mapping",
+			"missingDescription": "Create a temporal mapping for each corpus before this visualization can query NoSketch metadata.",
+			"missingTitle": "Temporal metadata mapping required"
+		},
+		"settings": {
+			"intervalDescription": "Choose the size of each interval and whether grouping starts at the beginning or end of the date range.",
+			"intervalTitle": "Interval chart settings",
+			"timeSeriesDescription": "Choose how the temporal series is measured and which date range it covers.",
+			"timeSeriesTitle": "Time-series settings"
+		},
+		"toolbar": {
+			"interval": "Interval chart controls",
+			"sourceData": "Source data controls",
+			"timeSeries": "Time-series controls"
+		},
+		"tooltips": {
+			"absoluteMode": "Show absolute frequencies.",
+			"automaticRange": "Use the full available date range.",
+			"customRange": "Choose a custom date range.",
+			"endDate": "Set the exclusive end date for the temporal frequency range.",
+			"fromBeginning": "Group intervals forward from the beginning of the selected date range.",
+			"fromEnd": "Group intervals backward from the end of the selected date range.",
+			"intervalSize": "Choose how many selected time units are combined into each interval.",
+			"queryDetails": "Show query details and cache controls.",
+			"relativeMode": "Show relative frequencies per million tokens.",
+			"sourceData": "Show or hide the source data table.",
+			"startDate": "Set the first date included in the temporal frequency range.",
+			"timeUnit": "Choose the time unit used to bucket the time-series chart."
+		},
+		"title": "Temporal frequencies",
+		"units": {
+			"day": "day | days",
+			"month": "month | months",
+			"quarter": "quarter | quarters",
+			"week": "week | weeks",
+			"year": "year | years"
+		},
+		"warnings": {
+			"parseExcluded": "{count} temporal value could not be parsed and was excluded. | {count} temporal values could not be parsed and were excluded."
+		}
+	},
+	"VisualizationToolbar": {
+		"barChartMode": "Bar chart mode",
+		"chartMode": "Chart mode",
+		"collocations": "Collocation controls",
+		"combinedMapChart": "Combined map chart",
+		"frequencyMode": "Frequency mode",
+		"mapMode": "Map mode",
+		"mediaSource": "Media source controls",
+		"mediaType": "Media type controls",
+		"queryDetails": "Query details",
+		"regional": "Regional controls",
+		"separateMapCharts": "Separate map charts",
+		"sourceData": "Source data controls",
+		"wordFormFrequency": "Word-form frequency controls",
+		"tooltips": {
+			"absoluteMode": "Show absolute frequencies.",
+			"queryDetails": "Show query details and cache controls.",
+			"relativeMode": "Show relative frequencies per million tokens.",
+			"sourceData": "Show or hide the source data table."
+		}
+	},
+	"Navigation": {
+		"platformFunctions": "Platform functions",
+		"settings": "Settings",
+		"colorScheme": "Color scheme",
+		"language": "Language",
+		"imprint": "Imprint",
+		"publishedPanels": "Published panels",
+		"noSketchEngines": "NoSketch engines"
+	},
+	"UserMenu": {
+		"notYet": "Not yet available",
+		"start": "Start",
+		"accountSettings": "Account settings",
+		"credentialManagement": "Credential management",
+		"logOut": "Log out"
+	},
+	"NoskeInstanceDetail": {
+		"availableCorpora": "Available corpora",
+		"description": "Description",
+		"viewDescription": "View description",
+		"loadingCorpora": "Loading corpora...",
+		"corporaLoaded": "Corpora loaded: {count}",
+		"corporaFailed": "Could not load corpora.",
+		"detailsStatus": {
+			"loading": "Loading details…",
+			"success": "Details loaded",
+			"error": "Could not load details."
+		},
+		"cache": {
+			"hit": "Cache hit",
+			"miss": "Cache miss",
+			"refresh": "Cache refreshed",
+			"skip": "Cache bypassed"
+		},
+		"createQuery": "Create query",
+		"emptyCorpora": "No corpora found for this instance.",
+		"compiled": "Compiled",
+		"tagset": "Tagset",
+		"tagsetDocumentation": "Tagset documentation",
+		"filter": "Filter",
+		"minimum": "Min",
+		"maximum": "Max",
+		"columns": {
+			"corpus": "Corpus",
+			"language": "Language",
+			"words": "Words",
+			"documents": "Documents"
+		},
+		"actions": "Actions"
+	},
+	"QueryDetail": {
+		"owners": "Owners",
+		"visualizationsUsingQuery": "Visualizations using this query",
+		"action": "Action",
+		"viewVisualization": "View visualization",
+		"emptyVisualizations": "No visualizations yet."
+	},
+	"MetadataMappingEditor": {
+		"loading": "Loading metadata mappings…",
+		"loadFailed": "Could not load metadata mappings.",
+		"retry": "Retry",
+		"title": "Corpus metadata mappings",
+		"selectQuery": "Select a query with a corpus before editing metadata mappings.",
+		"mappingLabel": "{corpus} metadata mapping",
+		"private": "Private",
+		"default": "Default",
+		"missing": "Missing",
+		"savePrivate": "Save private mapping",
+		"saveDefault": "Save default mapping",
+		"saveCopy": "Save private copy",
+		"saving": "Saving...",
+		"saveFailed": "Could not save mapping."
+	},
+	"PublishVisualization": {
+		"publish": "Publish",
+		"title": "Publish visualization",
+		"description": "Create an immutable public snapshot from cached NoSketch results.",
+		"titleLabel": "Title",
+		"descriptionLabel": "Description",
+		"publishedLink": "Published link",
+		"embedSnippet": "Embed snippet",
+		"publishing": "Publishing...",
+		"failed": "Publishing failed.",
+		"missingResults": "Cannot publish yet. {count} cached result(s) are missing; view or refresh the selected visualization panels first."
+	},
+	"PublishedPanelsPage": {
+		"title": "Published panels",
+		"tableTitle": "Title",
+		"state": "State",
+		"published": "Published",
+		"link": "Link",
+		"embed": "Embed",
+		"actions": "Actions",
+		"public": "Public",
+		"hidden": "Hidden",
+		"hide": "Hide",
+		"hideTitle": "Take visualization offline?",
+		"hideDescription": "‘{title}’ will no longer be publicly accessible. Existing links and embeds will stop working.",
+		"hideError": "Could not take the visualization offline. Please try again.",
+		"empty": "No published visualizations yet."
+	},
+	"PublishedVisualizationPage": {
+		"unavailable": "Published visualization unavailable",
+		"noLongerAvailable": "This published visualization is no longer publicly available.",
+		"publishedBy": "Published by {username} on {date}"
+	},
+	"Accessibility": {
+		"refreshNoSketchResult": "Refresh NoSketch result",
+		"close": "Close",
+		"previousSlide": "Previous slide",
+		"nextSlide": "Next slide",
+		"toggleSidebar": "Toggle sidebar"
+	},
+	"Charts": "Charts",
+	"email": "Email",
+	"login": "Log in",
+	"password": "Password",
+	"skip-to-main-content": "Skip to main content",
+	"username": "Username",
+	"Corpsum": {
+		"left": "Left",
+		"link": "Link",
+		"open": "Open",
+		"region": "Region",
+		"right": "Right",
+		"source": "Source",
+		"total-of-n-entries": "Total of {0} entries.",
+		"word": "Word"
+	},
+	"Attributes": "Attributes",
+	"Attributes and Structures": "Attributes and Structures",
+	"HideData": "Hide data",
+	"No results.": "No results.",
+	"ShowData": "Show data",
+	"Structures": "Structures",
+	"absolute": "Absolute",
+	"all-queries-in-one-chart": "All queries in one chart",
+	"cattr": "Context attribute",
+	"close": "Close",
+	"coll_freq": "Collocational frequency",
+	"collocations": "Collocations",
+	"collocationsDesc": "Explore words that frequently occur near each query.",
+	"collocationsTitle": "{mode} for {query}",
+	"freq": "Frequency",
+	"lemma": "Lemma",
+	"lempos": "Lemma and part of speech",
+	"log_dice": "logDice",
+	"interval": "Interval",
+	"keywordInContext": "Keyword in context",
+	"keywordInContextDesc": "Inspect the query results in their surrounding context.",
+	"loading-the-full-ref": "Loading the full reference",
+	"map-showing-the-different-query-frequencies-relating-to-the-region": "Map showing the different query frequencies by region",
+	"mediaSources": "Media sources",
+	"mediaSourcesDesc": "Compare the distribution of results across media sources.",
+	"mediaTypes": "Media types",
+	"mediaTypesDesc": "Compare the distribution of results across media types.",
+	"mediaTypeDistribution": "Distribution of media types per query",
+	"separateBarChart": "Separate bar chart",
+	"stackedBarChart": "Stacked bar chart",
+	"percentageBarChart": "Percentage bar chart",
+	"next": "Next",
+	"previous": "Previous",
+	"queries": "Queries",
+	"regionalFrequencies": "Regional frequencies",
+	"regionalFrequenciesDesc": "Compare query frequencies across regions.",
+	"relative": "Relative",
+	"sources": "Hits",
+	"viewOptions": "View options",
+	"wordFormFrequencies": "Word form frequencies",
+	"wordFormFrequenciesDesc": "Compare the most frequent word forms returned by each query.",
+	"yearlyFrequencies": "Yearly frequencies",
+	"yearlyFrequenciesDesc": "Compare query frequencies over time.",
+	"yearlyFrequenciesPer": "Yearly frequencies per ",
+	"Table": {
+		"sortAscending": "Sort ascending",
+		"sortDescending": "Sort descending"
+	},
+	"CorpusPin": {
+		"pin": "Pin corpus",
+		"unpin": "Unpin corpus",
+		"error": "Could not update pin."
+	}
+}

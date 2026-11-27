@@ -1,0 +1,978 @@
+<script lang="ts" setup>
+import {
+	CalendarDays,
+	CalendarRange,
+	CalendarSearch,
+	CalendarCog,
+	Ruler,
+	Hash,
+	Info,
+	Percent,
+	Rows3,
+} from "lucide-vue-next";
+import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from "reka-ui";
+
+import FetchErrorAlert from "@/components/fetch-error-alert.vue";
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
+import { buttonVariants } from "@/components/ui/button";
+import {
+	type CorpusMetadataMappingResponse,
+	type TemporalFrequencyDistributionSettings,
+	type TemporalUnit,
+	defaultTemporalFrequencyDistributionSettings,
+	isTemporalBucketRangeSupported,
+	normalizeTemporalFrequencyDistributionSettings,
+	temporalIntervalOptions,
+} from "@/lib/visualization-types";
+import { getQueryWithFacetting } from "@/utils/corpus-query";
+import type { components } from "~/lib/noske-types";
+
+import {
+	type TemporalFrequency,
+	type TemporalFrequencyParser,
+	type TemporalFrequencyPoint,
+	aggregateTemporalFrequencies,
+	addTemporalUnits,
+	createTemporalFrequencyParser,
+	floorDateToUnit,
+	formatTemporalFrequencyInterval,
+	formatTemporalTimestamp,
+	getAllowedTemporalBucketUnitsForMappings,
+	getTemporalSourceUnit,
+	groupTemporalFrequencies,
+} from "./data-display-temporal-frequency-distribution.transformations.ts";
+
+type FreqMlResponse = components["schemas"]["11_freqml"];
+type FreqMlBlock = NonNullable<FreqMlResponse["Blocks"]>[number];
+type FreqMlItem = NonNullable<FreqMlBlock["Items"]>[number];
+
+type FrequencyMode = "absolute" | "relative";
+
+interface TemporalFrequencySeries {
+	name: string;
+	data: Array<TemporalFrequencyPoint>;
+	color: string;
+}
+
+const props = withDefaults(
+	defineProps<{
+		queries: Array<CorpusQuery>;
+		settings?: Partial<TemporalFrequencyDistributionSettings>;
+		metadataMappings?: Array<CorpusMetadataMappingResponse | null>;
+		mappingsStatus?: "idle" | "pending" | "success" | "error";
+		data?: Array<FreqMlResponse | null | undefined>;
+		interactive?: boolean;
+		showHeader?: boolean;
+		showSourceData?: boolean;
+	}>(),
+	{
+		data: undefined,
+		interactive: true,
+		metadataMappings: undefined,
+		mappingsStatus: undefined,
+		settings: undefined,
+		showHeader: true,
+		showSourceData: true,
+	},
+);
+
+const emit = defineEmits<{
+	"update:settings": [settings: TemporalFrequencyDistributionSettings];
+	"loading-change": [loading: boolean];
+}>();
+
+const t = useTranslations();
+const locale = useLocale();
+
+const activeQueries = computed(() => props.queries);
+const normalizedSettings = computed(() =>
+	normalizeTemporalFrequencyDistributionSettings(props.settings),
+);
+
+const intervalOptions = temporalIntervalOptions;
+const mode = ref<FrequencyMode>(normalizedSettings.value.mode);
+const rangeMode = ref(normalizedSettings.value.rangeMode);
+const bucketUnit = ref<TemporalUnit>(normalizedSettings.value.bucketUnit);
+const interval = ref(normalizedSettings.value.intervalSize);
+const reverse = ref(normalizedSettings.value.reverseIntervals);
+const expand = ref(normalizedSettings.value.sourceTableExpanded);
+const rangeStart = ref(normalizedSettings.value.dateRange.start.slice(0, 10));
+const rangeEnd = ref(normalizedSettings.value.dateRange.end.slice(0, 10));
+const automaticDateRange = ref<{ start: string; end: string } | null>(null);
+const automaticRangeTooLarge = ref(false);
+
+function createIsoDate(value: string) {
+	const date = new Date(`${value}T00:00:00.000Z`);
+	return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+const selectedDateRange = computed(() => {
+	const start = createIsoDate(rangeStart.value);
+	const end = createIsoDate(rangeEnd.value);
+	return start && end && start < end ? { start, end } : null;
+});
+
+watch(
+	normalizedSettings,
+	(value) => {
+		mode.value = value.mode;
+		rangeMode.value = value.rangeMode;
+		bucketUnit.value = value.bucketUnit;
+		interval.value = value.intervalSize;
+		reverse.value = value.reverseIntervals;
+		expand.value = value.sourceTableExpanded;
+		rangeStart.value = value.dateRange.start.slice(0, 10);
+		rangeEnd.value = value.dateRange.end.slice(0, 10);
+	},
+	{ deep: true },
+);
+
+watch([mode, rangeMode, bucketUnit, interval, reverse, expand, rangeStart, rangeEnd], () => {
+	if (!selectedDateRange.value) return;
+	emit("update:settings", {
+		type: defaultTemporalFrequencyDistributionSettings.type,
+		mode: mode.value,
+		rangeMode: rangeMode.value,
+		bucketUnit: bucketUnit.value,
+		dateRange: selectedDateRange.value,
+		intervalSize: interval.value,
+		reverseIntervals: reverse.value,
+		sourceTableExpanded: expand.value,
+	});
+});
+
+const mappings = computed(() => props.metadataMappings ?? []);
+const supportedBucketUnits = computed(() =>
+	getAllowedTemporalBucketUnitsForMappings(mappings.value),
+);
+const availableBucketUnits = computed(() => {
+	if (!selectedDateRange.value) return supportedBucketUnits.value;
+	const { start, end } = selectedDateRange.value;
+	return supportedBucketUnits.value.filter((unit) =>
+		isTemporalBucketRangeSupported(new Date(start), new Date(end), unit),
+	);
+});
+const bucketUnitOptions = computed(() =>
+	availableBucketUnits.value.map((unit) => ({
+		value: unit,
+		label: formatTemporalUnit(unit, 1),
+	})),
+);
+const hasMultipleBucketUnitOptions = computed(() => bucketUnitOptions.value.length > 1);
+const intervalSizeOptions = computed(() =>
+	intervalOptions.map((value) => ({
+		value,
+		label: `${value} ${formatTemporalUnit(bucketUnit.value, value)}`,
+	})),
+);
+function setMode(value: unknown) {
+	if (value === "absolute" || value === "relative") mode.value = value;
+}
+function setRangeMode(value: unknown) {
+	if (value === "auto" || value === "custom") rangeMode.value = value;
+}
+const intervalDirection = computed({
+	get: () => (reverse.value ? "reverse" : "forward"),
+	set: (value?: string) => {
+		if (value === "forward" || value === "reverse") reverse.value = value === "reverse";
+	},
+});
+const usesProvidedData = computed(() => props.data !== undefined);
+watchEffect(() => {
+	if (!availableBucketUnits.value.includes(bucketUnit.value)) {
+		bucketUnit.value = availableBucketUnits.value.at(-1) ?? "year";
+	}
+});
+const dateRange = computed(() => {
+	const selected =
+		rangeMode.value === "auto" && automaticDateRange.value
+			? automaticDateRange.value
+			: selectedDateRange.value;
+	return {
+		start: new Date(selected?.start ?? normalizedSettings.value.dateRange.start),
+		end: new Date(selected?.end ?? normalizedSettings.value.dateRange.end),
+	};
+});
+const missingMappingQueries = computed(() =>
+	activeQueries.value.filter((_, index) => !mappings.value[index]),
+);
+const temporalParsers = computed(() =>
+	mappings.value.map((mapping) => (mapping ? createTemporalFrequencyParser(mapping) : null)),
+);
+const invalidMappingQueries = computed(() =>
+	activeQueries.value.filter((_, index) => temporalParsers.value[index]?.error),
+);
+const queryableQueryCount = computed(
+	() =>
+		activeQueries.value.filter((_, index) => {
+			const parser = temporalParsers.value[index];
+			return parser && !parser.error;
+		}).length,
+);
+
+const queryDescriptors = computed<Array<NoskeFreqMlQueryDescriptor>>(() =>
+	activeQueries.value.map((query, index) => {
+		const mapping = mappings.value[index];
+		const queryKey = [
+			"get-temporal-frequency-distribution",
+			query.noske,
+			query.corpus,
+			query.subCorpus,
+			mapping?.attribute,
+			JSON.stringify(getQueryWithFacetting(query)),
+		] as const;
+		return {
+			queryKey,
+			noske: query.noske ?? "",
+			enabled: !usesProvidedData.value && Boolean(mapping) && !temporalParsers.value[index]?.error,
+			params: {
+				corpname: query.corpus,
+				usesubcorp: query.subCorpus || undefined,
+				group: 0,
+				showpoc: 1,
+				showreltt: 1,
+				showrel: 1,
+				freqlevel: 1,
+				ml1attr: mapping?.attribute ?? "",
+				ml1ctx: "0~0 > 0",
+				json: JSON.stringify({
+					concordance_query: getQueryWithFacetting(query),
+				}),
+			},
+		};
+	}),
+);
+
+const queryResults = useNoskeFreqMlQueries(queryDescriptors);
+const frequencyData = computed(() =>
+	usesProvidedData.value
+		? activeQueries.value.map((_, index) => props.data?.[index])
+		: queryResults.value.map((result) => result.data),
+);
+
+watchEffect(() => {
+	const dates = frequencyData.value.flatMap((data, index) => {
+		const parser = temporalParsers.value[index];
+		if (!data || !parser || parser.error) return [];
+		return parseTemporalFrequencies(data, parser).map((entry) => entry.date);
+	});
+	if (dates.length === 0) {
+		automaticDateRange.value = null;
+		automaticRangeTooLarge.value = false;
+		return;
+	}
+	const start = floorDateToUnit(
+		new Date(Math.min(...dates.map((date) => date.getTime()))),
+		bucketUnit.value,
+	);
+	const end = addTemporalUnits(
+		floorDateToUnit(new Date(Math.max(...dates.map((date) => date.getTime()))), bucketUnit.value),
+		bucketUnit.value,
+		1,
+	);
+	if (!isTemporalBucketRangeSupported(start, end, bucketUnit.value)) {
+		automaticDateRange.value = null;
+		automaticRangeTooLarge.value = true;
+		return;
+	}
+	automaticRangeTooLarge.value = false;
+	automaticDateRange.value = { start: start.toISOString(), end: end.toISOString() };
+	if (rangeMode.value === "auto") {
+		rangeStart.value = start.toISOString().slice(0, 10);
+		rangeEnd.value = end.toISOString().slice(0, 10);
+	}
+});
+
+const rangeSliderDates = computed(() => {
+	if (!automaticDateRange.value) return [];
+	const end = new Date(automaticDateRange.value.end);
+	const dates: Array<Date> = [];
+	for (
+		let date = new Date(automaticDateRange.value.start);
+		date <= end;
+		date = addTemporalUnits(date, bucketUnit.value, 1)
+	) {
+		dates.push(date);
+	}
+	return dates;
+});
+const rangeSliderValue = computed(() => {
+	const dates = rangeSliderDates.value;
+	if (dates.length < 2) return [0, 1];
+	const findIndex = (value: string) => {
+		const timestamp = new Date(`${value}T00:00:00.000Z`).getTime();
+		const index = dates.findIndex((date) => date.getTime() >= timestamp);
+		return index < 0 ? dates.length - 1 : index;
+	};
+	const start = Math.min(findIndex(rangeStart.value), dates.length - 2);
+	return [start, Math.max(start + 1, findIndex(rangeEnd.value))];
+});
+function setSliderRange(value: Array<number> | undefined) {
+	if (!value || value.length !== 2) return;
+	const start = rangeSliderDates.value[value[0] ?? -1];
+	const end = rangeSliderDates.value[value[1] ?? -1];
+	if (!start || !end || start >= end) return;
+	rangeStart.value = start.toISOString().slice(0, 10);
+	rangeEnd.value = end.toISOString().slice(0, 10);
+}
+function sliderDateLabel(index: number) {
+	const date = rangeSliderDates.value[index];
+	return date ? formatTemporalTimestamp(date.getTime(), bucketUnit.value, locale.value) : "";
+}
+
+const temporalFrequencies = computed(() =>
+	frequencyData.value.map((data, index) => {
+		if (rangeMode.value === "auto" && automaticRangeTooLarge.value) return [];
+		const parser = temporalParsers.value[index];
+		const mapping = mappings.value[index];
+		if (!parser || parser.error || !data) return [];
+		return aggregateTemporalFrequencies(
+			parseTemporalFrequencies(data, parser),
+			dateRange.value,
+			bucketUnit.value,
+			mapping ? getTemporalSourceUnit(mapping) : undefined,
+		);
+	}),
+);
+
+const temporalSourceRows = computed(() =>
+	temporalFrequencies.value.map((frequencies) =>
+		frequencies.map((frequency) => ({
+			...frequency,
+			date: formatTemporalTimestamp(frequency.date.getTime(), bucketUnit.value, locale.value),
+		})),
+	),
+);
+
+const temporalFrequenciesLoading = computed(() =>
+	usesProvidedData.value
+		? activeQueries.value.map(() => false)
+		: queryResults.value.map(
+				(result) =>
+					!result.isError && (result.data === undefined || result.isFetching || result.isLoading),
+			),
+);
+const temporalFrequenciesErrors = computed(() =>
+	activeQueries.value.map((_, index) => {
+		const parserError = temporalParsers.value[index]?.error;
+		if (parserError === "invalidMappingRegex") {
+			return t("TemporalFrequencyDistribution.errors.invalidMappingRegex");
+		}
+		if (parserError) return parserError;
+		if (usesProvidedData.value) return null;
+		const result = queryResults.value[index];
+		return result?.isError ? t("TemporalFrequencyDistribution.errors.loadFailed") : null;
+	}),
+);
+
+const normalizationWarnings = computed(() =>
+	frequencyData.value.map((data, index) => {
+		const parser = temporalParsers.value[index];
+		if (!parser || parser.error || !data) return 0;
+		return countUnparseableTemporalValues(data, parser);
+	}),
+);
+
+function parseTemporalFrequencies(
+	data: FreqMlResponse,
+	parser: TemporalFrequencyParser,
+): Array<TemporalFrequency> {
+	return data.Blocks?.[0]?.Items?.flatMap((item) => parseTemporalFrequencyItem(item, parser)) ?? [];
+}
+
+function parseTemporalFrequencyItem(
+	item: FreqMlItem,
+	parser: TemporalFrequencyParser,
+): Array<TemporalFrequency> {
+	const date = parser.parse(parseRawTemporalValue(item));
+	if (date === null) return [];
+	return [
+		{
+			absolute: item.frq ?? 0,
+			relative: item.reltt ?? 0,
+			norm: item.norm,
+			date,
+		},
+	];
+}
+
+function countUnparseableTemporalValues(data: FreqMlResponse, parser: TemporalFrequencyParser) {
+	return (
+		data.Blocks?.[0]?.Items?.filter((item) => parser.parse(parseRawTemporalValue(item)) === null)
+			.length ?? 0
+	);
+}
+
+function parseRawTemporalValue(item: FreqMlItem) {
+	return item.Word?.map(({ n }) => n ?? "").join("") ?? "";
+}
+
+function createSeriesName(query: CorpusQuery) {
+	return `${query.type}: ${query.userInput} (${query.corpus}${
+		query.subCorpus ? ` / ${query.subCorpus})` : ")"
+	}`;
+}
+
+function getFrequencyValue(frequency: TemporalFrequency, selectedMode: FrequencyMode) {
+	return selectedMode === "relative" ? frequency.relative : frequency.absolute;
+}
+
+function createSampleAdjustedTemporalSeries(
+	query: CorpusQuery,
+	frequencies: Array<TemporalFrequency>,
+	selectedMode: FrequencyMode,
+): TemporalFrequencySeries {
+	return {
+		name: createSeriesName(query),
+		data: applySampleRatio(
+			createTemporalFrequencyPoints(frequencies, selectedMode),
+			query.SampleRatio,
+		),
+		color: query.color,
+	};
+}
+
+function createTemporalFrequencyPoints(
+	frequencies: Array<TemporalFrequency>,
+	selectedMode: FrequencyMode,
+): Array<TemporalFrequencyPoint> {
+	return [...frequencies]
+		.sort((a, b) => a.date.getTime() - b.date.getTime())
+		.map((frequency) => [frequency.date.getTime(), getFrequencyValue(frequency, selectedMode)]);
+}
+
+function applySampleRatio<TYear extends string | number>(
+	points: Array<[TYear, number]>,
+	sampleRatio: number,
+): Array<[TYear, number]> {
+	return points.map(([year, value]) => [year, value * (sampleRatio / 100)]);
+}
+
+const series = computed(() =>
+	activeQueries.value.flatMap((query, index) => {
+		const frequencies = temporalFrequencies.value[index];
+		const data = frequencyData.value[index];
+		const parser = temporalParsers.value[index];
+		if (!frequencies || !data || !parser || parser.error) return [];
+
+		return [createSampleAdjustedTemporalSeries(query, frequencies, mode.value)];
+	}),
+);
+
+const intervalseries = computed(() =>
+	activeQueries.value.flatMap((query, index) => {
+		const frequencies = temporalFrequencies.value[index];
+		const parser = temporalParsers.value[index];
+		if (!frequencies || !frequencyData.value[index] || !parser || parser.error) return [];
+		return [
+			{
+				name: createSeriesName(query),
+				color: query.color,
+				data: groupTemporalFrequencies(frequencies, interval.value, reverse.value, mode.value)
+					.toSorted((a, b) => a.startTimestamp - b.startTimestamp)
+					.map((item) =>
+						formatTemporalFrequencyInterval(
+							{ ...item, value: item.value * (query.SampleRatio / 100) },
+							bucketUnit.value,
+							locale.value,
+						),
+					),
+			},
+		];
+	}),
+);
+
+function formatTemporalDomainValue(value: string | number) {
+	return typeof value === "number"
+		? formatTemporalTimestamp(value, bucketUnit.value, locale.value)
+		: value;
+}
+
+function formatTemporalUnit(unit: TemporalUnit, count: number) {
+	return t(`TemporalFrequencyDistribution.units.${unit}`, count);
+}
+
+function toggleSourceTable() {
+	expand.value = !expand.value;
+}
+</script>
+
+<template>
+	<Card>
+		<CardHeader v-if="showHeader">
+			<CardTitle>{{ t("TemporalFrequencyDistribution.title") }}</CardTitle>
+			<CardDescription>{{ t("TemporalFrequencyDistribution.description") }}</CardDescription>
+		</CardHeader>
+
+		<CardContent class="space-y-6">
+			<QueryDataStatusList
+				:errors="temporalFrequenciesErrors"
+				:loading="temporalFrequenciesLoading"
+				:queries="activeQueries"
+				@loading-change="emit('loading-change', $event)"
+			/>
+
+			<p v-if="mappingsStatus === 'pending'" class="text-sm text-muted-foreground" role="status">
+				{{ t("MetadataMappingEditor.loading") }}
+			</p>
+			<FetchErrorAlert
+				v-else-if="mappingsStatus === 'error'"
+				:message="t('MetadataMappingEditor.loadFailed')"
+			/>
+			<div v-else-if="missingMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
+				<p class="font-medium">
+					{{ t("TemporalFrequencyDistribution.mapping.missingTitle") }}
+				</p>
+				<p class="mt-1 text-muted-foreground">
+					{{ t("TemporalFrequencyDistribution.mapping.missingDescription") }}
+				</p>
+				<ul class="mt-3 list-disc pl-5">
+					<li v-for="query in missingMappingQueries" :key="`${query.noske}-${query.corpus}`">
+						{{
+							t("TemporalFrequencyDistribution.mapping.corpusOnNoske", {
+								corpus: query.corpus,
+								noske: query.noske,
+							})
+						}}
+					</li>
+				</ul>
+			</div>
+			<div v-if="invalidMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
+				<p class="font-medium">
+					{{ t("TemporalFrequencyDistribution.mapping.invalidTitle") }}
+				</p>
+				<p class="mt-1 text-muted-foreground">
+					{{ t("TemporalFrequencyDistribution.mapping.invalidDescription") }}
+				</p>
+				<ul class="mt-3 list-disc pl-5">
+					<li v-for="query in invalidMappingQueries" :key="`${query.noske}-${query.corpus}`">
+						{{
+							t("TemporalFrequencyDistribution.mapping.corpusOnNoske", {
+								corpus: query.corpus,
+								noske: query.noske,
+							})
+						}}
+					</li>
+				</ul>
+			</div>
+
+			<template v-if="queryableQueryCount > 0">
+				<div>
+					<Toolbar :aria-label="t('TemporalFrequencyDistribution.toolbar.timeSeries')">
+						<template v-if="interactive">
+							<div class="inline-flex min-w-0 items-center gap-1.5">
+								<Label class="sr-only">{{
+									t("TemporalFrequencyDistribution.labels.frequencyMode")
+								}}</Label>
+								<ToolbarToggleGroup
+									class="h-8 shrink-0 rounded-md border border-input bg-background p-0.5 shadow-sm"
+									:model-value="mode"
+									size="sm"
+									type="single"
+									:aria-label="t('TemporalFrequencyDistribution.labels.frequencyMode')"
+									@update:model-value="setMode"
+								>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<ToolbarToggleItem
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+													value="absolute"
+													:aria-label="t('absolute')"
+												>
+													<Hash />
+												</ToolbarToggleItem>
+											</TooltipTrigger>
+											<TooltipContent>
+												{{ t("TemporalFrequencyDistribution.tooltips.absoluteMode") }}
+											</TooltipContent>
+										</Tooltip>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<ToolbarToggleItem
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+													value="relative"
+													:aria-label="t('relative')"
+												>
+													<Percent />
+												</ToolbarToggleItem>
+											</TooltipTrigger>
+											<TooltipContent>
+												{{ t("TemporalFrequencyDistribution.tooltips.relativeMode") }}
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</ToolbarToggleGroup>
+							</div>
+							<ToolbarSeparator />
+							<div class="inline-flex min-w-0 items-center gap-1.5">
+								<Ruler class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+								<Label for="temporal-bucket-unit" class="sr-only">{{
+									t("TemporalFrequencyDistribution.labels.timeUnit")
+								}}</Label>
+								<TooltipProvider>
+									<Tooltip>
+										<TooltipTrigger as-child>
+											<span
+												class="inline-flex"
+												:tabindex="!hasMultipleBucketUnitOptions ? 0 : undefined"
+												:aria-label="
+													!hasMultipleBucketUnitOptions
+														? t('TemporalFrequencyDistribution.labels.timeUnit')
+														: undefined
+												"
+											>
+												<Select v-model="bucketUnit">
+													<SelectTrigger
+														id="temporal-bucket-unit"
+														class="h-8 w-34 min-w-0"
+														:disabled="!hasMultipleBucketUnitOptions"
+													>
+														<SelectValue
+															:placeholder="t('TemporalFrequencyDistribution.labels.timeUnit')"
+														/>
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem
+															v-for="option of bucketUnitOptions"
+															:key="option.value"
+															:value="option.value"
+															>{{ option.label }}</SelectItem
+														>
+													</SelectContent>
+												</Select>
+											</span>
+										</TooltipTrigger>
+										<TooltipContent>{{
+											t("TemporalFrequencyDistribution.tooltips.timeUnit")
+										}}</TooltipContent>
+									</Tooltip>
+								</TooltipProvider>
+							</div>
+							<ToolbarSeparator />
+							<div class="inline-flex min-w-0 items-center gap-1.5">
+								<CalendarRange class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+								<ToolbarToggleGroup
+									:model-value="rangeMode"
+									:aria-label="t('TemporalFrequencyDistribution.labels.rangeMode')"
+									class="h-8 shrink-0 rounded-md border border-input bg-background p-0.5 shadow-sm"
+									size="sm"
+									type="single"
+									@update:model-value="setRangeMode"
+								>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<ToolbarToggleItem
+													value="auto"
+													:aria-label="t('TemporalFrequencyDistribution.labels.automaticRange')"
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+												>
+													<CalendarSearch />
+												</ToolbarToggleItem>
+											</TooltipTrigger>
+											<TooltipContent>{{
+												t("TemporalFrequencyDistribution.tooltips.automaticRange")
+											}}</TooltipContent>
+										</Tooltip>
+										<Tooltip>
+											<TooltipTrigger as-child>
+												<ToolbarToggleItem
+													value="custom"
+													:aria-label="t('TemporalFrequencyDistribution.labels.customRange')"
+													class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+												>
+													<CalendarCog />
+												</ToolbarToggleItem>
+											</TooltipTrigger>
+											<TooltipContent>{{
+												t("TemporalFrequencyDistribution.tooltips.customRange")
+											}}</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</ToolbarToggleGroup>
+								<div
+									class="inline-flex min-w-0 items-center gap-2"
+									:class="{
+										'cursor-not-allowed opacity-40':
+											rangeMode === 'auto' || rangeSliderDates.length < 2,
+									}"
+								>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger as-child
+												><span class="whitespace-nowrap text-xs tabular-nums">{{
+													sliderDateLabel(rangeSliderValue[0] ?? 0)
+												}}</span></TooltipTrigger
+											>
+											<TooltipContent>{{
+												t("TemporalFrequencyDistribution.tooltips.startDate")
+											}}</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+									<SliderRoot
+										:model-value="rangeSliderValue"
+										:min="0"
+										:max="Math.max(1, rangeSliderDates.length - 1)"
+										:step="1"
+										:min-steps-between-thumbs="1"
+										:disabled="rangeMode === 'auto' || rangeSliderDates.length < 2"
+										class="relative flex h-8 w-28 touch-none items-center"
+										@update:model-value="setSliderRange"
+									>
+										<SliderTrack class="relative h-1.5 w-full grow rounded-full bg-secondary"
+											><SliderRange class="absolute h-full rounded-full bg-primary"
+										/></SliderTrack>
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger as-child
+													><SliderThumb
+														:aria-label="t('TemporalFrequencyDistribution.labels.startDate')"
+														:aria-valuetext="sliderDateLabel(rangeSliderValue[0] ?? 0)"
+														class="block size-4 rounded-full border border-primary bg-background shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+												/></TooltipTrigger>
+												<TooltipContent>{{
+													t("TemporalFrequencyDistribution.tooltips.startDate")
+												}}</TooltipContent>
+											</Tooltip>
+											<Tooltip>
+												<TooltipTrigger as-child
+													><SliderThumb
+														:aria-label="t('TemporalFrequencyDistribution.labels.endDate')"
+														:aria-valuetext="sliderDateLabel(rangeSliderValue[1] ?? 1)"
+														class="block size-4 rounded-full border border-primary bg-background shadow focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+												/></TooltipTrigger>
+												<TooltipContent>{{
+													t("TemporalFrequencyDistribution.tooltips.endDate")
+												}}</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									</SliderRoot>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger as-child
+												><span class="whitespace-nowrap text-xs tabular-nums">{{
+													sliderDateLabel(rangeSliderValue[1] ?? 1)
+												}}</span></TooltipTrigger
+											>
+											<TooltipContent>{{
+												t("TemporalFrequencyDistribution.tooltips.endDate")
+											}}</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</div>
+							</div>
+							<ToolbarSeparator />
+						</template>
+						<TooltipProvider v-if="showSourceData && interactive">
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<ToolbarButton
+										:aria-label="!expand ? t('ShowData') : t('HideData')"
+										:aria-pressed="expand"
+										class="w-8 px-0"
+										type="button"
+										variant="outline"
+										@click="toggleSourceTable"
+									>
+										<Rows3 />
+									</ToolbarButton>
+								</TooltipTrigger>
+								<TooltipContent>{{ !expand ? t("ShowData") : t("HideData") }}</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger as-child>
+									<span class="inline-flex"
+										><Popover>
+											<PopoverTrigger
+												:class="
+													buttonVariants({ variant: 'outline', size: 'sm', class: 'w-8 px-0' })
+												"
+												:aria-label="t('TemporalFrequencyDistribution.labels.queryDetails')"
+												type="button"
+											>
+												<Info />
+											</PopoverTrigger>
+											<PopoverContent align="end" class="w-80 p-2">
+												<div class="max-h-96 space-y-3 overflow-y-auto">
+													<div
+														v-for="(query, index) of activeQueries"
+														v-show="temporalParsers[index] && !temporalParsers[index]?.error"
+														:key="query.id"
+														class="min-w-0 rounded-md border p-2"
+													>
+														<QueryDisplay
+															class="my-0"
+															:loading="temporalFrequenciesLoading[index]"
+															:query="query"
+															:query-key="queryDescriptors[index]?.queryKey"
+														/>
+														<p
+															v-if="normalizationWarnings[index]"
+															class="mt-1 text-xs text-muted-foreground"
+														>
+															{{
+																t(
+																	"TemporalFrequencyDistribution.warnings.parseExcluded",
+																	normalizationWarnings[index],
+																)
+															}}
+														</p>
+														<p
+															v-if="temporalFrequenciesErrors[index]"
+															class="mt-1 text-sm text-destructive"
+															role="alert"
+														>
+															{{ temporalFrequenciesErrors[index] }}
+														</p>
+													</div>
+												</div>
+											</PopoverContent>
+										</Popover></span
+									>
+								</TooltipTrigger>
+								<TooltipContent>{{
+									t("TemporalFrequencyDistribution.tooltips.queryDetails")
+								}}</TooltipContent>
+							</Tooltip></TooltipProvider
+						>
+						<p
+							v-if="interactive && !selectedDateRange"
+							class="basis-full text-sm text-destructive"
+							role="alert"
+						>
+							{{ t("TemporalFrequencyDistribution.errors.invalidRange") }}
+						</p>
+						<p
+							v-if="automaticRangeTooLarge"
+							class="basis-full text-sm text-destructive"
+							role="alert"
+						>
+							{{ t("TemporalFrequencyDistribution.errors.automaticRangeTooLarge") }}
+						</p>
+					</Toolbar>
+
+					<Collapsible v-if="showSourceData" v-model:open="expand">
+						<CollapsibleContent class="pb-0">
+							<DataDisplaySourceTable
+								:data="temporalSourceRows"
+								datatype="yearlyFrequencies"
+								:loading="temporalFrequenciesLoading"
+								:queries="activeQueries"
+								:errors="temporalFrequenciesErrors"
+							/>
+						</CollapsibleContent>
+					</Collapsible>
+				</div>
+				<Chart
+					chart-type="line"
+					class="h-96"
+					domain-type="temporal"
+					:domain-value-formatter="formatTemporalDomainValue"
+					:series="series"
+					:title="`${series.length} ${t('queries')}`"
+					:y-axis="t('sources')"
+				></Chart>
+
+				<CardHeader class="px-0">
+					<CardTitle>
+						{{
+							t("TemporalFrequencyDistribution.intervalChart.title", {
+								count: interval,
+								unit: formatTemporalUnit(bucketUnit, interval),
+							})
+						}}
+					</CardTitle>
+					<CardDescription>{{
+						t("TemporalFrequencyDistribution.intervalChart.description")
+					}}</CardDescription>
+				</CardHeader>
+
+				<div v-if="interactive">
+					<Toolbar :aria-label="t('TemporalFrequencyDistribution.toolbar.interval')">
+						<CalendarRange class="mx-1 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+						<div class="inline-flex min-w-0 items-center gap-1.5">
+							<Label for="temporal-interval" class="sr-only">{{
+								t("TemporalFrequencyDistribution.labels.intervalSize")
+							}}</Label>
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger as-child>
+										<span class="inline-flex">
+											<Select v-model="interval" :aria-label="t('interval')">
+												<SelectTrigger id="temporal-interval" class="h-8 w-34 min-w-0">
+													<SelectValue :placeholder="t('interval')" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem
+														v-for="option of intervalSizeOptions"
+														:key="option.value"
+														:value="option.value"
+														>{{ option.label }}</SelectItem
+													>
+												</SelectContent>
+											</Select>
+										</span>
+									</TooltipTrigger>
+									<TooltipContent>{{
+										t("TemporalFrequencyDistribution.tooltips.intervalSize")
+									}}</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</div>
+						<ToolbarSeparator />
+						<TooltipProvider>
+							<ToolbarToggleGroup
+								v-model="intervalDirection"
+								class="h-8 rounded-md border border-input bg-background p-0.5 shadow-sm"
+								size="sm"
+								type="single"
+								:aria-label="t('TemporalFrequencyDistribution.labels.groupingDirection')"
+							>
+								<Tooltip>
+									<TooltipTrigger as-child>
+										<ToolbarToggleItem
+											class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+											value="forward"
+											:aria-label="t('TemporalFrequencyDistribution.labels.groupFromBeginning')"
+										>
+											<CalendarRange />
+										</ToolbarToggleItem>
+									</TooltipTrigger>
+									<TooltipContent>
+										{{ t("TemporalFrequencyDistribution.tooltips.fromBeginning") }}
+									</TooltipContent>
+								</Tooltip>
+								<Tooltip>
+									<TooltipTrigger as-child>
+										<ToolbarToggleItem
+											class="h-7 min-w-7 rounded-sm px-1.5 aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:shadow-sm aria-pressed:ring-1 aria-pressed:ring-primary/40"
+											value="reverse"
+											:aria-label="t('TemporalFrequencyDistribution.labels.groupFromEnd')"
+										>
+											<CalendarDays />
+										</ToolbarToggleItem>
+									</TooltipTrigger>
+									<TooltipContent>
+										{{ t("TemporalFrequencyDistribution.tooltips.fromEnd") }}
+									</TooltipContent>
+								</Tooltip>
+							</ToolbarToggleGroup>
+						</TooltipProvider>
+					</Toolbar>
+				</div>
+
+				<Chart
+					chart-type="bar"
+					:sort-categories="false"
+					class="h-96"
+					:series="intervalseries"
+					:title="`${intervalseries.length} ${t('queries')}`"
+					:y-axis="t('sources')"
+				></Chart>
+			</template>
+		</CardContent>
+	</Card>
+</template>

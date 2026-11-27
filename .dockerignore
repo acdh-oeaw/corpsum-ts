@@ -8,11 +8,12 @@ node_modules/
 *.log
 
 # non-public environment variables
-.env.local
+*.env
 .env.*.local
 
 # caches
 .eslintcache
+.prettiercache
 .stylelintcache
 *.tsbuildinfo
 
@@ -25,20 +26,23 @@ node_modules/
 
 # nuxt.js
 dist
+.data/
 .nuxt/
 .nitro/
 .output/
 
 # playwright
-/test-results/
-/playwright-report/
+/blob-report/
 /playwright/.cache/
+/playwright-report/
+/test-results/
 
 
 ## .dockerignore ##
 
 # git
 .git/
+.gitattributes
 .gitignore
 
 # github
@@ -50,3 +54,11 @@ dist
 # environment variables
 .env
 .env.*
+
+# tests
+playwright.config.ts
+/e2e/
+/test/
+
+# misc
+.editorconfig

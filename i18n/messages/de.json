@@ -1,0 +1,744 @@
+{
+	"Documentation": {
+		"title": "Dokumentation",
+		"overview": "Übersicht",
+		"search": "Dokumentation durchsuchen",
+		"noResults": "Keine Ergebnisse",
+		"toc": "Auf dieser Seite",
+		"previous": "Zurück",
+		"next": "Weiter"
+	},
+	"AppFooter": {
+		"links": {
+			"imprint": "Impressum"
+		},
+		"navigation-secondary": "Sekundärnavigation"
+	},
+	"AppHeader": {
+		"links": {
+			"home": "Startseite"
+		},
+		"navigation-main": "Hauptnavigation"
+	},
+	"ColorSchemeToggle": {
+		"change-color-scheme": "Farbschema ändern",
+		"color-schemes": {
+			"dark": "Dunkel",
+			"light": "Hell",
+			"system": "System"
+		}
+	},
+	"DefaultLayout": {
+		"meta": {
+			"description": "ACDH-CH App",
+			"title": "ACDH-CH App",
+			"twitter": "{'@acdh_oeaw'}"
+		},
+		"skip-to-main-content": "Zum Hauptinhalt springen"
+	},
+	"ErrorBoundary": {
+		"error": "Fehler"
+	},
+	"ErrorPage": {
+		"meta": {
+			"title": "Fehler"
+		},
+		"title": "Etwas ist schief gelaufen!",
+		"try-again": "Erneut versuchen"
+	},
+	"ImprintPage": {
+		"meta": {
+			"title": "Impressum"
+		},
+		"title": "Impressum"
+	},
+	"IndexPage": {
+		"meta": {
+			"title": "Startseite"
+		},
+		"title": "Startseite",
+		"welcome": "Willkommen bei CorpSum, einem Visualisierungstool für Korpusdaten.",
+		"overview": "Diese Seite bietet eine Übersicht über die grundlegenden Funktionen des Tools. Durch Klicken auf den jeweiligen Punkt erhalten Sie Detailinformationen.",
+		"navigation": "Über die Menüleiste am linken Bildschirmrand sind sämtliche Optionen jederzeit zugänglich.",
+		"pinnedCorpora": "Angeheftete Korpora",
+		"noPinnedCorpora": "Sie haben noch keine Korpora angeheftet.",
+		"recentQueries": "Letzte Abfragen",
+		"noRecentQueries": "Noch keine Abfragen vorhanden."
+	},
+	"LoginPage": {
+		"actions": {
+			"continueWithGithub": "Mit GitHub fortfahren",
+			"createAccount": "Konto erstellen",
+			"loginInstead": "Stattdessen anmelden",
+			"signup": "Registrieren"
+		},
+		"errors": {
+			"signup": "Konto konnte nicht erstellt werden.",
+			"sso": "Single Sign-on fehlgeschlagen."
+		},
+		"meta": {
+			"title": "Anmeldung"
+		},
+		"or": "oder",
+		"prompts": {
+			"hasAccount": "Sie haben bereits ein Konto?",
+			"noAccount": "Sie brauchen ein Konto?"
+		}
+	},
+	"SignupPage": {
+		"errors": {
+			"failed": "Konto konnte nicht erstellt werden."
+		},
+		"labels": {
+			"email": "E-Mail",
+			"passwordConfirmation": "Passwort wiederholen"
+		},
+		"meta": {
+			"title": "Konto erstellen"
+		},
+		"validation": {
+			"email": "Geben Sie eine gültige E-Mail-Adresse ein.",
+			"emailDuplicate": "Es gibt bereits ein Konto mit dieser E-Mail-Adresse.",
+			"password": "Verwenden Sie mindestens {min} Zeichen und mindestens drei davon: Kleinbuchstabe, Großbuchstabe, Zahl, Sonderzeichen.",
+			"passwordConfirmation": "Die Passwörter müssen übereinstimmen.",
+			"required": "Dieses Feld ist erforderlich.",
+			"username": "Verwenden Sie 3-48 Kleinbuchstaben, Zahlen, Bindestriche oder Unterstriche.",
+			"usernameDuplicate": "Dieser Benutzername ist bereits vergeben."
+		}
+	},
+	"LocaleSwitcher": {
+		"current-locale": "Aktuelle Sprache: {locale}",
+		"switch-locale": "Zu {locale} wechseln"
+	},
+	"Manifest": {
+		"name": "ACDH-CH App",
+		"short-name": "ACDH-CH App",
+		"description": "ACDH-CH App"
+	},
+	"FacettingModal": {
+		"actions": {
+			"clear": "Leeren",
+			"close": "Schließen",
+			"remove": "Entfernen"
+		},
+		"messages": {
+			"noTextTypes": "Keine Texttyp-Daten verfügbar.",
+			"selectAttribute": "Wählen Sie ein Attribut, um die Filter zu konfigurieren."
+		},
+		"title": "Facettierungsfilter für"
+	},
+	"FacettingSelection": {
+		"actions": {
+			"clearSelection": "Auswahl löschen",
+			"loadMore": "Mehr laden",
+			"search": "Suchen",
+			"useSearchAsRegex": "\"{search}\" als {mode}-Regex verwenden (setzt die Auswahl zurück)"
+		},
+		"labels": {
+			"mode": "Modus",
+			"search": "Suche"
+		},
+		"messages": {
+			"regexSelection": "Regex-Auswahl aktiv. Löschen Sie sie, um einzelne Werte auszuwählen."
+		},
+		"modes": {
+			"contains": "enthält",
+			"endsWith": "endet mit",
+			"regex": "Regex",
+			"startsWith": "beginnt mit"
+		}
+	},
+	"NoskeInstanceComboBox": {
+		"empty": "Keine Instanzen gefunden.",
+		"placeholder": "NoSketch-Instanz auswählen...",
+		"searchPlaceholder": "Instanzen durchsuchen..."
+	},
+	"CorpusComboBox": {
+		"empty": "Keine Korpora gefunden.",
+		"placeholder": "Korpus auswählen...",
+		"searchPlaceholder": "Korpora durchsuchen..."
+	},
+	"SubCorpusComboBox": {
+		"empty": "Keine Subkorpora gefunden.",
+		"placeholder": "Subkorpus auswählen...",
+		"searchPlaceholder": "Subkorpora durchsuchen..."
+	},
+	"NotFoundPage": {
+		"meta": {
+			"title": "Seite nicht gefunden"
+		},
+		"title": "Seite nicht gefunden"
+	},
+	"QueryForm": {
+		"actions": {
+			"cancel": "Abbrechen",
+			"copyFacetting": "Kopieren von",
+			"editFacetting": "Bearbeiten",
+			"loading": "Abfragedaten werden geladen",
+			"run": "Abfrage ausführen"
+		},
+		"labels": {
+			"corpus": "Korpus",
+			"facettingValues": "Facettierungswerte (JSON)",
+			"name": "Name",
+			"noske": "NoSketch-Instanz",
+			"subCorpus": "Subkorpus",
+			"type": "Typ",
+			"userInput": "Eingabe"
+		},
+		"messages": {
+			"corporaAvailable": "{count} Korpora verfügbar.",
+			"corporaLoading": "Korpora werden geladen...",
+			"noFacettingValues": "Noch keine Facettierungswerte konfiguriert.",
+			"selectNoskeForCorpora": "Wählen Sie eine NoSketch-Instanz, um Korpora zu laden.",
+			"selectCorpusForSubcorpora": "Wählen Sie ein Korpus, um Subkorpora zu laden.",
+			"subcorporaAvailable": "{count} Subkorpora verfügbar.",
+			"subcorporaLoading": "Subkorpora werden geladen..."
+		},
+		"table": {
+			"attribute": "Attribut",
+			"value": "Wert"
+		},
+		"validation": {
+			"facettingInvalidJson": "Facettierungswerte müssen gültiges JSON sein.",
+			"facettingRequired": "Facettierungswerte sind erforderlich.",
+			"invalidValue": "Ungültiger Wert.",
+			"required": "{label} ist erforderlich."
+		},
+		"copyName": "Kopiert von {name}"
+	},
+	"FacettingCopy": {
+		"actions": {
+			"confirm": "Werte überschreiben"
+		},
+		"description": "Wählen Sie eine gespeicherte Abfrage mit derselben NoSketch-Instanz und demselben Korpus.",
+		"messages": {
+			"empty": "Keine passenden gespeicherten Abfragen gefunden.",
+			"error": "Die gespeicherten Abfragen konnten nicht geladen werden.",
+			"loading": "Gespeicherte Abfragen werden geladen..."
+		},
+		"overwriteDescription": "Alle derzeit konfigurierten Facettierungswerte werden mit den Werten dieser Abfrage überschrieben.",
+		"overwriteTitle": "Facettierungswerte überschreiben?",
+		"title": "Facettierungswerte kopieren"
+	},
+	"QueryVisualizationPreview": {
+		"defaultName": "Visualisierung für {name}",
+		"description": "Ergebnisse der zuletzt ausgeführten Abfrage.",
+		"dialogDescription": "Speichert diese ausgeführte Abfrage mit den aktuellen Visualisierungseinstellungen.",
+		"dialogStaleDescription": "Das Formular wurde geändert. Gespeichert wird die zuletzt ausgeführte, unten angezeigte Abfrage.",
+		"dialogTitle": "Visualisierung speichern",
+		"loading": "Visualisierungen werden vorbereitet...",
+		"name": "Name der Visualisierung",
+		"save": "Visualisierung speichern",
+		"saveFailed": "Die Visualisierung konnte nicht gespeichert werden.",
+		"stale": "Die Abfrage wurde geändert. Führen Sie sie erneut aus, um diese Ergebnisse zu aktualisieren.",
+		"title": "Vorschau der Abfragevisualisierungen"
+	},
+	"totalHits": "Treffer insgesamt",
+	"KwicReferences": {
+		"date": "Datum",
+		"documentId": "Dokument",
+		"year": "Jahr"
+	},
+	"WrongCredentials": "Falsche Zugangsdaten.",
+	"NoskeForm": {
+		"actions": {
+			"cancel": "Abbrechen"
+		},
+		"labels": {
+			"authentication": "Authentifizierung",
+			"base": "Basis-URL",
+			"host": "Host",
+			"name": "Name",
+			"public": "Öffentlich",
+			"version": "Version"
+		},
+		"validation": {
+			"invalidValue": "Ungültiger Wert.",
+			"required": "{label} ist erforderlich."
+		}
+	},
+	"Actions": {
+		"cancel": "Abbrechen",
+		"copy": "Kopieren",
+		"create": "Erstellen",
+		"credentials": "Zugangsdaten",
+		"delete": "Löschen",
+		"edit": "Bearbeiten",
+		"newInstance": "Neue Instanz",
+		"newQuery": "Neue Abfrage",
+		"newVisualization": "Neue Visualisierung",
+		"save": "Speichern",
+		"view": "Ansehen"
+	},
+	"Dialogs": {
+		"deleteInstanceDescription": "\"{name}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+		"deleteInstanceTitle": "Instanz löschen",
+		"deleteQueryDescription": "\"{name}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+		"deleteQueryTitle": "Abfrage löschen",
+		"deleteVisualizationDescription": "\"{name}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+		"deleteVisualizationTitle": "Visualisierung löschen"
+	},
+	"Permissions": {
+		"queryEditDisabled": "Diese Abfrage gehört Ihnen nicht. Bearbeiten ist deaktiviert.",
+		"instanceEditDisabled": "Diese Instanz gehört Ihnen nicht. Bearbeiten ist deaktiviert."
+	},
+	"QueryCard": {
+		"corpus": "Korpus",
+		"input": "Eingabe",
+		"owner": "Eigentümer",
+		"subCorpus": "Subkorpus",
+		"type": "Typ"
+	},
+	"NoskeInstanceCard": {
+		"authentication": "Authentifizierung",
+		"host": "Host",
+		"ownedBy": "Eigentümer",
+		"public": "Öffentlich",
+		"version": "Version"
+	},
+	"QueriesPage": {
+		"title": "Abfragen",
+		"featuredTitle": "Ausgewählte Abfragen",
+		"featuredDescription": "Zeigt die ersten {count} Abfragen",
+		"moreTitle": "Weitere Abfragen",
+		"moreDescription": "Zeigt alle übrigen Abfragen",
+		"empty": "Keine weiteren Abfragen vorhanden.",
+		"table": {
+			"name": "Name",
+			"corpus": "Korpus",
+			"type": "Typ",
+			"owner": "Eigentümer",
+			"actions": "Aktionen"
+		}
+	},
+	"CorporaPage": {
+		"instanceOwner": "Instanzbesitzer",
+		"title": "Korpora",
+		"description": "Verfügbare Korpora durchsuchen.",
+		"featuredTitle": "Aktuelle Korpora",
+		"featuredDescription": "Zuletzt zwischengespeichert",
+		"moreTitle": "Weitere Korpora",
+		"moreDescription": "Alle übrigen Korpora",
+		"empty": "Keine weiteren Korpora verfügbar.",
+		"table": {
+			"corpus": "Korpus",
+			"language": "Sprache",
+			"words": "Wörter",
+			"documents": "Dokumente",
+			"noske": "NoSketch-Instanz",
+			"createQuery": "Abfrage"
+		}
+	},
+	"VisualizationsPage": {
+		"title": "Visualisierungen",
+		"newTitle": "Neue Visualisierung",
+		"detailTitle": "Visualisierung",
+		"featuredTitle": "Ausgewählte Visualisierungen",
+		"featuredDescription": "Zeigt die ersten {count} Visualisierungen",
+		"moreTitle": "Weitere Visualisierungen",
+		"moreDescription": "Zeigt alle übrigen Visualisierungen",
+		"empty": "Keine weiteren Visualisierungen verfügbar.",
+		"queriesTitle": "Abfragen",
+		"queriesDescription": "Neueste Abfragen",
+		"sectionsTitle": "Visualisierungen",
+		"sectionsDescription": "Gespeicherte Visualisierungssektionen",
+		"emptySections": "Noch keine Visualisierungen hinzugefügt.",
+		"card": {
+			"queryOwners": "Abfragebesitzer",
+			"queryCount": "Abfragen",
+			"visualizationCount": "Diagramme"
+		},
+		"table": {
+			"name": "Name",
+			"queryCount": "Abfragen",
+			"visualizationCount": "Diagramme",
+			"actions": "Aktionen"
+		}
+	},
+	"ColorPicker": {
+		"defaultColor": "Standardfarbe",
+		"themeColors": "Designfarben",
+		"standardColors": "Standardfarben",
+		"moreColors": "Weitere Farben…",
+		"pickerLabel": "Farbe auswählen"
+	},
+	"VisualizationForm": {
+		"actions": {
+			"addQuery": "Abfrage hinzufügen",
+			"removeQuery": "Abfrage entfernen"
+		},
+		"labels": {
+			"data": "Daten (JSON-Array)",
+			"name": "Name",
+			"queries": "Abfragen",
+			"settings": "Einstellungen (JSON-Array)",
+			"visualizations": "Visualisierungen"
+		},
+		"messages": {
+			"noQueries": "Keine Abfragen verfügbar.",
+			"selectQueries": "Abfragen für die Visualisierung auswählen.",
+			"noVisualizations": "Keine Visualisierungstypen verfügbar."
+		},
+		"validation": {
+			"invalidJsonArray": "Bitte gültige JSON-Arrays für Einstellungen und Daten angeben.",
+			"required": "Bitte alle Pflichtfelder ausfüllen."
+		}
+	},
+	"NoskeInstancesPage": {
+		"title": "NoSketch-Instanzen"
+	},
+	"Map": {
+		"label": "Karte"
+	},
+	"Chart": {
+		"sortOrder": "Sortierreihenfolge",
+		"sortAscending": "Aufsteigend sortieren",
+		"sortDescending": "Absteigend sortieren",
+		"valueRange": "Wertebereich",
+		"rowsToInclude": "Anzahl der Zeilen",
+		"rowCount": "{count} Zeilen",
+		"fullscreen": "Vollbild öffnen",
+		"export": {
+			"csv": "CSV exportieren",
+			"jpg": "JPG exportieren",
+			"png": "PNG exportieren",
+			"svg": "SVG exportieren",
+			"xlsx": "XLSX exportieren"
+		}
+	},
+	"CredentialsPage": {
+		"title": "NoSketch-Zugangsdaten",
+		"labels": {
+			"username": "Benutzername",
+			"password": "Passwort"
+		},
+		"messages": {
+			"required": "Benutzername und Passwort sind erforderlich.",
+			"saved": "Zugangsdaten gespeichert.",
+			"deleted": "Zugangsdaten gelöscht.",
+			"saveFailed": "Zugangsdaten konnten nicht gespeichert werden.",
+			"deleteFailed": "Zugangsdaten konnten nicht gelöscht werden."
+		},
+		"placeholders": {
+			"keepExistingPassword": "Neues Passwort eingeben, um das gespeicherte zu ersetzen"
+		},
+		"status": {
+			"configured": "Konfiguriert",
+			"missing": "Fehlt"
+		}
+	},
+	"Common": {
+		"no": "Nein",
+		"yes": "Ja",
+		"createdAt": "Erstellt",
+		"updatedAt": "Aktualisiert"
+	},
+	"QueryDataStatus": {
+		"label": "Status der Abfragedaten",
+		"loading": "Abfragedaten werden geladen"
+	},
+	"FetchError": {
+		"loadFailed": "Die Daten konnten nicht geladen werden.",
+		"retry": "Erneut versuchen"
+	},
+	"DataDisplayErrors": {
+		"keywordInContext": {
+			"loadFailed": "Die Keyword-im-Kontext-Daten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Keyword-im-Kontext-Daten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
+		"collocations": {
+			"loadFailed": "Die Kollokationsdaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Kollokationsdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
+		"wordFormFrequency": {
+			"loadFailed": "Die Wortformenfrequenzdaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Wortformenfrequenzdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
+		"mediaSource": {
+			"loadFailed": "Die Medienquellendaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Medienquellendaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
+		"mediaType": {
+			"loadFailed": "Die Medientypdaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die Medientypdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		},
+		"regionalFrequency": {
+			"loadFailed": "Die regionalen Frequenzdaten für diese Abfrage konnten nicht geladen werden.",
+			"refreshFailed": "Die regionalen Frequenzdaten für diese Abfrage konnten nicht aktualisiert werden. Das angezeigte Ergebnis ist möglicherweise veraltet."
+		}
+	},
+	"TemporalFrequencyDistribution": {
+		"description": "Vergleicht die Abfragefrequenzen im Zeitverlauf.",
+		"errors": {
+			"automaticRangeTooLarge": "Der automatische Datumsbereich enthält zu viele Intervalle. Wählen Sie eine gröbere Zeiteinheit oder einen eigenen Bereich.",
+			"invalidMappingRegex": "Die zeitliche Metadatenzuordnung enthält einen ungültigen regulären Ausdruck.",
+			"invalidRange": "Das exklusive Enddatum muss nach dem Startdatum liegen.",
+			"loadFailed": "Die zeitlichen Frequenzdaten konnten nicht geladen werden."
+		},
+		"intervalChart": {
+			"description": "Vergleicht Frequenzen, die in aufeinanderfolgende Zeitintervalle gruppiert sind.",
+			"title": "Zeitliche Frequenzen pro {count} {unit}"
+		},
+		"labels": {
+			"automaticRange": "Automatischer Bereich",
+			"customRange": "Benutzerdefinierter Bereich",
+			"rangeMode": "Datumsbereichsmodus",
+			"endDate": "Enddatum (exklusiv)",
+			"frequencyMode": "Frequenzmodus",
+			"groupFromBeginning": "Gruppierung am Anfang des Datumsbereichs beginnen",
+			"groupFromEnd": "Gruppierung am Ende des Datumsbereichs beginnen",
+			"groupingDirection": "Gruppierungsrichtung",
+			"intervalSize": "Intervallgröße",
+			"queryDetails": "Abfragedetails",
+			"startDate": "Startdatum",
+			"timeUnit": "Zeiteinheit"
+		},
+		"mapping": {
+			"corpusOnNoske": "{corpus} auf {noske}",
+			"invalidDescription": "Korrigieren Sie den regulären Ausdruck für jedes betroffene Korpus, bevor dessen Daten geladen werden.",
+			"invalidTitle": "Ungültige zeitliche Metadatenzuordnung",
+			"missingDescription": "Erstellen Sie für jedes Korpus eine zeitliche Zuordnung, bevor diese Visualisierung NoSketch-Metadaten abfragen kann.",
+			"missingTitle": "Zeitliche Metadatenzuordnung erforderlich"
+		},
+		"settings": {
+			"intervalDescription": "Legen Sie die Größe der Intervalle fest und bestimmen Sie, ob die Gruppierung am Anfang oder Ende des Datumsbereichs beginnt.",
+			"intervalTitle": "Einstellungen des Intervalldiagramms",
+			"timeSeriesDescription": "Legen Sie fest, wie die Zeitreihe gemessen wird und welchen Datumsbereich sie abdeckt.",
+			"timeSeriesTitle": "Zeitreiheneinstellungen"
+		},
+		"toolbar": {
+			"interval": "Steuerung des Intervalldiagramms",
+			"sourceData": "Steuerung der Quelldaten",
+			"timeSeries": "Steuerung der Zeitreihe"
+		},
+		"tooltips": {
+			"absoluteMode": "Absolute Frequenzen anzeigen.",
+			"automaticRange": "Den gesamten verfügbaren Datumsbereich verwenden.",
+			"customRange": "Einen benutzerdefinierten Datumsbereich wählen.",
+			"endDate": "Legt das exklusive Enddatum für den zeitlichen Frequenzbereich fest.",
+			"fromBeginning": "Intervalle vorwärts ab dem Anfang des gewählten Datumsbereichs gruppieren.",
+			"fromEnd": "Intervalle rückwärts ab dem Ende des gewählten Datumsbereichs gruppieren.",
+			"intervalSize": "Legt fest, wie viele ausgewählte Zeiteinheiten zu einem Intervall zusammengefasst werden.",
+			"queryDetails": "Abfragedetails und Cache-Steuerung anzeigen.",
+			"relativeMode": "Relative Frequenzen pro Million Token anzeigen.",
+			"sourceData": "Die Quelldatentabelle ein- oder ausblenden.",
+			"startDate": "Legt das erste Datum fest, das im zeitlichen Frequenzbereich enthalten ist.",
+			"timeUnit": "Legt die Zeiteinheit fest, nach der das Zeitreihendiagramm gruppiert wird."
+		},
+		"title": "Zeitliche Frequenzen",
+		"units": {
+			"day": "Tag | Tage",
+			"month": "Monat | Monate",
+			"quarter": "Quartal | Quartale",
+			"week": "Woche | Wochen",
+			"year": "Jahr | Jahre"
+		},
+		"warnings": {
+			"parseExcluded": "Ein zeitlicher Wert konnte nicht interpretiert werden und wurde ausgeschlossen. | {count} zeitliche Werte konnten nicht interpretiert werden und wurden ausgeschlossen."
+		}
+	},
+	"VisualizationToolbar": {
+		"barChartMode": "Balkendiagramm-Modus",
+		"chartMode": "Diagrammmodus",
+		"collocations": "Steuerung der Kollokationen",
+		"combinedMapChart": "Kombiniertes Kartendiagramm",
+		"frequencyMode": "Frequenzmodus",
+		"mapMode": "Kartenmodus",
+		"mediaSource": "Steuerung der Medienquellen",
+		"mediaType": "Steuerung der Medientypen",
+		"queryDetails": "Abfragedetails",
+		"regional": "Steuerung der regionalen Frequenzen",
+		"separateMapCharts": "Getrennte Kartendiagramme",
+		"sourceData": "Steuerung der Quelldaten",
+		"wordFormFrequency": "Steuerung der Wortformenfrequenzen",
+		"tooltips": {
+			"absoluteMode": "Absolute Frequenzen anzeigen.",
+			"queryDetails": "Abfragedetails und Cache-Steuerung anzeigen.",
+			"relativeMode": "Relative Frequenzen pro Million Token anzeigen.",
+			"sourceData": "Die Quelldatentabelle ein- oder ausblenden."
+		}
+	},
+	"Navigation": {
+		"platformFunctions": "Funktionen",
+		"settings": "Einstellungen",
+		"colorScheme": "Farbschema",
+		"language": "Sprache",
+		"imprint": "Impressum",
+		"publishedPanels": "Veröffentlichte Panels",
+		"noSketchEngines": "NoSketch-Engines"
+	},
+	"UserMenu": {
+		"notYet": "Noch nicht verfügbar",
+		"start": "Startseite",
+		"accountSettings": "Kontoeinstellungen",
+		"credentialManagement": "Zugangsdatenverwaltung",
+		"logOut": "Abmelden"
+	},
+	"NoskeInstanceDetail": {
+		"availableCorpora": "Verfügbare Korpora",
+		"description": "Beschreibung",
+		"viewDescription": "Beschreibung ansehen",
+		"loadingCorpora": "Korpora werden geladen ...",
+		"corporaLoaded": "Geladene Korpora: {count}",
+		"corporaFailed": "Korpora konnten nicht geladen werden.",
+		"detailsStatus": {
+			"loading": "Details werden geladen …",
+			"success": "Details geladen",
+			"error": "Details konnten nicht geladen werden."
+		},
+		"cache": {
+			"hit": "Cache-Treffer",
+			"miss": "Cache-Fehltreffer",
+			"refresh": "Cache aktualisiert",
+			"skip": "Cache umgangen"
+		},
+		"createQuery": "Abfrage erstellen",
+		"emptyCorpora": "Für diese Instanz wurden keine Korpora gefunden.",
+		"compiled": "Kompiliert",
+		"tagset": "Tagset",
+		"tagsetDocumentation": "Tagset-Dokumentation",
+		"filter": "Filter",
+		"minimum": "Min",
+		"maximum": "Max",
+		"columns": {
+			"corpus": "Korpus",
+			"language": "Sprache",
+			"words": "Wörter",
+			"documents": "Dokumente"
+		},
+		"actions": "Aktionen"
+	},
+	"QueryDetail": {
+		"owners": "Eigentümer",
+		"visualizationsUsingQuery": "Visualisierungen mit dieser Abfrage",
+		"action": "Aktion",
+		"viewVisualization": "Visualisierung ansehen",
+		"emptyVisualizations": "Noch keine Visualisierungen vorhanden."
+	},
+	"MetadataMappingEditor": {
+		"loading": "Metadatenzuordnungen werden geladen …",
+		"loadFailed": "Metadatenzuordnungen konnten nicht geladen werden.",
+		"retry": "Erneut versuchen",
+		"title": "Korpus-Metadatenzuordnungen",
+		"selectQuery": "Wählen Sie eine Abfrage mit Korpus aus, bevor Sie Metadatenzuordnungen bearbeiten.",
+		"mappingLabel": "Metadatenzuordnung für {corpus}",
+		"private": "Privat",
+		"default": "Standard",
+		"missing": "Fehlt",
+		"savePrivate": "Private Zuordnung speichern",
+		"saveDefault": "Standardzuordnung speichern",
+		"saveCopy": "Private Kopie speichern",
+		"saving": "Wird gespeichert ...",
+		"saveFailed": "Die Zuordnung konnte nicht gespeichert werden."
+	},
+	"PublishVisualization": {
+		"publish": "Veröffentlichen",
+		"title": "Visualisierung veröffentlichen",
+		"description": "Erstellen Sie einen unveränderlichen öffentlichen Snapshot aus den zwischengespeicherten NoSketch-Ergebnissen.",
+		"titleLabel": "Titel",
+		"descriptionLabel": "Beschreibung",
+		"publishedLink": "Veröffentlichter Link",
+		"embedSnippet": "Einbettungscode",
+		"publishing": "Wird veröffentlicht ...",
+		"failed": "Veröffentlichen fehlgeschlagen.",
+		"missingResults": "Die Veröffentlichung ist noch nicht möglich. Es fehlen {count} zwischengespeicherte Ergebnisse. Öffnen oder aktualisieren Sie zuerst die ausgewählten Visualisierungspanels."
+	},
+	"PublishedPanelsPage": {
+		"title": "Veröffentlichte Panels",
+		"tableTitle": "Titel",
+		"state": "Status",
+		"published": "Veröffentlicht",
+		"link": "Link",
+		"embed": "Einbettung",
+		"actions": "Aktionen",
+		"public": "Öffentlich",
+		"hidden": "Ausgeblendet",
+		"hide": "Ausblenden",
+		"hideTitle": "Visualisierung offline nehmen?",
+		"hideDescription": "„{title}“ ist dann nicht mehr öffentlich zugänglich. Bestehende Links und Einbettungen funktionieren nicht mehr.",
+		"hideError": "Die Visualisierung konnte nicht offline genommen werden. Bitte versuchen Sie es erneut.",
+		"empty": "Noch keine veröffentlichten Visualisierungen vorhanden."
+	},
+	"PublishedVisualizationPage": {
+		"unavailable": "Veröffentlichte Visualisierung nicht verfügbar",
+		"noLongerAvailable": "Diese veröffentlichte Visualisierung ist nicht mehr öffentlich verfügbar.",
+		"publishedBy": "Veröffentlicht von {username} am {date}"
+	},
+	"Accessibility": {
+		"refreshNoSketchResult": "NoSketch-Ergebnis aktualisieren",
+		"close": "Schließen",
+		"previousSlide": "Vorherige Folie",
+		"nextSlide": "Nächste Folie",
+		"toggleSidebar": "Seitenleiste umschalten"
+	},
+	"Charts": "Diagramme",
+	"email": "E-Mail",
+	"login": "Anmelden",
+	"password": "Passwort",
+	"skip-to-main-content": "Zum Hauptinhalt springen",
+	"username": "Benutzername",
+	"Corpsum": {
+		"left": "Links",
+		"link": "Link",
+		"open": "Öffnen",
+		"region": "Region",
+		"right": "Rechts",
+		"source": "Quelle",
+		"total-of-n-entries": "Insgesamt {0} Einträge.",
+		"word": "Wort"
+	},
+	"Attributes": "Attribute",
+	"Attributes and Structures": "Attribute und Strukturen",
+	"HideData": "Daten ausblenden",
+	"No results.": "Keine Ergebnisse.",
+	"ShowData": "Daten anzeigen",
+	"Structures": "Strukturen",
+	"absolute": "Absolut",
+	"all-queries-in-one-chart": "Alle Abfragen in einem Diagramm",
+	"cattr": "Kontextattribut",
+	"close": "Schließen",
+	"coll_freq": "Kollokationsfrequenz",
+	"collocations": "Kollokationen",
+	"collocationsDesc": "Zeigt Wörter, die häufig im Umfeld der Abfrage vorkommen.",
+	"collocationsTitle": "{mode} für {query}",
+	"freq": "Frequenz",
+	"lemma": "Lemma",
+	"lempos": "Lemma und Wortart",
+	"log_dice": "logDice",
+	"interval": "Intervall",
+	"keywordInContext": "Keyword im Kontext",
+	"keywordInContextDesc": "Zeigt die Treffer im umgebenden Kontext an.",
+	"loading-the-full-ref": "Vollständige Referenz wird geladen",
+	"map-showing-the-different-query-frequencies-relating-to-the-region": "Karte mit den unterschiedlichen Abfragefrequenzen nach Region",
+	"mediaSources": "Medienquellen",
+	"mediaSourcesDesc": "Vergleicht die Verteilung der Treffer nach Medienquelle.",
+	"mediaTypes": "Medientypen",
+	"mediaTypesDesc": "Vergleicht die Verteilung der Treffer nach Medientyp.",
+	"mediaTypeDistribution": "Verteilung der Medientypen pro Abfrage",
+	"separateBarChart": "Getrenntes Balkendiagramm",
+	"stackedBarChart": "Gestapeltes Balkendiagramm",
+	"percentageBarChart": "Prozentuales Balkendiagramm",
+	"next": "Weiter",
+	"previous": "Zurück",
+	"queries": "Abfragen",
+	"regionalFrequencies": "Regionale Frequenzen",
+	"regionalFrequenciesDesc": "Vergleicht die Abfragefrequenzen zwischen Regionen.",
+	"relative": "Relativ",
+	"sources": "Treffer",
+	"viewOptions": "Ansichtsoptionen",
+	"wordFormFrequencies": "Wortformfrequenzen",
+	"wordFormFrequenciesDesc": "Vergleicht die häufigsten Wortformen je Abfrage.",
+	"yearlyFrequencies": "Jährliche Frequenzen",
+	"yearlyFrequenciesDesc": "Vergleicht die Abfragefrequenzen im Zeitverlauf.",
+	"yearlyFrequenciesPer": "Jährliche Frequenzen pro ",
+	"Table": {
+		"sortAscending": "Aufsteigend sortieren",
+		"sortDescending": "Absteigend sortieren"
+	},
+	"CorpusPin": {
+		"pin": "Korpus anheften",
+		"unpin": "Korpus lösen",
+		"error": "Anheftung konnte nicht geändert werden."
+	}
+}

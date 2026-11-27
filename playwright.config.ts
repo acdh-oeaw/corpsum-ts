@@ -1,54 +1,84 @@
-// import "dotenv/config";
+import { join } from "node:path";
 
+import { config as dotenv } from "@dotenvx/dotenvx";
 import { defineConfig, devices } from "@playwright/test";
+import isCI from "is-in-ci";
 
-const port = process.env.PORT ?? 3000;
+/**
+ * Reading `.env` files here instead of using `dotenvx run` so environment variables are available
+ * to the vs code plugin as well.
+ */
+dotenv({
+	path: [".env.test.local", "local.env", ".env.test", ".env"].map((envFilePath) =>
+		join(process.cwd(), envFilePath),
+	),
+	ignore: ["MISSING_ENV_FILE"],
+	quiet: true,
+});
+
+const port = 3000;
 const baseUrl = `http://localhost:${String(port)}`;
 
 export default defineConfig({
 	testDir: "./e2e",
+	testMatch: ["tests/**/*.test.ts", "tests/global.setup.ts"],
+	snapshotDir: "./e2e/snapshots",
 	fullyParallel: true,
-	forbidOnly: Boolean(process.env.CI),
-	retries: process.env.CI ? 2 : 0,
-	workers: process.env.CI ? 1 : undefined,
-	reporter: "html",
+	forbidOnly: isCI,
+	retries: isCI ? 2 : 0,
+	maxFailures: 10,
+	workers: isCI ? 1 : undefined,
+	reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["html"]],
 	use: {
 		baseURL: baseUrl,
 		trace: "on-first-retry",
 	},
 	projects: [
 		{
+			name: "setup",
+			testMatch: "global.setup.ts",
+		},
+		{
 			name: "chromium",
 			use: { ...devices["Desktop Chrome"] },
+			dependencies: ["setup"],
 		},
 		{
 			name: "firefox",
 			use: { ...devices["Desktop Firefox"] },
+			dependencies: ["setup"],
 		},
 		{
 			name: "webkit",
 			use: { ...devices["Desktop Safari"] },
+			dependencies: ["setup"],
 		},
+		/** Test against mobile viewports. */
 		// {
-		//   name: 'Mobile Chrome',
-		//   use: { ...devices['Pixel 5'] },
+		//      name: "Mobile Chrome",
+		//      use: { ...devices["Pixel 5"] },
+		//      dependencies: ["setup"],
 		// },
 		// {
-		//   name: 'Mobile Safari',
-		//   use: { ...devices['iPhone 12'] },
+		//      name: "Mobile Safari",
+		//      use: { ...devices["iPhone 12"] },
+		//      dependencies: ["setup"],
+		// },
+		/** Test against branded browsers. */
+		// {
+		//      name: "Microsoft Edge",
+		//      use: { ...devices["Desktop Edge"], channel: "msedge" },
+		//      dependencies: ["setup"],
 		// },
 		// {
-		//   name: 'Microsoft Edge',
-		//   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-		// },
-		// {
-		//   name: 'Google Chrome',
-		//   use: { ..devices['Desktop Chrome'], channel: 'chrome' },
+		//      name: "Google Chrome",
+		//      use: { ...devices["Desktop Chrome"], channel: "chrome" },
+		//      dependencies: ["setup"],
 		// },
 	],
 	webServer: {
-		command: "pnpm run start --dotenv ./.env.local",
+		command: "pnpm run start",
 		url: baseUrl,
-		reuseExistingServer: !process.env.CI,
+		reuseExistingServer: !isCI,
 	},
 });

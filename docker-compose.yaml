@@ -1,0 +1,53 @@
+version: "3.7"
+services:
+  corpsum-mongodb:
+    image: mongo:7.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USER
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+      - mongodumps:/data/dumps
+    networks:
+      - corpsumnet
+  corpsum-app:
+    build:
+      context: ./
+      target: dev
+    image: corpsum-refactor
+    # Includes the separate Studio OAuth credentials and session secret.
+    env_file:
+      - local.env
+    environment:
+      NUXT_HOST: 0.0.0.0
+    networks:
+      - corpsumnet
+    ports:
+      - "3001:3000"
+      - "4000:4000"
+    volumes:
+      - .:/app:z
+      - app_node_modules:/app/node_modules
+      - app_nuxt:/app/.nuxt
+    command: sh -c "CI=true pnpm install --frozen-lockfile && pnpm run dev"
+
+networks:
+  corpsumnet:
+
+volumes:
+  mongodata:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: $DOCKER_MONGODATA_DIR
+  mongodumps:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: $DOCKER_MONGODUMPS_DIR
+  app_node_modules:
+  app_nuxt:

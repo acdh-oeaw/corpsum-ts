@@ -1,0 +1,190 @@
+<script setup lang="ts">
+import turfCentroid from "@turf/centroid";
+import { toWgs84 } from "@turf/projection";
+import { computed } from "vue";
+
+import type { PieSliceData, TooltipData } from "@/components/map.vue";
+import { mapAustria } from "@/utils/map-austria";
+import { hexToRgb, MAP_USED_REGIONS } from "@/utils/map-colors";
+
+const props = defineProps<{
+	queries: Array<CorpusQuery>;
+	resdata: Array<RegionalFrequency>;
+	mode: string;
+	valueRange?: [number, number];
+}>();
+
+const t = useTranslations();
+
+const usedRegions = MAP_USED_REGIONS;
+
+const PIE_RADIUS_DEG = 0.25;
+const PIE_SEGMENTS = 32;
+
+const mapAustriaWgs84Features = mapAustria.features.map((f) => toWgs84(f));
+
+const wgs84Centroids = mapAustriaWgs84Features
+	.filter((f) => usedRegions.includes(String(f.properties?.["hc-key"] ?? "")))
+	.map((f) => {
+		const center = turfCentroid(f as Parameters<typeof turfCentroid>[0]);
+		return {
+			key: String(f.properties?.["hc-key"] ?? ""),
+			name: String(f.properties?.["name"] ?? ""),
+			position: center.geometry.coordinates as [number, number],
+		};
+	});
+
+const regionNames = Object.fromEntries(
+	mapAustria.features.map((f) => [String(f.properties["hc-key"]), String(f.properties["name"])]),
+);
+
+const currentRegionData = computed(() => {
+	const map = new Map<string, { values: number[]; winnerIndex: number }>();
+
+	for (const region of usedRegions) {
+		map.set(region, {
+			values: new Array(props.queries.length).fill(0) as number[],
+			winnerIndex: 0,
+		});
+	}
+
+	for (const rdata of props.resdata) {
+		const queryIdx = props.queries.findIndex((q) => q.id === rdata.query);
+		if (queryIdx === -1) continue;
+
+		for (const d of rdata.data) {
+			const entry = map.get(d.region);
+			if (!entry) continue;
+			const value = props.mode === "relative" ? d.relative : d.absolute;
+			entry.values[queryIdx] =
+				props.valueRange && (value < props.valueRange[0] || value > props.valueRange[1])
+					? 0
+					: value;
+		}
+	}
+
+	for (const entry of map.values()) {
+		let maxVal = 0;
+		let maxIdx = -1;
+		entry.values.forEach((v, i) => {
+			if (v > maxVal) {
+				maxVal = v;
+				maxIdx = i;
+			}
+		});
+		entry.winnerIndex = maxIdx;
+	}
+
+	return map;
+});
+
+const colors = computed(() => {
+	const result: Record<string, [number, number, number, number]> = {};
+	for (const [key, entry] of currentRegionData.value) {
+		if (props.queries.length === 0) {
+			result[key] = [220, 220, 220, 255];
+			continue;
+		}
+		const winner = props.queries[entry.winnerIndex];
+		if (!winner) {
+			result[key] = [220, 220, 220, 255];
+			continue;
+		}
+		const [r, g, b] = hexToRgb(winner.color);
+		result[key] = [r, g, b, 200];
+	}
+	return result;
+});
+
+const regionData = computed(() => {
+	const result: Record<string, TooltipData> = {};
+	for (const [key, entry] of currentRegionData.value) {
+		const name = regionNames[key] ?? key;
+		const sorted = props.queries
+			.map((q, i) => ({ label: q.userInput, color: q.color, value: entry.values[i] ?? 0 }))
+			.sort((a, b) => b.value - a.value);
+
+		result[key] = {
+			x: name,
+			payload: sorted.map((q) => [q.label, q.value]),
+			config: Object.fromEntries(
+				sorted.map((q, i) => [String(i), { label: q.label, color: q.color }]),
+			),
+		};
+	}
+	return result;
+});
+
+const pieSlices = computed(() => {
+	const result: PieSliceData[] = [];
+	if (props.queries.length <= 1) return result;
+
+	for (const centroid of wgs84Centroids) {
+		const entry = currentRegionData.value.get(centroid.key);
+		if (!entry) continue;
+
+		const total = entry.values.reduce((s, v) => s + v, 0);
+		if (total === 0) continue;
+
+		const [cx, cy] = centroid.position;
+		const cosLat = Math.cos((cy * Math.PI) / 180);
+
+		let startAngle = -Math.PI / 2;
+
+		for (let i = 0; i < props.queries.length; i++) {
+			const query = props.queries[i];
+			if (!query) continue;
+			const value = entry.values[i] ?? 0;
+			if (value <= 0) continue;
+
+			const tooltipData: TooltipData = {
+				x: centroid.name,
+				payload: [[query.userInput, value]],
+				config: { "0": { label: query.userInput, color: query.color } },
+			};
+
+			const angle = (value / total) * 2 * Math.PI;
+			const numSteps = Math.max(2, Math.ceil((angle / (2 * Math.PI)) * PIE_SEGMENTS));
+			const polygon: [number, number][] = [[cx, cy]];
+
+			for (let step = 0; step <= numSteps; step++) {
+				const a = startAngle + (angle * step) / numSteps;
+				polygon.push([
+					cx + (PIE_RADIUS_DEG / cosLat) * Math.cos(a),
+					cy + PIE_RADIUS_DEG * Math.sin(a),
+				]);
+			}
+
+			const [r, g, b] = hexToRgb(query.color);
+			result.push({ polygon, fillColor: [r, g, b, 255], tooltipData });
+
+			startAngle += angle;
+		}
+	}
+
+	return result;
+});
+</script>
+
+<template>
+	<div class="space-y-3">
+		<h3 class="text-sm font-medium">{{ t("all-queries-in-one-chart") }}</h3>
+
+		<div class="flex flex-wrap gap-3">
+			<div v-for="query in queries" :key="query.id" class="flex items-center gap-1.5 text-xs">
+				<span
+					class="inline-block h-3 w-3 shrink-0 rounded-sm"
+					:style="{ backgroundColor: query.color }"
+				/>
+				{{ query.userInput }}
+			</div>
+		</div>
+
+		<Map
+			:colors="colors"
+			:pie-slices="pieSlices.length > 0 ? pieSlices : undefined"
+			:region-data="regionData"
+			:used-regions="usedRegions"
+		/>
+	</div>
+</template>

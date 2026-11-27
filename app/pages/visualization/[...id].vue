@@ -1,0 +1,321 @@
+<script setup lang="ts">
+import DataDisplayCollocations from "@/components/data-display/data-display-collocations.vue";
+import DataDisplayKeywordInContext from "@/components/data-display/data-display-keyword-in-context.vue";
+import DataDisplayMediaSource from "@/components/data-display/data-display-media-source.vue";
+import DataDisplayMediaType from "@/components/data-display/data-display-media-type.vue";
+import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
+import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
+import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
+import {
+	getDefaultKwicQueryOptions,
+	getKwicAttrsStructsOptions,
+	getKwicAuthoritativeOptions,
+} from "@/lib/kwic-query-options";
+import {
+	type VisualizationType,
+	getVisualizationMetadataSemantics,
+	normalizeVisualizationSettings,
+	temporalFrequencyDistributionType,
+} from "@/lib/visualization-types";
+import type { QueryListItem } from "~/server/api/queries.get.ts";
+import type { VisualizationResponse } from "~/server/api/visualization/[id].get.ts";
+
+const t = useTranslations();
+definePageMeta({ key: (route) => route.path });
+
+const route = useRoute();
+const env = useRuntimeConfig();
+const locale = useLocale();
+
+const visualizationId = computed(() => {
+	const idParam = route.params.id;
+	return Array.isArray(idParam) ? idParam[0] : idParam;
+});
+
+const [
+	{ data: visualization, error: pageError },
+	{ data: queries, error: queriesError, pending: queriesPending, refresh: retryQueries },
+] = await Promise.all([
+	useFetch<VisualizationResponse>(() => `/api/visualization/${visualizationId.value}`),
+	useFetch<Array<QueryListItem>>("/api/queries", {}),
+]);
+if (pageError.value)
+	throw createError({ statusCode: pageError.value.statusCode ?? 500, fatal: true });
+const publishOpen = ref(false);
+const publishTitle = ref("");
+const publishDescription = ref("");
+const publishError = ref("");
+const isPublishing = ref(false);
+const publishedUid = ref("");
+
+const queriesList = computed(() => queries.value ?? []);
+const selectedQueryItems = computed(() => {
+	const selected = new Set(visualization.value?.queries ?? []);
+	return queriesList.value.filter((query) => selected.has(query._id));
+});
+const { buildCorpusQuery } = useCorpusQueryBuilder();
+const corpusQueries = computed(() =>
+	selectedQueryItems.value.map((item, index) =>
+		buildCorpusQuery(item, index, visualization.value?.queryColors?.[item._id]),
+	),
+);
+const hasKeywordInContext = computed(() =>
+	visualization.value?.visualizations.includes("data-display-keyword-in-context"),
+);
+const corpusInfoDescriptors = computed<Array<NoskeCorpusInfoQueryDescriptor>>(() =>
+	hasKeywordInContext.value
+		? selectedQueryItems.value.map((query) => ({
+				queryKey: ["get-corp-info", query.noske, query.corpus],
+				noske: query.noske,
+				corpus: query.corpus,
+			}))
+		: [],
+);
+const corpusInfoResults = useNoskeCorpusInfoQueries(corpusInfoDescriptors);
+const initializedKwicQueries = new Set<number>();
+watch(
+	[corpusQueries, corpusInfoResults],
+	([currentQueries, currentResults]) => {
+		currentQueries.forEach((query, index) => {
+			const corpusInfo = currentResults[index]?.data;
+			const options = getKwicAttrsStructsOptions(corpusInfo);
+			if (JSON.stringify(query.KWICAttrsStructsOptions) !== JSON.stringify(options)) {
+				query.KWICAttrsStructsOptions = options;
+			}
+			if (!initializedKwicQueries.has(query.id) && corpusInfo) {
+				query.KWICAttrsStructs = getDefaultKwicQueryOptions(
+					getKwicAuthoritativeOptions(corpusInfo),
+				);
+				initializedKwicQueries.add(query.id);
+			}
+		});
+	},
+	{ deep: true, immediate: true },
+);
+const { mappingsForQueries: temporalMetadataMappings, mappingsStatus: temporalMappingsStatus } =
+	await useCorpusMetadataMappings(corpusQueries, "temporal");
+
+const visualizationComponents: Record<VisualizationType, unknown> = {
+	"data-display-collocations": DataDisplayCollocations,
+	"data-display-keyword-in-context": DataDisplayKeywordInContext,
+	"data-display-media-source": DataDisplayMediaSource,
+	"data-display-media-type": DataDisplayMediaType,
+	"data-display-regional-frequencies": DataDisplayRegionalFrequencies,
+	"data-display-word-form-frequencies": DataDisplayWordFormFrequencies,
+	[temporalFrequencyDistributionType]: DataDisplayTemporalFrequencyDistribution,
+};
+
+const publishedLink = computed(() => {
+	if (!publishedUid.value) return "";
+	return new URL(`/${locale.value}/v/${publishedUid.value}`, env.public.appBaseUrl).toString();
+});
+
+function escapeAttribute(value: string) {
+	return value
+		.replaceAll("&", "&amp;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;");
+}
+
+const embedSnippet = computed(() => {
+	if (!publishedUid.value) return "";
+	const src = new URL(
+		`/${locale.value}/v/${publishedUid.value}/embed`,
+		env.public.appBaseUrl,
+	).toString();
+	return `<iframe src="${src}" width="100%" height="720" loading="lazy" style="border:0;" title="${escapeAttribute(publishTitle.value)}"></iframe>`;
+});
+
+function getVisualizationSettings(index: number, type: VisualizationType) {
+	return normalizeVisualizationSettings(type, visualization.value?.settings[index]);
+}
+
+function getVisualizationMetadataMappings(type: VisualizationType) {
+	if (getVisualizationMetadataSemantics(type).includes("temporal")) {
+		return temporalMetadataMappings.value;
+	}
+	return undefined;
+}
+
+watch(
+	visualization,
+	(value) => {
+		if (!value) return;
+		publishTitle.value = value.name;
+	},
+	{ immediate: true },
+);
+
+async function publishVisualization() {
+	if (!visualization.value || isPublishing.value) return;
+	publishError.value = "";
+	publishedUid.value = "";
+	isPublishing.value = true;
+	try {
+		const published = await $fetch<{ uid: string }>(
+			`/api/visualization/${visualization.value._id}/publish`,
+			{
+				method: "POST",
+				body: {
+					title: publishTitle.value.trim() || visualization.value.name,
+					description: publishDescription.value,
+					kwicQueryOptions: Object.fromEntries(
+						selectedQueryItems.value.map((query, index) => [
+							query._id,
+							{
+								attributes: [...(corpusQueries.value[index]?.KWICAttrsStructs.attributes ?? [])],
+								structures: [...(corpusQueries.value[index]?.KWICAttrsStructs.structures ?? [])],
+							},
+						]),
+					),
+				},
+			},
+		);
+		publishedUid.value = published.uid;
+	} catch (error) {
+		const data = (error as { data?: { data?: { missing?: Array<unknown> }; message?: string } })
+			.data;
+		const missing = data?.data?.missing;
+		publishError.value =
+			Array.isArray(missing) && missing.length > 0
+				? t("PublishVisualization.missingResults", { count: missing.length })
+				: (data?.message ?? t("PublishVisualization.failed"));
+	} finally {
+		isPublishing.value = false;
+	}
+}
+</script>
+
+<template>
+	<MainContent v-if="visualization" class="w-full min-w-0">
+		<FetchErrorAlert
+			v-if="queriesError"
+			class="my-3"
+			:pending="queriesPending"
+			:retry="retryQueries"
+		/>
+		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
+			<div class="flex items-center gap-3">
+				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
+					<LucideIcon class="size-8 text-foreground" name="ChartColumn" :stroke-width="2" />
+				</div>
+				<PageTitle>{{ visualization.name || t("VisualizationsPage.detailTitle") }}</PageTitle>
+			</div>
+			<div class="inline-flex items-center gap-1 rounded-md border bg-muted/40 p-1">
+				<Button as-child size="sm" type="button" variant="ghost">
+					<NuxtLinkLocale :href="{ path: `/visualization/edit/${visualization._id}` }">
+						<LucideIcon class="mr-1 size-4" name="Pencil" :stroke-width="2" />
+						{{ t("Actions.edit") }}
+					</NuxtLinkLocale>
+				</Button>
+				<Dialog v-model:open="publishOpen">
+					<DialogTrigger as-child>
+						<Button size="sm" type="button" variant="ghost">
+							<LucideIcon class="mr-1 size-4" name="Upload" :stroke-width="2" />
+							{{ t("PublishVisualization.publish") }}
+						</Button>
+					</DialogTrigger>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>{{ t("PublishVisualization.title") }}</DialogTitle>
+							<DialogDescription>
+								{{ t("PublishVisualization.description") }}
+							</DialogDescription>
+						</DialogHeader>
+						<div class="grid gap-4">
+							<div class="grid gap-2">
+								<Label for="published-title">{{ t("PublishVisualization.titleLabel") }}</Label>
+								<Input id="published-title" v-model="publishTitle" :disabled="isPublishing" />
+							</div>
+							<div class="grid gap-2">
+								<Label for="published-description">{{
+									t("PublishVisualization.descriptionLabel")
+								}}</Label>
+								<textarea
+									id="published-description"
+									v-model="publishDescription"
+									class="min-h-28 rounded-md border bg-background px-3 py-2 text-sm"
+									:disabled="isPublishing"
+								></textarea>
+							</div>
+							<p v-if="publishError" class="text-sm text-destructive">{{ publishError }}</p>
+							<div v-if="publishedUid" class="grid gap-2 rounded-md border bg-muted/40 p-3 text-sm">
+								<p class="font-medium">{{ t("PublishVisualization.publishedLink") }}</p>
+								<a class="break-all underline" :href="publishedLink">{{ publishedLink }}</a>
+								<p class="font-medium">{{ t("PublishVisualization.embedSnippet") }}</p>
+								<code class="whitespace-pre-wrap break-all rounded bg-background p-2 text-xs">{{
+									embedSnippet
+								}}</code>
+							</div>
+						</div>
+						<DialogFooter>
+							<Button
+								:disabled="isPublishing || !publishTitle.trim()"
+								@click="publishVisualization"
+							>
+								{{
+									isPublishing
+										? t("PublishVisualization.publishing")
+										: t("PublishVisualization.publish")
+								}}
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+			</div>
+		</div>
+
+		<div class="grid gap-6">
+			<div class="grid gap-2">
+				<p class="text-sm font-medium">{{ t("VisualizationForm.labels.queries") }}</p>
+				<div class="space-y-2 rounded-md border p-3">
+					<div v-if="selectedQueryItems.length === 0" class="text-sm text-muted-foreground">
+						{{ t("VisualizationForm.messages.noQueries") }}
+					</div>
+					<Carousel v-else class="w-full" :opts="{ align: 'start' }">
+						<CarouselContent>
+							<CarouselItem v-for="query in selectedQueryItems" :key="query._id" class="basis-auto">
+								<Card class="flex h-full w-[350px] flex-col overflow-hidden">
+									<CardHeader class="border-b bg-primary text-primary-foreground">
+										<CardDescription class="truncate font-semibold text-primary-foreground/80">
+											{{ query.corpus }}
+										</CardDescription>
+										<TruncatedCardTitle :title="query.name" />
+									</CardHeader>
+									<CardContent class="flex-1 pt-4">
+										<dl class="grid grid-cols-1 gap-2">
+											<CardProperty :label="t('QueryCard.type')">{{ query.type }}</CardProperty>
+											<CardProperty :label="t('QueryCard.input')">{{
+												query.userInput
+											}}</CardProperty>
+										</dl>
+									</CardContent>
+								</Card>
+							</CarouselItem>
+						</CarouselContent>
+						<CarouselPrevious />
+						<CarouselNext />
+					</Carousel>
+				</div>
+			</div>
+
+			<div class="grid gap-3">
+				<p class="text-sm font-medium">{{ t("VisualizationForm.labels.visualizations") }}</p>
+				<div class="grid gap-4">
+					<component
+						:is="visualizationComponents[item]"
+						v-for="(item, index) in visualization.visualizations"
+						:key="`${item}-${index}`"
+						:metadata-mappings="getVisualizationMetadataMappings(item)"
+						:mappings-status="
+							item === temporalFrequencyDistributionType ? temporalMappingsStatus : undefined
+						"
+						:queries="corpusQueries"
+						:settings="getVisualizationSettings(index, item)"
+					/>
+				</div>
+			</div>
+		</div>
+	</MainContent>
+</template>

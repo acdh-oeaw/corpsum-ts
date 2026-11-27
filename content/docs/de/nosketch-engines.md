@@ -1,0 +1,15 @@
+---
+title: NoSketch-Engines
+description: Auf dieser Seite werden die verfügbaren Instanzen aufgeführt, deren Korpora die Grundlage für die Visualisierungen in CorpSum bilden. Wenn Sie eine neue Instanz hinzufügen wollen, klicken Sie auf  und geben die notwendigen Informationen in der Eingabemaske ein. Anschließend klicken Sie auf „Erstellen“.
+navigationOrder: 3
+---
+
+# NoSketch-Engines
+
+Auf dieser Seite werden die verfügbaren Instanzen aufgeführt, deren Korpora die Grundlage für die Visualisierungen in CorpSum bilden. Wenn Sie eine neue Instanz hinzufügen wollen, klicken Sie auf ![Abbildung: NoSketch-Engines](/assets/documentation/de/image12.png) und geben die notwendigen Informationen in der Eingabemaske ein. Anschließend klicken Sie auf „Erstellen“.
+
+Wenn Sie einen Zugang zum amc erworben und erfolgreich reingerichtet haben, sehen Sie folgende Darstellung:
+
+![Abbildung: NoSketch-Engines](/assets/documentation/de/image13.png)
+
+Neben der Information, dass ein Basiszugang erworben wurde (Balken „basic“) und die Zugangsdaten vollständig eingegeben wurden (Balken „Konfiguriert“), werden weitere Eckdaten zur Instanz angezeigt. Vier Symbole am unteren Rand bieten weitere Optionen: Ein Klick auf das Schloss-Symbol führt zu den Zugangsdaten; das Stift-Symbol ermöglicht die Bearbeitung der spezifischen Instanz-Informationen (wenn ausgegraut, ist eine Bearbeitung nicht möglich); ein Klick auf den Papierkorb löscht die Instanz (wenn ausgegraut, ist keine Löschung möglich); das Augen-Symbol führt zur Seite mit detaillierten Informationen zur Instanz, inkl. einer Liste an verfügbaren Korpora.
