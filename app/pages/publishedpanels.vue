@@ -7,9 +7,12 @@ const selected = ref<PublishedVisualizationResponse | null>(null);
 const isHiding = ref(false);
 const hideFailed = ref(false);
 
-const { data: published, refresh } = await useFetch<Array<PublishedVisualizationResponse>>(
-	"/api/published-visualizations",
-);
+const {
+	data: published,
+	refresh,
+	error: publishedError,
+	pending: publishedPending,
+} = await useFetch<Array<PublishedVisualizationResponse>>("/api/published-visualizations");
 
 function publicLink(uid: string) {
 	return new URL(`/v/${uid}`, env.public.appBaseUrl).toString();
@@ -49,6 +52,12 @@ async function hide() {
 
 <template>
 	<MainContent class="w-full min-w-0">
+		<FetchErrorAlert
+			v-if="publishedError"
+			class="my-3"
+			:pending="publishedPending"
+			:retry="refresh"
+		/>
 		<div class="my-10 flex items-center gap-3">
 			<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
 				<LucideIcon class="size-8 text-foreground" name="PanelsTopLeft" :stroke-width="2" />
@@ -103,7 +112,7 @@ async function hide() {
 							</Button>
 						</TableCell>
 					</TableRow>
-					<TableRow v-if="(published ?? []).length === 0">
+					<TableRow v-if="!publishedError && !publishedPending && (published ?? []).length === 0">
 						<TableCell class="text-muted-foreground" colspan="6">
 							{{ t("PublishedPanelsPage.empty") }}
 						</TableCell>

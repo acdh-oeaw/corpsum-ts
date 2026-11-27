@@ -7,13 +7,15 @@ const { pins } = usePinnedCorpora();
 const { data: instancesData } = useGetNoskeinstances(null, {
 	enabled: computed(() => auth.isLoggedIn()),
 });
-const { data: queries, refresh: refreshQueries } = await useFetch<Array<QueryListItem>>(
-	"/api/queries",
-	{
-		default: () => [],
-		immediate: auth.isLoggedIn(),
-	},
-);
+const {
+	data: queries,
+	refresh: refreshQueries,
+	error: queriesError,
+	pending: queriesPending,
+} = await useFetch<Array<QueryListItem>>("/api/queries", {
+	default: () => [],
+	immediate: auth.isLoggedIn(),
+});
 const recentQueries = computed(() =>
 	[...queries.value]
 		.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
@@ -70,6 +72,12 @@ usePageMetadata({ title: t("IndexPage.meta.title") });
 
 <template>
 	<MainContent class="grid w-full min-w-0 content-start gap-y-8 py-8">
+		<FetchErrorAlert
+			v-if="queriesError"
+			class="my-3"
+			:pending="queriesPending"
+			:retry="refreshQueries"
+		/>
 		<PageTitle>{{ t("IndexPage.title") }}</PageTitle>
 		<AppDescription>
 			<div class="space-y-3">

@@ -2,10 +2,12 @@
 import type { VisualizationListItem } from "~/server/api/visualizations.get.ts";
 
 const t = useTranslations();
-const { data: visualizations, refresh } = await useFetch<Array<VisualizationListItem>>(
-	"/api/visualizations",
-	{},
-);
+const {
+	data: visualizations,
+	refresh,
+	error: visualizationsError,
+	pending: visualizationsPending,
+} = await useFetch<Array<VisualizationListItem>>("/api/visualizations", {});
 const deletingId = ref<string | null>(null);
 
 const featuredCount = 5;
@@ -33,6 +35,12 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 
 <template>
 	<MainContent class="w-full min-w-0">
+		<FetchErrorAlert
+			v-if="visualizationsError"
+			class="my-3"
+			:pending="visualizationsPending"
+			:retry="refresh"
+		/>
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
@@ -251,7 +259,13 @@ async function deleteVisualization(visualization: VisualizationListItem) {
 								</TooltipProvider>
 							</TableCell>
 						</TableRow>
-						<TableRow v-if="remainingVisualizations.length === 0">
+						<TableRow
+							v-if="
+								!visualizationsError &&
+								!visualizationsPending &&
+								remainingVisualizations.length === 0
+							"
+						>
 							<TableCell class="h-20 text-center text-muted-foreground" colspan="4">
 								{{ t("VisualizationsPage.empty") }}
 							</TableCell>

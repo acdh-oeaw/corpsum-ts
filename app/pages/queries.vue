@@ -6,7 +6,12 @@ import type { QueryListItem } from "~/server/api/queries.get.ts";
 const t = useTranslations();
 const auth = useAuth();
 const locale = useLocale();
-const { data: queries, refresh } = await useFetch<Array<QueryListItem>>("/api/queries", {});
+const {
+	data: queries,
+	refresh,
+	error: queriesError,
+	pending: queriesPending,
+} = await useFetch<Array<QueryListItem>>("/api/queries", {});
 const deletingId = ref<string | null>(null);
 
 const featuredCount = 5;
@@ -51,6 +56,7 @@ async function deleteQuery(query: QueryListItem) {
 
 <template>
 	<MainContent class="w-full min-w-0">
+		<FetchErrorAlert v-if="queriesError" class="my-3" :pending="queriesPending" :retry="refresh" />
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
@@ -197,7 +203,7 @@ async function deleteQuery(query: QueryListItem) {
 								</TooltipProvider>
 							</TableCell>
 						</TableRow>
-						<TableRow v-if="remainingQueries.length === 0">
+						<TableRow v-if="!queriesError && !queriesPending && remainingQueries.length === 0">
 							<TableCell class="h-20 text-center text-muted-foreground" colspan="6">
 								{{ t("QueriesPage.empty") }}
 							</TableCell>

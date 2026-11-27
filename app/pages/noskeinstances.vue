@@ -8,7 +8,12 @@ interface CredentialListItem {
 }
 
 const t = useTranslations();
-const { data: instancesData, refresh } = useGetNoskeinstances(null);
+const {
+	data: instancesData,
+	refresh,
+	error: instancesDataError,
+	pending: instancesDataPending,
+} = useGetNoskeinstances(null);
 const { data: credentials } = await useFetch<Array<CredentialListItem>>("/api/credentials", {
 	default: () => [],
 });
@@ -27,6 +32,12 @@ function handleDeleted() {
 
 <template>
 	<MainContent class="w-full min-w-0">
+		<FetchErrorAlert
+			v-if="instancesDataError"
+			class="my-3"
+			:pending="instancesDataPending"
+			:retry="refresh"
+		/>
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">

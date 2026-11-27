@@ -1,7 +1,12 @@
 <script setup lang="ts">
 const t = useTranslations();
 const featuredCount = 5;
-const { data: corpusItems } = await useFetch("/api/corpus-catalogue", { default: () => [] });
+const {
+	data: corpusItems,
+	error: corpusItemsError,
+	pending: corpusItemsPending,
+	refresh: retryCorpusItems,
+} = await useFetch("/api/corpus-catalogue", { default: () => [] });
 const formatCount = (value?: number) => (typeof value === "number" ? value.toLocaleString() : "—");
 const featuredCorpora = computed(() => corpusItems.value.slice(0, featuredCount));
 const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
@@ -9,6 +14,12 @@ const remainingCorpora = computed(() => corpusItems.value.slice(featuredCount));
 
 <template>
 	<MainContent class="w-full min-w-0">
+		<FetchErrorAlert
+			v-if="corpusItemsError"
+			class="my-3"
+			:pending="corpusItemsPending"
+			:retry="retryCorpusItems"
+		/>
 		<div class="my-10 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<div class="flex size-16 items-center justify-center rounded-full border bg-muted/40">
