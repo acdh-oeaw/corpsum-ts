@@ -158,8 +158,10 @@ beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
 				const resolved = typeof url === "function" ? url() : url;
 				return {
 					data: ref(resolved === "/api/queries" ? fixture.queries : fixture.visualization),
+					error: ref(null),
 				};
 			},
+			definePageMeta: () => {},
 			useRoute: () => ({ params: { id: [String(fixture.visualization._id)] } }),
 			useRuntimeConfig: () => ({ public: { appBaseUrl: "https://example.test" } }),
 		});
