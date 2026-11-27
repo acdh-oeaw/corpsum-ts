@@ -438,6 +438,10 @@
 		"label": "Query data status",
 		"loading": "Loading query data"
 	},
+	"FetchError": {
+		"loadFailed": "Could not load data.",
+		"retry": "Retry"
+	},
 	"DataDisplayErrors": {
 		"keywordInContext": {
 			"loadFailed": "Keyword-in-context data for this query could not be loaded.",

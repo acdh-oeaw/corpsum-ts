@@ -438,6 +438,10 @@
 		"label": "Status der Abfragedaten",
 		"loading": "Abfragedaten werden geladen"
 	},
+	"FetchError": {
+		"loadFailed": "Die Daten konnten nicht geladen werden.",
+		"retry": "Erneut versuchen"
+	},
 	"DataDisplayErrors": {
 		"keywordInContext": {
 			"loadFailed": "Die Keyword-im-Kontext-Daten für diese Abfrage konnten nicht geladen werden.",
