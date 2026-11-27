@@ -12,6 +12,7 @@ import {
 } from "lucide-vue-next";
 
 import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
 import {
 	type RegionalVisualizationSettings,
 	normalizeRegionalVisualizationSettings,
@@ -385,6 +386,7 @@ const regionalBarSeries = computed(() =>
 					<DataDisplaySourceTable
 						:data="regionalFrequencies.map((entry) => entry.data)"
 						datatype="regionalFrequencies"
+						:errors="regionalFrequencyErrors"
 						:loading="regionalFrequenciesLoading"
 						:queries="queries"
 					/>
@@ -397,20 +399,6 @@ const regionalBarSeries = computed(() =>
 				:queries="queries"
 				@loading-change="emit('loading-change', $event)"
 			/>
-
-			<div v-if="regionalFrequencyErrors.some(Boolean)" class="space-y-2">
-				<div
-					v-for="(query, index) of queries"
-					v-show="regionalFrequencyErrors[index]"
-					:key="query.id"
-					class="rounded-md border border-destructive/50 bg-destructive/5 p-3"
-				>
-					<QueryDisplay class="my-0" :query="query" />
-					<p class="mt-1 text-sm text-destructive" role="alert">
-						{{ regionalFrequencyErrors[index] }}
-					</p>
-				</div>
-			</div>
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<ClientOnly v-if="!regionalFrequenciesLoading[index] && regionalFrequencies[index]">

@@ -3,6 +3,7 @@ import { Hash, Info, Percent, Rows3 } from "lucide-vue-next";
 
 import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
 import { buttonVariants } from "@/components/ui/button";
 import {
 	type WordFormFrequencyVisualizationSettings,
@@ -284,19 +285,10 @@ const seriesByQuery = computed(() =>
 							datatype="wordFormFrequencies"
 							:loading="[wordFormFrequenciesLoading[index] ?? false]"
 							:queries="[query]"
+							:errors="[wordFormFrequencyErrors[index] ?? null]"
 						/>
 					</CollapsibleContent>
 				</Collapsible>
-
-				<div
-					v-if="wordFormFrequencyErrors[index]"
-					class="rounded-md border border-destructive/50 bg-destructive/5 p-3"
-				>
-					<QueryDisplay class="my-0" :query="query" />
-					<p class="mt-1 text-sm text-destructive" role="alert">
-						{{ wordFormFrequencyErrors[index] }}
-					</p>
-				</div>
 
 				<Chart
 					v-if="queries.length > 0"

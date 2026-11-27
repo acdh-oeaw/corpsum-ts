@@ -3,6 +3,7 @@ import { BarChart3, BarChart4, ChartBarStacked, Hash, Info, Percent, Rows3 } fro
 
 import ChartRowLimitSelect from "@/components/chart-row-limit-select.vue";
 import ChartSortToggle from "@/components/chart-sort-toggle.vue";
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
 import { buttonVariants } from "@/components/ui/button";
 import {
 	type MediaSourceVisualizationSettings,
@@ -324,6 +325,7 @@ const isStacked = computed(() => chartMode.value === "stack");
 						datatype="mediaSources"
 						:loading="sourceDistributionsLoading"
 						:queries="queries"
+						:errors="sourceDistributionErrors"
 					/>
 				</CollapsibleContent>
 			</Collapsible>
@@ -334,20 +336,6 @@ const isStacked = computed(() => chartMode.value === "stack");
 				:queries="queries"
 				@loading-change="emit('loading-change', $event)"
 			/>
-
-			<div v-if="sourceDistributionErrors.some(Boolean)" class="space-y-2">
-				<div
-					v-for="(query, index) of queries"
-					v-show="sourceDistributionErrors[index]"
-					:key="query.id"
-					class="rounded-md border border-destructive/50 bg-destructive/5 p-3"
-				>
-					<QueryDisplay class="my-0" :query="query" />
-					<p class="mt-1 text-sm text-destructive" role="alert">
-						{{ sourceDistributionErrors[index] }}
-					</p>
-				</div>
-			</div>
 
 			<MediaStackedBarChart
 				:row-limit="interactive ? rowLimit : undefined"

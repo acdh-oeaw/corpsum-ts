@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
 import { createKwicRequestOptionParams } from "@/lib/kwic-query-options";
 import { getQueryWithFacetting } from "@/utils/corpus-query";
 import type { components } from "~/lib/noske-types";
@@ -108,20 +109,6 @@ const concordanceErrors = computed(() =>
 				:queries="queries"
 				@loading-change="emit('loading-change', $event)"
 			/>
-
-			<div v-if="concordanceErrors.some(Boolean)" class="space-y-2">
-				<div
-					v-for="(query, index) of queries"
-					v-show="concordanceErrors[index]"
-					:key="query.id"
-					class="rounded-md border border-destructive/50 bg-destructive/5 p-3"
-				>
-					<QueryDisplay class="my-0" :query="query" />
-					<p class="mt-1 text-sm text-destructive" role="alert">
-						{{ concordanceErrors[index] }}
-					</p>
-				</div>
-			</div>
 
 			<KwicQueryDisplay
 				v-for="(query, index) of queries"

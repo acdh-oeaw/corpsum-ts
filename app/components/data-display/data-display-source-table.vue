@@ -1,10 +1,12 @@
 <script lang="ts" setup>
+import FetchErrorAlert from "@/components/fetch-error-alert.vue";
 type LegalAny = unknown;
 
 const props = defineProps<{
 	queries: Array<CorpusQuery>;
 	datatype: SearchFunctionKey;
 	loading: Array<boolean>;
+	errors?: Array<string | null>;
 	data: Array<Array<LegalAny>>;
 }>();
 
@@ -59,8 +61,9 @@ const columnsByQuery = computed(() => {
 					:value="String(query.id)"
 				>
 					<QueryDisplay :loading="loading[index]" :query="query" />
+					<FetchErrorAlert v-if="errors?.[index]" :message="errors[index]" />
 					<CorpsumDataTable
-						v-if="!loading[index]"
+						v-if="!loading[index] && (!errors?.[index] || (data[index]?.length ?? 0) > 0)"
 						:columns="columnsByQuery[index] ?? []"
 						:data="data[index] ?? []"
 					/>

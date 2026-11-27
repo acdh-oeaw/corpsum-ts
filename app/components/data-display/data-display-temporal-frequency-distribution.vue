@@ -12,6 +12,8 @@ import {
 } from "lucide-vue-next";
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from "reka-ui";
 
+import FetchErrorAlert from "@/components/fetch-error-alert.vue";
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
 import { buttonVariants } from "@/components/ui/button";
 import {
 	type CorpusMetadataMappingResponse,
@@ -513,9 +515,10 @@ function toggleSourceTable() {
 			<p v-if="mappingsStatus === 'pending'" class="text-sm text-muted-foreground" role="status">
 				{{ t("MetadataMappingEditor.loading") }}
 			</p>
-			<p v-else-if="mappingsStatus === 'error'" class="text-sm text-destructive" role="status">
-				{{ t("MetadataMappingEditor.loadFailed") }}
-			</p>
+			<FetchErrorAlert
+				v-else-if="mappingsStatus === 'error'"
+				:message="t('MetadataMappingEditor.loadFailed')"
+			/>
 			<div v-else-if="missingMappingQueries.length > 0" class="rounded-md border p-4 text-sm">
 				<p class="font-medium">
 					{{ t("TemporalFrequencyDistribution.mapping.missingTitle") }}
@@ -858,6 +861,7 @@ function toggleSourceTable() {
 								datatype="yearlyFrequencies"
 								:loading="temporalFrequenciesLoading"
 								:queries="activeQueries"
+								:errors="temporalFrequenciesErrors"
 							/>
 						</CollapsibleContent>
 					</Collapsible>

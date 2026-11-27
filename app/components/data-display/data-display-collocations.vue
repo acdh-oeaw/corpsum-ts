@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { Hash, Info, Rows3, Weight } from "lucide-vue-next";
 
+import QueryDataStatusList from "@/components/query-data-status-list.vue";
 import {
 	type CollocationVisualizationSettings,
 	normalizeCollocationVisualizationSettings,
@@ -286,6 +287,7 @@ const wordClouds = computed(() =>
 						datatype="collocations"
 						:loading="collocationsLoading"
 						:queries="queries"
+						:errors="collocationErrors"
 					/>
 				</CollapsibleContent>
 			</Collapsible>
@@ -296,20 +298,6 @@ const wordClouds = computed(() =>
 				:queries="queries"
 				@loading-change="emit('loading-change', $event)"
 			/>
-
-			<div v-if="collocationErrors.some(Boolean)" class="space-y-2">
-				<div
-					v-for="(query, index) of queries"
-					v-show="collocationErrors[index]"
-					:key="query.id"
-					class="rounded-md border border-destructive/50 bg-destructive/5 p-3"
-				>
-					<QueryDisplay class="my-0" :query="query" />
-					<p class="mt-1 text-sm text-destructive" role="alert">
-						{{ collocationErrors[index] }}
-					</p>
-				</div>
-			</div>
 
 			<div v-for="(query, index) of queries" :key="query.id">
 				<WordCloudGraph
