@@ -175,17 +175,22 @@ settings.
 `local.env` is the canonical local environment file. Package scripts load it through
 `--dotenv local.env`.
 
+The server checks runtime configuration at startup. Supply the auth secret and JWT lifetime
+to the running server. Production image builds only need the public build settings, including the
+Redmine ID for imprint prerendering. Keep the existing credential encryption key across deployments.
+If no separate credential secret is configured, the app uses the auth secret as the encryption key.
+
 | Variable                               | Required   | Scope        | Description                                                                                     |
 | -------------------------------------- | ---------- | ------------ | ----------------------------------------------------------------------------------------------- |
 | `DATABASE_URL`                         | yes        | server       | MongoDB connection string. Use `corpsum-mongodb` for Compose and `localhost` for host-run Nuxt. |
 | `NUXT_AUTH_SECRET`                     | yes        | server       | Secret used for auth/session JWT signing. Use at least 32 characters.                           |
-| `NUXT_CREDENTIAL_SECRET`               | yes        | server       | Secret used to encrypt stored NoSketch credentials. Use at least 32 characters.                 |
-| `NUXT_JWT_EXPIRATION`                  | yes        | server       | JWT lifetime in milliseconds.                                                                   |
+| `NUXT_CREDENTIAL_SECRET`               | no         | server       | Secret used to encrypt stored NoSketch credentials. Use at least 32 characters.                 |
+| `NUXT_JWT_EXPIRATION`                  | yes        | server       | Positive integer JWT lifetime in milliseconds.                                                  |
 | `NUXT_OAUTH_GITHUB_CLIENT_ID`          | no         | server       | GitHub OAuth app client id. GitHub sign-in is unavailable when unset.                           |
 | `NUXT_OAUTH_GITHUB_CLIENT_SECRET`      | no         | server       | GitHub OAuth app client secret. Keep this value secret.                                         |
-| `NUXT_PUBLIC_APP_BASE_URL`             | yes        | public/build | Canonical public app URL for i18n, metadata, robots, and sitemap output.                        |
+| `NUXT_PUBLIC_APP_BASE_URL`             | no         | public/build | Canonical HTTP(S) URL. Defaults to `http://localhost:3000`.                                     |
 | `NUXT_PUBLIC_REDMINE_ID`               | yes        | public/build | ACDH Redmine service id used by the imprint component and deployment metadata.                  |
-| `NUXT_PUBLIC_BOTS`                     | no         | public/build | Set to `disabled` or `enabled` for robots handling.                                             |
+| `NUXT_PUBLIC_BOTS`                     | no         | public/build | Set to `disabled` or `enabled` for robots handling. Defaults to `disabled`.                     |
 | `NUXT_PUBLIC_MATOMO_BASE_URL`          | no         | public/build | Matomo base URL. Analytics loads only when this and `NUXT_PUBLIC_MATOMO_ID` are set.            |
 | `NUXT_PUBLIC_MATOMO_ID`                | no         | public/build | Matomo site id.                                                                                 |
 | `NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | no         | public/build | Google Search Console verification token.                                                       |
