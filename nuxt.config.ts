@@ -116,6 +116,9 @@ export default defineNuxtConfig({
 	},
 
 	nitro: {
+		externals: {
+			inline: ["zod", "xlsx"],
+		},
 		compressPublicAssets: true,
 		prerender: {
 			routes: [],
