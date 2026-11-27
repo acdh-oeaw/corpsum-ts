@@ -2,16 +2,12 @@ import { jwtVerify, SignJWT } from "jose";
 
 import type { AuthPayload } from "@/types/server";
 
-const { authSecret, jwtExpiration } = useRuntimeConfig();
-
-const JWT_SECRET = new TextEncoder().encode(authSecret);
+function getJwtSecret() {
+	return new TextEncoder().encode(useRuntimeConfig().authSecret);
+}
 
 export function getJwtExpirationMs() {
-	const expirationMs = Number.parseInt(jwtExpiration ?? "", 10);
-	if (!Number.isFinite(expirationMs) || expirationMs <= 0) {
-		throw createError({ statusCode: 500, statusMessage: "JWT expiration is not configured" });
-	}
-	return expirationMs;
+	return useRuntimeConfig().jwtExpiration;
 }
 
 export async function createJWT(username: string) {
@@ -22,9 +18,9 @@ export async function createJWT(username: string) {
 		.setIssuer("acdh-ch.corpsum")
 		.setIssuedAt()
 		.setExpirationTime(expiresAt)
-		.sign(JWT_SECRET);
+		.sign(getJwtSecret());
 }
 
 export async function verifyJWT(token: string) {
-	return (await jwtVerify(token, JWT_SECRET)).payload as AuthPayload;
+	return (await jwtVerify(token, getJwtSecret())).payload as AuthPayload;
 }

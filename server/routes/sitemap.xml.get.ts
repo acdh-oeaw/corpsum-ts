@@ -1,13 +1,11 @@
 import { createUrl } from "@acdh-oeaw/lib";
-import * as v from "valibot";
 
 import { locales } from "@/config/i18n.config";
 
 const sitemapPaths = ["", "/imprint"];
 
 export default defineEventHandler((event) => {
-	const { appBaseUrl } = useRuntimeConfig(event).public;
-	const baseUrl = v.parse(v.pipe(v.string(), v.url()), appBaseUrl);
+	const { appBaseUrl: baseUrl } = useRuntimeConfig(event).public;
 	const entries = locales.flatMap((locale) =>
 		sitemapPaths.map((path) => {
 			const url = createUrl({ baseUrl, pathname: `/${locale}${path}` });
