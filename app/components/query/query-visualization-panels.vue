@@ -6,6 +6,7 @@ import DataDisplayMediaType from "@/components/data-display/data-display-media-t
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
+import { metadataMappingEditorEnabled } from "@/config/metadata-mapping-editor";
 import {
 	type VisualizationSettingsByType,
 	type VisualizationSettingsState,
@@ -68,7 +69,7 @@ function updateSettings<TType extends VisualizationType>(
 <template>
 	<div class="grid grid-cols-1 gap-6 @min-[56rem]:grid-cols-2 [&>*]:min-w-0">
 		<VisualizationCorpusMetadataMappingEditor
-			v-if="showMetadataMappingEditor && temporalQueries.length > 0"
+			v-if="metadataMappingEditorEnabled && showMetadataMappingEditor && temporalQueries.length > 0"
 			class="col-span-full"
 			:queries="temporalQueries"
 			semantic="temporal"

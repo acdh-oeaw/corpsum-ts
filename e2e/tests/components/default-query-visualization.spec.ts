@@ -31,6 +31,9 @@ test.describe("default query visualization", () => {
 			"data-display-collocations",
 		]);
 		expect(amc.settings[temporalFrequencyDistributionType]).toMatchObject({ rangeMode: "auto" });
+		for (const corpus of ["amc4_demo", "amc5_demo"]) {
+			expect(getDefaultVisualizationPreset(corpus)).toStrictEqual(amc);
+		}
 		expect(getDefaultVisualizationPreset("other").types).toStrictEqual([
 			"data-display-word-form-frequencies",
 			"data-display-keyword-in-context",

@@ -258,14 +258,9 @@ async function saveVisualization() {
 				</p>
 			</div>
 			<Toolbar v-if="allowSave" class="ms-auto" aria-labelledby="query-preview-title">
-				<ToolbarButton
-					:aria-label="t('QueryVisualizationPreview.save')"
-					class="w-8 px-0"
-					type="button"
-					variant="outline"
-					@click="openSaveDialog"
-				>
-					<Save />
+				<ToolbarButton type="button" variant="outline" @click="openSaveDialog">
+					<Save aria-hidden="true" />
+					{{ t("QueryVisualizationPreview.save") }}
 				</ToolbarButton>
 			</Toolbar>
 		</div>

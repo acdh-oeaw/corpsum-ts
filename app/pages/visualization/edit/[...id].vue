@@ -10,6 +10,7 @@ import DataDisplayMediaType from "@/components/data-display/data-display-media-t
 import DataDisplayRegionalFrequencies from "@/components/data-display/data-display-regional-frequencies.vue";
 import DataDisplayTemporalFrequencyDistribution from "@/components/data-display/data-display-temporal-frequency-distribution.vue";
 import DataDisplayWordFormFrequencies from "@/components/data-display/data-display-word-form-frequencies.vue";
+import { metadataMappingEditorEnabled } from "@/config/metadata-mapping-editor";
 import {
 	type CorpusMetadataSemantic,
 	type VisualizationSettingsByType,
@@ -408,7 +409,10 @@ function cancel() {
 						:model-value="selectedVisualizations"
 						@toggle="toggleVisualizationSelection"
 					/>
-					<div v-if="editableMetadataSemantics.length > 0" class="grid gap-3">
+					<div
+						v-if="metadataMappingEditorEnabled && editableMetadataSemantics.length > 0"
+						class="grid gap-3"
+					>
 						<VisualizationCorpusMetadataMappingEditor
 							v-for="semantic in editableMetadataSemantics"
 							:key="semantic"

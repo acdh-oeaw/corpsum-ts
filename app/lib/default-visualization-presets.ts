@@ -5,6 +5,7 @@ import {
 	normalizeTemporalFrequencyDistributionSettings,
 	temporalFrequencyDistributionType,
 } from "@/lib/visualization-types";
+import { isAmcCorpus } from "~/shared/amc-corpus";
 
 const genericVisualizationTypes = [
 	"data-display-word-form-frequencies",
@@ -24,10 +25,6 @@ const amcVisualizationTypes = [
 export interface DefaultVisualizationPreset {
 	types: Array<VisualizationType>;
 	settings: VisualizationSettingsState;
-}
-
-export function isAmcCorpus(corpus: string) {
-	return /^amc(?:_|$)/iu.test(corpus);
 }
 
 export function getDefaultVisualizationPreset(corpus: string): DefaultVisualizationPreset {

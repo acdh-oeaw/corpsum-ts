@@ -158,6 +158,13 @@ variables; server secrets come from GitHub environment secrets.
 pnpm github:env:sync
 ```
 
+For the `production` environment, the script reads the git-ignored `prod.env` by default:
+
+```bash
+pnpm github:env:sync -- --env production --dry-run
+pnpm github:env:sync -- --env production
+```
+
 The script requires an authenticated GitHub CLI session with access to the repository:
 
 ```bash

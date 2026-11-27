@@ -82,6 +82,20 @@ test.describe("amc public metadata mappings", () => {
 		}
 	});
 
+	test("copies the AMC defaults for each demo corpus and instance", async () => {
+		for (const noske of ["main", "demo"]) {
+			for (const corpus of ["amc4_demo", "amc5_demo"]) {
+				expect(await ensureDefault({ noske, corpus, semantic: "temporal" })).toMatchObject({
+					noske,
+					corpus,
+					scope: "default",
+					...getAmcTemporalDefault("amc_4.3x"),
+				});
+			}
+		}
+		expect(records).toHaveLength(4);
+	});
+
 	test("private overrides and curated shared defaults remain unchanged", async () => {
 		const shared = { ...input, scope: "default", attribute: "doc.datum" };
 		const privateMapping = { ...input, scope: "user", owner: "reader", attribute: "custom.date" };

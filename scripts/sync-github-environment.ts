@@ -54,7 +54,7 @@ Usage:
   pnpm github:env:sync [options]
 
 Options:
-  --env-file <path>    Dotenv file to read. Default: dev.env
+  --env-file <path>    Dotenv file to read. Default: prod.env for production, dev.env otherwise
   --repo <owner/repo>  GitHub repository. Default: acdh-oeaw/corpsum-ts
   --env <name>         GitHub environment name. Default: review/dev
   --dry-run            Print planned updates without calling gh
@@ -63,9 +63,8 @@ Options:
 }
 
 function parseArgs(args: Array<string>): Options {
-	const options: Options = {
+	const options: Omit<Options, "envFile"> & { envFile?: string } = {
 		dryRun: false,
-		envFile: "dev.env",
 		environment: "review/dev",
 		repo: "acdh-oeaw/corpsum-ts",
 	};
@@ -114,7 +113,10 @@ function parseArgs(args: Array<string>): Options {
 		throw new Error(`Unknown option: ${arg}.`);
 	}
 
-	return options;
+	return {
+		...options,
+		envFile: options.envFile ?? (options.environment === "production" ? "prod.env" : "dev.env"),
+	};
 }
 
 function unquote(value: string): string {
