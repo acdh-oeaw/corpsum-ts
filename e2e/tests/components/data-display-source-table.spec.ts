@@ -45,6 +45,18 @@ function props(overrides = {}) {
 }
 
 test.describe("data display source table", () => {
+	test("shows a fetch alert only for the failed query tab", async ({ mount }) => {
+		const component = await mount(DataDisplaySourceTable, {
+			props: props({ errors: ["Source data could not be loaded.", null] }),
+		});
+
+		await expect(component.getByRole("alert")).toHaveText("Source data could not be loaded.");
+		await expect(component.getByText("No results.")).toHaveCount(0);
+		await component.getByRole("tab", { name: "wordrow: second" }).click();
+		await expect(component.getByRole("alert")).toHaveCount(0);
+		await expect(component.getByRole("cell", { name: "Radio" })).toBeVisible();
+	});
+
 	test("renders a later aligned dataset when the first query is empty", async ({ mount }) => {
 		const component = await mount(DataDisplaySourceTable, { props: props() });
 

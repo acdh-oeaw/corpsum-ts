@@ -1,3 +1,5 @@
+import assert from "node:assert/strict";
+
 import { expect, test } from "@playwright/experimental-ct-vue";
 import type { Page } from "@playwright/test";
 
@@ -25,7 +27,7 @@ import {
 } from "@/lib/visualization-types";
 import VisualizationDetailPage from "~/e2e/fixtures/visualization-detail-page.vue";
 
-const queries: Array<CorpusQuery> = [
+const queries: Array<CorpusQuery & { noske: string }> = [
 	{
 		id: 11,
 		noske: "noske-a",
@@ -142,7 +144,7 @@ const corpusInfoResponse = {
 	structs: ["doc.id", "doc.datum", "doc.region", "doc.docsrc", "doc.genre"],
 };
 
-const kwicQueries: Array<CorpusQuery> = queries.map((query) => ({
+const kwicQueries = queries.map((query) => ({
 	...query,
 	KWICAttrsStructs: {
 		attributes: [],
@@ -226,7 +228,7 @@ test.describe("non-metadata visualization contracts", () => {
 			[1, { noske: "noske-b", corpus: "corpus-b", subcorpus: null, facet: "west" }],
 		] as const) {
 			const request = requests[index];
-			expect(request).toBeDefined();
+			assert(request);
 			const url = new URL(request.url);
 			expect(url.pathname).toBe(`/api/noske/${expected.noske}/search/freqml`);
 			expect(url.searchParams.get("corpname")).toBe(expected.corpus);
@@ -236,7 +238,9 @@ test.describe("non-metadata visualization contracts", () => {
 			expect(JSON.parse(url.searchParams.get("json") ?? "{}")).toMatchObject({
 				concordance_query: { sca_region: [expected.facet] },
 			});
-			const cacheKey = JSON.parse(request.headers["x-corpsum-client-query-key"] ?? "[]");
+			const cacheKey = JSON.parse(
+				decodeURIComponent(request.headers["x-corpsum-client-query-key"] ?? "[]"),
+			);
 			expect(cacheKey[1]).toBe(expected.noske);
 			expect(cacheKey[2]).toBe(expected.corpus);
 		}
@@ -245,7 +249,7 @@ test.describe("non-metadata visualization contracts", () => {
 			"Word-form frequency data for this query could not be loaded.",
 		);
 		await expect(component.getByRole("alert")).not.toContainText("private upstream");
-		await expect(component.getByTestId("chart")).toHaveAttribute(
+		await expect(component.getByTestId("chart").and(component.getByTitle("alpha"))).toHaveAttribute(
 			"data-series",
 			JSON.stringify([
 				{
@@ -253,8 +257,11 @@ test.describe("non-metadata visualization contracts", () => {
 					name: "wordrow: alpha (corpus-a / sub-a)",
 					data: [["Alpha", 1.5]],
 				},
-				{ color: "#2563eb", name: "lemmarow: beta (corpus-b)", data: [] },
 			]),
+		);
+		await expect(component.getByTestId("chart").and(component.getByTitle("beta"))).toHaveAttribute(
+			"data-series",
+			JSON.stringify([{ color: "#2563eb", name: "lemmarow: beta (corpus-b)", data: [] }]),
 		);
 	});
 
@@ -371,7 +378,7 @@ test.describe("non-metadata visualization contracts", () => {
 					})),
 					visualizations: ["data-display-word-form-frequencies"],
 					panels: queries.map((_, index) => ({
-						type: "data-display-word-form-frequencies",
+						type: "data-display-word-form-frequencies" as const,
 						queryId: `query-${index}`,
 						data: index === 0 ? wordResponses["noske-a"] : null,
 						settings: { mode: "absolute", sourceTableExpanded: true },
@@ -408,7 +415,7 @@ test.describe("non-metadata visualization contracts", () => {
 			[1, { noske: "noske-b", corpus: "corpus-b", subcorpus: null, facet: "west" }],
 		] as const) {
 			const request = requests[index];
-			expect(request).toBeDefined();
+			assert(request);
 			const url = new URL(request.url);
 			expect(url.pathname).toBe(`/api/noske/${expected.noske}/search/collx`);
 			expect(url.searchParams.get("corpname")).toBe(expected.corpus);
@@ -424,7 +431,9 @@ test.describe("non-metadata visualization contracts", () => {
 			expect(JSON.parse(url.searchParams.get("json") ?? "{}")).toMatchObject({
 				concordance_query: { sca_region: [expected.facet] },
 			});
-			const cacheKey = JSON.parse(request.headers["x-corpsum-client-query-key"] ?? "[]");
+			const cacheKey = JSON.parse(
+				decodeURIComponent(request.headers["x-corpsum-client-query-key"] ?? "[]"),
+			);
 			expect(cacheKey[1]).toBe(expected.noske);
 			expect(cacheKey[2]).toBe(expected.corpus);
 			expect(cacheKey[4]).toMatchObject({ cattr: "lemma", citemsperpage: 10 });
@@ -497,7 +506,9 @@ test.describe("non-metadata visualization contracts", () => {
 		await expect.poll(() => requests.length).toBe(2);
 		const secondUrl = new URL(requests[1]!.url);
 		expect(secondUrl.searchParams.get("cattr")).toBe("word");
-		const secondKey = JSON.parse(requests[1]!.headers["x-corpsum-client-query-key"] ?? "[]");
+		const secondKey = JSON.parse(
+			decodeURIComponent(requests[1]!.headers["x-corpsum-client-query-key"] ?? "[]"),
+		);
 		expect(secondKey[4]).toMatchObject({ cattr: "word" });
 		await component.getByRole("button", { name: "Show data" }).click();
 		expect(updates.at(-1)).toStrictEqual({
@@ -571,7 +582,7 @@ test.describe("non-metadata visualization contracts", () => {
 					})),
 					visualizations: ["data-display-collocations"],
 					panels: queries.map((_, index) => ({
-						type: "data-display-collocations",
+						type: "data-display-collocations" as const,
 						queryId: `query-${index}`,
 						data: index === 0 ? collocationResponses["noske-a"] : null,
 						settings: { mode: "coll_freq", cattr: "word", sourceTableExpanded: true },
@@ -613,7 +624,7 @@ test.describe("non-metadata visualization contracts", () => {
 			[1, { noske: "noske-b", corpus: "corpus-b", subcorpus: null, facet: "west" }],
 		] as const) {
 			const request = requests[index];
-			expect(request).toBeDefined();
+			assert(request);
 			const url = new URL(request.url);
 			expect(url.pathname).toBe(`/api/noske/${expected.noske}/search/concordance`);
 			expect(url.searchParams.get("corpname")).toBe(expected.corpus);
@@ -627,7 +638,9 @@ test.describe("non-metadata visualization contracts", () => {
 			expect(JSON.parse(url.searchParams.get("json") ?? "{}")).toMatchObject({
 				concordance_query: { sca_region: [expected.facet] },
 			});
-			const cacheKey = JSON.parse(request.headers["x-corpsum-client-query-key"] ?? "[]");
+			const cacheKey = JSON.parse(
+				decodeURIComponent(request.headers["x-corpsum-client-query-key"] ?? "[]"),
+			);
 			expect(cacheKey[1]).toBe(expected.noske);
 			expect(cacheKey[2]).toBe(expected.corpus);
 			expect(cacheKey[4]).toMatchObject({
@@ -704,7 +717,7 @@ test.describe("non-metadata visualization contracts", () => {
 		await expect.poll(() => requests.length).toBeGreaterThanOrEqual(2);
 
 		const finalRequest = requests.at(-1);
-		expect(finalRequest).toBeDefined();
+		assert(finalRequest);
 		const url = new URL(finalRequest.url);
 		expect(url.searchParams.get("attrs")).toBe("lemma");
 		expect(url.searchParams.get("structs")).toBe(
@@ -713,7 +726,9 @@ test.describe("non-metadata visualization contracts", () => {
 		expect(url.searchParams.get("refs")).toBe(
 			"=doc.id,=doc.datum,=doc.region,=doc.docsrc,=doc.genre",
 		);
-		const cacheKey = JSON.parse(finalRequest.headers["x-corpsum-client-query-key"] ?? "[]");
+		const cacheKey = JSON.parse(
+			decodeURIComponent(finalRequest.headers["x-corpsum-client-query-key"] ?? "[]"),
+		);
 		expect(cacheKey[4]).toMatchObject({
 			attrs: "lemma",
 			structs: "doc.id,doc.datum,doc.region,doc.docsrc,doc.genre",
@@ -907,7 +922,9 @@ test.describe("non-metadata visualization contracts", () => {
 				Object.keys(expectedParams).map((key) => [key, warmedUrl.searchParams.get(key)]),
 			),
 		).toStrictEqual(expectedParams);
-		const warmedKey = JSON.parse(warmed.headers["x-corpsum-client-query-key"] ?? "[]");
+		const warmedKey = JSON.parse(
+			decodeURIComponent(warmed.headers["x-corpsum-client-query-key"] ?? "[]"),
+		);
 		expect(warmedKey[4]).toMatchObject(expectedParams);
 
 		await component.getByRole("button", { name: "Publish", exact: true }).click();
@@ -1023,7 +1040,7 @@ test.describe("non-metadata visualization contracts", () => {
 		await expect(published.getByRole("columnheader", { name: "Quelle" })).toBeVisible();
 		await expect(published.getByRole("columnheader", { name: "Wort" })).toBeVisible();
 		await expect(published.getByText("Alpha hit", { exact: true })).toBeVisible();
-		await expect(published.getByTestId("query-display")).toHaveAttribute(
+		await expect(published.getByTestId("query-display").filter({ visible: true })).toHaveAttribute(
 			"data-query",
 			JSON.stringify({
 				...snapshotQuery,

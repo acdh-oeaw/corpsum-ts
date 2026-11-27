@@ -1,3 +1,5 @@
+import assert from "node:assert/strict";
+
 import { expect, test } from "@playwright/experimental-ct-vue";
 import type { Locator, Page } from "@playwright/test";
 
@@ -22,7 +24,7 @@ import {
 	type RegionalVisualizationSettings,
 } from "@/lib/visualization-types";
 
-const query: CorpusQuery = {
+const query: CorpusQuery & { noske: string } = {
 	id: 1,
 	noske: "demo-noske",
 	type: "wordrow",
@@ -190,7 +192,7 @@ async function expectRegionalConsumers(
 		JSON.stringify(queries.map(() => false)),
 	);
 
-	const queryDisplays = component.getByTestId("query-display");
+	const queryDisplays = component.getByTestId("query-display").filter({ visible: true });
 	await expect(queryDisplays).toHaveCount(queries.length);
 	for (const [index, currentQuery] of queries.entries()) {
 		await expect(queryDisplays.nth(index)).toHaveAttribute(
@@ -213,7 +215,9 @@ async function routeMixedInstanceResponses(page: Page) {
 		const noske = new URL(request.url()).pathname.split("/")[3] as keyof typeof mixedResponses;
 		requests.push({
 			url: request.url(),
-			queryKey: JSON.parse(request.headers()["x-corpsum-client-query-key"] ?? "[]"),
+			queryKey: JSON.parse(
+				decodeURIComponent(request.headers()["x-corpsum-client-query-key"] ?? "[]"),
+			),
 		});
 		await route.fulfill({ json: mixedResponses[noske] });
 	});
@@ -593,10 +597,7 @@ test.describe("categorical and regional visualization components", () => {
 	}) => {
 		const [queryA, queryB] = repeatedRegionalQueries;
 		const [responseA, responseB] = suppliedRegionalResponses;
-		expect(queryA).toBeDefined();
-		expect(queryB).toBeDefined();
-		expect(responseA).toBeDefined();
-		expect(responseB).toBeDefined();
+		assert(queryA && queryB && responseA && responseB);
 
 		const component = await mount(RegionalFrequencies, {
 			props: { queries: [queryA, queryB], data: [responseA, responseB] },
