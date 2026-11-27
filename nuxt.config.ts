@@ -1,12 +1,24 @@
 import { fileURLToPath } from "node:url";
 
 import tailwindcss from "@tailwindcss/vite";
+import { toStandardJsonSchema } from "@valibot/to-json-schema";
+import * as v from "valibot";
 
 // noinspection ES6PreferShortImport
 import { defaultLocale, files } from "./app/config/i18n.config.ts";
+import { publicRuntimeConfigSchema, runtimeConfigSchema } from "./config/runtime-config";
 import oxlintGlobals from "./modules/oxlint-globals.ts";
 
-const baseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL!;
+const publicDefaults = {
+	appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL || "http://localhost:3000",
+	redmineId: process.env.NUXT_PUBLIC_REDMINE_ID || undefined,
+	bots: process.env.NUXT_PUBLIC_BOTS || "disabled",
+	googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "",
+	matomoBaseUrl: process.env.NUXT_PUBLIC_MATOMO_BASE_URL ?? "",
+	matomoId: process.env.NUXT_PUBLIC_MATOMO_ID ?? "",
+};
+const publicFields = publicRuntimeConfigSchema.entries;
+const runtimeFields = runtimeConfigSchema.entries;
 
 export default defineNuxtConfig({
 	alias: {
@@ -43,6 +55,7 @@ export default defineNuxtConfig({
 	},
 
 	experimental: {
+		ssrErrorBoundary: false,
 		// Required by @nuxtjs/i18n until https://github.com/nuxt-modules/i18n/issues/4175 is fixed.
 		nitroAutoImports: true,
 		componentIslands: {
@@ -69,8 +82,7 @@ export default defineNuxtConfig({
 	},
 
 	i18n: {
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		baseUrl: baseUrl ?? "http://localhost:3000",
+		baseUrl: publicDefaults.appBaseUrl,
 		defaultLocale,
 		detectBrowserLanguage: {
 			redirectOn: "root",
@@ -116,6 +128,16 @@ export default defineNuxtConfig({
 	},
 
 	nitro: {
+		hooks: {
+			"prerender:routes"() {
+				const result = v.safeParse(publicRuntimeConfigSchema, publicDefaults);
+				if (!result.success) {
+					throw new Error(
+						`Invalid public build configuration: ${result.issues.map((issue) => v.getDotPath(issue)).join(", ")}`,
+					);
+				}
+			},
+		},
 		externals: {
 			inline: ["zod", "xlsx"],
 		},
@@ -129,22 +151,34 @@ export default defineNuxtConfig({
 	},
 
 	runtimeConfig: {
-		authSecret: "",
-		credentialSecret: "",
-		jwtExpiration: "",
-		oauth: {
-			github: {
-				clientId: "",
-				clientSecret: "",
-			},
-		},
+		authSecret: toStandardJsonSchema(runtimeFields.authSecret),
+		credentialSecret: toStandardJsonSchema(runtimeFields.credentialSecret),
+		jwtExpiration: toStandardJsonSchema(runtimeFields.jwtExpiration),
+		oauth: toStandardJsonSchema(runtimeFields.oauth),
 		public: {
-			appBaseUrl: process.env.NUXT_PUBLIC_APP_BASE_URL ?? "http://localhost:3000",
-			bots: process.env.NUXT_PUBLIC_BOTS,
-			googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-			matomoBaseUrl: process.env.NUXT_PUBLIC_MATOMO_BASE_URL,
-			matomoId: process.env.NUXT_PUBLIC_MATOMO_ID,
-			redmineId: process.env.NUXT_PUBLIC_REDMINE_ID,
+			appBaseUrl: toStandardJsonSchema(
+				v.optional(publicFields.appBaseUrl, publicDefaults.appBaseUrl),
+			),
+			redmineId: toStandardJsonSchema(
+				publicDefaults.redmineId
+					? v.optional(publicFields.redmineId, publicDefaults.redmineId)
+					: publicFields.redmineId,
+			),
+			bots: toStandardJsonSchema(
+				v.optional(publicFields.bots.wrapped, v.parse(publicFields.bots, publicDefaults.bots)),
+			),
+			googleSiteVerification: toStandardJsonSchema(
+				v.optional(
+					publicFields.googleSiteVerification.wrapped,
+					publicDefaults.googleSiteVerification,
+				),
+			),
+			matomoBaseUrl: toStandardJsonSchema(
+				v.optional(publicFields.matomoBaseUrl.wrapped, publicDefaults.matomoBaseUrl),
+			),
+			matomoId: toStandardJsonSchema(
+				v.optional(publicFields.matomoId.wrapped, publicDefaults.matomoId),
+			),
 		},
 	},
 
