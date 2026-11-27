@@ -130,14 +130,11 @@ function hasUserMapping(query: CorpusQuery) {
 		<p v-else-if="mappingsStatus === 'pending'" class="text-sm text-muted-foreground" role="status">
 			{{ t("MetadataMappingEditor.loading") }}
 		</p>
-		<div v-else-if="mappingsStatus === 'error'" class="flex items-center gap-2">
-			<p class="text-sm text-destructive" role="status">
-				{{ t("MetadataMappingEditor.loadFailed") }}
-			</p>
-			<Button size="sm" type="button" variant="outline" @click="refreshMappings()">
-				{{ t("MetadataMappingEditor.retry") }}
-			</Button>
-		</div>
+		<FetchErrorAlert
+			v-else-if="mappingsStatus === 'error'"
+			:message="t('MetadataMappingEditor.loadFailed')"
+			:retry="refreshMappings"
+		/>
 
 		<template v-else-if="mappingsStatus === 'success'">
 			<div
